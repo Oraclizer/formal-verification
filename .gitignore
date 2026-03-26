@@ -1,0 +1,18 @@
+# Isabelle build output
+output/
+.isabelle/
+*~
+
+# Generated session files (rebuild from source)
+Cross_Domain_State_Preservation/output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

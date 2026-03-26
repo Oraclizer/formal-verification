@@ -1,0 +1,106 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{isabelle,isabellesym}
+\usepackage{amsmath,amssymb}
+\usepackage{pdfsetup}
+
+\urlstyle{rm}
+\isabellestyle{it}
+
+\begin{document}
+
+\title{Cross-Domain State Preservation Functor}
+\author{Jinwook Kim (Jay)}
+\maketitle
+
+\begin{abstract}
+We present a generic, reusable framework for verifying that state transitions
+are faithfully preserved when synchronized across heterogeneous domains
+(blockchains, off-chain ledgers, etc.).
+
+The core abstraction is a hierarchy of Isabelle/HOL locales:
+\texttt{state\_machine} defines finite-state deterministic transition systems
+with terminal states;
+\texttt{state\_preservation} captures the naturality (homomorphism) condition
+ensuring that a synchronization map commutes with transitions;
+\texttt{symmetric\_state\_preservation} extends this to bidirectional
+synchronization with inverse roundtrip guarantees; and
+\texttt{multi\_domain\_preservation} generalizes to $N$ domains sharing the
+same abstract state machine, with a cross-domain consistency theorem.
+
+We instantiate this framework with a concrete regulatory state model
+comprising five states (\textsc{Active}, \textsc{Frozen}, \textsc{Seized},
+\textsc{Confiscated}, \textsc{Restricted}) and seven actions, motivated by
+the requirements of tokenized asset regulation across multiple blockchain
+networks.  The instantiation proves that a synchronization protocol with
+preemptive locking preserves cross-chain regulatory consistency (the
+\emph{regulatory homomorphism} theorem), that the global validity invariant
+is maintained across synchronization events (\emph{valid state preservation}),
+and that the generic multi-domain locale applies parametrically to the
+regulatory model.
+
+The design is inspired by Lochbihler's Merkle Functor (AFP entry
+\texttt{ADS\_Functor}), which abstracted authenticated data structures into
+composable building blocks.  This entry extends that pattern to a different
+axis of abstraction: cross-domain state preservation targeting
+synchronization correctness rather than data structure integrity.
+\end{abstract}
+
+\tableofcontents
+
+\section{Overview}
+
+This AFP entry consists of two theory files:
+
+\begin{description}
+\item[\texttt{State\_Preservation.thy}] defines domain-independent locales
+  for state machines, pairwise state preservation (with naturality),
+  symmetric bidirectional preservation, and multi-domain preservation.
+  All locales are parameterized over abstract types and can be instantiated
+  with any domain that has finite states, deterministic transitions, and
+  optional terminal states.
+
+\item[\texttt{Regulatory\_Instance.thy}] instantiates the generic framework
+  with a concrete regulatory state model.  It defines the five regulatory
+  states and seven regulatory actions, proves fundamental properties
+  (terminal absorption, universal reachability of confiscation, transition
+  exclusions with legal justification), models a synchronization protocol
+  with preemptive locking, and proves the main theorems:
+  \emph{regulatory homomorphism} (cross-chain consistency after sync),
+  \emph{valid state preservation} (sync maintains the global validity
+  invariant), and \emph{multi-domain parametric instantiation}.
+\end{description}
+
+\subsection{Design Decisions}
+
+The regulatory state model incorporates several deliberate design decisions
+based on legal precedence and operational considerations:
+
+\begin{itemize}
+\item \textsc{Recover} and \textsc{Liquidate} are excluded from the state
+  machine as they involve force transfers or external DEX interactions
+  rather than state transitions.
+\item The direct transition \textsc{Seized} $\to$ \textsc{Frozen} is
+  excluded because seizure is a strictly stronger legal constraint than
+  freezing; relaxation requires explicit release first.
+\item The direct transition \textsc{Frozen} $\to$ \textsc{Restricted} is
+  excluded to enforce passage through \textsc{Active}.
+\item Preemptive locking prevents concurrent regulatory actions on the
+  same asset, \emph{not} double-spending (which is handled at a different
+  layer).
+\end{itemize}
+
+% include generated text of all theories
+\input{session}
+
+\section{Acknowledgments}
+
+The regulatory state model (five states, seven actions, and the
+transition exclusions) is motivated by the Regulatory Compliance
+Protocol (RCP), a framework developed by the Oraclizer research team
+that systematically classifies requirements from 15 global financial
+regulatory authorities for tokenized capital markets.  RCP is currently
+proposed as an Informational Ethereum Improvement Proposal (EIP) in
+Draft status.
+
+\end{document}

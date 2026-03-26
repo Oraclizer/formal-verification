@@ -1,0 +1,11 @@
+chapter AFP
+
+session Cross_Domain_State_Preservation (AFP) = HOL +
+  options [timeout = 600]
+  sessions
+    HOL
+  theories
+    State_Preservation
+    Regulatory_Instance
+  document_files
+    "root.tex"
