@@ -7,8 +7,9 @@
   Regulatory Domain Instance of the Cross-Domain State Preservation Functor
 
   This theory instantiates the generic state_machine and multi_domain_preservation
-  locales from State_Preservation.thy with a concrete regulatory state model
-  for tokenized asset compliance.
+  locales from State_Preservation.thy with the regulatory state model of
+  Oraclizer, a state synchronization oracle for tokenized assets across
+  blockchain networks and off-chain ledgers.
 
   Regulatory states: ACTIVE, FROZEN, SEIZED, CONFISCATED, RESTRICTED
   Regulatory actions: FREEZE, SEIZE, CONFISCATE, RESTRICT, UNFREEZE, UNRESTRICT, RELEASE
