@@ -28,11 +28,12 @@ synchronization with inverse roundtrip guarantees; and
 \texttt{multi\_domain\_preservation} generalizes to $N$ domains sharing the
 same abstract state machine, with a cross-domain consistency theorem.
 
-We instantiate this framework with a concrete regulatory state model
-comprising five states (\textsc{Active}, \textsc{Frozen}, \textsc{Seized},
-\textsc{Confiscated}, \textsc{Restricted}) and seven actions, motivated by
-the requirements of tokenized asset regulation across multiple blockchain
-networks.  The instantiation proves that a synchronization protocol with
+As a practical application, we instantiate this framework with the
+regulatory state model of Oraclizer, a state synchronization oracle for
+tokenized assets across blockchain networks and off-chain ledgers.
+The model comprises five states (\textsc{Active}, \textsc{Frozen},
+\textsc{Seized}, \textsc{Confiscated}, \textsc{Restricted}) and seven
+actions.  The instantiation proves that a synchronization protocol with
 preemptive locking preserves cross-chain regulatory consistency (the
 \emph{regulatory homomorphism} theorem), that the global validity invariant
 is maintained across synchronization events (\emph{valid state preservation}),
