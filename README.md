@@ -112,8 +112,8 @@ This work is submitted to the [Archive of Formal Proofs](https://www.isa-afp.org
 
 ## Related Work
 
+- Kim, J., Hong, J. (2026). *A Regulatory Compliance Protocol for Asset Interoperability Between Traditional and Decentralized Finance in Tokenized Capital Markets.* arXiv:2603.29278 [cs.CY]. [https://arxiv.org/abs/2603.29278](https://arxiv.org/abs/2603.29278)
 - Lochbihler, A. (2020). *Formalization of Authenticated Data Structures as Functors in Isabelle/HOL.* FMBC 2020. [AFP Entry: ADS_Functor](https://www.isa-afp.org/entries/ADS_Functor.html)
-- Regulatory Compliance Protocol (RCP) — Informational EIP in Draft status, systematically classifying requirements from 15 global financial regulatory authorities for tokenized capital markets.
 
 ## Related Resources
 
