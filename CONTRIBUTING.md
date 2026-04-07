@@ -4,11 +4,11 @@ Thank you for your interest in contributing to the Oraclizer formal verification
 
 ## Scope
 
-This repository contains Isabelle/HOL theories that formally verify properties of cross-domain state synchronization. Contributions may include:
+This repository contains Isabelle/HOL theories that formally verify safety and liveness properties of cross-domain state synchronization in Byzantine environments. Contributions may include:
 
 - Bug reports (counterexamples, incorrect assumptions)
 - Proof improvements (simplification, generalization)
-- New instantiations of the generic `State_Preservation` locales
+- New instantiations of the generic locales in `State_Preservation.thy` or `Priority_Resolution.thy`
 - Documentation improvements
 
 ## Requirements
@@ -33,8 +33,9 @@ All proofs must pass before submitting a pull request.
 
 - **Theory headers:** Include Title, Author, Maintainer, License fields in the header comment
 - **Locale naming:** Use descriptive `snake_case` names
-- **Lemma naming:** `[subject]_[property]` pattern (e.g., `confiscated_terminal`, `sync_isolation`)
+- **Lemma naming:** `[subject]_[property]` pattern (e.g., `confiscated_terminal`, `sync_isolation`, `lock_eventually_expires`)
 - **Comments:** Use `text \<open>...\<close>` blocks for documentation, `\<comment> \<open>...\<close>` for inline remarks
+- **LaTeX safety in comments:** When referring to identifiers containing underscores inside `text` blocks, wrap them with `\<^verbatim>\<open>...\<close>` or `\<^term>\<open>...\<close>` to prevent LaTeX rendering errors
 - **Proof style:** Prefer structured Isar proofs over `apply` scripts for non-trivial results
 - **Design decisions:** Document legal or domain-specific justifications in `text` blocks
 

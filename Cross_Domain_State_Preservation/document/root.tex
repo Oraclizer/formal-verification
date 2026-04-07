@@ -16,9 +16,11 @@
 \begin{abstract}
 We present a generic, reusable framework for verifying that state transitions
 are faithfully preserved when synchronized across heterogeneous domains
-(blockchains, off-chain ledgers, etc.).
+(blockchains, off-chain ledgers, etc.), and that the synchronization process
+remains live in the presence of Byzantine faults.
 
-The core abstraction is a hierarchy of Isabelle/HOL locales:
+The framework combines two complementary properties.  For \emph{safety},
+the core abstraction is a hierarchy of Isabelle/HOL locales:
 \texttt{state\_machine} defines finite-state deterministic transition systems
 with terminal states;
 \texttt{state\_preservation} captures the naturality (homomorphism) condition
@@ -27,31 +29,49 @@ ensuring that a synchronization map commutes with transitions;
 synchronization with inverse roundtrip guarantees; and
 \texttt{multi\_domain\_preservation} generalizes to $N$ domains sharing the
 same abstract state machine, with a cross-domain consistency theorem.
+For \emph{liveness} under Byzantine faults, three additional locales are
+introduced:
+\texttt{priority\_system} guarantees deterministic resolution of conflicting
+requests via a total order on priority keys;
+\texttt{deadlock\_free\_locking} guarantees that timeout-based forced release
+prevents indefinite locking; and
+\texttt{fair\_leader\_system} guarantees starvation freedom under fair leader
+scheduling, formulated as an assume-guarantee abstraction of probabilistic
+VRF-based leader election.
 
 As a practical application, we instantiate this framework with the
 regulatory state model of Oraclizer, a state synchronization oracle for
 tokenized assets across blockchain networks and off-chain ledgers.
 The model comprises five states (\textsc{Active}, \textsc{Frozen},
 \textsc{Seized}, \textsc{Confiscated}, \textsc{Restricted}) and seven
-actions.  The instantiation proves that a synchronization protocol with
-preemptive locking preserves cross-chain regulatory consistency (the
+actions.  The safety instantiation proves that a synchronization protocol
+with preemptive locking preserves cross-chain regulatory consistency (the
 \emph{regulatory homomorphism} theorem), that the global validity invariant
 is maintained across synchronization events (\emph{valid state preservation}),
 and that the generic multi-domain locale applies parametrically to the
-regulatory model.
+regulatory model.  The liveness instantiation models a Byzantine consensus
+system with $f < n/3$ malicious nodes, instantiates the three liveness
+locales with regulatory authority levels and a four-component priority key,
+and combines safety and liveness in a single
+\emph{combined safety liveness} theorem that discharges the honest-node
+assumption of the safety proof under Byzantine faults.
 
 The design is inspired by Lochbihler's Merkle Functor (AFP entry
 \texttt{ADS\_Functor}), which abstracted authenticated data structures into
 composable building blocks.  This entry extends that pattern to a different
 axis of abstraction: cross-domain state preservation targeting
-synchronization correctness rather than data structure integrity.
+synchronization correctness rather than data structure integrity, together
+with the liveness guarantees needed for that synchronization to actually
+make progress under Byzantine faults.
 \end{abstract}
 
 \tableofcontents
 
 \section{Overview}
 
-This AFP entry consists of two theory files:
+This AFP entry consists of four theory files organized as two
+``generic locale + regulatory instance'' pairs, one for safety and one
+for liveness:
 
 \begin{description}
 \item[\texttt{State\_Preservation.thy}] defines domain-independent locales
@@ -61,16 +81,52 @@ This AFP entry consists of two theory files:
   with any domain that has finite states, deterministic transitions, and
   optional terminal states.
 
-\item[\texttt{Regulatory\_Instance.thy}] instantiates the generic framework
-  with a concrete regulatory state model.  It defines the five regulatory
-  states and seven regulatory actions, proves fundamental properties
-  (terminal absorption, universal reachability of confiscation, transition
-  exclusions with legal justification), models a synchronization protocol
-  with preemptive locking, and proves the main theorems:
+\item[\texttt{Regulatory\_Instance.thy}] instantiates the generic safety
+  framework with a concrete regulatory state model.  It defines the five
+  regulatory states and seven regulatory actions, proves fundamental
+  properties (terminal absorption, universal reachability of confiscation,
+  transition exclusions with legal justification), models a synchronization
+  protocol with preemptive locking, and proves the main safety theorems:
   \emph{regulatory homomorphism} (cross-chain consistency after sync),
   \emph{valid state preservation} (sync maintains the global validity
   invariant), and \emph{multi-domain parametric instantiation}.
+
+\item[\texttt{Priority\_Resolution.thy}] defines domain-independent locales
+  for liveness properties under Byzantine faults: \texttt{priority\_system}
+  for deterministic selection from a finite message set with injective
+  priorities, \texttt{deadlock\_free\_locking} for timeout-based forced
+  release of locks, and \texttt{fair\_leader\_system} for starvation freedom
+  under periodic honest leader scheduling.  The locales are parameterized
+  over abstract types and impose no dependency on the regulatory domain;
+  they are reusable for any distributed system requiring deterministic
+  conflict resolution, deadlock freedom, or fair scheduling.
+
+\item[\texttt{DQuencer\_Instance.thy}] instantiates the generic liveness
+  framework with the regulatory domain.  It defines authority levels
+  (\textsc{Regional}, \textsc{National}, \textsc{International}), a
+  four-component priority key with proven injectivity, a Byzantine fault
+  model with the BFT threshold $n \geq 3f + 1$, and instantiates each of
+  the three liveness locales for the regulatory consensus system.  It
+  proves the main liveness theorems
+  (\emph{select highest deterministic}, \emph{deadlock freedom},
+  \emph{eventual completion}) and concludes with the
+  \emph{combined safety liveness} theorem that links the liveness results
+  back to the synchronization function defined in
+  \texttt{Regulatory\_Instance.thy}, discharging the honest-node assumption
+  of the safety proof under Byzantine faults.
 \end{description}
+
+\subsection{Theory Dependency Structure}
+
+The four theories form two independent generic-instance pairs that meet
+at \texttt{DQuencer\_Instance.thy}:
+\texttt{State\_Preservation.thy} is imported by \texttt{Regulatory\_Instance.thy};
+\texttt{Priority\_Resolution.thy} depends only on \texttt{Main} and is
+deliberately kept independent of the regulatory domain to preserve
+reusability; \texttt{DQuencer\_Instance.thy} imports both
+\texttt{Priority\_Resolution.thy} and \texttt{Regulatory\_Instance.thy},
+serving as the join point where the liveness framework is applied to the
+regulatory model and combined with the safety results.
 
 \subsection{Design Decisions}
 
@@ -91,6 +147,17 @@ based on legal precedence and operational considerations:
   layer).
 \end{itemize}
 
+The liveness model adopts an assume-guarantee approach for starvation
+freedom: rather than directly modeling the probabilistic guarantees of
+VRF-based leader election (which would require extensive probability
+theory infrastructure), the \texttt{fair\_leader\_system} locale assumes
+that within any \texttt{fairness\_bound} consecutive epochs, at least one
+epoch has an honest leader.  Under $f < n/3$ Byzantine faults, the
+probability that a Byzantine leader is elected $k$ consecutive times is
+$(f/n)^k$, which decreases exponentially.  The fairness bound captures
+this as a deterministic upper bound, following standard assume-guarantee
+reasoning practice.
+
 % include generated text of all theories
 \input{session}
 
@@ -103,5 +170,21 @@ that systematically classifies requirements from 15 global financial
 regulatory authorities for tokenized capital markets.  RCP is currently
 proposed as an Informational Ethereum Improvement Proposal (EIP) in
 Draft status.
+
+A companion paper presenting these proofs together with the surrounding
+context is available as
+\texttt{arXiv:2604.03844}~\cite{kim2026cdsp}, which discusses the
+mechanized proofs, the safety-liveness combination structure, the
+relation to Lochbihler's Merkle Functor pattern, and the application
+context in the regulatory state synchronization domain.
+
+\begin{thebibliography}{1}
+\bibitem{kim2026cdsp}
+J.~Kim (for the Oraclizer Core Team),
+``Safety and Liveness of Cross-Domain State Preservation under Byzantine
+Faults: A Mechanized Proof in Isabelle/HOL,''
+arXiv:2604.03844 [cs.CR], 2026.
+\url{https://arxiv.org/abs/2604.03844}.
+\end{thebibliography}
 
 \end{document}
