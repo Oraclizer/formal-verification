@@ -164,7 +164,7 @@ Property 2 is complete and will be submitted as an entry update after Property 1
 
 ## Related Resources
 
-- [Oraclizer Research — Proofs](https://research.oraclizer.io/category/proofs/) — Research blog covering the formal verification journey
+- [Oraclizer Research: Proofs](https://research.oraclizer.io/category/proofs/) — Research publications on formal verification
 - [Oraclizer Documentation](https://docs.oraclizer.io/) — Technical documentation
 
 ## License
