@@ -202,7 +202,7 @@ This abstraction is a separation of concerns: the Isabelle/HOL proof establishes
 
 ## Assumption Release Roadmap
 
-This section maps each model assumption to the future property (if any) that releases it, based on the Oraclizer FV Plan v9.2.
+This section maps each model assumption to the future property (if any) that releases it.
 
 | Current Assumption | Released By | Residual After Release | Final Resolution |
 |---|---|---|---|
@@ -280,5 +280,5 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
-| 0.3.0 | 2026-04-17 | Following FV Plan v9.2 specification correctness self-review. Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added "Assumption Release Roadmap" section making the verification program's trajectory transparent. Added "Verification Scope for Creusot and Kani" section. Updated Implementation Target column: OSS and D-quencer language changed from Go to Rust (reflecting Oraclizer Core Rust transition in Development Roadmap V4 and Full Development Spec v3.3). Added candidate annotations for Phase 2 Creusot and Phase 3 Kani work. |
+| 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added "Assumption Release Roadmap" section making the verification program's trajectory transparent. Added "Verification Scope for Creusot and Kani" section. Updated Implementation Target column: OSS and D-quencer language changed from Go to Rust (reflecting Oraclizer Core Rust transition). Added candidate annotations for Phase 2 Creusot and Phase 3 Kani work. |
 | 0.2.0 | 2026-04-07 | Initial mapping for Properties 1 and 2. |
