@@ -6,6 +6,7 @@ Formal verification artifacts for the [Oraclizer](https://oraclizer.io) oracle s
 [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-green.svg)](https://isabelle.in.tum.de/)
 [![AFP Submission](https://img.shields.io/badge/AFP-submitted-orange.svg)](https://www.isa-afp.org/submission/?id=2026-03-25_06-34-01_784)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.03844-b31b1b.svg)](https://arxiv.org/abs/2604.03844)
+[![SSRN](https://img.shields.io/badge/SSRN-6550359-006837.svg)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6550359)
 
 ## Overview
 
