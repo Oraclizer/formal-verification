@@ -54,7 +54,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 
 ### Property 2: D-quencer Determinism, Deadlock Freedom, Starvation Freedom ✅
 
-**Status:** Complete (2026-04-02). No `sorry` or `oops`. Ready for AFP entry update after Property 1 acceptance.
+**Status:** Complete (2026-04-02). No `sorry` or `oops`. Consolidated with Property 1 in the current entry revision, now under editor review.
 
 **What is proven:**
 
@@ -82,7 +82,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 
 ### Property 3: Heterogeneous Verification Composition
 
-**Status:** Not started. Planned after Property 1 AFP acceptance.
+**Status:** Not started. Planned as a future revision of the entry, after the current revision (safety and liveness) is accepted.
 
 Property 3 will compose the Cross-Domain State Preservation framework with Lochbihler's Merkle Functor (AFP entry `ADS_Functor`) to establish end-to-end assurance from Canton off-chain ledgers through OSS synchronization to on-chain EVM state.
 
@@ -161,7 +161,7 @@ This work is submitted to the [Archive of Formal Proofs](https://www.isa-afp.org
 - **Status:** Under editor review
 - **Submission URL:** [AFP Submission](https://www.isa-afp.org/submission/?id=2026-03-25_06-34-01_784)
 
-Property 2 is complete and will be submitted as an entry update after Property 1 acceptance.
+Property 1 (safety) and Property 2 (liveness) are consolidated in the current entry revision, now under editor review.
 
 ## Related Work
 
