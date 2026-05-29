@@ -6,39 +6,66 @@
 
   D-quencer Regulatory Instance of the Priority Resolution Locales
 
-  This theory instantiates the generic priority_system, deadlock_free_locking,
-  and fair_leader_system locales from Priority_Resolution.thy with the
-  D-quencer consensus mechanism of Oraclizer.
+  This theory instantiates the generic locales priority_system,
+  deadlock_free_locking, and fair_leader_system from Priority_Resolution.thy
+  with the D-quencer consensus mechanism of Oraclizer.
 
   D-quencer is a decentralized sequencing engine for regulatory state
   synchronization. It operates under Byzantine fault tolerance (f < n/3),
   uses BLS multisig + VRF leader election, and must handle conflicting
   regulatory actions from multiple jurisdictions.
 
+  Locale instantiations provided in this theory:
+    1. priority_system (dq_priority): instantiated on the
+       \<^verbatim>\<open>priority_key\<close> type (the lexicographic four-tuple
+       authority_rank, inverted timestamp, action_severity, inverted
+       source node id) with the identity function as the priority
+       projection. Injectivity then holds by reflexivity on the
+       carrier. The connection back to D-quencer messages is established inside a
+       sublocale \<^verbatim>\<open>dquencer_priority_concrete\<close>, which fixes a
+       well-formed message set with distinct priority keys and provides
+       a definition \<^verbatim>\<open>recover_msg\<close> mapping each priority key in the
+       induced priority-key set back to its unique message via the
+       priority-key distinctness assumption and the
+       \<^verbatim>\<open>priority_key_injectivity\<close> lemma.
+    2. deadlock_free_locking (dq_locking): instantiated with the system's
+       lock_timeout, providing timeout-based forced lock release.
+    3. fair_leader_system (dq_fair): instantiated within a sublocale
+       dquencer_liveness extending dquencer_system with a leader schedule
+       and pending-count function satisfying the locale assumptions.
+
   Key results:
     1. Priority instantiation: regulatory action priority is a total order
-       based on authority level, timestamp, severity, and node ID
-    2. Determinism: BFT consensus produces a unique, deterministic result
+       based on authority level, timestamp, severity, and node ID.
+    2. Determinism: BFT consensus produces a unique, deterministic result.
     3. Deadlock freedom: timeout-based lock release prevents Byzantine
-       nodes from permanently blocking assets
-    4. Starvation freedom: under fair leader assumption, every pending
-       regulatory request is processed within bounded time
+       nodes from permanently blocking assets.
+    4. Starvation freedom: under the fair leader assumption, every pending
+       regulatory request is processed within bounded time.
     5. Combined safety + liveness: connecting Property 1 (cross-domain
-       state preservation) with Property 2 (determinism + liveness)
+       state preservation) with Property 2 (determinism + liveness).
 
   Design decisions:
-    - Byzantine model: f < n/3 (standard BFT threshold)
+    - Byzantine model: f < n/3 (standard BFT threshold).
     - Starvation freedom uses assume-guarantee reasoning: the fairness
-      assumption (honest leader within k epochs) abstracts VRF randomness
+      assumption (honest leader within k epochs) abstracts VRF randomness.
     - Priority uses nat tuples for automatic linorder from Isabelle's
-      product order, avoiding manual linorder instance registration
-    - Message type extends oss_message via record inheritance
+      product order, avoiding manual linorder instance registration.
+    - Message type extends oss_message via record inheritance.
     - BFT consensus is abstracted (no BLS signature formalization):
-      only the determinism property of consensus output is modeled
+      only the determinism property of consensus output is modeled.
+    - The priority_system instantiation is performed on the
+      \<^verbatim>\<open>priority_key\<close> type as carrier with the identity priority
+      projection, so the locale's unconditional injectivity assumption
+      reduces to reflexivity. The corresponding D-quencer message is
+      recovered via the definition \<^verbatim>\<open>recover_msg\<close> inside the
+      \<^verbatim>\<open>dquencer_priority_concrete\<close> sublocale, which relies on the
+      priority-key distinctness hypothesis (\<^verbatim>\<open>msg_set_priority_distinct\<close>)
+      and the existing \<^verbatim>\<open>priority_key_injectivity\<close> lemma.
 *)
 
 theory DQuencer_Instance
-  imports Priority_Resolution Regulatory_Instance
+  imports Priority_Resolution Regulatory_Instance "HOL-Library.Product_Lexorder"
 begin
 
 section \<open>Authority Level and Action Severity\<close>
@@ -252,6 +279,144 @@ proof -
     by linarith
   from al ts act nd show ?thesis by auto
 qed
+
+
+text \<open>
+  Auxiliary corollary: under the well-formedness bounds, equal priority
+  keys imply equal messages on every priority-relevant field.
+
+  The generic \<^verbatim>\<open>priority_system\<close> locale assumes priority injectivity
+  unconditionally on its carrier type. We instantiate it with the
+  identity function on \<^verbatim>\<open>priority_key\<close> as the carrier; injectivity
+  holds by reflexivity on the carrier. The recovery of the unique
+  D-quencer message corresponding to a chosen priority key is provided
+  as a corollary inside the \<^verbatim>\<open>dquencer_priority_concrete\<close> locale,
+  using the well-formedness bounds and the additional priority-key
+  distinctness assumption.
+\<close>
+
+interpretation dq_priority:
+  priority_system "id :: priority_key \<Rightarrow> priority_key"
+  by unfold_locales auto
+
+text \<open>
+  The \<^verbatim>\<open>dquencer_priority_context\<close> locale extends \<^verbatim>\<open>dquencer_system\<close> with a
+  fixed message set whose elements satisfy the well-formedness bounds.
+  Together with the bound-preservation, this set induces the priority key
+  set \<^verbatim>\<open>msg_priority_keys\<close> on which priority-based selection operates.
+\<close>
+
+locale dquencer_priority_context = dquencer_system +
+  fixes msg_set :: "dq_message set"
+  assumes msg_set_nonempty: "msg_set \<noteq> {}"
+    and msg_set_well_formed:
+      "\<And>m. m \<in> msg_set \<Longrightarrow> msg_timestamp m \<le> max_time
+                            \<and> dqm_source_node m \<le> max_node"
+begin
+
+definition msg_priority_keys :: "priority_key set" where
+  "msg_priority_keys = make_priority_key max_time max_node ` msg_set"
+
+lemma msg_priority_keys_nonempty: "msg_priority_keys \<noteq> {}"
+  using msg_set_nonempty unfolding msg_priority_keys_def by simp
+
+lemma msg_priority_keys_finite:
+  "finite msg_set \<Longrightarrow> finite msg_priority_keys"
+  unfolding msg_priority_keys_def by simp
+
+end
+
+text \<open>
+  The \<^verbatim>\<open>dquencer_priority_concrete\<close> locale strengthens the context with
+  the priority-key distinctness assumption on \<^verbatim>\<open>msg_set\<close>. This is the
+  natural BFT-consensus precondition: distinct authority / timestamp /
+  severity / source-node tuples ensure determinism. Under this assumption
+  the priority key uniquely identifies a message in \<^verbatim>\<open>msg_set\<close>, so
+  selecting the highest priority key in \<^verbatim>\<open>msg_priority_keys\<close> is equivalent
+  to selecting the highest-priority message in \<^verbatim>\<open>msg_set\<close>.
+\<close>
+
+locale dquencer_priority_concrete = dquencer_priority_context +
+  assumes msg_set_priority_distinct:
+    "\<And>m1 m2. m1 \<in> msg_set \<Longrightarrow> m2 \<in> msg_set
+              \<Longrightarrow> make_priority_key max_time max_node m1
+                = make_priority_key max_time max_node m2
+              \<Longrightarrow> m1 = m2"
+begin
+
+text \<open>
+  Recovery: given a priority key from \<^verbatim>\<open>msg_priority_keys\<close>, return the
+  unique \<^verbatim>\<open>msg_set\<close> message with that key.
+\<close>
+
+definition recover_msg :: "priority_key \<Rightarrow> dq_message" where
+  "recover_msg k = (THE m. m \<in> msg_set \<and> make_priority_key max_time max_node m = k)"
+
+lemma recover_msg_unique_existence:
+  assumes "k \<in> msg_priority_keys"
+  shows "\<exists>!m. m \<in> msg_set \<and> make_priority_key max_time max_node m = k"
+proof -
+  from assms obtain m
+    where m_in: "m \<in> msg_set"
+      and m_key: "make_priority_key max_time max_node m = k"
+    unfolding msg_priority_keys_def by auto
+  show ?thesis
+  proof (rule ex1I[of _ m])
+    show "m \<in> msg_set \<and> make_priority_key max_time max_node m = k"
+      using m_in m_key by auto
+  next
+    fix m'
+    assume "m' \<in> msg_set \<and> make_priority_key max_time max_node m' = k"
+    then have m'_in: "m' \<in> msg_set"
+      and m'_key: "make_priority_key max_time max_node m' = k"
+      by auto
+    from m_key m'_key
+    have "make_priority_key max_time max_node m'
+        = make_priority_key max_time max_node m"
+      by simp
+    then show "m' = m"
+      using msg_set_priority_distinct[OF m'_in m_in] by simp
+  qed
+qed
+
+lemma recover_msg_correct:
+  assumes "k \<in> msg_priority_keys"
+  shows "recover_msg k \<in> msg_set
+       \<and> make_priority_key max_time max_node (recover_msg k) = k"
+proof -
+  from recover_msg_unique_existence[OF assms]
+  have ex1: "\<exists>!m. m \<in> msg_set \<and> make_priority_key max_time max_node m = k" .
+  show ?thesis
+    using theI'[OF ex1] unfolding recover_msg_def .
+qed
+
+text \<open>
+  Concrete consequence: deterministic selection of the highest-priority
+  key from a non-empty finite \<^verbatim>\<open>msg_priority_keys\<close> set, and recovery of
+  the unique well-formed D-quencer message that produced it.
+\<close>
+
+corollary dq_select_highest_deterministic:
+  assumes "finite msg_set"
+  shows "\<exists>!k. dq_priority.select_highest msg_priority_keys = Some k"
+  using dq_priority.select_highest_deterministic
+        [OF msg_priority_keys_finite[OF assms] msg_priority_keys_nonempty] .
+
+corollary dq_select_highest_in_set:
+  assumes "finite msg_set"
+    and "dq_priority.select_highest msg_priority_keys = Some k"
+  shows "k \<in> msg_priority_keys"
+  using dq_priority.select_highest_in_set
+        [OF msg_priority_keys_finite[OF assms(1)] assms(2)] .
+
+corollary dq_select_highest_message:
+  assumes "finite msg_set"
+    and "dq_priority.select_highest msg_priority_keys = Some k"
+  shows "recover_msg k \<in> msg_set
+       \<and> make_priority_key max_time max_node (recover_msg k) = k"
+  using recover_msg_correct[OF dq_select_highest_in_set[OF assms]] .
+
+end
 
 
 section \<open>BFT Consensus Abstraction\<close>
@@ -470,7 +635,12 @@ text \<open>
 
   \<^enum> \<^bold>\<open>Determinism\<close> (Property 2): Conflicting regulatory actions
     are resolved by a total order on priority keys. The BFT
-    consensus output is unique.
+    consensus output is unique. The \<^verbatim>\<open>priority_system\<close> locale is
+    instantiated on the \<^verbatim>\<open>priority_key\<close> type as carrier (with the
+    corresponding messages recovered inside
+    \<^verbatim>\<open>dquencer_priority_concrete\<close> via \<^verbatim>\<open>recover_msg\<close>), yielding
+    deterministic selection from any finite non-empty set of valid
+    candidate messages.
 
   \<^enum> \<^bold>\<open>Deadlock freedom\<close> (Property 2): No asset can be permanently
     locked, even if Byzantine nodes refuse to release locks.
@@ -480,11 +650,11 @@ text \<open>
     assumption, every pending regulatory request is processed
     within a bounded number of epochs.
 
-  What remains:
-    - Property 3: compositional assurance across heterogeneous
-      verification regimes (Canton + OSS + EVM)
-    - Refinement: formal correspondence between these models
-      and the Go/Solidity implementation
+  Open work for subsequent entries:
+    - Compositional assurance across heterogeneous verification regimes
+      (Canton + OSS + EVM).
+    - Refinement: formal correspondence between these models and the
+      Rust / Solidity implementation.
 \<close>
 
 end

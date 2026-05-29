@@ -6,38 +6,60 @@
 
   Regulatory Domain Instance of the Cross-Domain State Preservation Functor
 
-  This theory instantiates the generic state_machine and multi_domain_preservation
-  locales from State_Preservation.thy with the regulatory state model of
-  Oraclizer, a state synchronization oracle for tokenized assets across
-  blockchain networks and off-chain ledgers.
+  This theory instantiates the generic locales from State_Preservation.thy
+  with the regulatory state model of Oraclizer, a state synchronization
+  oracle for tokenized assets across blockchain networks and off-chain
+  ledgers.
 
   Regulatory states: ACTIVE, FROZEN, SEIZED, CONFISCATED, RESTRICTED
   Regulatory actions: FREEZE, SEIZE, CONFISCATE, RESTRICT, UNFREEZE, UNRESTRICT, RELEASE
 
+  Locale instantiations provided in this theory:
+    1. state_machine (reg_sm): the regulatory transition system satisfies
+       the generic state_machine locale.
+    2. state_preservation (escalation_preservation): a heterogeneous-action
+       instance modelling the case where two chains share a regulatory
+       state representation but have asymmetric on-chain action vocabularies.
+       The source chain supports the full seven-action set, while the target
+       chain only supports the four escalation actions (FREEZE, SEIZE,
+       CONFISCATE, RESTRICT). De-escalation actions are out of scope on the
+       target side (handled exclusively by separate judicial procedures in
+       that jurisdiction). This instance exercises the locale's actions_s
+       parameter as a strict subset of the source action type, together with
+       the heterogeneous source/target action types ('a vs 'b) of the
+       locale signature.
+    3. symmetric_state_preservation (onchain_daml_bridge): a layer-crossing
+       instance modelling the bidirectional binding between an on-chain
+       enum representation (reg_state, five values) and an off-chain DAML
+       structured permission record (daml_perm, status_tag plus auxiliary
+       fields seized_by and restriction_scope). The action vocabularies on
+       the two layers coincide, so action_map = id; the non-trivial content
+       lives in the layer-crossing state mapping. A type-level invariant
+       (valid_daml_perm) carves out the bijection domain.
+    4. multi_domain_preservation (reg_multi_domain_instantiation): the
+       generic multi-domain locale applies parametrically to the regulatory
+       model for any finite set of chain identifiers and any global state
+       satisfying valid_state.
+
   Key results:
-    1. State machine interpretation: reg_transition satisfies state_machine locale
-    2. Invariants:
-       - I1: CONFISCATED is terminal (absorbing)
-       - I2: CONFISCATE is reachable from every non-terminal state
-       - I3: Determinism (inherent from function definition)
-    3. Transition exclusions with legal justification:
-       - SEIZED → FROZEN (SEIZED is a strictly stronger constraint)
-       - FROZEN → RESTRICTED (must return to ACTIVE first)
-    4. Synchronization correctness:
-       - regulatory_homomorphism: after sync, all connected chains agree
-       - Sync isolation: synchronization does not affect other assets
-       - Preemptive locking: prevents concurrent regulatory action conflicts
-    5. Valid state preservation: sync preserves the global validity invariant
-       (consistent_state ∧ no_locked_without_reason)
-    6. Multi-domain parametric instantiation: the generic
-       multi_domain_preservation locale applies to the regulatory model
-       for any finite domain set
+    - Invariants: I1 (CONFISCATED terminal), I2 (CONFISCATE universally
+      reachable), I3 (determinism inherent from fun definition).
+    - Transition exclusions with legal justification:
+        SEIZED → FROZEN (SEIZED is a strictly stronger constraint).
+        FROZEN → RESTRICTED (must return to ACTIVE first).
+    - Synchronization correctness: regulatory_homomorphism (after sync, all
+      connected chains agree); sync_isolation (other assets unaffected);
+      preemptive locking prevents concurrent regulatory action conflicts.
+    - valid_state_preservation: sync preserves the global validity invariant
+      (consistent_state and no_locked_without_reason).
 
   Design decisions (justified by legal precedence and operational scope):
-    - RECOVER and LIQUIDATE excluded (force transfer / external DEX, not state transitions)
-    - SEIZED → FROZEN excluded (legally, SEIZED is a stronger constraint)
-    - FROZEN → RESTRICTED excluded (must go through ACTIVE)
-    - Locking scope: concurrent regulatory action prevention, NOT double-spend prevention
+    - RECOVER and LIQUIDATE excluded from reg_action (force transfer / external
+      DEX semantics, not state transitions; modelled at a different layer).
+    - SEIZED → FROZEN excluded (legally, SEIZED is a stronger constraint).
+    - FROZEN → RESTRICTED excluded (must go through ACTIVE).
+    - Locking scope: concurrent regulatory action prevention, not
+      double-spend prevention.
 *)
 
 theory Regulatory_Instance
@@ -118,7 +140,7 @@ lemma confiscate_universal:
 
 subsection \<open>Invariant I3: Determinism (inherent from function definition)\<close>
 
-text \<open>Determinism is trivially guaranteed by the \<^theory_text>\<open>fun\<close> definition.\<close>
+text \<open>Determinism follows directly from the \<^theory_text>\<open>fun\<close> definition.\<close>
 
 subsection \<open>SEIZED to FROZEN exclusion\<close>
 
@@ -256,6 +278,20 @@ next
   then show "reg_transition s a = None"
     using reg_states_UNIV by auto
 qed
+
+text \<open>
+  Bundle form of the regulatory state machine, used as a structural unit
+  when discharging \<^verbatim>\<open>state_preservation\<close> obligations whose source or target
+  matches the full \<^verbatim>\<open>reg_actions\<close> vocabulary. Mirrors the existing
+  \<^verbatim>\<open>chain_b_state_machine\<close> and \<^verbatim>\<open>daml_state_machine\<close> bundles defined later
+  in the theory.
+\<close>
+
+lemma reg_state_machine:
+  "state_machine reg_states reg_actions reg_transition reg_terminal"
+  using reg_sm.finite_states reg_sm.finite_actions reg_sm.terminal_subset
+        reg_sm.terminal_absorbing reg_sm.transition_closed reg_sm.transition_domain
+  by (rule state_machine.intro)
 
 
 section \<open>Asset and Global State Modeling\<close>
@@ -907,6 +943,678 @@ theorem valid_state_preservation:
   by auto
 
 
+section \<open>Heterogeneous-Action State Preservation Instance\<close>
+
+text \<open>
+  This section instantiates the \<^verbatim>\<open>state_preservation\<close> locale with a concrete
+  heterogeneous-action scenario between two chains.
+
+  The scenario models the following operational situation. Two chains A and B
+  share the same regulatory state space (ACTIVE, FROZEN, SEIZED, CONFISCATED,
+  RESTRICTED), but their on-chain action vocabularies differ. Chain A supports
+  the full seven-action set used elsewhere in this theory. Chain B is a chain
+  whose jurisdiction handles de-escalation (UNFREEZE, UNRESTRICT, RELEASE)
+  exclusively through separate judicial procedures rather than as on-chain
+  actions; correspondingly, Chain B's on-chain action vocabulary is the
+  four-action escalation subset only. The synchronisation map between the
+  two chains is therefore non-trivial in two ways:
+
+  \<^item> The source action type is \<^verbatim>\<open>reg_action\<close> and the target action type is
+    a separate datatype \<^verbatim>\<open>chain_b_action\<close> with four constructors. This
+    exercises the locale's heterogeneous source / target action types
+    (\<^verbatim>\<open>'a\<close> vs.\ \<^verbatim>\<open>'b\<close>).
+  \<^item> The locale parameter \<^verbatim>\<open>actions\<^sub>s\<close> is instantiated with a strict subset
+    of the full \<^verbatim>\<open>reg_action\<close> set, namely the four escalation actions.
+    De-escalation actions exist in \<^verbatim>\<open>reg_action\<close> as a datatype but are
+    out of scope for this synchronisation instance.
+
+  The naturality assumption then has to hold only on the escalation subset,
+  which is exactly the design intent of the locale's \<^verbatim>\<open>actions\<^sub>s\<close> parameter:
+  the user can scope structural preservation to a subset of source actions
+  rather than to the full source action type.
+\<close>
+
+datatype chain_b_action = B_FREEZE | B_SEIZE | B_CONFISCATE | B_RESTRICT
+
+text \<open>
+  The escalation subset of \<^verbatim>\<open>reg_action\<close> that this instance synchronises
+  across to Chain B.
+\<close>
+
+definition escalation_actions :: "reg_action set" where
+  "escalation_actions = {FREEZE, SEIZE, CONFISCATE, RESTRICT}"
+
+definition chain_b_actions :: "chain_b_action set" where
+  "chain_b_actions = {B_FREEZE, B_SEIZE, B_CONFISCATE, B_RESTRICT}"
+
+text \<open>
+  Chain B's transition function. Its values mirror Chain A's transition
+  function on the four escalation actions: when Chain A maps
+  \<^verbatim>\<open>(s, escalation action)\<close> to \<^verbatim>\<open>Some s'\<close>, Chain B does the same; when Chain A
+  rejects, Chain B rejects. Both chains share the regulatory state space, so
+  no state translation is required (the state map is the identity).
+\<close>
+
+fun chain_b_transition :: "reg_state \<Rightarrow> chain_b_action \<Rightarrow> reg_state option" where
+  "chain_b_transition s B_FREEZE      = reg_transition s FREEZE"
+| "chain_b_transition s B_SEIZE       = reg_transition s SEIZE"
+| "chain_b_transition s B_CONFISCATE  = reg_transition s CONFISCATE"
+| "chain_b_transition s B_RESTRICT    = reg_transition s RESTRICT"
+
+text \<open>The escalation action map: a 1-to-1 correspondence between Chain A's
+  four escalation actions and Chain B's four constructors.\<close>
+
+fun escalation_action_map :: "reg_action \<Rightarrow> chain_b_action" where
+  "escalation_action_map FREEZE     = B_FREEZE"
+| "escalation_action_map SEIZE      = B_SEIZE"
+| "escalation_action_map CONFISCATE = B_CONFISCATE"
+| "escalation_action_map RESTRICT   = B_RESTRICT"
+| "escalation_action_map UNFREEZE   = B_FREEZE"
+| "escalation_action_map UNRESTRICT = B_FREEZE"
+| "escalation_action_map RELEASE    = B_FREEZE"
+  \<comment> \<open>The last three clauses are unused by the locale instance, since
+      \<^verbatim>\<open>actions\<^sub>s = escalation_actions\<close> excludes the de-escalation actions.
+      They are present only to make the function total on \<^verbatim>\<open>reg_action\<close>.\<close>
+
+text \<open>
+  Chain B is also a state machine over the same regulatory state space.
+\<close>
+
+lemma chain_b_transition_closed:
+  "chain_b_transition s a = Some s' \<Longrightarrow> s' \<in> reg_states"
+proof -
+  assume "chain_b_transition s a = Some s'"
+  then have "\<exists>a'. reg_transition s a' = Some s'"
+    by (cases a) auto
+  then show "s' \<in> reg_states" using reg_transition_closed by auto
+qed
+
+lemma chain_b_terminal:
+  "s \<in> reg_terminal \<Longrightarrow> chain_b_transition s a = None"
+  unfolding reg_terminal_def
+  by (cases a) (auto simp: confiscated_terminal)
+
+lemma chain_b_state_machine:
+  "state_machine reg_states chain_b_actions chain_b_transition reg_terminal"
+proof -
+  have f1: "finite reg_states" unfolding reg_states_def by auto
+  have f2: "finite chain_b_actions" unfolding chain_b_actions_def by auto
+  have f3: "reg_terminal \<subseteq> reg_states"
+    unfolding reg_terminal_def reg_states_def by auto
+  have f4: "\<And>s a. s \<in> reg_terminal \<Longrightarrow> a \<in> chain_b_actions \<Longrightarrow> chain_b_transition s a = None"
+    using chain_b_terminal by auto
+  have f5: "\<And>s a s'. s \<in> reg_states \<Longrightarrow> a \<in> chain_b_actions \<Longrightarrow>
+    chain_b_transition s a = Some s' \<Longrightarrow> s' \<in> reg_states"
+    using chain_b_transition_closed by auto
+  have f6: "\<And>s a. (s :: reg_state) \<notin> reg_states \<Longrightarrow> chain_b_transition s a = None"
+    using reg_states_UNIV by auto
+  show ?thesis
+    by (intro state_machine.intro) (use f1 f2 f3 f4 f5 f6 in auto)
+qed
+
+text \<open>
+  The naturality conditions of \<^verbatim>\<open>state_preservation\<close> hold for the
+  escalation subset. Both directions (\<^verbatim>\<open>Some\<close> and \<^verbatim>\<open>None\<close> branches) follow
+  by case analysis on the escalation action: by construction, Chain B's
+  transition function on each \<^verbatim>\<open>B_X\<close> constructor mirrors Chain A's
+  transition function on the corresponding \<^verbatim>\<open>X\<close> action.
+\<close>
+
+lemma escalation_naturality_some:
+  assumes "a \<in> escalation_actions"
+    and "reg_transition s a = Some s'"
+  shows "chain_b_transition s (escalation_action_map a) = Some s'"
+proof -
+  from assms(1) have "a \<in> {FREEZE, SEIZE, CONFISCATE, RESTRICT}"
+    unfolding escalation_actions_def by simp
+  then consider "a = FREEZE" | "a = SEIZE" | "a = CONFISCATE" | "a = RESTRICT"
+    by auto
+  then show ?thesis using assms(2) by (cases) auto
+qed
+
+lemma escalation_naturality_none:
+  assumes "a \<in> escalation_actions"
+    and "reg_transition s a = None"
+  shows "chain_b_transition s (escalation_action_map a) = None"
+proof -
+  from assms(1) have "a \<in> {FREEZE, SEIZE, CONFISCATE, RESTRICT}"
+    unfolding escalation_actions_def by simp
+  then consider "a = FREEZE" | "a = SEIZE" | "a = CONFISCATE" | "a = RESTRICT"
+    by auto
+  then show ?thesis using assms(2) by (cases) auto
+qed
+
+text \<open>
+  The escalation instance: \<^verbatim>\<open>state_preservation\<close> with \<^verbatim>\<open>actions\<^sub>s\<close> the
+  escalation subset of \<^verbatim>\<open>reg_action\<close>, target action type \<^verbatim>\<open>chain_b_action\<close>,
+  and identity state map (both chains share the regulatory state space).
+\<close>
+
+text \<open>
+  Source and target state-machine bundles for the heterogeneous-action
+  instance. The target side reuses the existing \<^verbatim>\<open>chain_b_state_machine\<close>
+  lemma; the source side is on the escalation subset of \<^verbatim>\<open>reg_actions\<close>
+  rather than the full action set, so we discharge it inline.
+\<close>
+
+lemma escalation_source_state_machine:
+  "state_machine reg_states escalation_actions reg_transition reg_terminal"
+proof unfold_locales
+  show "finite reg_states" unfolding reg_states_def by auto
+next
+  show "finite escalation_actions" unfolding escalation_actions_def by auto
+next
+  show "reg_terminal \<subseteq> reg_states" unfolding reg_terminal_def reg_states_def by auto
+next
+  fix s a
+  assume "s \<in> reg_terminal" "a \<in> escalation_actions"
+  then show "reg_transition s a = None"
+    unfolding reg_terminal_def by (auto simp: confiscated_terminal)
+next
+  fix s a s'
+  assume "s \<in> reg_states" "a \<in> escalation_actions" "reg_transition s a = Some s'"
+  then show "s' \<in> reg_states" using reg_transition_closed by auto
+next
+  fix s :: reg_state and a :: reg_action
+  assume "s \<notin> reg_states"
+  then show "reg_transition s a = None" using reg_states_UNIV by auto
+qed
+
+text \<open>
+  Heterogeneous-action instance: the source action set is the
+  \<^verbatim>\<open>escalation_actions\<close> subset of \<^verbatim>\<open>reg_action\<close>, the target action set is
+  \<^verbatim>\<open>chain_b_actions\<close>, and the state map is the identity. Both source and
+  target state machines share the regulatory state space, so two of the
+  state-machine obligations (\<^verbatim>\<open>finite reg_states\<close> and
+  \<^verbatim>\<open>reg_terminal \<subseteq> reg_states\<close>) collapse between source and target; the
+  proof structure below reflects this by issuing each \<^verbatim>\<open>show\<close> exactly once
+  for the merged obligation.
+\<close>
+
+interpretation escalation_preservation:
+  state_preservation
+    reg_states escalation_actions reg_transition reg_terminal
+    reg_states chain_b_actions chain_b_transition reg_terminal
+    "id :: reg_state \<Rightarrow> reg_state" escalation_action_map
+proof unfold_locales
+  show "finite reg_states" unfolding reg_states_def by auto
+next
+  show "finite escalation_actions" unfolding escalation_actions_def by auto
+next
+  show "reg_terminal \<subseteq> reg_states" unfolding reg_terminal_def reg_states_def by auto
+next
+  fix s a
+  assume "s \<in> reg_terminal" "a \<in> escalation_actions"
+  then show "reg_transition s a = None"
+    unfolding reg_terminal_def by (auto simp: confiscated_terminal)
+next
+  fix s a s'
+  assume "s \<in> reg_states" "a \<in> escalation_actions" "reg_transition s a = Some s'"
+  then show "s' \<in> reg_states" using reg_transition_closed by auto
+next
+  fix s :: reg_state and a :: reg_action
+  assume "s \<notin> reg_states"
+  then show "reg_transition s a = None" using reg_states_UNIV by auto
+next
+  show "finite chain_b_actions" unfolding chain_b_actions_def by auto
+next
+  fix s a
+  assume "s \<in> reg_terminal" "a \<in> chain_b_actions"
+  then show "chain_b_transition s a = None" using chain_b_terminal by auto
+next
+  fix s a s'
+  assume "s \<in> reg_states" "a \<in> chain_b_actions" "chain_b_transition s a = Some s'"
+  then show "s' \<in> reg_states" using chain_b_transition_closed by auto
+next
+  fix s :: reg_state and a :: chain_b_action
+  assume "s \<notin> reg_states"
+  then show "chain_b_transition s a = None" using reg_states_UNIV by auto
+next
+  fix s
+  assume "s \<in> reg_states"
+  then show "id s \<in> reg_states" by simp
+next
+  fix a
+  assume "a \<in> escalation_actions"
+  then show "escalation_action_map a \<in> chain_b_actions"
+    unfolding escalation_actions_def chain_b_actions_def by auto
+next
+  fix s
+  assume "s \<in> reg_terminal"
+  then show "id s \<in> reg_terminal" by simp
+next
+  fix s a s'
+  assume "s \<in> reg_states" "a \<in> escalation_actions" "reg_transition s a = Some s'"
+  then show "chain_b_transition (id s) (escalation_action_map a) = Some (id s')"
+    using escalation_naturality_some by simp
+next
+  fix s a
+  assume "s \<in> reg_states" "a \<in> escalation_actions" "reg_transition s a = None"
+  then show "chain_b_transition (id s) (escalation_action_map a) = None"
+    using escalation_naturality_none by simp
+qed
+
+text \<open>
+  As a corollary of the locale interpretation, sequential preservation
+  (the locale's main theorem) applies to escalation action sequences:
+  any valid sequence of escalation actions on Chain A produces, when
+  mapped through \<^verbatim>\<open>escalation_action_map\<close>, a valid sequence on Chain B
+  ending in the same regulatory state.
+\<close>
+
+corollary escalation_sequential_preservation:
+  assumes "s \<in> reg_states"
+    and "\<forall>a \<in> set as. a \<in> escalation_actions"
+    and "escalation_preservation.source.apply_actions s as = Some s'"
+  shows "escalation_preservation.target.apply_actions s (map escalation_action_map as)
+       = Some s'"
+  using assms escalation_preservation.sequential_preservation [where as = as]
+  by simp
+
+
+section \<open>Layer-Crossing Symmetric State Preservation Instance\<close>
+
+text \<open>
+  This section instantiates the \<^verbatim>\<open>symmetric_state_preservation\<close> locale with
+  a concrete bidirectional binding between two representations of the same
+  regulatory state.
+
+  The on-chain representation is the five-element \<^verbatim>\<open>reg_state\<close> enum used
+  throughout this theory. The off-chain representation is a structured
+  permission record (\<^verbatim>\<open>daml_perm\<close>) modelling a DAML party-permission
+  ledger entry: a status tag plus auxiliary fields that carry the
+  party / scope metadata associated with a non-trivial regulatory status
+  (the seizing party for SEIZED, the restriction scope for RESTRICTED).
+  A type-level invariant (\<^verbatim>\<open>valid_daml_perm\<close>) carves out the bijection
+  domain by tying the auxiliary fields to the status tag.
+
+  The action vocabularies on the two layers coincide: both layers process
+  the seven actions of \<^verbatim>\<open>reg_action\<close>, and the action map is the identity.
+  All of the non-trivial content of the symmetric instance therefore lives
+  in the layer-crossing state mapping. The roundtrip assumptions of
+  \<^verbatim>\<open>symmetric_state_preservation\<close> become a pair of bijection conditions
+  between \<^verbatim>\<open>reg_state\<close> and the valid \<^verbatim>\<open>daml_perm\<close> records.
+\<close>
+
+datatype daml_status_tag =
+  D_Active | D_Frozen | D_Seized | D_Confiscated | D_Restricted
+
+record daml_perm =
+  status_tag        :: daml_status_tag
+  seized_by         :: "nat option"
+  restriction_scope :: "nat option"
+
+definition default_party_id :: nat where
+  "default_party_id = 0"
+
+definition default_scope_id :: nat where
+  "default_scope_id = 0"
+
+text \<open>
+  The well-formedness invariant: the auxiliary fields are non-\<^verbatim>\<open>None\<close> exactly
+  on the status tags that semantically require them.
+\<close>
+
+definition valid_daml_perm :: "daml_perm \<Rightarrow> bool" where
+  "valid_daml_perm p \<longleftrightarrow>
+     (status_tag p = D_Seized \<longleftrightarrow> seized_by p \<noteq> None) \<and>
+     (status_tag p = D_Restricted \<longleftrightarrow> restriction_scope p \<noteq> None)"
+
+text \<open>The two state maps between the two representations.\<close>
+
+fun reg_to_daml :: "reg_state \<Rightarrow> daml_perm" where
+  "reg_to_daml ACTIVE      = \<lparr> status_tag = D_Active,
+                                seized_by = None,
+                                restriction_scope = None \<rparr>"
+| "reg_to_daml FROZEN      = \<lparr> status_tag = D_Frozen,
+                                seized_by = None,
+                                restriction_scope = None \<rparr>"
+| "reg_to_daml SEIZED      = \<lparr> status_tag = D_Seized,
+                                seized_by = Some default_party_id,
+                                restriction_scope = None \<rparr>"
+| "reg_to_daml CONFISCATED = \<lparr> status_tag = D_Confiscated,
+                                seized_by = None,
+                                restriction_scope = None \<rparr>"
+| "reg_to_daml RESTRICTED  = \<lparr> status_tag = D_Restricted,
+                                seized_by = None,
+                                restriction_scope = Some default_scope_id \<rparr>"
+
+fun daml_to_reg :: "daml_perm \<Rightarrow> reg_state" where
+  "daml_to_reg p = (case status_tag p of
+                      D_Active       \<Rightarrow> ACTIVE
+                    | D_Frozen       \<Rightarrow> FROZEN
+                    | D_Seized       \<Rightarrow> SEIZED
+                    | D_Confiscated  \<Rightarrow> CONFISCATED
+                    | D_Restricted   \<Rightarrow> RESTRICTED)"
+
+text \<open>The DAML target state space: the image of \<^verbatim>\<open>reg_to_daml\<close>.\<close>
+
+definition daml_states :: "daml_perm set" where
+  "daml_states = range reg_to_daml"
+
+definition daml_terminal :: "daml_perm set" where
+  "daml_terminal = {reg_to_daml CONFISCATED}"
+
+text \<open>
+  The DAML transition function: lifts \<^verbatim>\<open>reg_transition\<close> through the
+  representation map. By construction, \<^verbatim>\<open>daml_transition\<close> respects the
+  \<^verbatim>\<open>reg_to_daml\<close> map.
+\<close>
+
+definition daml_transition :: "daml_perm \<Rightarrow> reg_action \<Rightarrow> daml_perm option" where
+  "daml_transition p a =
+     (if p \<in> daml_states then
+        (case reg_transition (daml_to_reg p) a of
+           None    \<Rightarrow> None
+         | Some s' \<Rightarrow> Some (reg_to_daml s'))
+      else None)"
+
+text \<open>Roundtrip lemmas establishing the layer-crossing bijection.\<close>
+
+lemma daml_to_reg_to_daml_id:
+  "daml_to_reg (reg_to_daml s) = s"
+  by (cases s) auto
+
+lemma reg_to_daml_to_reg_on_image:
+  assumes "p \<in> daml_states"
+  shows "reg_to_daml (daml_to_reg p) = p"
+proof -
+  from assms obtain s where "p = reg_to_daml s"
+    unfolding daml_states_def by auto
+  then show ?thesis using daml_to_reg_to_daml_id by simp
+qed
+
+lemma reg_to_daml_valid:
+  "valid_daml_perm (reg_to_daml s)"
+  unfolding valid_daml_perm_def by (cases s) auto
+
+lemma reg_to_daml_injective:
+  "reg_to_daml s1 = reg_to_daml s2 \<Longrightarrow> s1 = s2"
+  using daml_to_reg_to_daml_id by metis
+
+text \<open>
+  The DAML side is a state machine on the image of \<^verbatim>\<open>reg_to_daml\<close>.
+\<close>
+
+lemma daml_states_finite: "finite daml_states"
+proof -
+  have fin_reg: "finite reg_states" unfolding reg_states_def by auto
+  hence fin_img: "finite (reg_to_daml ` reg_states)" by (rule finite_imageI)
+  have eq: "daml_states = reg_to_daml ` reg_states"
+    unfolding daml_states_def using reg_states_UNIV by simp
+  from fin_img eq show ?thesis by simp
+qed
+
+lemma daml_terminal_subset: "daml_terminal \<subseteq> daml_states"
+  unfolding daml_terminal_def daml_states_def by blast
+
+lemma daml_terminal_absorbing:
+  assumes "p \<in> daml_terminal" and "a \<in> reg_actions"
+  shows "daml_transition p a = None"
+proof -
+  from assms(1) have "p = reg_to_daml CONFISCATED"
+    unfolding daml_terminal_def by simp
+  then have "daml_to_reg p = CONFISCATED" using daml_to_reg_to_daml_id by simp
+  moreover have "p \<in> daml_states"
+    using assms(1) daml_terminal_subset by auto
+  ultimately show ?thesis
+    unfolding daml_transition_def using confiscated_terminal by simp
+qed
+
+lemma daml_transition_closed:
+  assumes "p \<in> daml_states" and "a \<in> reg_actions"
+    and "daml_transition p a = Some p'"
+  shows "p' \<in> daml_states"
+proof -
+  from assms(1,3) obtain s' where
+    s'_eq: "reg_transition (daml_to_reg p) a = Some s'"
+    and p'_def: "p' = reg_to_daml s'"
+    unfolding daml_transition_def
+    by (auto split: option.splits if_splits)
+  then show ?thesis
+    unfolding daml_states_def by auto
+qed
+
+lemma daml_transition_outside_states:
+  "p \<notin> daml_states \<Longrightarrow> daml_transition p a = None"
+  unfolding daml_transition_def by simp
+
+lemma daml_state_machine:
+  "state_machine daml_states reg_actions daml_transition daml_terminal"
+proof
+  show "finite daml_states" by (rule daml_states_finite)
+next
+  show "finite reg_actions" unfolding reg_actions_def by auto
+next
+  show "daml_terminal \<subseteq> daml_states" by (rule daml_terminal_subset)
+next
+  fix s a
+  assume "s \<in> daml_terminal" "a \<in> reg_actions"
+  then show "daml_transition s a = None" by (rule daml_terminal_absorbing)
+next
+  fix s a s'
+  assume "s \<in> daml_states" "a \<in> reg_actions" "daml_transition s a = Some s'"
+  then show "s' \<in> daml_states" by (rule daml_transition_closed)
+next
+  fix s :: daml_perm and a :: reg_action
+  assume "s \<notin> daml_states"
+  then show "daml_transition s a = None" by (rule daml_transition_outside_states)
+qed
+
+text \<open>
+  Forward naturality: \<^verbatim>\<open>reg_to_daml\<close> commutes with transitions.
+\<close>
+
+lemma reg_to_daml_naturality_some:
+  assumes "s \<in> reg_states" and "a \<in> reg_actions"
+    and "reg_transition s a = Some s'"
+  shows "daml_transition (reg_to_daml s) a = Some (reg_to_daml s')"
+proof -
+  have in_states: "reg_to_daml s \<in> daml_states"
+    unfolding daml_states_def by auto
+  have "daml_to_reg (reg_to_daml s) = s" using daml_to_reg_to_daml_id by simp
+  with assms(3) have
+    "reg_transition (daml_to_reg (reg_to_daml s)) a = Some s'" by simp
+  with in_states show ?thesis
+    unfolding daml_transition_def by simp
+qed
+
+lemma reg_to_daml_naturality_none:
+  assumes "s \<in> reg_states" and "a \<in> reg_actions"
+    and "reg_transition s a = None"
+  shows "daml_transition (reg_to_daml s) a = None"
+proof -
+  have in_states: "reg_to_daml s \<in> daml_states"
+    unfolding daml_states_def by auto
+  have "daml_to_reg (reg_to_daml s) = s" using daml_to_reg_to_daml_id by simp
+  with assms(3) have
+    "reg_transition (daml_to_reg (reg_to_daml s)) a = None" by simp
+  with in_states show ?thesis
+    unfolding daml_transition_def by simp
+qed
+
+text \<open>
+  Backward naturality: \<^verbatim>\<open>daml_to_reg\<close> on the image of \<^verbatim>\<open>reg_to_daml\<close>
+  commutes with transitions in the opposite direction.
+\<close>
+
+lemma daml_to_reg_naturality_some:
+  assumes "p \<in> daml_states" and "a \<in> reg_actions"
+    and "daml_transition p a = Some p'"
+  shows "reg_transition (daml_to_reg p) a = Some (daml_to_reg p')"
+proof -
+  from assms(1,3) obtain s' where
+    s'_eq: "reg_transition (daml_to_reg p) a = Some s'"
+    and p'_def: "p' = reg_to_daml s'"
+    unfolding daml_transition_def
+    by (auto split: option.splits if_splits)
+  from p'_def have "daml_to_reg p' = s'" using daml_to_reg_to_daml_id by simp
+  with s'_eq show ?thesis by simp
+qed
+
+lemma daml_to_reg_naturality_none:
+  assumes "p \<in> daml_states" and "a \<in> reg_actions"
+    and "daml_transition p a = None"
+  shows "reg_transition (daml_to_reg p) a = None"
+proof (rule ccontr)
+  assume "reg_transition (daml_to_reg p) a \<noteq> None"
+  then obtain s' where "reg_transition (daml_to_reg p) a = Some s'" by auto
+  with assms(1) have "daml_transition p a = Some (reg_to_daml s')"
+    unfolding daml_transition_def by simp
+  with assms(3) show False by simp
+qed
+
+text \<open>
+  Forward state preservation: \<^verbatim>\<open>reg_to_daml\<close> as a structure-preserving map.
+\<close>
+
+text \<open>
+  Forward state preservation. The source state machine is on
+  \<^verbatim>\<open>(reg_states, reg_actions, reg_transition, reg_terminal)\<close>, which exactly
+  matches the \<^verbatim>\<open>reg_sm\<close> interpretation; consequently \<^verbatim>\<open>unfold_locales\<close>
+  auto-discharges all six source state-machine obligations. The target side
+  is the DAML structured-permission record, for which only individual
+  lemmas (not a registered interpretation) are available, so all six target
+  state-machine obligations remain pending alongside the five
+  preservation-specific axioms — eleven obligations in total. The
+  asymmetry with \<^verbatim>\<open>backward_layer_preservation\<close> below (which has only the
+  five preservation axioms remaining) reflects the order in which the
+  locale extension presents the two state-machine sub-locales.
+\<close>
+
+interpretation forward_layer_preservation:
+  state_preservation
+    reg_states reg_actions reg_transition reg_terminal
+    daml_states reg_actions daml_transition daml_terminal
+    reg_to_daml id
+proof unfold_locales
+  show "finite daml_states" by (rule daml_states_finite)
+next
+  show "finite reg_actions" unfolding reg_actions_def by auto
+next
+  show "daml_terminal \<subseteq> daml_states" by (rule daml_terminal_subset)
+next
+  fix s a
+  assume "s \<in> daml_terminal" "a \<in> reg_actions"
+  then show "daml_transition s a = None" by (rule daml_terminal_absorbing)
+next
+  fix s a s'
+  assume "s \<in> daml_states" "a \<in> reg_actions" "daml_transition s a = Some s'"
+  then show "s' \<in> daml_states" by (rule daml_transition_closed)
+next
+  fix s :: daml_perm and a :: reg_action
+  assume "s \<notin> daml_states"
+  then show "daml_transition s a = None" by (rule daml_transition_outside_states)
+next
+  fix s
+  assume "s \<in> reg_states"
+  then show "reg_to_daml s \<in> daml_states" unfolding daml_states_def by auto
+next
+  fix a
+  assume "a \<in> reg_actions"
+  then show "id a \<in> reg_actions" by simp
+next
+  fix s
+  assume "s \<in> reg_terminal"
+  then show "reg_to_daml s \<in> daml_terminal"
+    unfolding reg_terminal_def daml_terminal_def by simp
+next
+  fix s a s'
+  assume "s \<in> reg_states" "a \<in> reg_actions" "reg_transition s a = Some s'"
+  then show "daml_transition (reg_to_daml s) (id a) = Some (reg_to_daml s')"
+    using reg_to_daml_naturality_some by simp
+next
+  fix s a
+  assume "s \<in> reg_states" "a \<in> reg_actions" "reg_transition s a = None"
+  then show "daml_transition (reg_to_daml s) (id a) = None"
+    using reg_to_daml_naturality_none by simp
+qed
+
+text \<open>
+  Backward state preservation: \<^verbatim>\<open>daml_to_reg\<close> as a structure-preserving map
+  on the image of \<^verbatim>\<open>reg_to_daml\<close>.
+\<close>
+
+text \<open>
+  Backward state preservation. The source side is DAML and the target side
+  matches \<^verbatim>\<open>reg_sm\<close>. \<^verbatim>\<open>unfold_locales\<close> auto-discharges all twelve
+  state-machine obligations (six target via \<^verbatim>\<open>reg_sm\<close>, six source via the
+  bundled \<^verbatim>\<open>daml_state_machine\<close> lemma combined with the individual
+  \<^verbatim>\<open>daml_*\<close> lemmas), so only the five preservation axioms remain pending.
+\<close>
+
+interpretation backward_layer_preservation:
+  state_preservation
+    daml_states reg_actions daml_transition daml_terminal
+    reg_states reg_actions reg_transition reg_terminal
+    daml_to_reg id
+proof unfold_locales
+  fix p
+  assume "p \<in> daml_states"
+  then show "daml_to_reg p \<in> reg_states" using reg_states_UNIV by auto
+next
+  fix a
+  assume "a \<in> reg_actions"
+  then show "id a \<in> reg_actions" by simp
+next
+  fix p
+  assume "p \<in> daml_terminal"
+  then have "p = reg_to_daml CONFISCATED" unfolding daml_terminal_def by simp
+  then have "daml_to_reg p = CONFISCATED" using daml_to_reg_to_daml_id by simp
+  then show "daml_to_reg p \<in> reg_terminal" unfolding reg_terminal_def by simp
+next
+  fix p a p'
+  assume "p \<in> daml_states" "a \<in> reg_actions" "daml_transition p a = Some p'"
+  then show "reg_transition (daml_to_reg p) (id a) = Some (daml_to_reg p')"
+    using daml_to_reg_naturality_some by simp
+next
+  fix p a
+  assume "p \<in> daml_states" "a \<in> reg_actions" "daml_transition p a = None"
+  then show "reg_transition (daml_to_reg p) (id a) = None"
+    using daml_to_reg_naturality_none by simp
+qed
+
+text \<open>
+  The symmetric instance: forward and backward state preservation
+  composed with roundtrip guarantees. The non-trivial content is the
+  bijection between \<^verbatim>\<open>reg_state\<close> and the image of \<^verbatim>\<open>reg_to_daml\<close> in
+  \<^verbatim>\<open>daml_perm\<close>; the action map is the identity because both layers share
+  the same regulatory action vocabulary.
+\<close>
+
+interpretation onchain_daml_bridge:
+  symmetric_state_preservation
+    reg_states reg_actions reg_transition reg_terminal
+    daml_states reg_actions daml_transition daml_terminal
+    reg_to_daml id
+    daml_to_reg id
+proof unfold_locales
+  fix s
+  assume "s \<in> reg_states"
+  then show "daml_to_reg (reg_to_daml s) = s" using daml_to_reg_to_daml_id by simp
+next
+  fix p
+  assume "p \<in> daml_states"
+  then show "reg_to_daml (daml_to_reg p) = p" using reg_to_daml_to_reg_on_image by simp
+next
+  fix a
+  assume "a \<in> reg_actions"
+  then show "id (id a) = a" by simp
+qed
+
+text \<open>
+  As a corollary of the symmetric interpretation, \<^verbatim>\<open>reg_to_daml\<close> is
+  injective on \<^verbatim>\<open>reg_states\<close>: distinct on-chain states map to distinct
+  off-chain DAML records, so the layer-crossing representation incurs
+  no information loss.
+\<close>
+
+corollary reg_to_daml_injective_on_states:
+  "\<lbrakk> s1 \<in> reg_states; s2 \<in> reg_states; reg_to_daml s1 = reg_to_daml s2 \<rbrakk>
+   \<Longrightarrow> s1 = s2"
+  using onchain_daml_bridge.state_map_injective .
+
+
 section \<open>Multi-Domain Locale Instantiation\<close>
 
 text \<open>
@@ -1042,15 +1750,29 @@ text \<open>
      the global validity invariant: \<^verbatim>\<open>consistent_state\<close> AND no outstanding
      locks. This closes the inductive invariant.
 
-  8. The \<^verbatim>\<open>multi_domain_preservation\<close> locale is instantiated parametrically:
-     for any finite domain set and valid global state, the abstract
-     framework from \<^verbatim>\<open>State_Preservation\<close>.thy applies to the regulatory model.
+  8. The heterogeneous-action instance (\<^verbatim>\<open>escalation_preservation\<close>) instantiates
+     \<^verbatim>\<open>state_preservation\<close> with the four-action escalation subset of
+     \<^verbatim>\<open>reg_action\<close> on the source side, the dedicated four-constructor
+     datatype \<^verbatim>\<open>chain_b_action\<close> on the target side, and the identity state
+     map. This exercises both the locale's \<^verbatim>\<open>actions\<^sub>s\<close> subset parameter
+     and the heterogeneous source / target action types.
 
-  What remains for future work:
-    - Prove eventual consistency under the partially synchronous network
-      model (with message delays, redelivery, and out-of-order arrival)
-    - (Optional) Connect to the \<^verbatim>\<open>state_preservation\<close> locale with identity
-      state/action maps for the uniform-model case
+  9. The layer-crossing instance (\<^verbatim>\<open>onchain_daml_bridge\<close>) instantiates
+     \<^verbatim>\<open>symmetric_state_preservation\<close> with the on-chain enum representation
+     and a structured DAML permission record (\<^verbatim>\<open>daml_perm\<close>) carrying
+     auxiliary fields. The action vocabularies coincide so the action map
+     is the identity; the non-trivial content is the bijection between
+     the enum and the valid records, with a type-level invariant
+     (\<^verbatim>\<open>valid_daml_perm\<close>) carving out the bijection domain.
+
+  10. The \<^verbatim>\<open>multi_domain_preservation\<close> locale is instantiated parametrically:
+      for any finite domain set and valid global state, the abstract
+      framework from \<^verbatim>\<open>State_Preservation\<close>.thy applies to the regulatory
+      model.
+
+  Open work for subsequent entries:
+    - Eventual consistency under the partially synchronous network model
+      (with message delays, redelivery, and out-of-order arrival).
 \<close>
 
 end

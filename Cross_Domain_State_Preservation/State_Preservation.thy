@@ -11,37 +11,23 @@
   preserved when synchronized across heterogeneous domains (blockchains,
   off-chain ledgers, etc.).
 
-  The key insight is that cross-domain state synchronization can be modeled
-  as a functor between categories of state machines, where the naturality
-  condition of the synchronization map guarantees structural preservation
-  of transitions.
+  Cross-domain state synchronization is modelled as a structure-preserving
+  map between state machines, where the naturality (homomorphism) condition
+  of the synchronization map captures preservation of transitions.
 
-  This theory is domain-independent. Regulatory state is one instantiation
-  (see Regulatory_Instance.thy), but the locales apply to any domain with
-  finite states, deterministic transitions, and optional terminal states.
+  This theory is domain-independent. The regulatory state model in
+  Regulatory_Instance.thy provides concrete instances for all four
+  locales defined here (state_machine, state_preservation,
+  symmetric_state_preservation, multi_domain_preservation), but the
+  locales apply to any domain with finite states, deterministic
+  transitions, and optional terminal states.
 
-  Locales defined:
-    - state_machine: finite-state deterministic transition system with
-      terminal states
-    - state_preservation: structure-preserving map between two state machines
-      (naturality / homomorphism condition)
-    - symmetric_state_preservation: bidirectional synchronization with
-      inverse maps and roundtrip guarantees
-    - multi_domain_preservation: N domains sharing the same state machine,
-      with cross-domain consistency after synchronization
-
-  Key theorems:
-    - sequential_preservation: naturality extends to action sequences
-    - sequential_preservation_none: failure preservation for sequences
-    - cross_domain_consistency: after sync_all, all connected domains agree
-    - sync_isolation: synchronization does not affect other assets
-
-  Design lineage:
-    Lochbihler's Merkle Functor (AFP, ADS_Functor) abstracted authenticated
-    data structures into composable building blocks. This theory extends
-    that pattern to cross-domain state preservation — a different axis of
-    abstraction targeting synchronization correctness rather than data
-    structure integrity.
+  Methodological lineage:
+    Our use of locales for compositional, reusable abstractions follows
+    the methodological tradition exemplified in the AFP by Lochbihler's
+    ADS_Functor entry. The technical content of this theory is independent
+    of ADS_Functor; the connection is one of design philosophy (locale-based
+    reusable abstractions over functor-shaped data), not formal dependency.
 *)
 
 theory State_Preservation

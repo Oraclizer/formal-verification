@@ -12,38 +12,23 @@
   verifying liveness properties in distributed systems with concurrent
   resource access and leader-based consensus.
 
-  The key insight is that three common liveness concerns in distributed
-  systems — deterministic ordering, deadlock avoidance, and starvation
-  prevention — can each be captured by a minimal locale with clean
-  assumptions, enabling domain-independent proofs that any conforming
-  system can instantiate.
+  Three common liveness concerns in distributed systems — deterministic
+  ordering, deadlock avoidance, and starvation prevention — are each
+  captured by a minimal locale with clean assumptions, enabling
+  domain-independent proofs that any conforming system can instantiate.
 
   This theory is domain-independent. The D-quencer regulatory consensus
-  is one instantiation (see DQuencer_Instance.thy), but the locales
-  apply to any system with linearly ordered priorities, timeout-based
-  locking, and periodic honest leader scheduling.
+  in DQuencer_Instance.thy provides a concrete instantiation of all
+  three locales, but they apply to any system with linearly ordered
+  priorities, timeout-based locking, and periodic honest leader
+  scheduling.
 
-  Locales defined:
-    - priority_system: deterministic selection from a finite message set
-      via an injective priority function into a linear order
-    - deadlock_free_locking: timeout-based locking guaranteeing that no
-      resource is locked indefinitely
-    - fair_leader_system: starvation freedom under periodic honest
-      leader scheduling with monotone pending count
-
-  Key theorems:
-    - highest_priority_exists: a non-empty finite set has a unique maximum
-    - highest_priority_unique: deterministic selection
-    - timeout_releases: every lock expires within bounded time
-    - deadlock_freedom: no resource is permanently blocked
-    - starvation_bound: pending count decreases within fairness bound
-    - eventual_completion: all pending requests are eventually processed
-
-  Design lineage:
-    State_Preservation.thy abstracted cross-domain state preservation
-    into composable locales. This theory extends that methodology to
-    liveness properties — a complementary axis ensuring not just
-    correctness of state (safety) but progress of computation (liveness).
+  Methodological lineage:
+    State_Preservation.thy in this entry abstracts cross-domain state
+    preservation into composable locales. This theory follows the same
+    methodology on the liveness side, providing the operational
+    abstractions through which the safety-side atomic-sync model can
+    be lifted to a Byzantine-fault-tolerant deployment.
 *)
 
 theory Priority_Resolution

@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.3.0
-**Last updated:** 2026-04-17
+**Version:** 0.4.0
+**Last updated:** 2026-05-29
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -280,5 +280,6 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.4.0 | 2026-05-29 | Reflected new concrete locale instantiations in `Regulatory_Instance.thy`: a heterogeneous-action instance of `state_preservation` (escalation preservation) and a layer-crossing instance of `symmetric_state_preservation` (onchain DAML bridge), instantiating the generic safety locales with concrete examples. No change to the assumption set or implementation targets. |
 | 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added "Assumption Release Roadmap" section making the verification program's trajectory transparent. Added "Verification Scope for Creusot and Kani" section. Updated Implementation Target column: OSS and D-quencer language changed from Go to Rust (reflecting Oraclizer Core Rust transition). Added candidate annotations for Phase 2 Creusot and Phase 3 Kani work. |
 | 0.2.0 | 2026-04-07 | Initial mapping for Properties 1 and 2. |

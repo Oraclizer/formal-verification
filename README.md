@@ -17,12 +17,14 @@ This repository contains machine-checked proofs of safety and liveness propertie
 
 The core abstractions are two hierarchies of Isabelle/HOL locales:
 
-- **Cross-Domain State Preservation Functor** (Property 1): Models state synchronization as a functor between categories of state machines, where the naturality condition guarantees structural preservation of transitions.
+- **Cross-Domain State Preservation** (Property 1): A hierarchy of state-machine locales (pairwise state preservation with naturality, symmetric bidirectional preservation, multi-domain preservation) whose naturality condition guarantees structural preservation of transitions across domains.
 - **Priority Resolution and Liveness Locales** (Property 2): Captures deterministic ordering, deadlock avoidance, and starvation freedom as reusable abstractions for leader-based Byzantine consensus systems.
 
 The two properties are connected via an assume-guarantee pattern: the liveness proof of Property 2 discharges the honest-node assumption in Property 1's safety proof, lifting conditional safety into unconditional guarantee under the Byzantine model.
 
-**Design lineage.** Inspired by Lochbihler's [Merkle Functor](https://www.isa-afp.org/entries/ADS_Functor.html) (AFP), which abstracted authenticated data structures into composable building blocks. This work extends that pattern along two complementary axes: cross-domain state preservation (safety) and priority-based liveness under Byzantine faults.
+Every generic locale in both hierarchies is instantiated with a concrete example drawn from the regulatory model, for eight locale interpretations in total.
+
+**Design lineage.** Our use of locales for compositional, reusable abstractions follows the methodological tradition exemplified in the AFP by Lochbihler's [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html) entry, which structured authenticated data structures through composable building blocks. The technical content here is independent of `ADS_Functor`; the connection is one of design philosophy (locale-based reusable abstractions over functor-shaped data), not formal dependency.
 
 ## Verified Properties
 
@@ -82,29 +84,33 @@ The two properties are connected via an assume-guarantee pattern: the liveness p
 
 **Status:** Not started. Planned after Property 1 AFP acceptance.
 
-Property 3 will compose the Cross-Domain State Preservation Functor with Lochbihler's Merkle Functor (AFP entry `ADS_Functor`) to establish end-to-end assurance from Canton off-chain ledgers through OSS synchronization to on-chain EVM state.
+Property 3 will compose the Cross-Domain State Preservation framework with Lochbihler's Merkle Functor (AFP entry `ADS_Functor`) to establish end-to-end assurance from Canton off-chain ledgers through OSS synchronization to on-chain EVM state.
 
 ## Repository Structure
 
 ```
 .
 ├── Cross_Domain_State_Preservation/   # AFP entry
-│   ├── State_Preservation.thy         # Property 1 generic theory (383 lines)
+│   ├── State_Preservation.thy         # Property 1 generic theory (370 lines)
 │   │                                  #   4 locales: state_machine,
 │   │                                  #   state_preservation,
 │   │                                  #   symmetric_state_preservation,
 │   │                                  #   multi_domain_preservation
-│   ├── Regulatory_Instance.thy        # Property 1 regulatory instance (1053 lines)
+│   ├── Regulatory_Instance.thy        # Property 1 regulatory instance (1778 lines)
 │   │                                  #   State machine interpretation,
 │   │                                  #   synchronization protocol,
 │   │                                  #   regulatory homomorphism,
 │   │                                  #   valid state preservation,
-│   │                                  #   multi-domain instantiation
-│   ├── Priority_Resolution.thy        # Property 2 generic theory (422 lines)
+│   │                                  #   multi-domain instantiation,
+│   │                                  #   heterogeneous-action instance
+│   │                                  #     (escalation preservation),
+│   │                                  #   layer-crossing instance
+│   │                                  #     (onchain DAML bridge)
+│   ├── Priority_Resolution.thy        # Property 2 generic theory (407 lines)
 │   │                                  #   3 locales: priority_system,
 │   │                                  #   deadlock_free_locking,
 │   │                                  #   fair_leader_system
-│   ├── DQuencer_Instance.thy          # Property 2 D-quencer instance (491 lines)
+│   ├── DQuencer_Instance.thy          # Property 2 D-quencer instance (660 lines)
 │   │                                  #   Authority levels, priority keys,
 │   │                                  #   BFT system locale,
 │   │                                  #   liveness instantiation,
