@@ -17,8 +17,8 @@ This document tracks the correspondence between formally verified model elements
 
 This mapping covers:
 
-- **Property 1 (Cross-Domain State Preservation Homomorphism)** — safety
-- **Property 2 (D-quencer Determinism, Deadlock Freedom, Starvation Freedom)** — liveness
+- **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
+- **Property 2 (D-quencer Determinism, Deadlock Freedom, Starvation Freedom)**: liveness
 
 Property 3 (Heterogeneous Verification Composition) will be added when it is completed.
 

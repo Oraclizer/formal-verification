@@ -12,8 +12,8 @@ Formal verification artifacts for the [Oraclizer](https://oraclizer.io) oracle s
 
 This repository contains machine-checked proofs of safety and liveness properties for cross-domain state synchronization in Byzantine environments. The proofs establish two independent but complementary guarantees:
 
-1. **Safety** — Regulatory actions (freeze, seize, confiscate, etc.) applied on one blockchain network are faithfully reflected across all connected networks, preserving the structure of state transitions.
-2. **Liveness** — Under Byzantine faults (f < n/3), regulatory actions are resolved deterministically, no asset can be permanently locked, and no pending request is starved indefinitely.
+1. **Safety**: Regulatory actions (freeze, seize, confiscate, etc.) applied on one blockchain network are faithfully reflected across all connected networks, preserving the structure of state transitions.
+2. **Liveness**: Under Byzantine faults (f < n/3), regulatory actions are resolved deterministically, no asset can be permanently locked, and no pending request is starved indefinitely.
 
 The core abstractions are two hierarchies of Isabelle/HOL locales:
 
@@ -171,8 +171,8 @@ Property 2 is complete and will be submitted as an entry update after Property 1
 
 ## Related Resources
 
-- [Oraclizer Research: Proofs](https://research.oraclizer.io/category/proofs/) — Research publications on formal verification
-- [Oraclizer Documentation](https://docs.oraclizer.io/) — Technical documentation
+- [Oraclizer Research: Proofs](https://research.oraclizer.io/category/proofs/): Research publications on formal verification
+- [Oraclizer Documentation](https://docs.oraclizer.io/): Technical documentation
 
 ## License
 
@@ -180,5 +180,5 @@ BSD License. See [LICENSE](LICENSE) for details.
 
 ## Contact
 
-- **Author:** Jinwook Kim (Jay) — jay@oraclizer.io
+- **Author:** Jinwook Kim (Jay), jay@oraclizer.io
 - **Twitter/X:** [@Oraclizer](https://x.com/Oraclizer)
