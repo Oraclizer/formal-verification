@@ -2,7 +2,7 @@
 
 Formal verification artifacts for the [Oraclizer](https://oraclizer.io) oracle state machine, verified in [Isabelle/HOL](https://isabelle.in.tum.de/).
 
-[![License: BSD](https://img.shields.io/badge/License-BSD-blue.svg)](LICENSE)
+[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-green.svg)](https://isabelle.in.tum.de/)
 [![AFP Submission](https://img.shields.io/badge/AFP-submitted-orange.svg)](https://www.isa-afp.org/submission/?id=2026-03-25_06-34-01_784)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.03844-b31b1b.svg)](https://arxiv.org/abs/2604.03844)
@@ -80,11 +80,11 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 
 **Design pattern.** The liveness proof uses assume-guarantee reasoning: the fairness assumption abstracts VRF randomness as a deterministic condition, and Property 2 discharges the honest-node assumption that Property 1 implicitly required. Together they establish unconditional safety + liveness under the Byzantine model.
 
-### Property 3: Heterogeneous Verification Composition
+### Property 3: Cross-Domain State Preservation (Functor)
 
-**Status:** Not started. Planned as a future revision of the entry, after the current revision (safety and liveness) is accepted.
+**Status:** In progress. To be added in a subsequent revision of the entry, after the current revision (safety and liveness) is accepted. The "(Functor)" designation becomes official once the functor laws (identity preservation, composition preservation) are established as theorems within the entry; the current revision provides the foundational locales and concrete instances that support this.
 
-Property 3 will compose the Cross-Domain State Preservation framework with Lochbihler's Merkle Functor (AFP entry `ADS_Functor`) to establish end-to-end assurance from Canton off-chain ledgers through OSS synchronization to on-chain EVM state.
+This revision will compose the Cross-Domain State Preservation framework with Lochbihler's Merkle Functor (AFP entry `ADS_Functor`) to establish end-to-end assurance from Canton off-chain ledgers through OSS synchronization to on-chain EVM state, and will add explicit functor laws (identity and composition preservation) to the entry.
 
 ## Repository Structure
 
@@ -176,7 +176,7 @@ Property 1 (safety) and Property 2 (liveness) are consolidated in the current en
 
 ## License
 
-BSD License. See [LICENSE](LICENSE) for details.
+BSD 3-Clause License. See [LICENSE](LICENSE) for details.
 
 ## Contact
 

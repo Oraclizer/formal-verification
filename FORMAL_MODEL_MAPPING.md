@@ -20,7 +20,7 @@ This mapping covers:
 - **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
 - **Property 2 (D-quencer Determinism, Deadlock Freedom, Starvation Freedom)**: liveness
 
-Property 3 (Heterogeneous Verification Composition) will be added when it is completed.
+Property 3, Cross-Domain State Preservation (Functor), will be added in a subsequent revision.
 
 ## What Verification Establishes and What It Does Not
 

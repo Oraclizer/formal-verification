@@ -1,59 +1,67 @@
-# Contributing to Oraclizer Formal Verification
+# Contributing
 
-Thank you for your interest in contributing to the Oraclizer formal verification project.
+This repository is the public mirror of an academic verification artifact: a set of
+Isabelle/HOL theories submitted to the [Archive of Formal Proofs](https://www.isa-afp.org/)
+and currently under editor review. It is maintained as a single-author scholarly entry rather
+than as a conventional open-source project that merges external pull requests. Please keep this
+context in mind when engaging with the repository.
 
-## Scope
+## What is most welcome
 
-This repository contains Isabelle/HOL theories that formally verify safety and liveness properties of cross-domain state synchronization in Byzantine environments. Contributions may include:
+The highest-value contribution is scrutiny of the proofs themselves:
 
-- Bug reports (counterexamples, incorrect assumptions)
-- Proof improvements (simplification, generalization)
-- New instantiations of the generic locales in `State_Preservation.thy` or `Priority_Resolution.thy`
-- Documentation improvements
+- **Counterexamples** to any stated theorem or property.
+- **Incorrect or overly strong assumptions** in a locale or instance.
+- **Soundness concerns** about the model, the threat model, or the stated scope.
+- **Clarity issues** in the documentation, the abstract, or the model-to-implementation mapping.
 
-## Requirements
+If you find any of these, please open an issue (see below). Reports that question the validity
+or the framing of the formalization are exactly the kind of engagement this entry benefits from.
 
-- **Isabelle version:** 2025-2 or later
-- All theories must build without `sorry` or `oops`
-- Follow existing code style (see below)
+## On code contributions
 
-## Building and Testing
+Because the theories are an AFP submission under review, changes to the `.thy` sources are
+handled through the AFP process and the entry's authorship, not through ad-hoc merges here.
+We do not generally accept pull requests that add new locales, instances, or theorems. If you
+believe a proof change is warranted (a fix for an unsound step, a meaningful simplification, or
+a generalization), please open an issue first to discuss it before preparing any patch. This
+keeps the public mirror consistent with the version under review at the AFP.
+
+## Reporting issues
+
+Please open an issue with:
+
+- The specific theorem, lemma, or locale affected.
+- A minimal reproduction (an Isabelle theory snippet if applicable).
+- Your Isabelle version.
+
+## Building and checking the proofs
+
+Anyone can independently check the proofs:
 
 ```bash
-# Check all proofs
+# Check all proofs (expects: Finished Cross_Domain_State_Preservation, no errors)
 isabelle build -d . Cross_Domain_State_Preservation
 
-# Generate documentation
+# Generate the document PDF
 isabelle build -d . -o document=pdf Cross_Domain_State_Preservation
 ```
 
-All proofs must pass before submitting a pull request.
+- **Isabelle version:** 2025-2 or later.
+- All theories build without `sorry` or `oops`; independent confirmation of this is welcome.
 
-## Code Style
+## Code style (for reference)
 
-- **Theory headers:** Include Title, Author, Maintainer, License fields in the header comment
-- **Locale naming:** Use descriptive `snake_case` names
-- **Lemma naming:** `[subject]_[property]` pattern (e.g., `confiscated_terminal`, `sync_isolation`, `lock_eventually_expires`)
-- **Comments:** Use `text \<open>...\<close>` blocks for documentation, `\<comment> \<open>...\<close>` for inline remarks
-- **LaTeX safety in comments:** When referring to identifiers containing underscores inside `text` blocks, wrap them with `\<^verbatim>\<open>...\<close>` or `\<^term>\<open>...\<close>` to prevent LaTeX rendering errors
-- **Proof style:** Prefer structured Isar proofs over `apply` scripts for non-trivial results
-- **Design decisions:** Document legal or domain-specific justifications in `text` blocks
+These conventions describe the existing sources, for readers studying or independently checking them:
 
-## Pull Request Process
-
-1. Fork the repository
-2. Create a feature branch from `main`
-3. Ensure `isabelle build` passes with no errors
-4. Submit a pull request with a clear description of changes
-
-## Reporting Issues
-
-If you find an error in a proof, an incorrect assumption, or a counterexample to a stated property, please open an issue with:
-
-- The specific theorem or lemma affected
-- A minimal reproduction (Isabelle theory snippet if applicable)
-- Your Isabelle version
+- **Theory headers:** Title, Author, Maintainer, License fields in the header comment.
+- **Locale naming:** descriptive `snake_case`.
+- **Lemma naming:** `[subject]_[property]` (e.g., `confiscated_terminal`, `sync_isolation`, `lock_eventually_expires`).
+- **Comments:** `text \<open>...\<close>` for documentation, `\<comment> \<open>...\<close>` for inline remarks.
+- **LaTeX safety:** when referring to identifiers with underscores inside `text` blocks, wrap them with `\<^verbatim>\<open>...\<close>` or `\<^term>\<open>...\<close>`.
+- **Proof style:** structured Isar proofs preferred over `apply` scripts for non-trivial results.
+- **Design decisions:** legal or domain-specific justifications documented in `text` blocks.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the BSD 2-Clause License.
+By contributing, you agree that your contributions will be licensed under the BSD 3-Clause License.
