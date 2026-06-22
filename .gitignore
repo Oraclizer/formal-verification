@@ -17,9 +17,5 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Claude Code local files (not AFP artifacts)
-.claude/
-CLAUDE.md
-
 # Misnamed gitignore artifacts (from earlier local sessions)
 gitignore
