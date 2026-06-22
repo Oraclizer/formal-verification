@@ -37,14 +37,18 @@ Please open an issue with:
 
 ## Building and checking the proofs
 
-Anyone can independently check the proofs:
+Anyone can independently check the proofs. The entry depends on the AFP entry `ADS_Functor`,
+so the AFP must be available to Isabelle: register it once with `isabelle components -u
+/path/to/afp/thys`, or pass it via `-d` as shown below. See https://www.isa-afp.org/help/ for
+obtaining and using the AFP.
 
 ```bash
-# Check all proofs (expects: Finished Cross_Domain_State_Preservation, no errors)
-isabelle build -d . Cross_Domain_State_Preservation
+# Check all proofs (point -d at both this repo and the AFP)
+# expects: Finished Cross_Domain_State_Preservation, no errors
+isabelle build -d . -d /path/to/afp/thys Cross_Domain_State_Preservation
 
 # Generate the document PDF
-isabelle build -d . -o document=pdf Cross_Domain_State_Preservation
+isabelle build -d . -d /path/to/afp/thys -o document=pdf Cross_Domain_State_Preservation
 ```
 
 - **Isabelle version:** 2025-2 or later.
