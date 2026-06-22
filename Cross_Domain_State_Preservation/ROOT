@@ -1,13 +1,20 @@
 chapter AFP
 
 session Cross_Domain_State_Preservation (AFP) = "HOL-Library" +
-  options [timeout = 600]
+  options [timeout = 1200]
   sessions
     "HOL-Library"
+    "HOL-Eisbach"
+    "ADS_Functor"
   theories
     State_Preservation
     Regulatory_Instance
     Priority_Resolution
     DQuencer_Instance
+    Composition
+    Proof_Automation
+    Functor_Laws
+    Hierarchy
+    External_Instance
   document_files
     "root.tex"

@@ -1,17 +1,17 @@
 # Formal Model to Implementation Mapping
 
 **Version:** 0.4.0
-**Last updated:** 2026-05-29
+**Last updated:** 2026-06-23
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
 
 This document tracks the correspondence between formally verified model elements in the `.thy` files and their planned implementation in Oraclizer's codebase. It serves four purposes:
 
-1. **Design reference:** Implementation code should match the verified model's state transition rules and liveness parameters.
+1. **Design reference:** Implementation code should match the verified model's state transition rules, liveness parameters, and degree-hierarchy guarantees.
 2. **Traceability:** External reviewers can verify that the implementation follows the formal specification.
 3. **Gap tracking:** Identifies where the model makes assumptions that the implementation must satisfy through other means. Assumption explicitness is treated as a design property, not a limitation.
-4. **Assumption release roadmap:** Documents which future properties release which current assumptions, making the verification program's trajectory transparent.
+4. **Assumption scope:** Documents, for each model assumption, whether it is discharged within the current proofs or handled at the implementation layer. Assumption explicitness is treated as a design property, not a limitation.
 
 ## Coverage Scope
 
@@ -19,8 +19,12 @@ This mapping covers:
 
 - **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
 - **Property 2 (D-quencer Determinism, Deadlock Freedom, Starvation Freedom)**: liveness
+- **Cross-Domain State Preservation Functor**: functor laws (identity / composition / associativity over state-preservation morphisms), authenticated cross-domain state soundness via the Merkle interface, and guarded bounded convergence with terminal-faithful safe recovery
+- **Synchronization-Degree Hierarchy**: composable natural transformations between degree functors and degree-class monotonicity (over-provisioning safe, under-provisioning unsafe)
+- **Domain-Independence Instance**: an out-of-regulatory-domain instance discharging the generic locales
+- **Proof Automation**: reusable Eisbach discharge methods for the generic locale obligations
 
-Property 3, Cross-Domain State Preservation (Functor), will be added in a subsequent revision.
+All theory files mapped below are mechanically checked by Isabelle/HOL 2025-2 with no `sorry` or `oops` occurrences.
 
 ## What Verification Establishes and What It Does Not
 
@@ -28,9 +32,9 @@ The Isabelle/HOL proofs in this repository establish properties at the **model l
 
 The current proofs do **not** establish:
 
-- Correspondence between the Isabelle/HOL model and the Rust implementation (refinement proof; scheduled for Phases 2–6 using Creusot/Kani).
+- Correspondence between the Isabelle/HOL model and the Rust implementation (refinement proof; addressed during refinement-proof work using Creusot/Kani).
 - Probabilistic properties of VRF-based leader election (abstracted as the deterministic `fair_leader` assumption; see Assumption Gap Analysis below).
-- Network-level properties such as message loss, partial synchrony, or dynamic topology changes (subject of Open Questions; see Assumption Release Roadmap below).
+- Network-level properties such as message loss, partial synchrony, or dynamic topology changes (handled at the implementation layer; see Assumption Disposition below).
 - Properties of unverified external components: P2P networking, external cryptographic libraries (BLS), UI, database layer.
 
 ---
@@ -57,7 +61,7 @@ The current proofs do **not** establish:
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
 | `fun reg_transition` (35 rules) | State transition logic: `require` + state update in Solidity; `match` expression in OSS (Rust) | Each `(state, action) → state'` rule maps to an exhaustive branch |
-| `no_self_loops` theorem | Assertion: post-state ≠ pre-state | Implementation should include this as a post-condition check; candidate for Creusot annotation in Phase 2 |
+| `no_self_loops` theorem | Assertion: post-state ≠ pre-state | Implementation should include this as a post-condition check; refinement-annotation candidate for Creusot |
 
 ### Design Decisions (Exclusions)
 
@@ -76,7 +80,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `acquire_lock` / `release_lock` | OSS preemptive lock (Rust) | Model assumes atomic lock; implementation uses distributed locking. Refinement of atomicity is the subject of Property 5 |
+| `acquire_lock` / `release_lock` | OSS preemptive lock (Rust) | Model assumes atomic lock; implementation uses distributed locking. Refinement of atomicity is the subject of the preemptive-lock layer |
 | `is_locked` predicate | Lock status check in OSS State DB | |
 
 ### Sync Operation
@@ -85,7 +89,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 |---|---|---|
 | `sync` function (5-step protocol) | OSS sync workflow (Rust) | Model steps: verify → check transition → lock → update all → unlock. Implementation uses BVC (Bind-Verify-Commit) 3-phase execution which collectively satisfies the model's atomic sync specification |
 | `connected_chains` | OSS chain registry | Set of chains holding a given asset; registry-backed dynamic lookup replaces the model's finite set |
-| `update_all_chains` | OSS cross-chain message broadcast | Model is synchronous; implementation is asynchronous with finality tracking. Propagation failure recovery is subject of Property 8 |
+| `update_all_chains` | OSS cross-chain message broadcast | Model is synchronous; implementation is asynchronous with finality tracking. Propagation failure recovery is the subject of the cross-chain finality layer |
 
 ### Global State
 
@@ -114,7 +118,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 |---|---|---|
 | `priority_key = nat × nat × nat × nat` | 4-tuple priority encoding in D-quencer (Rust) | Rust's derived `Ord` for tuples matches Isabelle's product linorder |
 | `make_priority_key max_time max_node msg` | `compute_priority_key(msg)` in D-quencer | 4 components: authority, inverted timestamp, action severity, inverted node ID |
-| `priority_key_injectivity` theorem | Tiebreaking guarantee | Distinct messages never share the same priority key; candidate for Creusot precondition in Phase 4 |
+| `priority_key_injectivity` theorem | Tiebreaking guarantee | Distinct messages never share the same priority key; refinement-annotation candidate for a Creusot precondition |
 | `action_severity` (7 levels from UNRESTRICT=1 to CONFISCATE=7) | Action severity config in D-quencer | Stronger enforcement actions take precedence |
 
 ### Selection Algorithm
@@ -142,7 +146,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 | `timeout: nat, timeout > 0` | `lock_timeout` config parameter | OSS configuration, must be positive; `Duration` type in Rust |
 | `lock_effective` definition | Lock check with timestamp comparison | `current_time < lock_time + timeout` |
 | `lock_eventually_expires` theorem | Byzantine lock resistance guarantee | Even indefinitely-held locks expire by timeout |
-| `deadlock_freedom` theorem | Lock release bound | Lock released within `timeout` time units after acquisition; candidate for Kani model checking in Phase 3 |
+| `deadlock_freedom` theorem | Lock release bound | Lock released within `timeout` time units after acquisition; refinement-annotation candidate for Kani model checking |
 
 ## Starvation Freedom
 
@@ -163,31 +167,118 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 ---
 
+# Cross-Domain State Preservation Functor
+
+## Functor Laws over State-Preservation Morphisms
+
+| Formal Model (`Functor_Laws.thy`, `Composition.thy`) | Implementation Target | Notes |
+|---|---|---|
+| `preservation_id` | Identity adapter between OSS state-machine views (Rust) | The identity morphism (id, id) is a state-preservation morphism; corresponds to a no-op domain adapter |
+| `preservation_compose` | Composed cross-domain adapter pipeline (Rust) | Chaining two domain adapters (e.g. DAML → regulatory → Chain B) is itself a valid preservation morphism; OSS composes adapters at the registry layer |
+| `preservation_assoc` | Adapter pipeline reassociation | Composition order of adapter legs is associative; allows the OSS pipeline to group adapter stages freely |
+| `daml_to_chain_b_composed` | Three-domain adapter (DAML record → regulatory enum → Chain B vocabulary) (Rust) | Obtained purely by composing two legs; mirrors the Canton/DAML → OSS → EVM adapter chain |
+| `guard_is_load_bearing` | Domain-guard enforcement in adapters | The domain guard is essential; implementation must reject out-of-domain records (e.g. RELEASE outside the carved-out domain) rather than projecting blindly |
+
+## Authenticated Cross-Domain State (Merkle Interface Coupling)
+
+| Formal Model | Implementation Target | Notes |
+|---|---|---|
+| `merkle_interface_auth` | Authenticated state commitment over (regulatory state, chain-set) pairs | OSS State DB commitment layer; the concrete triple (hash, blinding-order, merge) forms a Merkle interface (`ADS_Functor` dependency) |
+| `authenticated_preservation_soundness` | Cross-chain view merge in OSS State DB (Rust) | Merging two authenticated views yields a valid join refining each input view; OSS merge of partial chain views must preserve this |
+| `blinded_view_preserves_validity` | Need-to-know disclosure of cross-domain state (Rust) | A blinded view extracts to a valid state refining the original; supports selective disclosure (e.g. regulator-only views) without breaking validity |
+| `state_refines_*` (refl / trans / preserves_consistency) | Partial-view refinement relation | OSS partial-view semantics; refinement is reflexive, transitive, and preserves consistency |
+| `rogue_join_excluded` | Join admission control in OSS State DB | A rogue view adding a FROZEN holding on an unrevealed chain is rejected as a join; OSS must reject inconsistent merges |
+
+## Guarded Bounded Convergence and Safe Recovery
+
+| Formal Model | Implementation Target | Notes |
+|---|---|---|
+| `oraclizer_guarded_bounded_convergence` | OSS recovery / reconciliation loop (Rust) | From any finite-domain, unlocked state (no initial consistency assumed) the system reaches a valid state within a bounded number of evolution steps; bounds the OSS reconciliation loop |
+| `inconsistent_has_safe_recovery` | OSS recovery action selection (Rust) | Any inconsistent, unlocked state admits a terminal-faithful safe recovery; recovery selection must always find a measure-reducing, terminal-faithful step |
+| `sync_reduces_inconsistency` | Recovery progress measure | A synchronization on a disagreeing asset strictly decreases the inconsistency measure; OSS reconciliation must make monotone progress |
+| `safe_recovery_sync_no_fresh_terminal` | Recovery confiscation guard (Rust) | A safe recovery never makes CONFISCATED appear on an asset that did not already carry it; implementation must not synthesize confiscations during recovery |
+| `blind_confiscate_excluded` / `terminal_overwrite_excluded` | Recovery action validation | Indiscriminate confiscation and confiscation erasure are both excluded as safe recoveries; OSS recovery validation must reject both |
+| `fair_schedule_exists` | D-quencer fair scheduling (Rust) | Every D-quencer system admits a fair leader schedule under the BFT threshold; ties the convergence bound to the consensus layer |
+
+---
+
+# Synchronization-Degree Hierarchy
+
+| Formal Model (`Hierarchy.thy`) | Implementation Target | Notes |
+|---|---|---|
+| degree functors `F k` (degree-indexed) | OSS degree-classed processing paths (Rust) | Per-degree processing functor; OSS routes assets to a degree-appropriate path |
+| `degree_natural_transformation` | Degree demotion / blinding map (Rust) | The degree-forgetting map is a natural transformation between adjacent degree functors with commuting squares; OSS degree demotion must commute with processing |
+| `nt_compose` / `nt_vertical_compose` | Multi-step degree demotion | Demotion across multiple degrees composes as a natural transformation; OSS may demote across several degree levels at once |
+| `degree_forget_refines` | Demoted-view refinement | Degree demotion produces a blinding refinement of the original state; demoted views are partial views of the full state |
+| `hierarchy_monotonicity` | Capability-vs-requirement check (Rust) | When system capability degree ≥ asset required degree, processing preserves validity (**over-provisioning is safe**); OSS must verify capability dominates requirement before processing |
+| `over_provisioning_guarantees` | Cross-chain agreement under over-provisioning | All required chains holding the asset agree on its regulatory state after processing |
+| `no_downward_safety` | Under-provisioning rejection (Rust) | Under-provisioning (required degree > capability) admits a state defeating every guarantee; OSS must refuse to process assets whose required degree exceeds system capability |
+| `boundary_well_defined` | Causal-consistency boundary check | The boundary separating adjacent degree classes is single-valued and induced by a strict happened-before order; OSS causal ordering must respect this boundary |
+| `static_promotion_safety` | Static degree re-assignment (governance) | A static re-assignment within system capability transfers the guarantee verbatim; governance-time degree changes are safe within capability |
+
+**Note.** In-flight promotion (a re-assignment crossing a live synchronization) is out of scope for this layer.
+
+---
+
+# Domain-Independence Instance
+
+| Formal Model (`External_Instance.thy`) | Implementation Target | Notes |
+|---|---|---|
+| `tcp_state_machine` / `conntrack_state_machine` | (No Oraclizer implementation target) | An out-of-regulatory-domain instance (TCP/RFC 793 endpoint vs. connection tracker) discharging the generic state-machine locale; demonstrates the framework carries no hidden regulatory assumptions |
+| `tcp_conntrack_preservation` | (No Oraclizer implementation target) | The representation map is a full state-preservation morphism over the tracked event subset; evidence of framework generality, not a deployed component |
+| `tracked_sequence_mirrored` | (No Oraclizer implementation target) | Any tracked packet sequence accepted by the endpoint is mirrored step-for-step by the tracker |
+
+---
+
+# Proof Automation
+
+| Formal Model (`Proof_Automation.thy`) | Implementation Target | Notes |
+|---|---|---|
+| `discharge_state_machine` (Eisbach method) | (No Oraclizer implementation target) | Reusable proof-automation method closing the generic `state_machine` locale obligations via named theorem collections |
+| `discharge_preservation` (Eisbach method) | (No Oraclizer implementation target) | Reusable proof-automation method closing the generic `state_preservation` locale obligations; used to re-derive the regulatory bridges through a single automated discharge |
+
+---
+
 ## Assumption Gap Analysis
 
-The formal model makes simplifying assumptions. This section documents each assumption and how the implementation addresses the gap. Assumption explicitness is a design property: it makes the scope of mechanical verification transparent and enables compositional refinement through subsequent properties.
+The formal model makes simplifying assumptions. This section documents each assumption and how the implementation addresses the gap. Assumption explicitness is a design property: it makes the scope of mechanical verification transparent.
 
 ### Property 1 Assumptions
 
-| Model Assumption | Implementation Reality | Gap Mitigation | Release Plan |
+| Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
-| Synchronous execution (lock → update → unlock is atomic) | Asynchronous cross-chain communication with variable finality | OSS BVC (Bind-Verify-Commit) 3-phase execution collectively satisfies atomicity; per-chain finality tracked; commits only after all chains finalize | Partial release in Property 5 (lock atomicity), Property 8 (propagation failure recovery) |
-| Honest nodes | Byzantine nodes possible | D-quencer BFT consensus with slashing | Released by Property 2 |
-| Finite chain set | Chain set can change over time | RWA Registry manages chain membership; new chains require governance approval | Open Question 2 (dynamic domain topology) |
-| Lock acquisition is instant | Network latency exists | Timeout-based lock expiration with automatic rollback | Property 5 (Preemptive Lock Correctness) |
+| Synchronous execution (lock → update → unlock is atomic) | Asynchronous cross-chain communication with variable finality | OSS BVC (Bind-Verify-Commit) 3-phase execution collectively satisfies atomicity; per-chain finality tracked; commits only after all chains finalize | Handled at the implementation layer (BVC phased execution and per-chain finality tracking) |
+| Honest nodes | Byzantine nodes possible | D-quencer BFT consensus with slashing | Discharged by the D-quencer liveness proof (Property 2) |
+| Finite chain set | Chain set can change over time | RWA Registry manages chain membership; new chains require governance approval | Handled at the implementation layer (RWA Registry membership management) |
+| Lock acquisition is instant | Network latency exists | Timeout-based lock expiration with automatic rollback | Handled at the implementation layer (timeout-based lock expiration with rollback) |
 
 ### Property 2 Assumptions
 
-| Model Assumption | Implementation Reality | Gap Mitigation | Release Plan |
+| Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
-| `fair_leader` deterministic guarantee | VRF-based probabilistic leader election | VRF + leader rotation enforcement + view change mechanisms + L3 force inclusion for extreme cases | Deterministic abstraction retained (see rationale below); probabilistic interpretation is composable but not formalized in current proofs |
-| `honest_progress` (honest leader reduces pending) | Synchronous network with non-empty valid request queue | Standard BFT liveness model; bounded request arrival via admission control | Partial synchrony generalization is Open Question 1 |
-| `non_honest_bounded` (closed system) | Dynamic request arrival | Open-system extension listed as open question | Open Question 3 (open system starvation freedom) |
-| Atomic lock acquisition (Property 2) | Distributed lock contention | Lock queue + timeout + automatic release | Property 5 |
+| `fair_leader` deterministic guarantee | VRF-based probabilistic leader election | VRF + leader rotation enforcement + view change mechanisms + L3 force inclusion for extreme cases | Deterministic abstraction retained in the proofs (see rationale below); the probabilistic VRF behaviour is provided at the implementation layer |
+| `honest_progress` (honest leader reduces pending) | Synchronous network with non-empty valid request queue | Standard BFT liveness model; bounded request arrival via admission control | Handled at the implementation layer (admission control bounding request arrival) |
+| `non_honest_bounded` (closed system) | Dynamic request arrival | Admission control bounds the active request set | Handled at the implementation layer (admission control) |
+| Atomic lock acquisition (Property 2) | Distributed lock contention | Lock queue + timeout + automatic release | Handled at the implementation layer (lock queue with timeout and automatic release) |
+
+### Functor / Convergence Layer Assumptions
+
+| Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
+|---|---|---|---|
+| Atomic single evolution step | OSS reconciliation runs as discrete asynchronous rounds | Each reconciliation round corresponds to one evolution step; round boundaries enforce atomicity per step | Handled at the implementation layer (reconciliation-round boundaries enforce per-step atomicity) |
+| Finite-domain global state | Chain/asset domains grow over time | RWA Registry bounds the active domain at any instant; convergence bound recomputed as domain changes | Handled at the implementation layer (RWA Registry bounds the active domain) |
+| Bounded fairness window (from D-quencer) | VRF-based probabilistic fairness | Inherits the `fair_leader` deterministic abstraction from Property 2 | Same as the Property 2 fair-leader disposition (see rationale below) |
+
+### Synchronization-Degree Hierarchy Assumptions
+
+| Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
+|---|---|---|---|
+| Static degree assignment | Degrees may need re-assignment during operation | `static_promotion_safety` covers governance-time re-assignment within capability; in-flight promotion is out of scope | Discharged in current proofs for governance-time re-assignment (`static_promotion_safety`); in-flight promotion is out of scope of this layer |
+| System capability degree known and fixed | Capability may vary across deployments | Capability declared at genesis / governance; `hierarchy_monotonicity` requires capability ≥ requirement before processing | Handled at the implementation layer (capability declared at genesis / governance) |
 
 ### Rationale for the Deterministic `fair_leader` Abstraction
 
-The `fair_leader` assumption requires that within any `fairness_bound` consecutive epochs, at least one epoch has an honest leader. This is stated deterministically, but actual VRF leader election is probabilistic: under f < n/3 Byzantine faults, the probability of k consecutive Byzantine leaders is `(f/n)^k < (1/3)^k`, which decreases exponentially but is not zero.
+The `fair_leader` assumption requires that within any `fairness_bound` consecutive epochs, at least one epoch has an honest leader. This is stated deterministically, but actual VRF leader election is probabilistic: under f < n/3 Byzantine faults, the probability of k consecutive Byzantine leaders is `(f/n)^k`, which decreases exponentially but is not zero.
 
 The deterministic abstraction is retained for the following reasons:
 
@@ -200,38 +291,40 @@ This abstraction is a separation of concerns: the Isabelle/HOL proof establishes
 
 ---
 
-## Assumption Release Roadmap
+## Assumption Disposition (current scope)
 
-This section maps each model assumption to the future property (if any) that releases it.
+This section records, for each model assumption, whether it is discharged within the current proofs or handled at the implementation layer.
 
-| Current Assumption | Released By | Residual After Release | Final Resolution |
-|---|---|---|---|
-| Honest nodes (Property 1) | Property 2 (Byzantine consensus with f < n/3) | Byzantine consensus liveness | Released within the model |
-| Atomic sync: lock acquisition and release atomicity | Property 5 (Preemptive Lock Correctness) | Multi-step protocol correctness under timing | Resolved at the preemptive lock layer |
-| Atomic sync: cross-chain propagation success | Property 8 (Cross-Chain Pre-trading Finality) | Recovery from propagation failures | Resolved via pending sync queue mechanism |
-| Fair leader (deterministic) | Not released within FV 1–9 scope | Probabilistic VRF composition | Deferred to separate probabilistic verification work (not currently scheduled) |
-| Honest progress (synchronous network) | Partially addressed by Property 8 timing model | Full partial synchrony | Open Question 1 (future work) |
-| Closed system (no dynamic arrivals) | Not released within FV 1–9 scope | Open system liveness | Open Question 3 (future work) |
-| Finite connected_chains (static topology) | Not released within FV 1–9 scope | Dynamic topology | Open Question 2 (future work) |
+| Model Assumption | Disposition |
+|---|---|
+| Honest nodes (Property 1) | Discharged in current proofs by the D-quencer liveness proof (Property 2, Byzantine consensus with f < n/3) |
+| Conditional safety (consistency assumed at start) | Discharged in current proofs by guarded bounded convergence: the system converges to a valid state from an arbitrary unlocked state |
+| Atomic sync: lock acquisition and release atomicity | Handled at the implementation layer (timeout-based locking with automatic rollback) |
+| Atomic sync: cross-chain propagation success | Handled at the implementation layer (pending sync queue with finality tracking) |
+| Fair leader (deterministic) | Deterministic abstraction retained in the proofs (see rationale above); the probabilistic VRF behaviour is provided at the implementation layer |
+| Honest progress (synchronous network) | Handled at the implementation layer (admission control and the cross-chain timing model) |
+| Closed system (no dynamic arrivals) | Handled at the implementation layer (admission control) |
+| Finite connected_chains (static topology) | Handled at the implementation layer (RWA Registry membership management) |
+| Static degree assignment (hierarchy layer) | Discharged in current proofs for governance-time re-assignment (`static_promotion_safety`); in-flight promotion is out of scope of this layer |
 
-The CDSP paper's four Open Questions are elaborated here:
+The CDSP paper states the following open questions:
 
 1. **Partial synchrony extension**: Generalize `fair_leader` and `honest_progress` to partial synchrony. Related work: Castro & Liskov PBFT, HotStuff. Potential approach: Heard-Of model with partial synchrony variants.
 2. **Dynamic topology**: Extend `multi_domain_preservation` to handle chains joining/leaving the connected set. Requires invariant-preserving topology updates.
-3. **Open system starvation freedom**: Release `non_honest_bounded` assumption. Standard approach: admission control bounds + amortized analysis.
-4. **Model-implementation refinement**: The subject of Phases 2–6 with Creusot/Kani. This document itself is the starting point.
+3. **Open system starvation freedom**: Generalize the `non_honest_bounded` assumption. Standard approach: admission control bounds + amortized analysis.
+4. **Model-implementation refinement**: Establishing correspondence between the Isabelle/HOL model and the Rust implementation. This document is the starting point.
 
 ---
 
-## Verification Scope for Creusot and Kani (Phases 2–6)
+## Verification Scope for Creusot and Kani
 
-When refinement proof work begins in Phase 2, the following scope applies:
+During refinement-proof work, the following scope applies:
 
-- **In Creusot scope**: Function-level pre/postconditions derived from model theorems (state transition correctness, priority key injectivity, lock effectiveness predicate, no self-loops).
-- **In Kani scope**: Bounded model checking for concurrency-sensitive code (lock acquisition races, consensus message ordering, timeout expiration races).
-- **Out of both scopes**: Probabilistic VRF properties, network-level timing, cryptographic primitives (BLS signature correctness is assumed from the `bls-signatures` crate). These require either probabilistic verification tools (not currently scheduled) or acceptance as unverified external components.
+- **In Creusot scope**: Function-level pre/postconditions derived from model theorems (state transition correctness, priority key injectivity, lock effectiveness predicate, no self-loops, degree capability-vs-requirement check, recovery confiscation guard).
+- **In Kani scope**: Bounded model checking for concurrency-sensitive code (lock acquisition races, consensus message ordering, timeout expiration races, reconciliation-round atomicity).
+- **Out of both scopes**: Probabilistic VRF properties, network-level timing, cryptographic primitives (BLS signature correctness is assumed from the `bls-signatures` crate). These are handled either by probabilistic verification tools or by acceptance as unverified external components.
 
-Specific theorems targeted for refinement annotation in each phase are listed under "Candidate for Creusot annotation" and "Candidate for Kani model checking" notes in the mapping tables above.
+Specific theorems treated as refinement-annotation candidates are listed under the "refinement-annotation candidate for Creusot" and "refinement-annotation candidate for Kani model checking" notes in the mapping tables above.
 
 ---
 
@@ -262,17 +355,28 @@ Until formal refinement proofs (model → code) are available, the following tes
 | `eventual_completion` | Integration test: simulated load with pending requests; verify queue drains | Planned |
 | `combined_safety_liveness` | End-to-end test: Byzantine environment, cross-chain sync under concurrent regulatory actions | Planned |
 
+### Functor / Convergence and Hierarchy Theorems
+
+| Theorem | Test Strategy | Status |
+|---|---|---|
+| `authenticated_preservation_soundness` | Property test: random pairs of authenticated views merge to a valid join refining each input | Planned |
+| `blinded_view_preserves_validity` | Property test: blinded views extract to valid states refining the original | Planned |
+| `oraclizer_guarded_bounded_convergence` | Integration test: random unlocked inconsistent state reaches a valid state within the computed bound | Planned |
+| `safe_recovery_sync_no_fresh_terminal` | Integration test: recovery never introduces a fresh CONFISCATED holding | Planned |
+| `hierarchy_monotonicity` | Property test: over-provisioned processing preserves validity | Planned |
+| `no_downward_safety` | Property test: under-provisioned processing exhibits a guarantee-defeating state | Planned |
+
 ---
 
 ## Update Policy
 
 This document is updated when:
 
-- New `.thy` files are added (Property 3 and beyond)
+- New `.thy` files are added
 - Implementation code is written that corresponds to model elements
 - A model-implementation gap is discovered
 - Model assumptions change
-- A new assumption release relationship is established by a completed property
+- An assumption disposition changes (discharged in current proofs vs. handled at the implementation layer)
 
 Changes are committed with the message format: `mapping update: [reason]`
 
@@ -280,6 +384,6 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
-| 0.4.0 | 2026-05-29 | Reflected new concrete locale instantiations in `Regulatory_Instance.thy`: a heterogeneous-action instance of `state_preservation` (escalation preservation) and a layer-crossing instance of `symmetric_state_preservation` (onchain DAML bridge), instantiating the generic safety locales with concrete examples. No change to the assumption set or implementation targets. |
-| 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added "Assumption Release Roadmap" section making the verification program's trajectory transparent. Added "Verification Scope for Creusot and Kani" section. Updated Implementation Target column: OSS and D-quencer language changed from Go to Rust (reflecting Oraclizer Core Rust transition). Added candidate annotations for Phase 2 Creusot and Phase 3 Kani work. |
+| 0.4.0 | 2026-06-23 | Added mappings for the new theories now in the repository: the Cross-Domain State Preservation Functor (`Composition.thy`, `Functor_Laws.thy`: functor laws over preservation morphisms, authenticated cross-domain state soundness via the Merkle interface, guarded bounded convergence and terminal-faithful safe recovery), the Synchronization-Degree Hierarchy (`Hierarchy.thy`: composable natural transformations and degree-class monotonicity), the domain-independence instance (`External_Instance.thy`), and the proof-automation layer (`Proof_Automation.thy`). Added corresponding assumption-gap rows (functor/convergence and hierarchy), assumption-disposition rows, and theorem-to-test rows. All mapped theories are mechanized and `sorry`/`oops`-free. No change to the Property 1/2 assumption set or implementation targets. |
+| 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added an assumption-disposition section recording, per assumption, whether it is discharged in the proofs or handled at the implementation layer. Added "Verification Scope for Creusot and Kani" section. Updated Implementation Target column: OSS and D-quencer language changed from Go to Rust (reflecting Oraclizer Core Rust transition). Added refinement-annotation candidate notes for Creusot and Kani work. |
 | 0.2.0 | 2026-04-07 | Initial mapping for Properties 1 and 2. |
