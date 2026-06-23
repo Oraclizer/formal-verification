@@ -1,6 +1,6 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.4.0
+**Version:** 0.4.1
 **Last updated:** 2026-06-23
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
@@ -69,7 +69,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 | Exclusion | Formal Justification | Implementation Note |
 |---|---|---|
-| RECOVER excluded from state machine | Force transfer operation, not a state transition | Implemented as `_forceTransfer(current, original, amount)` |
+| RECOVER excluded from state machine | Force transfer operation, not a state transition | Implemented as a force-transfer operation |
 | LIQUIDATE excluded from state machine | Force transfer + external DEX interaction | Implemented in ERC-TRUST Extensions |
 | SEIZED → FROZEN direct transition | Seizure is strictly stronger than freezing (legal precedence) | Path: RELEASE → ACTIVE → FREEZE |
 | FROZEN → RESTRICTED direct transition | Must pass through ACTIVE | Path: UNFREEZE → ACTIVE → RESTRICT |
@@ -95,7 +95,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `global_state` record | OSS State DB (RocksDB) | |
+| `global_state` record | OSS State DB (embedded key-value store) | |
 | `valid_state` invariant | Runtime invariant check | `consistent_state ∧ no_locked_without_reason` |
 | `consistent_state` | Cross-chain state consistency check | All chains agree on regulatory state for each asset |
 
@@ -322,7 +322,7 @@ During refinement-proof work, the following scope applies:
 
 - **In Creusot scope**: Function-level pre/postconditions derived from model theorems (state transition correctness, priority key injectivity, lock effectiveness predicate, no self-loops, degree capability-vs-requirement check, recovery confiscation guard).
 - **In Kani scope**: Bounded model checking for concurrency-sensitive code (lock acquisition races, consensus message ordering, timeout expiration races, reconciliation-round atomicity).
-- **Out of both scopes**: Probabilistic VRF properties, network-level timing, cryptographic primitives (BLS signature correctness is assumed from the `bls-signatures` crate). These are handled either by probabilistic verification tools or by acceptance as unverified external components.
+- **Out of both scopes**: Probabilistic VRF properties, network-level timing, cryptographic primitives (BLS signature correctness is assumed from an external BLS signature library). These are handled either by probabilistic verification tools or by acceptance as unverified external components.
 
 Specific theorems treated as refinement-annotation candidates are listed under the "refinement-annotation candidate for Creusot" and "refinement-annotation candidate for Kani model checking" notes in the mapping tables above.
 
@@ -384,6 +384,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.4.1 | 2026-06-23 | Editorial pass: generalized infrastructure-specific references in the implementation-target column (storage engine, a force-transfer signature, the BLS library reference). No change to theorems, assumptions, mappings, or dispositions. |
 | 0.4.0 | 2026-06-23 | Added mappings for the new theories now in the repository: the Cross-Domain State Preservation Functor (`Composition.thy`, `Functor_Laws.thy`: functor laws over preservation morphisms, authenticated cross-domain state soundness via the Merkle interface, guarded bounded convergence and terminal-faithful safe recovery), the Synchronization-Degree Hierarchy (`Hierarchy.thy`: composable natural transformations and degree-class monotonicity), the domain-independence instance (`External_Instance.thy`), and the proof-automation layer (`Proof_Automation.thy`). Added corresponding assumption-gap rows (functor/convergence and hierarchy), assumption-disposition rows, and theorem-to-test rows. All mapped theories are mechanized and `sorry`/`oops`-free. No change to the Property 1/2 assumption set or implementation targets. |
-| 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added an assumption-disposition section recording, per assumption, whether it is discharged in the proofs or handled at the implementation layer. Added "Verification Scope for Creusot and Kani" section. Updated Implementation Target column: OSS and D-quencer language changed from Go to Rust (reflecting Oraclizer Core Rust transition). Added refinement-annotation candidate notes for Creusot and Kani work. |
+| 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added an assumption-disposition section recording, per assumption, whether it is discharged in the proofs or handled at the implementation layer. Added "Verification Scope for Creusot and Kani" section. Added refinement-annotation candidate notes for Creusot and Kani work. |
 | 0.2.0 | 2026-04-07 | Initial mapping for Properties 1 and 2. |
