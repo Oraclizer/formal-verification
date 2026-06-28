@@ -62,7 +62,7 @@ These conventions describe the existing sources, for readers studying or indepen
 - **Locale naming:** descriptive `snake_case`.
 - **Lemma naming:** `[subject]_[property]` (e.g., `confiscated_terminal`, `sync_isolation`, `lock_eventually_expires`).
 - **Comments:** `text \<open>...\<close>` for documentation, `\<comment> \<open>...\<close>` for inline remarks.
-- **LaTeX safety:** when referring to identifiers with underscores inside `text` blocks, wrap them with `\<^verbatim>\<open>...\<close>` or `\<^term>\<open>...\<close>`.
+- **LaTeX safety:** the AFP document build runs LaTeX over `text` blocks and `\<comment> \<open>...\<close>` inline comments, so a bare underscore in either breaks it (math-mode error). When referring to identifiers with underscores inside a `text` block or a `\<comment>` comment, wrap them with `\<^verbatim>\<open>...\<close>` or `\<^term>\<open>...\<close>`, or word the remark without underscores.
 - **Proof style:** structured Isar proofs preferred over `apply` scripts for non-trivial results.
 - **Design decisions:** legal or domain-specific justifications documented in `text` blocks.
 

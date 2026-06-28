@@ -6,14 +6,19 @@
 
   D-quencer Regulatory Instance of the Priority Resolution Locales
 
-  This theory instantiates the generic locales priority_system,
-  deadlock_free_locking, and fair_leader_system from Priority_Resolution.thy
-  with the D-quencer consensus mechanism of Oraclizer.
+  This theory instantiates the generic locales priority_system and
+  fair_leader_system from Priority_Resolution.thy with the D-quencer
+  consensus mechanism of Oraclizer.
 
-  D-quencer is a decentralized sequencing engine for regulatory state
-  synchronization. It operates under Byzantine fault tolerance (f < n/3),
-  uses BLS multisig + VRF leader election, and must handle conflicting
-  regulatory actions from multiple jurisdictions.
+  In the Oraclizer product the D-quencer is a decentralized sequencing
+  engine (BLS multisig with VRF leader election). That distributed
+  consensus is product context, not what this theory formalizes: here the
+  sequencer is abstracted as deterministic priority selection under a
+  static Byzantine-threshold assumption, a cardinality bound (f < n/3) on
+  a two-valued node tag, with conflicting regulatory actions from multiple
+  jurisdictions resolved by a total priority order. BLS, VRF, network
+  messaging, and adversarial node behaviour are not formalized (see the
+  design decisions below).
 
   Locale instantiations provided in this theory:
     1. priority_system (dq_priority): instantiated on the
@@ -28,22 +33,26 @@
        induced priority-key set back to its unique message via the
        priority-key distinctness assumption and the
        \<^verbatim>\<open>priority_key_injectivity\<close> lemma.
-    2. deadlock_free_locking (dq_locking): instantiated with the system's
-       lock_timeout, providing timeout-based forced lock release.
-    3. fair_leader_system (dq_fair): instantiated within a sublocale
+    2. fair_leader_system (dq_fair): instantiated within a sublocale
        dquencer_liveness extending dquencer_system with a leader schedule
        and pending-count function satisfying the locale assumptions.
 
   Key results:
     1. Priority instantiation: regulatory action priority is a total order
        based on authority level, timestamp, severity, and node ID.
-    2. Determinism: BFT consensus produces a unique, deterministic result.
-    3. Deadlock freedom: timeout-based lock release prevents Byzantine
-       nodes from permanently blocking assets.
+    2. Determinism: the priority-ordered selection produces a unique,
+       deterministic result (a total order on priority keys, not a BFT
+       consensus protocol).
+    3. Deadlock: out of scope (not a proved result). The atomic sync model
+       has no concurrent lock contention, so deadlock does not arise within
+       the model's scope; forced lock release under contention is deferred
+       to the preemptive-lock property.
     4. Starvation freedom: under the fair leader assumption, every pending
        regulatory request is processed within bounded time.
-    5. Combined safety + liveness: connecting Property 1 (cross-domain
-       state preservation) with Property 2 (determinism + liveness).
+    5. Combined safety (conditional): conditional_safety_preservation restates
+       valid_state_preservation under an unlocked precondition. Its proof
+       uses only the safety side and does not fuse liveness; the genuine
+       fusion is oraclizer_guarded_bounded_convergence (Functor_Laws.thy).
 
   Design decisions:
     - Byzantine model: f < n/3 (standard BFT threshold).
@@ -93,7 +102,7 @@ text \<open>
   authority level. Stronger enforcement actions (CONFISCATE, SEIZE)
   take precedence over weaker ones (RESTRICT, UNFREEZE). This reflects
   the legal principle that more conservative (asset-protective) actions
-  should prevail when concurrent conflicting orders exist.
+  prevail when conflicting orders must be ranked against one another.
 \<close>
 
 fun action_severity :: "reg_action \<Rightarrow> nat" where
@@ -200,7 +209,6 @@ text \<open>
 locale dquencer_system =
   fixes nodes :: "node_info set"
     and f_max :: nat
-    and lock_timeout :: nat
     and fairness_bound :: nat
     and max_time :: nat
     and max_node :: nat
@@ -208,7 +216,6 @@ locale dquencer_system =
     and bft_threshold: "card nodes \<ge> 3 * f_max + 1"
     and byzantine_bound: "card (byzantine_nodes nodes) \<le> f_max"
     and nonempty_nodes: "nodes \<noteq> {}"
-    and timeout_positive: "lock_timeout > 0"
     and fairness_positive: "fairness_bound > 0"
 begin
 
@@ -419,98 +426,6 @@ corollary dq_select_highest_message:
 end
 
 
-section \<open>BFT Consensus Abstraction\<close>
-
-text \<open>
-  We abstract the BFT consensus mechanism. Rather than formalizing
-  BLS signatures and vote counting, we model the consensus as:
-  given a set of messages and honest majority, the consensus output
-  is the highest-priority valid message.
-
-  This is justified because:
-  \<^enum> Honest nodes follow the priority protocol
-  \<^enum> With > 2/3 honest nodes, the BFT consensus output reflects
-    the honest majority's agreement
-  \<^enum> The honest majority will agree on the highest-priority message
-    (since priority is a total order and deterministic)
-\<close>
-
-definition valid_dq_message :: "global_state \<Rightarrow> dq_message \<Rightarrow> bool" where
-  "valid_dq_message gs msg =
-    (asset_exists gs (msg_source msg) (msg_asset_id msg) \<and>
-     (\<exists>s. get_reg_state gs (msg_source msg) (msg_asset_id msg) = Some s \<and>
-          reg_transition s (msg_action msg) \<noteq> None))"
-
-text \<open>
-  A scalar encoding of the priority key for use with \<^verbatim>\<open>sort_key\<close>.
-  Maps each message to a single natural number that preserves the
-  lexicographic order on priority key components, given the bounds
-  \<^term>\<open>max_t\<close> and \<^term>\<open>max_n\<close>.
-\<close>
-
-definition priority_scalar ::
-  "nat \<Rightarrow> nat \<Rightarrow> dq_message \<Rightarrow> nat"
-where
-  "priority_scalar max_t max_n m =
-    authority_rank (dqm_authority_level m) * (Suc max_t) * 8 * (Suc max_n) +
-    (max_t - msg_timestamp m) * 8 * (Suc max_n) +
-    action_severity (msg_action m) * (Suc max_n) +
-    (max_n - dqm_source_node m)"
-
-definition bft_select ::
-  "dq_message list \<Rightarrow> global_state \<Rightarrow> nat \<Rightarrow> nat \<Rightarrow> dq_message option"
-where
-  "bft_select msgs gs max_t max_n =
-    (let valid_msgs = filter (valid_dq_message gs) msgs;
-         ranked = sort_key (priority_scalar max_t max_n) valid_msgs
-     in if ranked = [] then None else Some (last ranked))"
-
-
-section \<open>Deadlock-Free Locking Instantiation\<close>
-
-text \<open>
-  We instantiate the \<^verbatim>\<open>deadlock_free_locking\<close> locale with the
-  D-quencer's lock timeout. This provides:
-  \<^enum> Every lock expires within \<^verbatim>\<open>lock_timeout\<close> time units
-  \<^enum> Byzantine nodes that hold locks indefinitely are handled
-    by forced timeout release
-  \<^enum> Deadlock freedom: no asset can be permanently blocked
-\<close>
-
-context dquencer_system
-begin
-
-text \<open>
-  The D-quencer system's lock timeout satisfies the
-  \<^verbatim>\<open>deadlock_free_locking\<close> locale.
-\<close>
-
-interpretation dq_locking: deadlock_free_locking lock_timeout
-  by unfold_locales (rule timeout_positive)
-
-text \<open>
-  Concrete deadlock freedom for the D-quencer:
-  any locked asset will be unlocked within \<^verbatim>\<open>lock_timeout\<close> time.
-\<close>
-
-corollary dq_deadlock_freedom:
-  assumes "dq_locking.lock_effective lock_time current_time"
-  shows "\<exists>t'. t' \<le> lock_time + lock_timeout \<and>
-              \<not> dq_locking.lock_effective lock_time t'"
-  using dq_locking.deadlock_freedom[OF assms] .
-
-text \<open>
-  Byzantine lock resistance: even if a Byzantine node acquires
-  a lock and never releases it, the lock expires by timeout.
-\<close>
-
-corollary byzantine_lock_expires:
-  "\<exists>t'. \<not> dq_locking.lock_effective lock_time t'"
-  using dq_locking.lock_eventually_expires by auto
-
-end
-
-
 section \<open>Fair Leader Starvation Freedom Instantiation\<close>
 
 text \<open>
@@ -580,27 +495,38 @@ end
 section \<open>Combined Safety and Liveness\<close>
 
 text \<open>
-  This section connects Property 1 (cross-domain state preservation,
-  safety) with Property 2 (determinism + liveness).
+  This section records how the safety result of Property 1 (cross-domain
+  state preservation) sits alongside the liveness results of Property 2
+  (deterministic selection, timeout-bounded locking, fair scheduling).
 
-  Property 1 guarantees: if sync is executed correctly, the resulting
-  state preserves cross-domain consistency.
+  The theorem below, \<^verbatim>\<open>conditional_safety_preservation\<close>, is a \<^emph>\<open>conditional
+  safety\<close> statement: from a valid global state in which the target asset
+  is unlocked and a transition is enabled, the synchronization function
+  succeeds and preserves the global validity invariant. Its proof uses
+  only the safety side (\<^verbatim>\<open>lock_acquire_success\<close> and
+  \<^verbatim>\<open>valid_state_preservation\<close>); it does not invoke the liveness
+  interpretations (\<^verbatim>\<open>dq_priority\<close>, \<^verbatim>\<open>dq_fair\<close>) and makes no
+  Byzantine, determinism, deadlock, or starvation claim of its own. Those
+  liveness properties are the separate theorems of this theory
+  (\<^verbatim>\<open>dq_select_highest_deterministic\<close> and
+  \<^verbatim>\<open>dq_starvation_bound\<close>), each stated in its own right.
 
-  Property 2 guarantees: under Byzantine faults, D-quencer
-  deterministically selects actions, locks are bounded by timeout,
-  and all pending requests are eventually processed.
-
-  Combined: in a decentralized Byzantine environment, cross-domain
-  regulatory state is synchronized deterministically, without deadlock,
-  and without starvation.
+  The genuine fusion of the two sides --- safety made \<^emph>\<open>unconditional\<close> by a
+  well-founded progress measure on cross-chain inconsistency, under the
+  fair-leader assumption --- is
+  \<^verbatim>\<open>oraclizer_guarded_bounded_convergence\<close> in \<^verbatim>\<open>Functor_Laws.thy\<close>, which
+  drops the initial-validity hypothesis assumed here.
 \<close>
 
 text \<open>
-  The combined theorem ties \<^verbatim>\<open>valid_state_preservation\<close> from
-  \<^verbatim>\<open>Regulatory_Instance.thy\<close> with the liveness guarantees from this theory.
+  The statement below is a leaf corollary: it restates
+  \<^verbatim>\<open>valid_state_preservation\<close> under the explicit precondition that the asset
+  is unlocked --- the precondition the lock discipline is designed to
+  establish. It is deliberately not the place where liveness and safety
+  are fused (see \<^verbatim>\<open>Functor_Laws.thy\<close>).
 \<close>
 
-theorem combined_safety_liveness:
+theorem conditional_safety_preservation:
   assumes valid: "valid_state gs"
     and exists: "asset_exists gs source aid"
     and current: "get_reg_state gs source aid = Some s"
@@ -642,9 +568,12 @@ text \<open>
     deterministic selection from any finite non-empty set of valid
     candidate messages.
 
-  \<^enum> \<^bold>\<open>Deadlock freedom\<close> (Property 2): No asset can be permanently
-    locked, even if Byzantine nodes refuse to release locks.
-    Timeout-based forced release bounds the lock duration.
+  \<^enum> \<^bold>\<open>Deadlock\<close> (Property 2, scope note): deadlock is a concurrency
+    phenomenon. The atomic sync model has no concurrent lock contention
+    (lock holding is a boolean without contended holders), so deadlock does
+    not arise within the model's scope; forced lock release under contention
+    is out of scope, deferred to the preemptive-lock property. The theory
+    states no proved deadlock-freedom theorem.
 
   \<^enum> \<^bold>\<open>Starvation freedom\<close> (Property 2): Under the fair leader
     assumption, every pending regulatory request is processed

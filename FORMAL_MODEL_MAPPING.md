@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.4.1
-**Last updated:** 2026-06-23
+**Version:** 0.5.0
+**Last updated:** 2026-06-29
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -20,6 +20,7 @@ This mapping covers:
 - **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
 - **Property 2 (D-quencer Determinism, Deadlock Freedom, Starvation Freedom)**: liveness
 - **Cross-Domain State Preservation Functor**: functor laws (identity / composition / associativity over state-preservation morphisms), authenticated cross-domain state soundness via the Merkle interface, and guarded bounded convergence with terminal-faithful safe recovery
+- **Authenticated Functor and Canton Instantiation**: composite functor laws over the authenticated extraction map, sequence-level authenticity preservation (validity, need-to-know, hash soundness, state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree
 - **Synchronization-Degree Hierarchy**: composable natural transformations between degree functors and degree-class monotonicity (over-provisioning safe, under-provisioning unsafe)
 - **Domain-Independence Instance**: an out-of-regulatory-domain instance discharging the generic locales
 - **Proof Automation**: reusable Eisbach discharge methods for the generic locale obligations
@@ -138,15 +139,9 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 | `byzantine_bound: card byzantine_nodes ≤ f_max` | Byzantine fault assumption | Not directly enforced; ensured by honest majority assumption |
 | `honest_majority` theorem | Security invariant | Honest nodes > 2f (derived from BFT threshold) |
 
-## Deadlock Freedom
+## Deadlock (Out of Scope)
 
-| Formal Model | Implementation Target | Notes |
-|---|---|---|
-| `deadlock_free_locking` locale | OSS preemptive lock with timeout (Rust) | Generic timeout-based locking |
-| `timeout: nat, timeout > 0` | `lock_timeout` config parameter | OSS configuration, must be positive; `Duration` type in Rust |
-| `lock_effective` definition | Lock check with timestamp comparison | `current_time < lock_time + timeout` |
-| `lock_eventually_expires` theorem | Byzantine lock resistance guarantee | Even indefinitely-held locks expire by timeout |
-| `deadlock_freedom` theorem | Lock release bound | Lock released within `timeout` time units after acquisition; refinement-annotation candidate for Kani model checking |
+The atomic `sync` model has no concurrent lock contention, so deadlock does not arise within the model's scope; forced lock release under contention is deferred to a preemptive-lock layer. No deadlock formal model is mapped here.
 
 ## Starvation Freedom
 
@@ -163,7 +158,8 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `combined_safety_liveness` theorem | End-to-end guarantee: sync succeeds AND preserves validity | Ties Property 1's `valid_state_preservation` with Property 2's liveness guarantees |
+| `conditional_safety_preservation` theorem | Conditional safety: from valid + unlocked, sync succeeds and preserves validity | Restates `valid_state_preservation` under the unlocked precondition; its proof uses only the safety side (no liveness interpretations). The unconditional fusion of safety and liveness is `oraclizer_guarded_bounded_convergence` |
+| `liveness_inhabitable` theorem | Satisfiability of the fair-leader assumption | Derives a fair schedule from the BFT threshold (via `fair_schedule_exists`), making the Byzantine chain load-bearing; `bft_quorum` is a non-degenerate (n=4, f=1) witness |
 
 ---
 
@@ -199,6 +195,21 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 | `safe_recovery_sync_no_fresh_terminal` | Recovery confiscation guard (Rust) | A safe recovery never makes CONFISCATED appear on an asset that did not already carry it; implementation must not synthesize confiscations during recovery |
 | `blind_confiscate_excluded` / `terminal_overwrite_excluded` | Recovery action validation | Indiscriminate confiscation and confiscation erasure are both excluded as safe recoveries; OSS recovery validation must reject both |
 | `fair_schedule_exists` | D-quencer fair scheduling (Rust) | Every D-quencer system admits a fair leader schedule under the BFT threshold; ties the convergence bound to the consensus layer |
+
+---
+
+# Authenticated Functor and Canton Transaction-Tree Instantiation
+
+| Formal Model (`Canton_Bridge.thy`) | Implementation Target | Notes |
+|---|---|---|
+| `cdsp_ads_compose` / `cdsp_ads_merge_assoc` | OSS authenticated commitment layer (Rust) | The extraction map is a composite functor from the ADS blinding preorder to the cross-domain refinement preorder; composing two domain views composes their authenticated refinements, and the lifted merge is associative |
+| `sequence_authenticity_preservation` / `sequence_merge_soundness` | OSS multi-step view reconciliation (Rust) | Single-step authenticity generalizes to a whole synchronization sequence: every partial view along a path of blindings, and an n-ary fold of merges, extracts to a valid state refining the endpoint |
+| `sequence_inclusion_integrity` | OSS revealed-holding inclusion check | Any holding revealed by a view in a sequence is included in the most-revealed endpoint with the same regulatory state (state-level inclusion, sharpened to concrete Merkle-path inclusion by the inclusion-proof instantiation below) |
+| `oss_blindable` | OSS State DB commitment over the ADS blindable functor | Instantiation on the concrete blindable-position functor of `ADS_Functor`, beyond the bespoke interface |
+| `reg_tx_authenticated` / `demo_subview_disclosure` | OSS / Canton bridge transaction commitment (Rust) | Instantiation on a recursive model of the Canton transaction tree (public rose-tree Merkle machinery, concrete content); subview-level selective disclosure is preserved in the proofs |
+| `reg_view_inclusion_same_hash` / `reg_view_inclusion_blinding_of` / `reg_view_inclusion_chains_sound` | OSS Merkle inclusion-proof verifier (Rust) | The recursive view tree is instantiated on the entry's generic rose-tree inclusion-proof (zipper) machinery: each inclusion proof commits to the same root hash as the full tree, is a blinding of it, and its attested chains are contained in the full set; no added assumption |
+
+**Model-fidelity boundary (for confirmation against the Canton specification).** The recursive Canton instance is structurally faithful, with two declared modelling choices: concrete leaf content in place of the opaque content types of the public Canton model, and a shared, non-independently-blindable consensus field (so a revealed view under a blinded consensus is out of scope). These are model-fidelity items, not proof gaps; no axiom relates the opaque Canton types to the regulatory model.
 
 ---
 
@@ -349,11 +360,9 @@ Until formal refinement proofs (model → code) are available, the following tes
 |---|---|---|
 | `select_highest_deterministic` | Unit test: given same message set, D-quencer produces identical output across runs | Planned |
 | `priority_key_injectivity` | Unit test: distinct messages (by any of 4 fields) produce distinct priority keys | Planned |
-| `lock_eventually_expires` | Integration test: simulated Byzantine node holds lock; verify expiration by timeout | Planned |
-| `deadlock_freedom` | Integration test: concurrent lock requests + timeout; verify no permanent block | Planned |
 | `starvation_bound` | Integration test: repeated Byzantine leader attempts; verify honest leader within `fairness_bound` | Planned |
 | `eventual_completion` | Integration test: simulated load with pending requests; verify queue drains | Planned |
-| `combined_safety_liveness` | End-to-end test: Byzantine environment, cross-chain sync under concurrent regulatory actions | Planned |
+| `conditional_safety_preservation` | End-to-end test: from a valid, unlocked state with an enabled transition, verify sync succeeds and the result is valid (the corollary's conditional-safety scope) | Planned |
 
 ### Functor / Convergence and Hierarchy Theorems
 
@@ -384,6 +393,8 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.5.1 | 2026-06-25 | Added `Canton_Bridge.thy` path-level Merkle inclusion mappings (`reg_view_inclusion_same_hash` / `reg_view_inclusion_blinding_of` / `reg_view_inclusion_chains_sound`): the recursive view tree is instantiated on the entry's generic rose-tree inclusion-proof (zipper) machinery, sharpening sequence-level inclusion to the concrete Merkle path with no added assumption. Monotone addition; no change to existing theories, theorems, assumptions, or dispositions. |
+| 0.5.0 | 2026-06-24 | Added `Canton_Bridge.thy` mappings: composite functor laws over the authenticated extraction map, sequence-level authenticity preservation (validity / need-to-know / hash soundness / state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree, with the declared model-fidelity boundary. Monotone addition; no change to existing theories, theorems, assumptions, or dispositions. |
 | 0.4.1 | 2026-06-23 | Editorial pass: generalized infrastructure-specific references in the implementation-target column (storage engine, a force-transfer signature, the BLS library reference). No change to theorems, assumptions, mappings, or dispositions. |
 | 0.4.0 | 2026-06-23 | Added mappings for the new theories now in the repository: the Cross-Domain State Preservation Functor (`Composition.thy`, `Functor_Laws.thy`: functor laws over preservation morphisms, authenticated cross-domain state soundness via the Merkle interface, guarded bounded convergence and terminal-faithful safe recovery), the Synchronization-Degree Hierarchy (`Hierarchy.thy`: composable natural transformations and degree-class monotonicity), the domain-independence instance (`External_Instance.thy`), and the proof-automation layer (`Proof_Automation.thy`). Added corresponding assumption-gap rows (functor/convergence and hierarchy), assumption-disposition rows, and theorem-to-test rows. All mapped theories are mechanized and `sorry`/`oops`-free. No change to the Property 1/2 assumption set or implementation targets. |
 | 0.3.0 | 2026-04-17 | Added "What Verification Establishes and What It Does Not" scope declaration. Added rationale for deterministic `fair_leader` abstraction (Heard-Of model tradition, Wanner et al. SRDS 2020 precedent). Added an assumption-disposition section recording, per assumption, whether it is discharged in the proofs or handled at the implementation layer. Added "Verification Scope for Creusot and Kani" section. Added refinement-annotation candidate notes for Creusot and Kani work. |

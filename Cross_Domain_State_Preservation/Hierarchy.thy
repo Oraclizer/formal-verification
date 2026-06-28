@@ -14,17 +14,24 @@
   keeps chains 0..k of an asset in lockstep around a hub chain (chain 0).
   This yields a tower of transition functors F 0, F 1, F 2, F 3, ... with the
   weaker functor obtained from the stronger one by forgetting the top coupled
-  chain.  The forgetful map degree_forget is shown to be a genuine natural
-  transformation between consecutive degrees (degree_natural_transformation):
-  its naturality square --- forget-after-transition equals
-  transition-after-forget --- commutes.  Crucially, natural transformations
-  are closed under composition (nt_compose / nt_vertical_compose), so the
-  whole ladder F (k+2) => F (k+1) => F k is structurally coherent, not merely
-  a point-to-point collection of forgetful maps.  This functor-tower layer,
-  with natural transformations between the functors, is the region of the
-  design that Lochbihler and Maric's ADS_Functor does not reach: ADS_Functor
-  establishes closure of functors under composition, but not a hierarchy of
-  functors with natural transformations between them.
+  chain.  Each F k is a genuine functor on the free category of regulatory
+  action words: it preserves the identity word and word concatenation
+  (deg_run_Nil, deg_run_append), and --- the non-degenerate content --- its
+  action on a word collapses to the composite regulatory transition broadcast
+  once (deg_run_collapse, via the broadcast-overwrite and hub-tracking lemmas),
+  so it is not a vacuous fold over an index set.  The forgetful map
+  degree_forget is a natural transformation between consecutive degrees: its
+  single-step naturality square commutes (degree_natural_transformation) and,
+  by induction over action words, the naturality holds on the whole action
+  category (degree_forget_natural_run), not merely on generators.  Natural
+  transformations are closed under composition (nt_compose / nt_vertical_compose),
+  so the whole ladder F (k+2) => F (k+1) => F k is structurally coherent, not
+  merely a point-to-point collection of forgetful maps.  This functor-tower
+  layer, with genuine functors and natural transformations between them, is the
+  region of the design that Lochbihler and Maric's ADS_Functor does not develop:
+  ADS_Functor establishes closure of functors under composition; to our
+  knowledge it does not build a hierarchy of functors with natural
+  transformations between them.
 
   Degree demotion is information-discarding: degree_forget yields a blinding
   refinement in the exact sense of the glue layer of Functor_Laws.thy
@@ -35,13 +42,14 @@
   The second part proves the monotonicity payload, parametrically in an
   arbitrary degree assignment (the assignment is operational data, fixed in
   an anonymous context): reduction containment of the degree classes
-  (reduction_containment), safety of over-provisioning
-  (hierarchy_monotonicity, with validity preservation isolated as the
-  degree-free lemma processing_preserves_validity), the absence of any
-  downward guarantee under under-provisioning (no_downward_safety), and
-  well-definedness of the causal-consistency boundary that separates degree 1
-  from degree 2 (boundary_well_defined), grounded in a Lamport
-  happened-before order.  A concrete example assignment witnesses
+  (reduction_containment), and a genuinely one-directional degree monotonicity
+  --- over-provisioning reconciles all of an asset's required chains
+  (over_provisioning_guarantees) while under-provisioning carries no such
+  guarantee (no_downward_safety).  Validity preservation itself is degree-free
+  (processing_preserves_validity), recorded in the over-provisioning regime as
+  the auxiliary lemma hierarchy_monotonicity.  The causal-consistency boundary
+  that separates degree 1 from degree 2 (boundary_well_defined) is grounded in
+  a strict timestamp order.  A concrete example assignment witnesses
   non-vacuity, and a static-promotion corollary (static_promotion_safety)
   records that the over-provisioning guarantee transfers verbatim to any
   re-assignment within the system's capability.
@@ -123,10 +131,6 @@ lemma degree_forget_locks [simp]:
 
 lemma degree_forget_reg_eq:
   "c \<noteq> j \<Longrightarrow> get_reg_state (degree_forget j gs) c aid = get_reg_state gs c aid"
-  by (simp add: degree_forget_def get_reg_state_def get_asset_state_def)
-
-lemma degree_forget_reg_cleared:
-  "get_reg_state (degree_forget j gs) j aid = None"
   by (simp add: degree_forget_def get_reg_state_def get_asset_state_def)
 
 lemma degree_forget_exists:
@@ -380,9 +384,10 @@ text \<open>
   vertically composing \<open>F (k+2) \<Rightarrow> F (k+1)\<close> with \<open>F (k+1) \<Rightarrow> F k\<close>.  This is
   what lifts the degree ladder from a point-to-point collection of forgetful
   maps to a structurally coherent tower: the whole chain
-  \<open>S\<^sub>3 \<Rightarrow> S\<^sub>2 \<Rightarrow> S\<^sub>1 \<Rightarrow> S\<^sub>0\<close> is natural at once.  It is the region beyond
-  \<^verbatim>\<open>ADS_Functor\<close>, which closes functors under composition but does not build a
-  hierarchy of functors with natural transformations between them.
+  \<open>S\<^sub>3 \<Rightarrow> S\<^sub>2 \<Rightarrow> S\<^sub>1 \<Rightarrow> S\<^sub>0\<close> is natural at once.  This is a layer that, to our
+  knowledge, \<^verbatim>\<open>ADS_Functor\<close> does not develop: it closes functors under
+  composition but does not build a hierarchy of functors with natural
+  transformations between them.
 \<close>
 
 theorem nt_compose:
@@ -394,6 +399,301 @@ proof (rule nt_vertical_compose)
 next
   show "natural_transformation (F (Suc k)) (F k) (degree_forget (Suc k))"
     using degree_natural_transformation[of k] .
+qed
+
+
+section \<open>Functoriality of the Degree Transition Functor on Action Words\<close>
+
+text \<open>
+  The natural-transformation results above operate on single regulatory
+  operations.  To make \<^const>\<open>F\<close> a functor in the genuine sense --- and the
+  degree demotion a natural transformation on the whole one-object action
+  category, not only on its generators --- we must extend the transition step
+  to action \<^emph>\<open>words\<close> and prove it preserves the category structure (identity
+  word and word concatenation).  The action category is the free monoid of
+  regulatory action sequences; its non-degenerate content is supplied by the
+  regulatory transition relation, which composes the sequence into a single
+  composite state.
+\<close>
+
+fun reg_run :: "reg_state \<Rightarrow> reg_action list \<Rightarrow> reg_state option" where
+  "reg_run s [] = Some s"
+| "reg_run s (a # w) =
+     (case reg_transition s a of None \<Rightarrow> None | Some s' \<Rightarrow> reg_run s' w)"
+
+text \<open>Regulatory composition: running a concatenated action word is running the
+  first part and then, from the resulting state, the second.  This is the
+  monoid structure the degree functor must transport.\<close>
+
+lemma reg_run_append:
+  "reg_run s (v @ w) = (case reg_run s v of None \<Rightarrow> None | Some s' \<Rightarrow> reg_run s' w)"
+  by (induction v arbitrary: s) (auto split: option.splits)
+
+fun deg_run ::
+  "nat \<Rightarrow> asset_id \<Rightarrow> reg_action list \<Rightarrow> global_state \<Rightarrow> global_state option" where
+  "deg_run k aid [] gs = Some gs"
+| "deg_run k aid (a # w) gs =
+     (case deg_step k (a, aid) gs of None \<Rightarrow> None | Some gs' \<Rightarrow> deg_run k aid w gs')"
+
+text \<open>
+  Broadcast overwrite: a second degree-\<open>k\<close> broadcast of the same asset
+  obliterates the first.  This is not a free-monoid triviality --- it holds
+  because the broadcast set is the chains that \<^emph>\<open>already\<close> hold the asset (which
+  the first broadcast does not change) so the second writes over exactly the
+  same chains.  It is the structural reason a word of synchronizations
+  collapses to a single one.
+\<close>
+
+lemma broadcast_le_overwrite:
+  "broadcast_le k aid v2 (broadcast_le k aid v1 gs) = broadcast_le k aid v2 gs"
+proof (rule global_state.equality, goal_cases chains locks more)
+  case chains
+  show ?case
+  proof (intro ext)
+    fix c aid'
+    show "gs_chains (broadcast_le k aid v2 (broadcast_le k aid v1 gs)) c aid'
+          = gs_chains (broadcast_le k aid v2 gs) c aid'"
+    proof (cases "c \<le> k")
+      case True
+      show ?thesis
+        by (cases "aid' = aid"; cases "gs_chains gs c aid")
+           (simp_all add: broadcast_le_chains True)
+    next
+      case False
+      then show ?thesis by (simp add: broadcast_le_chains)
+    qed
+  qed
+next
+  case locks then show ?case by (simp add: broadcast_le_locks)
+next
+  case more then show ?case by simp
+qed
+
+text \<open>Hub tracking: because the hub chain \<open>0\<close> is always within the coupling
+  reach (\<open>0 \<le> k\<close>), a broadcast that finds the asset at the hub leaves the hub
+  carrying exactly the broadcast value, so the next step in a word reads the
+  updated state.\<close>
+
+lemma broadcast_le_hub:
+  assumes "get_reg_state gs 0 aid = Some s0"
+  shows "get_reg_state (broadcast_le k aid v gs) 0 aid = Some v"
+  using assms broadcast_le_reg_in[of 0 k aid v gs] by simp
+
+text \<open>
+  The collapse, on an already-broadcast state.  Running an action word at
+  degree \<open>k\<close> from a state of the form \<^term>\<open>broadcast_le k aid v gs\<close> reduces to
+  the regulatory composite \<^term>\<open>reg_run v w\<close> broadcast once.  The induction is
+  where the degree/broadcast structure does real work: each successive step
+  reads the hub value left by the previous broadcast (\<open>broadcast_le_hub\<close>)
+  and overwrites it (\<open>broadcast_le_overwrite\<close>).
+\<close>
+
+lemma deg_run_on_broadcast:
+  assumes "asset_exists gs 0 aid"
+  shows "deg_run k aid w (broadcast_le k aid v gs)
+         = (case reg_run v w of None \<Rightarrow> None
+            | Some sn \<Rightarrow> Some (broadcast_le k aid sn gs))"
+  using assms
+proof (induction w arbitrary: v)
+  case Nil
+  show ?case by simp
+next
+  case (Cons a w)
+  have hub: "get_reg_state (broadcast_le k aid v gs) 0 aid = Some v"
+  proof -
+    from Cons.prems obtain ast where "get_asset_state gs 0 aid = Some ast"
+      by (auto simp: asset_exists_def)
+    then have "get_reg_state gs 0 aid = Some (as_reg_state ast)"
+      by (simp add: get_reg_state_def)
+    then show ?thesis by (rule broadcast_le_hub)
+  qed
+  show ?case
+  proof (cases "reg_transition v a")
+    case None
+    then show ?thesis using hub by (simp add: deg_step_def)
+  next
+    case (Some v')
+    have step: "deg_step k (a, aid) (broadcast_le k aid v gs)
+                = Some (broadcast_le k aid v' gs)"
+      using hub Some by (simp add: deg_step_def broadcast_le_overwrite)
+    show ?thesis using Cons.IH[OF Cons.prems, of v'] Some by (simp add: step)
+  qed
+qed
+
+text \<open>The general collapse: a non-empty word of degree-\<open>k\<close> synchronizations on an
+  asset held at the hub equals broadcasting the composite regulatory state once.\<close>
+
+lemma deg_run_collapse:
+  assumes "get_reg_state gs 0 aid = Some s0"
+  shows "deg_run k aid (a # w) gs
+         = (case reg_run s0 (a # w) of None \<Rightarrow> None
+            | Some sn \<Rightarrow> Some (broadcast_le k aid sn gs))"
+proof -
+  have ex: "asset_exists gs 0 aid"
+    using assms by (auto simp: asset_exists_def get_reg_state_def get_asset_state_def
+                         split: option.splits)
+  show ?thesis
+  proof (cases "reg_transition s0 a")
+    case None
+    then show ?thesis using assms by (simp add: deg_step_def)
+  next
+    case (Some s1)
+    have "deg_step k (a, aid) gs = Some (broadcast_le k aid s1 gs)"
+      using assms Some by (simp add: deg_step_def)
+    then show ?thesis
+      using deg_run_on_broadcast[OF ex, of k w s1] Some by simp
+  qed
+qed
+
+text \<open>The degree-\<open>k\<close> step keeps a state inside the degree-\<open>k\<close> carrier: a
+  broadcast rewrites regulatory values but never changes which chains hold the
+  asset, so the support bound \<open>c \<le> k\<close> is preserved.\<close>
+
+lemma deg_step_carrier:
+  assumes "gs \<in> deg_carrier k" and "deg_step k (a, aid) gs = Some gs'"
+  shows "gs' \<in> deg_carrier k"
+proof -
+  from assms(2) obtain s s' where
+    "get_reg_state gs 0 aid = Some s" and "reg_transition s a = Some s'"
+    and gs': "gs' = broadcast_le k aid s' gs"
+    by (auto simp: deg_step_def split: option.splits)
+  have "\<And>c aid''. asset_exists gs' c aid'' = asset_exists gs c aid''"
+    unfolding gs' by (simp add: broadcast_le_exists)
+  with assms(1) show ?thesis by (auto simp: deg_carrier_def)
+qed
+
+text \<open>
+  Functor laws on action words.  The identity word acts as the identity, and a
+  concatenation of words is the Kleisli composition of the two segment maps:
+  \<^const>\<open>deg_run\<close> is a functor from the free monoid of regulatory action
+  sequences into the Kleisli category of the option monad on
+  \<^typ>\<open>global_state\<close>.  These two laws are the categorical skeleton; the
+  semantic content that the functor is non-degenerate --- that its action on a
+  word is the regulatory composite broadcast once, not an arbitrary fold --- is
+  @{thm [source] deg_run_collapse}.
+\<close>
+
+lemma deg_run_Nil: "deg_run k aid [] = Some"
+  by (simp add: fun_eq_iff)
+
+lemma deg_run_append:
+  "deg_run k aid (v @ w) gs = Option.bind (deg_run k aid v gs) (deg_run k aid w)"
+  by (induction v arbitrary: gs) (auto split: option.splits)
+
+text \<open>
+  Non-degeneracy witness.  A genuine two-action regulatory word ---
+  \<^term>\<open>FREEZE\<close> then \<^term>\<open>CONFISCATE\<close> --- composes to \<^term>\<open>CONFISCATED\<close>
+  through the intermediate \<^term>\<open>FROZEN\<close>, and at the degree level its second
+  synchronization overwrites the first: the word \<open>[FREEZE, CONFISCATE]\<close>
+  broadcasts \<^term>\<open>CONFISCATED\<close> while its prefix \<open>[FREEZE]\<close> broadcasts
+  \<^term>\<open>FROZEN\<close>.  The two differ, so the composition is not idempotent padding;
+  the functor transports real regulatory content.
+\<close>
+
+lemma deg_run_nondegenerate:
+  assumes "get_reg_state gs 0 0 = Some ACTIVE"
+  shows "deg_run k 0 [FREEZE, CONFISCATE] gs = Some (broadcast_le k 0 CONFISCATED gs)"
+    and "deg_run k 0 [FREEZE] gs = Some (broadcast_le k 0 FROZEN gs)"
+    and "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs
+         \<or> (\<forall>c\<le>k. \<not> asset_exists gs c 0)"
+proof -
+  have f1: "reg_transition ACTIVE FREEZE = Some FROZEN" by simp
+  have f2: "reg_transition FROZEN CONFISCATE = Some CONFISCATED" by simp
+  have rc: "reg_run ACTIVE [FREEZE, CONFISCATE] = Some CONFISCATED" using f1 f2 by simp
+  have rf: "reg_run ACTIVE [FREEZE] = Some FROZEN" using f1 by simp
+  show "deg_run k 0 [FREEZE, CONFISCATE] gs = Some (broadcast_le k 0 CONFISCATED gs)"
+    using deg_run_collapse[OF assms, of k FREEZE "[CONFISCATE]"] rc by simp
+  show "deg_run k 0 [FREEZE] gs = Some (broadcast_le k 0 FROZEN gs)"
+    using deg_run_collapse[OF assms, of k FREEZE "[]"] rf by simp
+  show "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs
+        \<or> (\<forall>c\<le>k. \<not> asset_exists gs c 0)"
+  proof (cases "\<exists>c\<le>k. asset_exists gs c 0")
+    case True
+    then obtain c where ck: "c \<le> k" and ae: "asset_exists gs c 0" by blast
+    from ae obtain s where s: "get_reg_state gs c 0 = Some s"
+      by (auto simp: asset_exists_def get_reg_state_def get_asset_state_def split: option.splits)
+    have c1: "get_reg_state (broadcast_le k 0 CONFISCATED gs) c 0 = Some CONFISCATED"
+      using ck s by (simp add: broadcast_le_reg_in)
+    have c2: "get_reg_state (broadcast_le k 0 FROZEN gs) c 0 = Some FROZEN"
+      using ck s by (simp add: broadcast_le_reg_in)
+    have "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs"
+    proof
+      assume "broadcast_le k 0 CONFISCATED gs = broadcast_le k 0 FROZEN gs"
+      then have "get_reg_state (broadcast_le k 0 CONFISCATED gs) c 0
+               = get_reg_state (broadcast_le k 0 FROZEN gs) c 0" by simp
+      with c1 c2 show False by simp
+    qed
+    then show ?thesis by blast
+  next
+    case False
+    then show ?thesis by blast
+  qed
+qed
+
+
+text \<open>
+  The single-step naturality square of \<^theory_text>\<open>degree_natural_transformation\<close>,
+  re-exposed at the level of \<^const>\<open>deg_step\<close> for use inside the word
+  induction below.
+\<close>
+
+lemma deg_step_forget_some:
+  assumes "gs \<in> deg_carrier (Suc k)" and "deg_step (Suc k) opn gs = Some gs'"
+  shows "deg_step k opn (degree_forget (Suc k) gs) = Some (degree_forget (Suc k) gs')"
+proof -
+  obtain a b where opn: "opn = (a, b)" by (cases opn)
+  show ?thesis
+    using degree_natural_transformation[of k] assms
+    unfolding opn natural_transformation_def F_def by auto
+qed
+
+lemma deg_step_forget_none:
+  assumes "gs \<in> deg_carrier (Suc k)" and "deg_step (Suc k) opn gs = None"
+  shows "deg_step k opn (degree_forget (Suc k) gs) = None"
+proof -
+  obtain a b where opn: "opn = (a, b)" by (cases opn)
+  show ?thesis
+    using degree_natural_transformation[of k] assms
+    unfolding opn natural_transformation_def F_def by auto
+qed
+
+text \<open>
+  Naturality on the whole action category.  The single-step square above
+  lifts, by induction on the action word, to the statement that degree
+  demotion commutes with running an \<^emph>\<open>entire\<close> word: forgetting the top chain
+  and then running at degree \<open>k\<close> equals running at degree \<^term>\<open>Suc k\<close> and then
+  forgetting.  Together with the functor laws @{thm [source] deg_run_Nil} and
+  @{thm [source] deg_run_append}, this promotes
+  @{thm [source] degree_natural_transformation} from a square on generators to
+  a genuine natural transformation between the degree functors
+  \<^term>\<open>F (Suc k)\<close> and \<^term>\<open>F k\<close> on the free action category --- the
+  functor-tower structure the entry claims.
+\<close>
+
+theorem degree_forget_natural_run:
+  assumes "gs \<in> deg_carrier (Suc k)"
+  shows "deg_run k aid w (degree_forget (Suc k) gs)
+         = map_option (degree_forget (Suc k)) (deg_run (Suc k) aid w gs)"
+  using assms
+proof (induction w arbitrary: gs)
+  case Nil
+  show ?case by simp
+next
+  case (Cons a w)
+  show ?case
+  proof (cases "deg_step (Suc k) (a, aid) gs")
+    case None
+    then have "deg_step k (a, aid) (degree_forget (Suc k) gs) = None"
+      using deg_step_forget_none[OF Cons.prems] by simp
+    then show ?thesis using None by simp
+  next
+    case (Some gs')
+    have "deg_step k (a, aid) (degree_forget (Suc k) gs) = Some (degree_forget (Suc k) gs')"
+      using deg_step_forget_some[OF Cons.prems Some] .
+    moreover have "gs' \<in> deg_carrier (Suc k)"
+      using deg_step_carrier[OF Cons.prems Some] .
+    ultimately show ?thesis using Cons.IH Some by simp
+  qed
 qed
 
 
@@ -497,8 +797,9 @@ next
   ultimately show ?thesis using Some by (simp add: process_at_degree_def valid_state_def)
 qed
 
-text \<open>The happened-before order underlying the causal boundary is likewise
-  independent of the degree assignment.\<close>
+text \<open>The timestamp order \<^verbatim>\<open>lamport_hb\<close> underlying the causal boundary is
+  likewise independent of the degree assignment; it is a plain strict order on
+  integer timestamps, not a distributed causal order.\<close>
 
 definition lamport_hb :: "timestamp \<Rightarrow> timestamp \<Rightarrow> bool" where
   "lamport_hb t1 t2 \<longleftrightarrow> t1 < t2"
@@ -526,19 +827,22 @@ theorem reduction_containment:
   unfolding degree_capable_def by simp
 
 text \<open>
-  Over-provisioning is safe.  A system whose capability degree dominates the
-  asset's required degree preserves global validity when it processes the
-  asset.  The headline is stated, as in the design, on the global validity
-  invariant; the regulatory reconciliation does not introduce a disagreement
-  or a stuck lock.  The proof is the degree-free
-  @{thm [source] processing_preserves_validity}; the provisioning hypothesis
-  records the intended regime.
+  Validity preservation in the over-provisioning regime (auxiliary).  A system
+  preserves global validity when it processes an asset.  This is a
+  \<^emph>\<open>degree-free\<close> fact: its proof is exactly
+  @{thm [source] processing_preserves_validity}, and it carries no provisioning
+  hypothesis (an earlier redundant one was removed).  It is therefore recorded
+  as an auxiliary lemma aliasing that fact, \<^emph>\<open>not\<close> the headline monotonicity
+  result.  The genuinely
+  degree-sensitive, one-directional monotonicity is carried by
+  \<open>over_provisioning_guarantees\<close> together with \<open>no_downward_safety\<close> below,
+  where the provisioning hypothesis is load-bearing.
 \<close>
 
-theorem hierarchy_monotonicity:
-  assumes "asset_degree aid \<le> system_degree" and "valid_state gs"
+lemma hierarchy_monotonicity:
+  assumes "valid_state gs"
   shows "valid_state (process_at_degree system_degree gs aid)"
-  using assms(2) by (rule processing_preserves_validity)
+  using assms by (rule processing_preserves_validity)
 
 text \<open>
   The coupling guarantee a degree-\<open>d\<close> system actually delivers: after
@@ -614,8 +918,8 @@ theorem no_downward_safety:
   assumes "asset_degree aid > system_degree"
   shows "\<not> (\<forall>gs. guarantees_preservation system_degree gs aid)"
 proof -
-  define ast0 where "ast0 = \<lparr> as_asset_id = aid, as_reg_state = ACTIVE, as_owner = 0, as_locked = False \<rparr>"
-  define ast1 where "ast1 = \<lparr> as_asset_id = aid, as_reg_state = FROZEN, as_owner = 0, as_locked = False \<rparr>"
+  define ast0 where "ast0 = \<lparr> as_asset_id = aid, as_reg_state = ACTIVE \<rparr>"
+  define ast1 where "ast1 = \<lparr> as_asset_id = aid, as_reg_state = FROZEN \<rparr>"
   define gs0 where "gs0 =
      \<lparr> gs_chains = (\<lambda>c. if c = 0 then (\<lambda>a. if a = aid then Some ast0 else None)
                          else if c = Suc system_degree then (\<lambda>a. if a = aid then Some ast1 else None)
@@ -652,8 +956,15 @@ text \<open>
   well-defined on \<open>(asset, system)\<close> pairs: the requirement is a single-valued
   function of the asset's degree, it is met whenever the system over-provisions
   the asset, and the underlying happened-before relation is a strict partial
-  order (irreflexive and asymmetric), so the causal boundary it induces is
-  itself well-formed.
+  order (irreflexive and asymmetric; in fact linear, as timestamps are
+  linearly ordered), so the causal boundary it induces is itself well-formed.
+\<close>
+
+text \<open>
+  The degree index corresponds to the product's synchronization-degree
+  hierarchy: \<open>F k\<close> realises sync degree \<open>S\<^sub>k\<close> for \<open>k \<le> 3\<close> (S0 static,
+  S1 unidirectional observation, S2 bidirectional coupling, S3 atomic state
+  binding), with the causal boundary at \<open>k = 2\<close>, the S1/S2 transition below.
 \<close>
 
 definition requires_causal :: "asset_id \<Rightarrow> bool" where

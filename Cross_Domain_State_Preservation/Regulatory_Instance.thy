@@ -49,7 +49,9 @@
         FROZEN → RESTRICTED (must return to ACTIVE first).
     - Synchronization correctness: regulatory_homomorphism (after sync, all
       connected chains agree); sync_isolation (other assets unaffected);
-      preemptive locking prevents concurrent regulatory action conflicts.
+      preemptive locking guards the sync function (a second acquire while the
+      lock is held fails), expressing the intended exclusion of competing
+      regulatory actions under the atomic model (no dynamic serialisation).
     - valid_state_preservation: sync preserves the global validity invariant
       (consistent_state and no_locked_without_reason).
 
@@ -58,7 +60,8 @@
       DEX semantics, not state transitions; modelled at a different layer).
     - SEIZED → FROZEN excluded (legally, SEIZED is a stronger constraint).
     - FROZEN → RESTRICTED excluded (must go through ACTIVE).
-    - Locking scope: concurrent regulatory action prevention, not
+    - Locking scope: the guard expresses the intended exclusion of competing
+      regulatory actions (atomic model, no interleaving to serialise), not
       double-spend prevention.
 *)
 
@@ -279,21 +282,6 @@ next
     using reg_states_UNIV by auto
 qed
 
-text \<open>
-  Bundle form of the regulatory state machine, used as a structural unit
-  when discharging \<^verbatim>\<open>state_preservation\<close> obligations whose source or target
-  matches the full \<^verbatim>\<open>reg_actions\<close> vocabulary. Mirrors the existing
-  \<^verbatim>\<open>chain_b_state_machine\<close> and \<^verbatim>\<open>daml_state_machine\<close> bundles defined later
-  in the theory.
-\<close>
-
-lemma reg_state_machine:
-  "state_machine reg_states reg_actions reg_transition reg_terminal"
-  using reg_sm.finite_states reg_sm.finite_actions reg_sm.terminal_subset
-        reg_sm.terminal_absorbing reg_sm.transition_closed reg_sm.transition_domain
-  by (rule state_machine.intro)
-
-
 section \<open>Asset and Global State Modeling\<close>
 
 type_synonym asset_id = nat
@@ -304,8 +292,6 @@ type_synonym timestamp = nat
 record asset_state =
   as_asset_id  :: asset_id
   as_reg_state :: reg_state
-  as_owner     :: nat         \<comment> \<open>Abstract address\<close>
-  as_locked    :: bool        \<comment> \<open>Preemptive lock\<close>
 
 type_synonym chain_state = "asset_id \<Rightarrow> asset_state option"
 
@@ -386,7 +372,7 @@ subsection \<open>State update across chains\<close>
 
 text \<open>
   Update the regulatory state of an asset on a specific chain.
-  Preserves all other asset fields (owner, etc.).
+  Preserves the other asset fields (the asset identifier).
 \<close>
 
 definition update_chain_reg_state ::
@@ -565,14 +551,11 @@ qed
 subsection \<open>Lock mutual exclusion\<close>
 
 text \<open>
-  If a lock is held, concurrent sync on the same asset fails.
-  This prevents concurrent regulatory action conflicts.
+  If a lock is held, a further lock acquisition on the same asset fails
+  (\<^verbatim>\<open>acquire_lock\<close> returns \<^verbatim>\<open>None\<close>).  In the atomic model this guard
+  expresses the intended mutual exclusion of regulatory actions on an asset;
+  there is no concurrent execution in the model to serialise.
 \<close>
-
-lemma lock_mutual_exclusion:
-  assumes "is_locked gs aid"
-  shows "acquire_lock gs aid = None"
-  unfolding acquire_lock_def using assms by auto
 
 lemma lock_acquire_success:
   assumes "\<not> is_locked gs aid"
@@ -586,10 +569,6 @@ proof -
     unfolding is_locked_def by simp
   ultimately show ?thesis by auto
 qed
-
-lemma lock_release:
-  shows "\<not> is_locked (release_lock gs aid) aid"
-  unfolding release_lock_def is_locked_def by auto
 
 
 section \<open>Main Theorem: Cross-Chain Regulatory Consistency\<close>
@@ -648,21 +627,9 @@ lemma acquire_lock_chains:
   using assms unfolding acquire_lock_def is_locked_def
   by (auto split: if_splits)
 
-lemma acquire_lock_reg_state:
-  assumes "acquire_lock gs aid = Some gs'"
-  shows "get_reg_state gs' cid aid' = get_reg_state gs cid aid'"
-  using acquire_lock_chains[OF assms]
-  unfolding get_reg_state_def get_asset_state_def by simp
-
 text \<open>
   Auxiliary: \<^verbatim>\<open>connected_chains\<close> uses original gs, not locked gs.
 \<close>
-
-lemma acquire_lock_asset_exists:
-  assumes "acquire_lock gs aid = Some gs'"
-  shows "asset_exists gs' cid aid' = asset_exists gs cid aid'"
-  using acquire_lock_chains[OF assms]
-  unfolding asset_exists_def get_asset_state_def by simp
 
 text \<open>
   The cross-chain regulatory homomorphism theorem.
@@ -1739,9 +1706,10 @@ text \<open>
   4. The synchronization protocol (lock, then update, then unlock) preserves
      cross-chain consistency for the same asset while isolating other assets.
 
-  5. Preemptive locking prevents concurrent regulatory actions on the
-     same asset (NOT double-spend prevention — that is handled at a
-     different layer).
+  5. Preemptive locking guards the sync function against a second action
+     while the lock is held; under the atomic model this expresses the
+     intended exclusion of competing regulatory actions on the same asset
+     (NOT double-spend prevention — that is handled at a different layer).
 
   6. The \<^verbatim>\<open>regulatory_homomorphism\<close> theorem establishes that after sync,
      all connected chains agree on the new regulatory state.

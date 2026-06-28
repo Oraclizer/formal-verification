@@ -29,11 +29,14 @@
 
   Reuse beyond the regulatory instance.  The glue layer is an abstract
   structure: an authenticated data structure carrying a cross-domain state
-  view.  It applies to distributed databases with Merkle-authenticated
-  replication, to sharded blockchains with authenticated cross-shard
-  messages, and to the public/witness layering of zero-knowledge proof
-  systems, where state_refines expresses that a public view is a blinding
-  refinement of a full witness.
+  view.  The glue layer commits only to a single authoritative value per
+  object identifier, so any system of that shape is a potential transplant
+  target (for instance Merkle-replicated registries, authenticated
+  cross-shard asset records, or the public/witness layering of
+  zero-knowledge proofs, where state_refines would express that a public
+  view is a blinding refinement of a full witness).  The present entry
+  instantiates the layer only on the regulatory state model; those other
+  domains are not formalized here.
 *)
 
 theory Functor_Laws
@@ -675,8 +678,7 @@ text \<open>The extraction map.  \<^term>\<open>auth_state r P\<close> is the gl
 definition auth_state :: "reg_state \<Rightarrow> chain_id set \<Rightarrow> global_state" where
   "auth_state r P =
      \<lparr> gs_chains = (\<lambda>c a. if c \<in> P \<and> a = 0
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = r,
-                                      as_owner = 0, as_locked = False \<rparr>
+                          then Some \<lparr> as_asset_id = 0, as_reg_state = r \<rparr>
                           else None),
        gs_locks = (\<lambda>a. False) \<rparr>"
 
@@ -797,11 +799,9 @@ text \<open>
 definition rogue_join_state :: global_state where
   "rogue_join_state =
      \<lparr> gs_chains = (\<lambda>c a. if a = 0 \<and> (c = 0 \<or> c = Suc 0)
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = ACTIVE,
-                                      as_owner = 0, as_locked = False \<rparr>
+                          then Some \<lparr> as_asset_id = 0, as_reg_state = ACTIVE \<rparr>
                           else if a = 0 \<and> c = 7
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = FROZEN,
-                                      as_owner = 0, as_locked = False \<rparr>
+                          then Some \<lparr> as_asset_id = 0, as_reg_state = FROZEN \<rparr>
                           else None),
        gs_locks = (\<lambda>a. False) \<rparr>"
 
@@ -1527,11 +1527,9 @@ text \<open>
 definition mixed_pair_state :: "reg_state \<Rightarrow> reg_state \<Rightarrow> global_state" where
   "mixed_pair_state v0 v1 =
      \<lparr> gs_chains = (\<lambda>c a. if a = 0 \<and> c = 0
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = v0,
-                                      as_owner = 0, as_locked = False \<rparr>
+                          then Some \<lparr> as_asset_id = 0, as_reg_state = v0 \<rparr>
                           else if a = 0 \<and> c = Suc 0
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = v1,
-                                      as_owner = 0, as_locked = False \<rparr>
+                          then Some \<lparr> as_asset_id = 0, as_reg_state = v1 \<rparr>
                           else None),
        gs_locks = (\<lambda>a. False) \<rparr>"
 
@@ -1688,7 +1686,8 @@ qed
 section \<open>Guarded Bounded Convergence for the Oraclizer\<close>
 
 text \<open>
-  Inside the Byzantine fault-tolerant D-quencer with fair leader election, the
+  Inside the D-quencer liveness context (a fair-leader assumption over a
+  Byzantine-threshold cardinality bound), the
   oraclizer data above forms a @{locale converging_composition}: the honest
   leader within every fairness window discharges a measure-reducing
   synchronization.  The fairness assumption is exactly the \<open>fair_leader\<close>
@@ -1737,6 +1736,45 @@ proof -
                  and x = sched, OF body])
 qed
 
+text \<open>
+  \<^bold>\<open>The Byzantine threshold is load-bearing.\<close>  The fair schedule witnessed
+  above is not idle: it instantiates the assume-guarantee liveness locale.  For
+  \<^emph>\<open>every\<close> D-quencer system the threshold therefore guarantees that
+  @{locale dquencer_liveness} is inhabitable --- the fair-leader assumption is
+  satisfiable rather than merely postulated.  This is the downstream consumer
+  that makes the entire Byzantine chain load-bearing: deleting any of
+  @{thm [source] bft_threshold}, @{thm [source] honest_majority},
+  @{thm [source] honest_nonempty}, or @{thm [source] fair_schedule_exists}
+  breaks the proof below.  This load-bearing role is for the inhabitability
+  result (\<^verbatim>\<open>liveness_inhabitable\<close>, a satisfiability witness for the
+  locale, terminal); the headline bounded-convergence theorem does not route
+  through it, being driven instead by the cross-chain inconsistency measure.
+\<close>
+
+theorem liveness_inhabitable:
+  "\<exists>(ls :: nat \<Rightarrow> node_info) (pc :: nat \<Rightarrow> nat).
+     dquencer_liveness nodes f_max fairness_bound ls pc"
+proof -
+  obtain sched :: "nat \<Rightarrow> node_info" where fair:
+      "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
+                    ni_behavior (sched e) = Honest"
+    using fair_schedule_exists by metis
+  have "dquencer_liveness nodes f_max fairness_bound sched (\<lambda>_. 0)"
+  proof unfold_locales
+    show "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
+                      ni_behavior (sched e) = Honest"
+      using fair .
+  next
+    fix e :: nat
+    assume "0 < (\<lambda>_::nat. 0::nat) e"
+    then show "(\<lambda>_::nat. 0::nat) (Suc e) < (\<lambda>_::nat. 0::nat) e" by simp
+  next
+    fix e :: nat
+    show "(\<lambda>_::nat. 0::nat) (Suc e) \<le> (\<lambda>_::nat. 0::nat) e" by simp
+  qed
+  thus ?thesis by blast
+qed
+
 end
 
 context dquencer_liveness
@@ -1777,13 +1815,14 @@ next
 qed
 
 text \<open>
-  The headline of revision~3's convergence layer.  From an \emph{arbitrary}
+  The headline of this entry's convergence layer.  From an \emph{arbitrary}
   finite-domain, unlocked global state --- in particular with \emph{no}
   assumption that the cross-chain consistency invariant holds initially --- the
   oraclizer reaches, within @{term "inconsistency_pairs gs\<^sub>0 * fairness_bound"}
   evolution steps, a state that is valid (consistent and unlocked).  Contrast
-  @{thm [source] combined_safety_liveness}, which assumes @{term "valid_state gs"}:
-  revision~3 upgrades conditional safety to unconditional bounded convergence.
+  @{thm [source] conditional_safety_preservation}, which assumes @{term "valid_state gs"}:
+  the convergence layer upgrades conditional safety to unconditional bounded
+  convergence.
 \<close>
 
 theorem oraclizer_guarded_bounded_convergence:
@@ -1918,7 +1957,7 @@ proof
 qed
 
 interpretation singleton_dq: dquencer_liveness
-  "{singleton_node}" 0 1 1 0 0 "\<lambda>_. singleton_node" "\<lambda>_. 0"
+  "{singleton_node}" 0 1 0 0 "\<lambda>_. singleton_node" "\<lambda>_. 0"
   by unfold_locales
      (auto simp: byzantine_nodes_def singleton_node_def intro: singleton_fair_leader)
 
@@ -1936,9 +1975,54 @@ definition singleton_msg :: dq_message where
        dqm_source_node = 0 \<rparr>"
 
 interpretation singleton_dq_priority: dquencer_priority_concrete
-  "{singleton_node}" 0 1 1 0 0 "{singleton_msg}"
+  "{singleton_node}" 0 1 0 0 "{singleton_msg}"
   by unfold_locales
      (auto simp: byzantine_nodes_def singleton_node_def singleton_msg_def
            intro: singleton_fair_leader)
+
+text \<open>
+  \<^bold>\<open>A non-degenerate Byzantine witness.\<close>  The singleton system above carries a
+  zero Byzantine budget, so it meets the threshold vacuously
+  (\<open>1 \<ge> 3 \<cdot> 0 + 1\<close>).  The four-node system below exercises the threshold at its
+  tight bound with a \<^emph>\<open>real\<close> fault: one Byzantine node among four
+  (\<open>4 \<ge> 3 \<cdot> 1 + 1\<close> and \<open>card (byzantine_nodes) = 1 \<le> 1\<close>), an honest
+  super-majority of three, scheduled constantly on one honest node.  It
+  discharges every assumption of @{locale dquencer_liveness} with \<open>f_max = 1\<close>,
+  so the Byzantine threshold is exercised at its tight bound by a real
+  Byzantine-tagged node (a cardinality witness), not only the degenerate
+  zero-fault case.
+\<close>
+
+definition quorum_nodes :: "node_info set" where
+  "quorum_nodes =
+     {\<lparr> ni_id = 0, ni_behavior = Byzantine \<rparr>,
+      \<lparr> ni_id = 1, ni_behavior = Honest \<rparr>,
+      \<lparr> ni_id = 2, ni_behavior = Honest \<rparr>,
+      \<lparr> ni_id = 3, ni_behavior = Honest \<rparr>}"
+
+definition quorum_leader :: "nat \<Rightarrow> node_info" where
+  "quorum_leader = (\<lambda>_. \<lparr> ni_id = 1, ni_behavior = Honest \<rparr>)"
+
+lemma quorum_finite: "finite quorum_nodes"
+  by (simp add: quorum_nodes_def)
+
+lemma quorum_nonempty: "quorum_nodes \<noteq> {}"
+  by (simp add: quorum_nodes_def)
+
+lemma quorum_card: "card quorum_nodes = 4"
+  by (simp add: quorum_nodes_def)
+
+lemma quorum_byzantine_eq:
+  "byzantine_nodes quorum_nodes = {\<lparr> ni_id = 0, ni_behavior = Byzantine \<rparr>}"
+  by (auto simp: quorum_nodes_def byzantine_nodes_def)
+
+lemma quorum_byz_card: "card (byzantine_nodes quorum_nodes) = 1"
+  by (simp add: quorum_byzantine_eq)
+
+interpretation bft_quorum: dquencer_liveness
+  quorum_nodes 1 1 0 0 quorum_leader "\<lambda>e. 1 - e"
+  by unfold_locales
+     (auto simp: quorum_card quorum_byz_card quorum_finite quorum_nonempty
+           quorum_leader_def)
 
 end

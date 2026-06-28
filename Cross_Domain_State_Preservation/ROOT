@@ -16,5 +16,6 @@ session Cross_Domain_State_Preservation (AFP) = "HOL-Library" +
     Functor_Laws
     Hierarchy
     External_Instance
+    Canton_Bridge
   document_files
     "root.tex"

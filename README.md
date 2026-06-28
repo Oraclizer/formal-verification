@@ -18,9 +18,9 @@ This repository contains machine-checked proofs of safety and liveness propertie
 The core abstractions are two hierarchies of Isabelle/HOL locales:
 
 - **Cross-Domain State Preservation** (Property 1): A hierarchy of state-machine locales (pairwise state preservation with naturality, symmetric bidirectional preservation, multi-domain preservation) whose naturality condition guarantees structural preservation of transitions across domains.
-- **Priority Resolution and Liveness Locales** (Property 2): Captures deterministic ordering, deadlock avoidance, and starvation freedom as reusable abstractions for leader-based Byzantine consensus systems.
+- **Priority Resolution and Liveness Locales** (Property 2): Captures deterministic ordering, eventual (timeout-bounded) lock release, and starvation freedom as reusable, domain-independent abstractions. They are order- and bound-theoretic and do not themselves model concurrent execution or message interleaving; the instantiating synchronization model is atomic.
 
-The two properties are combined in the theorem `combined_safety_liveness`: from a valid, unlocked global state a synchronization succeeds and the result is again valid (`valid_state_preservation`), so safety holds on the post-sync state reached under the deterministic, deadlock-free, starvation-free resolution that Property 2 establishes.
+`conditional_safety_preservation` is a conditional-safety corollary: from a valid, unlocked global state a synchronization succeeds and the result is again valid (`valid_state_preservation`). Its proof uses only the safety side; the deterministic and starvation-free results of Property 2 are separate theorems (`select_highest_deterministic`, `starvation_bound`). The genuine fusion of safety and liveness (convergence from an arbitrary state, driven by a well-founded measure on cross-chain inconsistency under the fair-leader assumption) is `oraclizer_guarded_bounded_convergence`. Deadlock is out of scope: the atomic sync model has no concurrent lock contention, and forced lock release under contention is deferred to a preemptive-lock layer.
 
 Every generic locale in both hierarchies is instantiated with a concrete example drawn from the regulatory model.
 
@@ -49,7 +49,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 - 5 regulatory states: ACTIVE, FROZEN, SEIZED, CONFISCATED, RESTRICTED
 - 7 regulatory actions: FREEZE, SEIZE, CONFISCATE, RESTRICT, UNFREEZE, UNRESTRICT, RELEASE
 - 35 transition rules (deterministic, partial)
-- Preemptive locking for concurrent regulatory action prevention
+- Preemptive locking: a guard expressing intended exclusion of competing regulatory actions (atomic model; a second acquire while held returns `None`)
 - Synchronization protocol: lock → update all connected chains → unlock
 
 ### Property 2: D-quencer Determinism, Deadlock Freedom, Starvation Freedom ✅
@@ -63,13 +63,11 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 | `select_highest_deterministic` | Given a finite non-empty message set with injective priorities, the highest-priority message is uniquely determined |
 | `select_highest_in_set` | The selected message is always a member of the input set |
 | `select_highest_is_max` | The selected message has the maximum priority among all messages in the set |
-| `lock_eventually_expires` | Every lock has a bounded lifetime; no resource is locked indefinitely |
-| `deadlock_freedom` | Any lock released within the timeout bound; no circular wait can persist |
 | `starvation_bound` | Under the fair leader assumption, if there are pending requests, at least one is processed within `fairness_bound` epochs |
 | `eventual_completion` | All pending requests are eventually processed (by well-founded induction on pending count) |
 | `priority_key_injectivity` | The D-quencer priority key uniquely identifies messages given distinct authority/timestamp/action/node |
 | `honest_majority` | Under the BFT threshold n ≥ 3f + 1, the number of honest nodes exceeds 2f |
-| `combined_safety_liveness` | From a valid, unlocked global state a synchronization succeeds and preserves the global validity invariant (determinism, deadlock-freedom, and starvation-freedom are established separately by `select_highest_deterministic`, `deadlock_freedom`, and `starvation_bound`) |
+| `conditional_safety_preservation` | From a valid, unlocked global state a synchronization succeeds and preserves the global validity invariant (determinism and starvation-freedom are established separately by `select_highest_deterministic` and `starvation_bound`) |
 
 **Model:**
 - 3 authority levels: Regional, National, International (RCP jurisdictional hierarchy)
@@ -78,7 +76,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 - Timeout-based locking (models VRF-randomized leader election abstractly)
 - Fair leader assumption: within any `fairness_bound` epochs, at least one honest leader is elected
 
-**Design pattern.** The liveness proof uses assume-guarantee reasoning: the fairness assumption abstracts VRF randomness as a deterministic condition. The D-quencer liveness layer is what justifies the honest-behaviour premise relied on by the synchronization model in deployment; the two are combined in `combined_safety_liveness`.
+**Design pattern.** The liveness proof uses assume-guarantee reasoning: the fairness assumption abstracts VRF randomness as a deterministic condition. The Byzantine threshold is load-bearing rather than decorative: `liveness_inhabitable` derives, from `fair_schedule_exists` (which rests on `honest_nonempty`, `honest_majority`, and the threshold `n ≥ 3f+1`), that the fair-leader assumption is satisfiable for every D-quencer system, and `bft_quorum` exhibits a non-degenerate four-node instance with one Byzantine node. `conditional_safety_preservation` is a conditional-safety corollary, not the place where the two sides fuse; the unconditional fusion is `oraclizer_guarded_bounded_convergence`.
 
 ### Cross-Domain State Preservation Functor ✅
 
@@ -99,6 +97,24 @@ This layer establishes that the cross-domain state-preservation construction is 
 | `inconsistent_has_safe_recovery` | Any inconsistent, finite-domain, unlocked state admits a terminal-faithful safe recovery |
 
 **Guarded bounded convergence.** Beyond the conditional safety invariant of Property 1, this layer derives that from an *arbitrary* carrier state (no initial consistency assumed) the system converges to a valid, consistent state within a bounded number of steps, by composing a guarded safety invariant with a bounded-fair liveness scheduler. The recovery is terminal-faithful: it neither erases an existing confiscation nor introduces one indiscriminately.
+
+### Authenticated Functor and Canton Transaction-Tree Instantiation ✅
+
+**Status:** Mechanized, `sorry`/`oops`-free. AFP registration pending.
+
+The authenticated extraction map is shown to be a **composite functor** from the ADS blinding preorder to the cross-domain refinement preorder (the category laws hold and the lifted merge is associative), and the single-step authenticity guarantees are **generalized to whole synchronization sequences** (validity, need-to-know refinement, hash soundness, and state-level inclusion are preserved along an entire path of blindings and an n-ary fold of merges). The construction is instantiated both on the concrete blindable-position functor of `ADS_Functor` and on a recursive model of the Canton transaction tree built from the public rose-tree Merkle machinery, with subview-level selective disclosure live in the proofs. The recursive view tree is further connected to the entry's generic rose-tree inclusion-proof machinery, sharpening inclusion from the state level to the concrete Merkle path: a revealed subview commits to the same authenticating root hash as the full tree and is a blinding of it, with no added assumption.
+
+| Theorem | Statement |
+|---|---|
+| `cdsp_ads_compose` | Composable blinding morphisms compose, and the extraction functor sends the composite to the composite of the extracted refinements |
+| `cdsp_ads_merge_assoc` | The lifted merge of authenticated views is associative (composite-functor associativity) |
+| `sequence_authenticity_preservation` | Along a blinding path, every intermediate view extracts to a valid state refining the most-revealed endpoint |
+| `sequence_merge_soundness` | A whole sequence of partial views over one committed object folds into a valid combined view refining every contributor |
+| `sequence_inclusion_integrity` | Every holding revealed by any view in a sequence is included in the endpoint with the same regulatory state |
+| `reg_tx_authenticated` | Cross-domain state preservation is instantiated on a recursive model of the Canton transaction tree (public rose-tree machinery, concrete content) |
+| `reg_view_inclusion_same_hash` / `reg_view_inclusion_blinding_of` | Path-level Merkle inclusion: each inclusion proof (target subview revealed, path to root and off-path siblings blinded) commits to the same authenticating root hash as the full view tree and is a blinding of it; no added assumption |
+
+**Model-fidelity boundary.** The recursive instance is structurally faithful (subviews nest as in the public model and subview-level blinding is live), with two declared modelling choices: leaf content is concrete rather than the opaque content types of the public Canton model, and the consensus metadata is modelled as a shared, non-independently-blindable field, so a revealed view under a blinded consensus is outside this model's scope. These are model-fidelity items for confirmation against the Canton specification, not proof gaps; no axiom relates the opaque Canton types to the regulatory model.
 
 ### Synchronization-Degree Hierarchy ✅
 
@@ -128,7 +144,7 @@ A reusable Eisbach automation layer (`discharge_state_machine`, `discharge_prese
 
 ## Scope Note
 
-The AFP entry currently under editor review covers the cross-domain state-preservation safety core (Property 1) and the D-quencer liveness core (Property 2). The functor framework (composition, functor laws, guarded bounded convergence), the synchronization-degree hierarchy monotonicity, the domain-independence instance, and the proof-automation layer are included in this repository and are mechanized and `sorry`/`oops`-free; they will be submitted as a revision of the entry once the current revision is registered. AFP registration is pending.
+The AFP entry currently under editor review covers the cross-domain state-preservation safety core (Property 1) and the D-quencer liveness core (Property 2). The functor framework (composition, functor laws, guarded bounded convergence), the authenticated functor and Canton instantiation (composite functor, sequence-level authenticity, recursive Canton transaction-tree instance), the synchronization-degree hierarchy monotonicity, the domain-independence instance, and the proof-automation layer are included in this repository and are mechanized and `sorry`/`oops`-free; they will be submitted as a revision of the entry once the current revision is registered. AFP registration is pending.
 
 ## Repository Structure
 
@@ -151,8 +167,7 @@ The AFP entry currently under editor review covers the cross-domain state-preser
 │   │                                  #   layer-crossing instance
 │   │                                  #     (onchain DAML bridge)
 │   ├── Priority_Resolution.thy        # Property 2 generic theory
-│   │                                  #   3 locales: priority_system,
-│   │                                  #   deadlock_free_locking,
+│   │                                  #   2 locales: priority_system,
 │   │                                  #   fair_leader_system
 │   ├── DQuencer_Instance.thy          # Property 2 D-quencer instance
 │   │                                  #   Authority levels, priority keys,
@@ -182,6 +197,11 @@ The AFP entry currently under editor review covers the cross-domain state-preser
 │   ├── External_Instance.thy          # Domain-independence instance
 │   │                                  #   (TCP/RFC 793 endpoint vs.
 │   │                                  #   connection tracker)
+│   ├── Canton_Bridge.thy              # Authenticated functor and instances:
+│   │                                  #   composite functor laws, sequence-
+│   │                                  #   level authenticity, concrete ADS
+│   │                                  #   and recursive Canton transaction-
+│   │                                  #   tree instantiation
 │   ├── ROOT                           # Isabelle session configuration
 │   └── document/
 │       └── root.tex                   # LaTeX document for AFP
@@ -229,7 +249,7 @@ This work is submitted to the [Archive of Formal Proofs](https://www.isa-afp.org
 - **Status:** Under editor review; AFP registration pending
 - **Submission URL:** [AFP Submission](https://www.isa-afp.org/submission/?id=2026-03-25_06-34-01_784)
 
-Property 1 (safety) and Property 2 (liveness) are consolidated in the current entry revision, now under editor review. The functor framework, degree hierarchy, domain-independence instance, and proof-automation layer in this repository are mechanized and `sorry`/`oops`-free, and will be submitted as a revision once the current revision is registered.
+Property 1 (safety) and Property 2 (liveness) are consolidated in the current entry revision, now under editor review. The functor framework, the authenticated functor and Canton instantiation, the degree hierarchy, domain-independence instance, and proof-automation layer in this repository are mechanized and `sorry`/`oops`-free, and will be submitted as a revision once the current revision is registered.
 
 ## Related Work
 

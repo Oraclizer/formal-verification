@@ -14,112 +14,32 @@
 \maketitle
 
 \begin{abstract}
-We present a generic, reusable framework for verifying that state
-transitions are faithfully preserved when synchronized across heterogeneous
-domains (blockchains, off-chain ledgers, etc.), and that the
-synchronization process remains live in the presence of Byzantine faults.
-
-The framework combines two complementary properties.  For \emph{safety},
-the core abstraction is a hierarchy of Isabelle/HOL locales:
-\texttt{state\_machine} defines finite-state deterministic transition
-systems with terminal states;
-\texttt{state\_preservation} captures the naturality (homomorphism)
-condition ensuring that a synchronization map commutes with transitions;
-\texttt{symmetric\_state\_preservation} extends this to bidirectional
-synchronization with inverse roundtrip guarantees; and
-\texttt{multi\_domain\_preservation} generalizes to $N$ domains sharing
-the same abstract state machine, with a cross-domain consistency theorem.
-For \emph{liveness} under Byzantine faults, three additional locales are
-introduced:
-\texttt{priority\_system} guarantees deterministic resolution of
-conflicting requests via a total order on priority keys;
-\texttt{deadlock\_free\_locking} guarantees that timeout-based forced
-release prevents indefinite locking; and
-\texttt{fair\_leader\_system} guarantees starvation freedom under fair
-leader scheduling, formulated as an assume-guarantee abstraction of
-probabilistic VRF-based leader election.
-
-As a practical application, we instantiate every locale of this
-framework with concrete examples drawn from the regulatory state model
-of Oraclizer, a state synchronization oracle for tokenized assets across
-blockchain networks and off-chain ledgers.  The model comprises five
-states (\textsc{Active}, \textsc{Frozen}, \textsc{Seized},
-\textsc{Confiscated}, \textsc{Restricted}) and seven actions.  The
-instantiations include:
-(i)~the regulatory transition system as a \texttt{state\_machine};
-(ii)~a heterogeneous-action instance of \texttt{state\_preservation}
-between two chains whose on-chain action vocabularies differ in scope
-(\emph{escalation preservation});
-(iii)~a layer-crossing instance of \texttt{symmetric\_state\_preservation}
-between an on-chain enum representation and an off-chain DAML structured
-permission record (\emph{onchain DAML bridge});
-(iv)~a parametric instance of \texttt{multi\_domain\_preservation} for
-any finite set of chain identifiers and any global state satisfying the
-validity invariant;
-(v)~an instance of \texttt{priority\_system} on the
-\texttt{priority\_key} type of D-quencer messages, using a four-component
-lexicographic priority key derived from message metadata;
-(vi)~a \texttt{deadlock\_free\_locking} instance with the system's lock
-timeout; and
-(vii)~a \texttt{fair\_leader\_system} instance with the D-quencer's
-leader schedule.  The synchronization protocol with preemptive locking
-is shown to preserve cross-chain regulatory consistency (the
-\emph{regulatory homomorphism} theorem) and the global validity invariant
-(\emph{valid state preservation}).  The liveness side culminates in a
-\emph{combined safety liveness} theorem that ties the synchronization
-function to the liveness guarantees and discharges the honest-node
-assumption of the safety proof under Byzantine faults.
-
-Building on this framework, the entry establishes its functorial core.  We
-prove that cross-domain state preservation is a functor by mechanizing the
-three category axioms on state-preservation morphisms (identity, composition,
-and associativity).  We add a compositional safety/liveness layer that yields
-\emph{guarded bounded convergence}: from an arbitrary finite-domain,
-lock-free initial global state, with no assumption that cross-chain
-consistency holds initially, the oracle reaches a valid state within a
-bounded number of steps inside the Byzantine D-quencer model
-($n \ge 3f + 1$) under its deterministic fair-leader assumption,
-strengthening the conditional safety above to unconditional convergence
-(unconditional in the precise sense: no initial-consistency assumption).
-We couple the functor with an authenticated data structure
-through two glue predicates that lift the merge and blinding operations of a
-Merkle interface to the global-state level, and prove the soundness of
-authenticated preservation and of blinded views.  Finally, we stratify the
-functor by synchronization degree into a tower of functors connected by
-natural transformations that are closed under composition, and establish the
-monotonicity of the degree hierarchy: over-provisioning is safe, while
-under-provisioning carries no guarantee.
-
-The authenticated-data-structure layer builds directly on Lochbihler and
-Mari\'{c}'s \texttt{ADS\_Functor} entry: the \texttt{authenticated\_state}
-locale extends its \texttt{merkle\_interface} with an extraction map, and the
-soundness proofs invoke the interface's mergeability assumption together with
-its join and hash lemmas explicitly, so the dependency is formal and
-load-bearing.  Methodologically, the entry follows the same tradition of
-locale-based reusable abstractions over functor-shaped data; where
-\texttt{ADS\_Functor}'s authenticated functor is single-domain, the present
-entry carries the functorial reading across heterogeneous domains and adds a
-hierarchy of functors with natural transformations between them.
-
-\paragraph{Scope of abstraction.}
-The synchronization model in this entry abstracts each \emph{sync}
-operation as an atomic action: lock acquisition, state update across
-connected chains, and lock release happen as a single step in the
-formal model.  We do not model interleaved concurrent sync attempts,
-network message delays, or partial failures within a sync.  Likewise, the
-convergence results of the compositional layer range over the carrier of
-finite-domain, lock-free global states; connecting lock expiry to the
-global-state model is left to subsequent entries.  This is a
-deliberate abstraction choice consistent with locale-based reasoning in
-the AFP for cross-domain protocols: under the modelled atomicity, the
-locales characterise the structural correctness of synchronization
-(naturality, roundtrip, multi-domain consensus); the operational
-realization of atomicity (timeout-based locks, automatic release on
-expiry, retry on contention) is an implementation concern out of scope
-for this entry.  The liveness side of the framework
-(\texttt{deadlock\_free\_locking} in particular) provides the
-abstractions needed to lift the model toward a partially synchronous
-deployment, which we leave to subsequent entries.
+We mechanize, in Isabelle/HOL, the preservation of state transitions
+synchronized across heterogeneous domains (blockchains and off-chain
+ledgers).  A hierarchy of locales captures cross-domain state preservation
+as a functor: we prove the three category axioms on preservation morphisms
+(identity, composition, associativity), lift them to a tower of
+synchronization-degree functors connected by natural transformations that
+are closed under composition, and establish degree monotonicity
+(over-provisioning is safe, under-provisioning is not).  A compositional
+safety/liveness layer yields \emph{guarded bounded convergence}: from an
+arbitrary finite-domain, lock-free state, with no assumption that cross-chain
+consistency holds initially, the synchronization oracle reaches a valid state
+within a bounded number of steps.  We couple the functor to an authenticated
+data structure by lifting the merge and blinding operations of a Merkle
+interface to the global-state level, building directly on Lochbihler and
+Mari\'{c}'s \texttt{ADS\_Functor} entry, and instantiate the construction
+both on its blindable-position functor and on a recursive model of the Canton
+transaction tree.  The liveness locales abstract priority resolution,
+timeout-bounded lock release, and fair scheduling under an assume-guarantee
+fairness bound; the Byzantine threshold ($n \ge 3f+1$) is load-bearing,
+yielding a fair schedule that makes the liveness layer inhabitable, witnessed
+by a non-degenerate four-node instance with one Byzantine node.  Every generic
+locale is instantiated on the regulatory state model of Oraclizer, a state
+synchronization oracle for tokenized assets, and, to exhibit domain
+independence, on a TCP connection tracker.  The synchronization model is
+atomic; lifting it to a partially synchronous network is left to subsequent
+entries.
 \end{abstract}
 
 \tableofcontents
@@ -150,7 +70,8 @@ the ADS merge and blinding (partial-order) operations to the global-state
 level.
 
 We claim no new proof technique.  The contribution is a mechanization, in
-three layers, of structure not previously formalized across domains:
+three layers, of structure that, to the best of our knowledge, has not
+previously been formalized across domains:
 (i)~the cross-domain state-preservation \emph{functor} and its category axioms,
 above;
 (ii)~\emph{guarded bounded convergence} within the Byzantine D-quencer model
@@ -160,13 +81,13 @@ with no assumption that the
 cross-chain consistency invariant holds initially, the synchronization oracle
 reaches a valid state within a bounded number of steps
 (\texttt{oraclizer\_guarded\_bounded\_convergence}), upgrading the conditional
-safety of \texttt{combined\_safety\_liveness} to convergence without an
+safety of \texttt{conditional\_safety\_preservation} to convergence without an
 initial-consistency hypothesis; and
 (iii)~a \emph{tower} of synchronization-degree functors connected by natural
 transformations (\texttt{degree\_natural\_transformation}) that are closed
 under composition (\texttt{nt\_compose}, via \texttt{nt\_vertical\_compose})
 --- a hierarchy of functors with natural transformations between them, which
-\texttt{ADS\_Functor} does not address.
+the \texttt{ADS\_Functor} entry, to our knowledge, does not develop.
 Within the authenticated layer, the validity of an extracted cross-domain
 state is supplied by the extraction invariant
 (\texttt{extract\_preserves\_validity}); the \texttt{merkle\_interface} locale
@@ -175,16 +96,17 @@ its lemmas \texttt{join} and \texttt{hash}, all invoked explicitly in the
 soundness proofs --- establishes the structural relations between extracted
 states (join and blinding refinement), not their validity.
 
-This AFP entry consists of nine theory files.  Four form the original two
+This AFP entry consists of ten theory files.  Four form the original two
 ``generic locales + regulatory instances'' pairs, one for safety and one
-for liveness; three further theories add the compositional and functorial
+for liveness; four further theories add the compositional and functorial
 layer --- a generic safety/liveness composition with bounded convergence,
-the functor laws together with the authenticated-data-structure glue, and
-the synchronization-degree hierarchy; a generic proof-automation theory
-contributes reusable discharge methods for the locale obligations; and an
-instance outside the regulatory domain (a TCP connection tracker)
-demonstrates that the generic layer carries no hidden regulatory
-assumptions.
+the functor laws together with the authenticated-data-structure glue,
+the synchronization-degree hierarchy, and the authenticated-functor laws
+over a recursive model of the Canton transaction tree; a generic
+proof-automation theory contributes reusable discharge methods for the
+locale obligations; and an instance outside the regulatory domain (a TCP
+connection tracker) demonstrates that the generic layer carries no hidden
+regulatory assumptions.
 
 \begin{description}
 \item[\texttt{State\_Preservation.thy}] defines domain-independent
@@ -213,37 +135,35 @@ assumptions.
 \item[\texttt{Priority\_Resolution.thy}] defines domain-independent
   locales for liveness properties under Byzantine faults:
   \texttt{priority\_system} for deterministic selection from a finite
-  message set with injective priorities,
-  \texttt{deadlock\_free\_locking} for timeout-based forced release of
-  locks, and \texttt{fair\_leader\_system} for starvation freedom under
+  message set with injective priorities, and
+  \texttt{fair\_leader\_system} for starvation freedom under
   periodic honest leader scheduling.  The locales are parameterized
   over abstract types and impose no dependency on the regulatory
   domain; they are reusable for any distributed system requiring
-  deterministic conflict resolution, deadlock freedom, or fair
-  scheduling.
+  deterministic conflict resolution or fair scheduling.
 
 \item[\texttt{DQuencer\_Instance.thy}] instantiates the generic liveness
   framework with the regulatory domain.  It defines authority levels
   (\textsc{Regional}, \textsc{National}, \textsc{International}), a
   four-component priority key with proven injectivity (under
   well-formedness bounds), a Byzantine fault model with the BFT
-  threshold $n \geq 3f + 1$, and instantiates each of the three
+  threshold $n \geq 3f + 1$, and instantiates each of the two
   liveness locales for the regulatory consensus system.  The
   \texttt{priority\_system} instantiation is performed on the
   \texttt{priority\_key} type as carrier, with the underlying
   D-quencer message recovered via a unicity corollary inside a
   well-formedness sublocale
   (Section~\ref{sec:priority-instance}); the
-  \texttt{deadlock\_free\_locking} and \texttt{fair\_leader\_system}
-  instantiations follow directly from the system's lock timeout and
+  \texttt{fair\_leader\_system} instantiation follows directly from the
   leader schedule.  The theory proves the main liveness consequences
-  (\emph{select highest deterministic}, \emph{deadlock freedom},
+  (\emph{select highest deterministic}, \emph{starvation freedom},
   \emph{eventual completion}) and concludes with the
-  \emph{combined safety liveness} theorem
-  (Section~\ref{sec:combined}) that links the liveness results back to
-  the synchronization function defined in
-  \texttt{Regulatory\_Instance.thy}, discharging the honest-node
-  assumption of the safety proof under Byzantine faults.
+  \emph{conditional safety preservation} theorem
+  (Section~\ref{sec:combined}), a conditional-safety corollary: a valid,
+  unlocked, transition-enabled state synchronizes successfully and stays
+  valid.  Its proof invokes only the safety side, so the corollary makes no
+  Byzantine, determinism, deadlock, or starvation claim of its own; those
+  liveness results are the separate theorems listed above.
 
 \item[\texttt{Proof\_Automation.thy}] provides reusable Eisbach discharge
   methods (\texttt{discharge\_state\_machine},
@@ -285,17 +205,27 @@ assumptions.
 
 \item[\texttt{Hierarchy.thy}] stratifies the construction by
   \emph{synchronization degree}, building a tower of transition functors
-  related by a forgetful map (\texttt{degree\_forget}).  The map is a natural
-  transformation between consecutive degrees
-  (\texttt{degree\_natural\_transformation}), and natural transformations are
+  related by a forgetful map (\texttt{degree\_forget}).  Each degree is a
+  genuine functor on the free category of regulatory action words --- it
+  preserves the identity word and word concatenation (\texttt{deg\_run\_Nil},
+  \texttt{deg\_run\_append}) and its action on a word collapses to the
+  composite regulatory transition broadcast once
+  (\texttt{deg\_run\_collapse}), not a vacuous fold.  The forgetful map is a
+  natural transformation between consecutive degrees, on the whole action
+  category and not merely its generators
+  (\texttt{degree\_natural\_transformation},
+  \texttt{degree\_forget\_natural\_run}), and natural transformations are
   closed under composition (\texttt{nt\_vertical\_compose},
   \texttt{nt\_compose}), so the whole degree ladder is structurally coherent.
   The theory also proves reduction containment of the degree classes
-  (\texttt{reduction\_containment}), safety of over-provisioning
-  (\texttt{hierarchy\_monotonicity}, \texttt{over\_provisioning\_guarantees}),
-  the absence of any guarantee under under-provisioning
-  (\texttt{no\_downward\_safety}), and well-definedness of the
-  causal-consistency boundary (\texttt{boundary\_well\_defined}).
+  (\texttt{reduction\_containment}) and a one-directional degree monotonicity
+  --- over-provisioning reconciles all required chains
+  (\texttt{over\_provisioning\_guarantees}) while under-provisioning guarantees
+  nothing (\texttt{no\_downward\_safety}); validity preservation itself is
+  degree-free (\texttt{processing\_preserves\_validity}, recorded in the
+  over-provisioning regime as the auxiliary \texttt{hierarchy\_monotonicity}).
+  It also shows well-definedness of the causal-consistency boundary
+  (\texttt{boundary\_well\_defined}).
 
 \item[\texttt{External\_Instance.thy}] instantiates the generic locales on a
   domain disjoint from the regulatory vocabulary: the TCP connection state
@@ -308,7 +238,7 @@ assumptions.
 
 \subsection{Theory Dependency Structure}
 
-The nine theories build up in two stages.  The four base theories form two
+The ten theories build up in two stages.  The four base theories form two
 generic-instance pairs that meet at \texttt{DQuencer\_Instance.thy}:
 \texttt{State\_Preservation.thy} is imported by
 \texttt{Regulatory\_Instance.thy}; \texttt{Priority\_Resolution.thy} depends
@@ -323,7 +253,9 @@ theories sit on top: \texttt{Composition.thy} imports
 \texttt{Functor\_Laws.thy} imports \texttt{Composition.thy},
 \texttt{Regulatory\_Instance.thy}, \texttt{DQuencer\_Instance.thy},
 \texttt{Proof\_Automation.thy}, and \texttt{ADS\_Functor.Merkle\_Interface};
-\texttt{Hierarchy.thy} imports \texttt{Functor\_Laws.thy}; and
+\texttt{Hierarchy.thy} and \texttt{Canton\_Bridge.thy} import
+\texttt{Functor\_Laws.thy} (\texttt{Canton\_Bridge.thy} additionally
+\texttt{ADS\_Functor.ADS\_Construction}); and
 \texttt{External\_Instance.thy} imports only
 \texttt{Proof\_Automation.thy} (hence, transitively, only the generic
 \texttt{State\_Preservation.thy}), deliberately independent of the
@@ -338,17 +270,31 @@ The regulatory state model incorporates several deliberate design
 decisions based on legal precedence and operational considerations:
 
 \begin{itemize}
-\item \textsc{Recover} and \textsc{Liquidate} are excluded from the
-  state machine as they involve force transfers or external DEX
-  interactions rather than state transitions.
+\item The state machine models seven regulatory \texttt{reg\_action}s: the
+  four escalation actions \textsc{Freeze}, \textsc{Seize},
+  \textsc{Confiscate}, \textsc{Restrict} and their de-escalation
+  counterparts \textsc{Unfreeze}, \textsc{Unrestrict}, \textsc{Release}.
+  \textsc{Recover} and \textsc{Liquidate}, two of the product's six
+  enforcement actions, are excluded as they involve force transfers or
+  external DEX interactions rather than regulatory state transitions.
 \item The direct transition \textsc{Seized} $\to$ \textsc{Frozen} is
   excluded because seizure is a strictly stronger legal constraint than
   freezing; relaxation requires explicit release first.
 \item The direct transition \textsc{Frozen} $\to$ \textsc{Restricted}
   is excluded to enforce passage through \textsc{Active}.
-\item Preemptive locking prevents concurrent regulatory actions on the
-  same asset, \emph{not} double-spending (which is handled at a
-  different layer).
+\item Preemptive locking is modelled as a guard on the synchronization
+  function: \texttt{sync} acquires the lock, updates, and releases in a
+  single atomic step.  Under this atomic abstraction the guard expresses the
+  \emph{intended} exclusion of competing regulatory actions on the same
+  asset rather than serialising them dynamically (there is no interleaving
+  in the model to serialise); the dynamic correctness of contention-time
+  locking is deferred to subsequent work.  The guard does not address
+  double-spending, which is handled at a different layer.
+\item Deadlock (a concurrency phenomenon) does not arise within the model's
+  scope: the atomic \texttt{sync} model has no concurrent lock contention.
+  Forced lock release under contention is out of scope, deferred to a
+  preemptive-lock-correctness property; the entry states no proved
+  deadlock-freedom theorem.
 \end{itemize}
 
 \subsection{Proof Automation}
@@ -394,20 +340,32 @@ least one epoch has an honest leader.  Under $f < n/3$ Byzantine
 faults, the probability that a Byzantine leader is elected $k$
 consecutive times is $(f/n)^k$, which decreases exponentially.  The
 fairness bound captures this as a deterministic upper bound, following
-standard assume-guarantee reasoning practice.  Formally, the BFT threshold
-already guarantees that a fair schedule exists
-(\texttt{fair\_schedule\_exists}): honest-node existence yields a constant
-witness schedule, so the fairness assumption is satisfiable, not merely
-plausible.
+standard assume-guarantee reasoning practice.  The Byzantine threshold is
+not decorative.  It guarantees that a fair schedule exists
+(\texttt{fair\_schedule\_exists}): honest-node existence
+(\texttt{honest\_nonempty}, in turn from \texttt{honest\_majority} and the
+threshold $n \ge 3f+1$) yields a constant witness schedule on an honest
+node.  This lemma is load-bearing, not idle: \texttt{liveness\_inhabitable}
+consumes it to show that \emph{every} D-quencer system admits an
+instantiation of the liveness locale, so the fair-leader assumption is
+satisfiable for every threshold-meeting system rather than merely
+postulated.  The whole chain --- threshold, \texttt{honest\_majority},
+\texttt{honest\_nonempty}, \texttt{fair\_schedule\_exists} --- is therefore
+load-bearing in the formal sense: deleting any link breaks the proof of
+\texttt{liveness\_inhabitable}.
 
-The liveness hosts are moreover inhabited unconditionally.  A global
-interpretation \texttt{singleton\_dq} discharges every assumption of the
-D-quencer liveness locale with a single-honest-node system (zero Byzantine
-budget, unit lock timeout and fairness window, constant schedule, no pending
-requests), and \texttt{singleton\_dq\_priority} does the same for the
-priority sublocale with a one-message set.  The assumption sets of the
-liveness locales are therefore consistent absolutely --- witnessed by a
-concrete model --- and not merely relative to a hypothetical deployment.
+The liveness hosts are moreover inhabited by concrete global
+interpretations.  \texttt{singleton\_dq} discharges every assumption of the
+D-quencer liveness locale with a single-honest-node system, and
+\texttt{singleton\_dq\_priority} does the same for the priority sublocale.
+Because a zero-fault system meets the threshold only vacuously, a second
+interpretation \texttt{bft\_quorum} exercises it at the tight bound with a
+\emph{real} fault: four nodes, one of them Byzantine
+($4 \ge 3 \cdot 1 + 1$, $\texttt{card (byzantine\_nodes)} = 1 \le 1$), an
+honest super-majority of three scheduled on one honest node.  The assumption
+sets of the liveness locales are thus consistent absolutely --- witnessed
+both degenerately and with a genuine Byzantine fault --- not merely relative
+to a hypothetical deployment.
 
 \subsection{Heterogeneous-Action Instance: Escalation Preservation}
 \label{sec:escalation}
@@ -561,34 +519,37 @@ sublocale; together they show that running the generic
 calling \texttt{recover\_msg} yields a deterministic choice of the
 highest-priority well-formed message in \texttt{msg\_set}.
 
-\subsection{Combined Safety and Liveness}
+\subsection{Conditional Safety Preservation}
 \label{sec:combined}
 
-The \texttt{combined\_safety\_liveness} theorem in
-\texttt{DQuencer\_Instance.thy} ties the synchronization function from
-the safety side to the liveness guarantees of the liveness side.
+The \texttt{conditional\_safety\_preservation} theorem in
+\texttt{DQuencer\_Instance.thy} is a conditional-safety corollary.
 Concretely: given a valid global state, an asset present on the source
 chain in a regulatory state from which a transition is enabled, and
 the asset not currently locked, the synchronization function returns
 \texttt{Some} and the resulting global state is again valid.
 
-The structural significance of the theorem is that it discharges the
-honest-node assumption of the safety proof under Byzantine faults.
-The safety theorems are stated in a model where the synchronization
-function executes atomically; the liveness locales
-(\texttt{deadlock\_free\_locking} and \texttt{fair\_leader\_system})
-formalize the conditions under which atomicity can be approximated in
-a Byzantine-fault-tolerant deployment with timeout-based forced lock
-release and a fair leader schedule.  The combined theorem shows that
-under these liveness conditions, every legitimate sync request that
-clears the safety preconditions has a successful outcome that
-preserves the safety invariant.
+Its proof invokes only the safety side --- \texttt{lock\_acquire\_success}
+and \texttt{valid\_state\_preservation}, both from
+\texttt{Regulatory\_Instance.thy} --- and none of the two liveness
+interpretations (\texttt{dq\_priority} and \texttt{dq\_fair}).  We are
+deliberate about its scope: it does \emph{not}
+discharge the honest-node or fair-leader assumption, and it makes no
+Byzantine, determinism, deadlock, or starvation claim.  The unlocked
+precondition is the state that the atomic lock discipline re-establishes
+after each synchronization, but that connection is operational, not a logical
+consequence of this corollary.  The genuine fusion of safety and liveness
+--- where the initial-validity hypothesis is dropped and convergence is
+driven by a well-founded measure on cross-chain inconsistency, under the
+fair-leader assumption --- is
+\texttt{oraclizer\_guarded\_bounded\_convergence}
+(Section~\ref{sec:convergence}).
 
 \subsection{Guarded Bounded Convergence}
 \label{sec:convergence}
 
 The safety results of the base entry are \emph{conditional}:
-\texttt{combined\_safety\_liveness} assumes the global state is already valid.
+\texttt{conditional\_safety\_preservation} assumes the global state is already valid.
 \texttt{Composition.thy} removes that assumption at the abstract level.  Its
 \texttt{converging\_composition} locale couples a guarded invariant with a
 bounded-fair discharger and a natural-number progress measure that every
@@ -603,12 +564,13 @@ progress measure is \texttt{inconsistency\_pairs}, the number of connected
 chain pairs that disagree on a shared asset; the critical step,
 \texttt{sync\_reduces\_inconsistency}, shows that synchronizing a disagreeing
 asset strictly decreases this count.  Interpreting
-\texttt{converging\_composition} inside the Byzantine D-quencer with fair
-leader election yields \texttt{oraclizer\_guarded\_bounded\_convergence}: from
+\texttt{converging\_composition} inside the D-quencer liveness context (the
+fair-leader assumption) yields \texttt{oraclizer\_guarded\_bounded\_convergence}: from
 an arbitrary finite-domain, unlocked state --- with \emph{no} assumption of
 initial cross-chain consistency --- the oracle reaches a valid state within a
-bounded number of evolution steps.  This is the unconditional strengthening of
-the conditional safety of Section~\ref{sec:combined}.
+bounded number of evolution steps.  This strengthens the conditional safety
+of Section~\ref{sec:combined} by dropping its initial-consistency hypothesis;
+it still operates under the fair-leader assumption.
 
 The realization map is pinned to \emph{terminal-faithful safe recovery}
 (\texttt{safe\_recovery}): a realized synchronization must not only reduce
@@ -659,12 +621,12 @@ signature.  Validity itself comes from the extraction invariant
 lemmas supply the structural relations between extracted states, not their
 validity.  The glue layer is abstract within one structural commitment:
 \texttt{state\_join} enforces a single consensus value per object identifier
-across both views, so the layer applies to systems maintaining one
-authoritative value per identifier --- Merkle-replicated registries,
-authenticated cross-shard asset records, and the
-public/witness layering of zero-knowledge proof systems, where
-\texttt{state\_refines} expresses that a public view is a blinding refinement
-of a full witness.
+across both views.  Any system of that shape is a potential transplant
+target --- for instance Merkle-replicated registries, authenticated
+cross-shard asset records, or the public/witness layering of zero-knowledge
+proofs, where \texttt{state\_refines} would express that a public view is a
+blinding refinement of a full witness --- but this entry instantiates the
+layer only on the regulatory model; those domains are not formalized here.
 
 \texttt{Functor\_Laws.thy} discharges this locale's model obligation with the
 interpretation \texttt{oss\_authenticated}, so its soundness theorems are not
@@ -689,6 +651,95 @@ oracle's concrete authenticated cross-domain state and a reusable pattern ---
 a consensus-committing hash over a revealed-participant set --- that an importer
 can transplant to the abstract domains just listed.
 
+\subsection{Authenticated Functor and the Canton Transaction Tree}
+\label{sec:canton}
+
+Beyond soundness, the authenticated layer of the previous subsection carries a
+functorial reading, and \texttt{Canton\_Bridge.thy} proves its categorical laws.
+Inside the \texttt{authenticated\_state} locale the blinding relation is a preorder
+on authenticated values and \texttt{state\_refines} is a preorder on global states;
+the extraction map is the composite functor from the first preorder to the second,
+sending each blinding morphism to a refinement morphism.  The headline law,
+\texttt{cdsp\_ads\_compose}, closes this functor under composition: two composable
+blindings $a \to b$ and $b \to c$ compose to $a \to c$ by transitivity of the
+blinding order, and the functor sends the composite to the composite refinement of
+the extracted states, with all three states valid.  It is the authenticated,
+cross-domain analogue of \texttt{preservation\_compose}.  The companion law,
+\texttt{cdsp\_ads\_merge\_assoc}, lifts the Merkle interface's merge associativity
+to the join algebra on extracted states: the three-way combination of authenticated
+views is independent of its bracketing, so the two groupings land on the same
+joined state.
+
+That single-step soundness is then raised to whole synchronization sequences.
+Along a \texttt{blinding\_path}, a list in which each element is a blinding of its
+successor, \texttt{sequence\_authenticity\_preservation} shows that every view
+extracts to a valid state and refines the most-revealed endpoint (validity and
+need-to-know together); \texttt{blinding\_path\_hash\_soundness} and
+\texttt{merge\_seq\_hash} show that the sequence commits to a single authenticating
+root in the blinding direction and in the merge direction respectively; and
+\texttt{sequence\_inclusion\_integrity} establishes inclusion integrity.  This
+sequence-level result is stated at the level of revealed holdings: a holding revealed
+by any view in the sequence is genuinely present at the endpoint with the same
+regulatory state, and no view fabricates a chain the endpoint does not authenticate.
+It is then sharpened to the concrete Merkle \emph{inclusion path} by instantiating the
+generic rose-tree inclusion-proof machinery of
+\texttt{ADS\_Functor.Inclusion\_Proof\_Construction} on the recursive view tree, with
+the discrete content embedding and hash.  An inclusion proof is a zipper in which the
+target subview is revealed while the path to the root and the off-path siblings are
+blinded: \texttt{reg\_view\_inclusion\_same\_hash} shows that every such proof commits to
+the same authenticating root hash as the fully revealed tree;
+\texttt{reg\_view\_inclusion\_blinding\_of} shows it is a blinding of the canonical
+inclusion-path tree, which carries that same root hash; and
+\texttt{reg\_view\_inclusion\_chains\_sound} shows its attested chains are contained in
+that tree's.  The
+instantiation adds no assumption, since the discrete content already satisfies the
+blinding-order locale.  Like the inclusion-proof construction it mirrors, the result
+characterises the proofs generated from a source view tree; it operates on the view
+tree, so the consensus scope limit recorded next is untouched.
+
+These sequence-level results are not vacuous.  \texttt{Canton\_Bridge.thy}
+instantiates the \texttt{authenticated\_state} locale directly on the
+blindable-position functor of \texttt{ADS\_Functor.ADS\_Construction}, in the
+interpretation \texttt{oss\_blindable}: an authenticated datum is either a revealed
+consensus state paired with its revealed-chain set or a hash-only commitment that
+reveals nothing, and the Merkle-interface obligation is discharged through
+\texttt{merkle\_blindable}, so no fresh interface proof is needed.  A
+machine-checked regression witness, \texttt{blinding\_path\_witness}, exhibits a
+genuinely increasing need-to-know sequence (a hash-only commitment, then a
+one-chain view, then a two-chain view, each blinding its successor) whose
+most-revealed endpoint extracts to a non-degenerate two-chain state, pinning the
+sequence-level theorems to a non-vacuous instance.
+
+Two further interpretations connect the layer to Canton's own transaction
+structure, both over concrete regulatory content rather than the opaque
+\texttt{view\_data} and \texttt{view\_metadata} types that the public Canton
+formalisation leaves as \texttt{typedecl}: reading a cross-domain state out of those
+opaque types would require an inadmissible axiom relating them to the regulatory
+model, which we do not introduce.  The interpretation \texttt{canton\_authenticated}
+mirrors the top-level shape of a Canton transaction, a single blindable position
+wrapping a metadata-and-views payload, transporting the three coherence obligations
+through the constructor bijection.  The interpretation \texttt{reg\_tx\_authenticated}
+keeps the public \emph{recursive} shape: it instantiates the content-agnostic
+rose-tree Merkle machinery (the \texttt{rose\_tree} datatype that the public Canton
+formalisation itself uses to build views) with concrete regulatory content, so that
+subviews nest and subview-level blinding stays alive, inheriting the Merkle
+interface with no new datatype and no new interface proof.  The honesty boundary is
+stated in the sources and held here.  The construction is \emph{recursive-faithful}
+but \emph{content-abstracted}, and the consensus \texttt{reg\_state} is modelled as
+a bare, non-independently-blindable field of the payload.  That modelling choice
+structurally forces a single consensus value per transaction --- a subview is
+reachable only by revealing the whole transaction, hence its consensus --- and this
+in turn yields validity with no added assumption; the machine-checked
+\texttt{single\_consensus\_load\_bearing} pins the point, exhibiting an inconsistent
+two-chain state that a per-node consensus would permit and that the recursive
+extraction never produces.  The accompanying price is a declared scope limit: the
+case in which a view is revealed while the consensus is blinded lies outside this
+model, because Canton's \texttt{common\_metadata} is independently blindable whereas
+the bare field here is not.  Lifting that case is left as future work on the public
+ground, and the single remaining question for the Canton authors is one of model
+fidelity --- whether the concrete payload faithfully abstracts their datatype --- which is
+a sanity check rather than a proof gap.
+
 \subsection{The Synchronization-Degree Hierarchy}
 \label{sec:hierarchy}
 
@@ -711,20 +762,21 @@ hierarchy back to the authenticated glue of
 Section~\ref{sec:authenticated}.
 
 The monotonicity payload follows.  The degree classes are nested
-(\texttt{reduction\_containment}); over-provisioning is safe --- a system
-whose capability dominates an asset's requirement preserves validity
-(\texttt{hierarchy\_monotonicity}) and reconciles all of the asset's required
-chains (\texttt{over\_provisioning\_guarantees}); under-provisioning carries
-no such guarantee (\texttt{no\_downward\_safety}), so the monotonicity is
-genuinely one-directional.  Validity preservation itself holds independently
-of the degrees (\texttt{processing\_preserves\_validity}, from which
-\texttt{hierarchy\_monotonicity} follows directly); the degree hypothesis is
-load-bearing precisely in the over-/under-provisioning regime pair.  A
-causal-consistency boundary, grounded in a Lamport happened-before order,
-separates the lower degrees from the higher and is shown to be well-defined
+(\texttt{reduction\_containment}).  The degree monotonicity is genuinely
+one-directional: over-provisioning reconciles all of the asset's required
+chains (\texttt{over\_provisioning\_guarantees}), while under-provisioning
+carries no such guarantee (\texttt{no\_downward\_safety}), so the degree
+hypothesis is load-bearing exactly in this over-/under-provisioning regime
+pair.  Validity preservation itself holds independently of the degrees
+(\texttt{processing\_preserves\_validity}); the auxiliary lemma
+\texttt{hierarchy\_monotonicity} records that validity preservation in the
+over-provisioning regime and follows directly, its provisioning hypothesis
+notational rather than load-bearing.  A causal-consistency boundary, grounded
+in a strict timestamp order, separates the lower degrees from the
+higher and is shown to be well-defined
 on asset/system pairs (\texttt{boundary\_well\_defined}).  This tower of
-functors with natural transformations between them is the layer that
-\texttt{ADS\_Functor} does not reach.
+functors with natural transformations between them is a layer that, to our
+knowledge, the \texttt{ADS\_Functor} entry does not develop.
 
 The degree-class layer is parametric in the degree assignment: the assignment
 of required degrees to assets is operational data, so the layer is developed
@@ -786,10 +838,9 @@ inside a single AFP entry.  Lifting the model to a partially
 synchronous network with message delays, redelivery, and out-of-order
 arrival is the next step.  The locales in this entry are designed to
 support that lift: \texttt{state\_preservation} carries the structural
-correctness condition that any concrete protocol must preserve;
-\texttt{deadlock\_free\_locking} and \texttt{fair\_leader\_system}
-provide the operational abstractions through which atomic sync can be
-realized as a sequence of bounded-duration steps.  We leave the
+correctness condition that any concrete protocol must preserve, and
+\texttt{fair\_leader\_system} provides an operational abstraction through
+which atomic sync can be realized as a sequence of bounded-duration steps.  We leave the
 construction of the lift to subsequent entries.
 
 % include generated text of all theories

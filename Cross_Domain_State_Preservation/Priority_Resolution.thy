@@ -7,15 +7,20 @@
   Priority Resolution and Liveness — Generic Theory
 
   This theory defines generic locales for priority-based deterministic
-  selection, deadlock-free locking with timeout, and starvation freedom
-  under fair leader scheduling. These are reusable abstractions for
-  verifying liveness properties in distributed systems with concurrent
-  resource access and leader-based consensus.
+  selection, timeout-bounded lock release, and starvation freedom under
+  fair leader scheduling. These are reusable, domain-independent
+  abstractions for the order- and bound-theoretic content of these three
+  liveness concerns: a total order on priorities yields a deterministic
+  choice, a timeout bound yields eventual release, and a fairness bound
+  yields bounded progress. The locales are stated over abstract carriers;
+  they do not themselves model concurrent execution, message interleaving,
+  or network failure, and the synchronization model that instantiates them
+  (Regulatory_Instance.thy) is atomic.
 
-  Three common liveness concerns in distributed systems — deterministic
-  ordering, deadlock avoidance, and starvation prevention — are each
-  captured by a minimal locale with clean assumptions, enabling
-  domain-independent proofs that any conforming system can instantiate.
+  Each concern — deterministic ordering, eventual lock release, and
+  bounded-fairness progress — is captured by a minimal locale with clean
+  assumptions, enabling domain-independent proofs that any conforming
+  system can instantiate.
 
   This theory is domain-independent. The D-quencer regulatory consensus
   in DQuencer_Instance.thy provides a concrete instantiation of all
@@ -26,9 +31,10 @@
   Methodological lineage:
     State_Preservation.thy in this entry abstracts cross-domain state
     preservation into composable locales. This theory follows the same
-    methodology on the liveness side, providing the operational
-    abstractions through which the safety-side atomic-sync model can
-    be lifted to a Byzantine-fault-tolerant deployment.
+    methodology on the liveness side, providing the order- and
+    bound-theoretic abstractions intended to support a future lift of the
+    atomic-sync model toward a partially synchronous, fault-tolerant
+    deployment (left to subsequent entries).
 *)
 
 theory Priority_Resolution
@@ -136,96 +142,6 @@ proof -
   from sel ne have "m = (THE x. x \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority x))"
     unfolding select_highest_def by simp
   with the_max show ?thesis by simp
-qed
-
-end
-
-
-section \<open>Deadlock-Free Locking with Timeout\<close>
-
-text \<open>
-  A resource locking system where each lock has a bounded lifetime.
-  After the timeout expires, the lock is considered released regardless
-  of whether the holder explicitly released it. This models systems
-  where Byzantine participants may hold locks indefinitely, but a
-  timeout mechanism prevents permanent blocking.
-
-  The key property: no resource can be locked beyond its timeout,
-  so no circular wait can persist indefinitely.
-\<close>
-
-locale deadlock_free_locking =
-  fixes timeout :: nat
-  assumes timeout_positive: "timeout > 0"
-begin
-
-text \<open>
-  A lock is effective only if it has not expired. Once the current
-  time exceeds the lock acquisition time plus timeout, the lock
-  is no longer blocking.
-\<close>
-
-definition lock_effective :: "nat \<Rightarrow> nat \<Rightarrow> bool" where
-  "lock_effective lock_time current_time \<longleftrightarrow> current_time < lock_time + timeout"
-
-text \<open>
-  Every lock eventually expires: for any lock acquired at time t,
-  there exists a future time at which the lock is no longer effective.
-\<close>
-
-theorem lock_eventually_expires:
-  "\<exists>t'. t' \<ge> current_time \<and> \<not> lock_effective lock_time t'"
-proof
-  show "lock_time + timeout + current_time \<ge> current_time \<and>
-        \<not> lock_effective lock_time (lock_time + timeout + current_time)"
-    unfolding lock_effective_def by auto
-qed
-
-text \<open>
-  The timeout is bounded: the lock expires no later than
-  \<^term>\<open>lock_time + timeout\<close> time units after acquisition.
-\<close>
-
-lemma lock_expiry_bound:
-  assumes "\<not> lock_effective lock_time t"
-  shows "t \<ge> lock_time + timeout"
-  using assms unfolding lock_effective_def by auto
-
-text \<open>
-  At the exact expiry moment, the lock is no longer effective.
-\<close>
-
-lemma lock_expired_at_timeout:
-  "\<not> lock_effective lock_time (lock_time + timeout)"
-  unfolding lock_effective_def by auto
-
-text \<open>
-  Before the timeout, the lock is effective.
-\<close>
-
-lemma lock_effective_before_timeout:
-  assumes "current_time < lock_time + timeout"
-  shows "lock_effective lock_time current_time"
-  using assms unfolding lock_effective_def by auto
-
-text \<open>
-  Deadlock freedom for single-resource locking: if each operation
-  acquires at most one lock, and every lock has a bounded timeout,
-  then no operation can be blocked indefinitely.
-
-  This follows directly from \<^verbatim>\<open>lock_eventually_expires\<close>: any lock
-  that blocks an operation will expire within \<^verbatim>\<open>timeout\<close> time units.
-  Since operations acquire single locks (no circular wait possible
-  with single-resource locking), deadlock is structurally impossible.
-\<close>
-
-theorem deadlock_freedom:
-  assumes "lock_effective lock_time current_time"
-  shows "\<exists>t'. t' \<le> lock_time + timeout \<and> \<not> lock_effective lock_time t'"
-proof
-  show "lock_time + timeout \<le> lock_time + timeout \<and>
-        \<not> lock_effective lock_time (lock_time + timeout)"
-    using lock_expired_at_timeout by auto
 qed
 
 end
