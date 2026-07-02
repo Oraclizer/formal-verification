@@ -35,7 +35,9 @@
        fields seized_by and restriction_scope). The action vocabularies on
        the two layers coincide, so action_map = id; the non-trivial content
        lives in the layer-crossing state mapping. A type-level invariant
-       (valid_daml_perm) carves out the bijection domain.
+       (valid_daml_perm) ties the auxiliary fields to the status tag; the
+       bijection itself is between reg_state and the image of the
+       representation map (daml_states).
     4. multi_domain_preservation (reg_multi_domain_instantiation): the
        generic multi-domain locale applies parametrically to the regulatory
        model for any finite set of chain identifiers and any global state
@@ -75,6 +77,16 @@ datatype reg_state = ACTIVE | FROZEN | SEIZED | CONFISCATED | RESTRICTED
 
 datatype reg_action = FREEZE | SEIZE | CONFISCATE | RESTRICT
                     | UNFREEZE | UNRESTRICT | RELEASE
+
+text \<open>
+  The seven constructors are the four escalation actions (\<^const>\<open>FREEZE\<close>,
+  \<^const>\<open>SEIZE\<close>, \<^const>\<open>CONFISCATE\<close>, \<^const>\<open>RESTRICT\<close>) and their
+  de-escalation counterparts (\<^const>\<open>UNFREEZE\<close>, \<^const>\<open>UNRESTRICT\<close>,
+  \<^const>\<open>RELEASE\<close>).  RECOVER and LIQUIDATE, two of the product's six
+  enforcement actions, are excluded from \<open>reg_action\<close>: they involve force
+  transfers or external DEX interactions rather than regulatory state
+  transitions, and are modelled at a different layer.
+\<close>
 
 text \<open>
   The regulatory transition function. Partial: returns None for invalid
@@ -286,11 +298,9 @@ section \<open>Asset and Global State Modeling\<close>
 
 type_synonym asset_id = nat
 type_synonym chain_id = nat
-type_synonym authority_id = nat
 type_synonym timestamp = nat
 
 record asset_state =
-  as_asset_id  :: asset_id
   as_reg_state :: reg_state
 
 type_synonym chain_state = "asset_id \<Rightarrow> asset_state option"
@@ -299,13 +309,17 @@ record global_state =
   gs_chains    :: "chain_id \<Rightarrow> chain_state"
   gs_locks     :: "asset_id \<Rightarrow> bool"
 
+text \<open>The synchronization message, reduced to the fields this model consumes:
+  the regulatory action and its timestamp.  The product's full message also
+  carries routing and attribution data (asset, authority, source, targets);
+  in this model routing lives at the global-state level
+  (\<^verbatim>\<open>connected_chains\<close> and the target set of \<^verbatim>\<open>update_all_chains\<close>), and the
+  D-quencer layer adds exactly the attribution fields its priority order
+  consumes (see \<^verbatim>\<open>dq_message\<close>).\<close>
+
 record oss_message =
   msg_action    :: reg_action
-  msg_asset_id  :: asset_id
-  msg_authority :: authority_id
   msg_timestamp :: timestamp
-  msg_source    :: chain_id
-  msg_targets   :: "chain_id set"
 
 
 section \<open>State Accessors and Predicates\<close>
@@ -349,8 +363,9 @@ definition consistent_state :: "global_state \<Rightarrow> bool" where
 definition no_locked_without_reason :: "global_state \<Rightarrow> bool" where
   "no_locked_without_reason gs \<equiv>
     \<forall>aid. \<not> is_locked gs aid"
-  \<comment> \<open>In a quiescent valid state, no assets are locked.
-      Locks are transient, held only during sync operations.\<close>
+  \<comment> \<open>Total absence of outstanding locks: in a quiescent valid state no
+      asset is locked at all (locks are transient, held only inside a
+      synchronization), not merely no unjustified lock.\<close>
 
 definition valid_state :: "global_state \<Rightarrow> bool" where
   "valid_state gs \<equiv> consistent_state gs \<and> no_locked_without_reason gs"
@@ -369,24 +384,6 @@ definition release_lock :: "global_state \<Rightarrow> asset_id \<Rightarrow> gl
   "release_lock gs aid = gs\<lparr> gs_locks := (gs_locks gs)(aid := False) \<rparr>"
 
 subsection \<open>State update across chains\<close>
-
-text \<open>
-  Update the regulatory state of an asset on a specific chain.
-  Preserves the other asset fields (the asset identifier).
-\<close>
-
-definition update_chain_reg_state ::
-  "global_state \<Rightarrow> chain_id \<Rightarrow> asset_id \<Rightarrow> reg_state \<Rightarrow> global_state"
-where
-  "update_chain_reg_state gs cid aid new_st =
-    (let old_chain = gs_chains gs cid in
-     let new_chain = (\<lambda>aid'.
-       if aid' = aid then
-         (case old_chain aid of
-            None \<Rightarrow> None
-          | Some ast \<Rightarrow> Some (ast\<lparr> as_reg_state := new_st \<rparr>))
-       else old_chain aid')
-     in gs\<lparr> gs_chains := (gs_chains gs)(cid := new_chain) \<rparr>)"
 
 text \<open>Update all connected chains to a new regulatory state.
 
@@ -420,7 +417,8 @@ text \<open>
   4. Update all connected chains to the new state
   5. Release lock
 
-  Returns None if any step fails (invalid transition, lock contention, etc.)
+  Returns None if any step fails (invalid transition, asset already
+  locked, etc.)
 \<close>
 
 definition sync ::
@@ -443,16 +441,12 @@ where
 
 section \<open>Synchronization Properties\<close>
 
-subsection \<open>Idempotency\<close>
+subsection \<open>No self-loops\<close>
 
 text \<open>
-  After synchronization, applying the same action again yields None
-  (the state has already transitioned, so the same transition from
-  the new state is typically invalid) or is a no-op.
-
-  More precisely: if sync succeeds and produces \<^verbatim>\<open>new_st\<close>, then
-  \<^verbatim>\<open>reg_transition\<close> \<^verbatim>\<open>new_st\<close> action = None for most action/state pairs
-  (the transition table has no self-loops).
+  The transition table has no self-loops: a successful transition always
+  changes the regulatory state, so a successful synchronization never
+  rewrites an asset to the state it already carries.
 \<close>
 
 lemma no_self_loops:
@@ -462,41 +456,6 @@ lemma no_self_loops:
 lemma transition_changes_state:
   "reg_transition s a = Some s' \<Longrightarrow> s \<noteq> s'"
   using no_self_loops by auto
-
-subsection \<open>Sync isolation: other assets are not affected\<close>
-
-text \<open>
-  Synchronization on asset aid does not change the state of any
-  other asset (where the asset identifier differs) on any chain.
-\<close>
-
-lemma update_chain_other_asset:
-  assumes "aid' \<noteq> aid"
-  shows "gs_chains (update_chain_reg_state gs cid aid new_st) cid' aid' =
-         gs_chains gs cid' aid'"
-proof (cases "cid' = cid")
-  case True
-  then show ?thesis
-    unfolding update_chain_reg_state_def Let_def
-    using assms by auto
-next
-  case False
-  then show ?thesis
-    unfolding update_chain_reg_state_def Let_def by auto
-qed
-
-subsection \<open>Sync correctness: source chain updated\<close>
-
-text \<open>
-  After \<^verbatim>\<open>update_chain_reg_state\<close>, the target chain reflects the new state.
-\<close>
-
-lemma update_chain_same_asset:
-  assumes "gs_chains gs cid aid = Some ast"
-  shows "gs_chains (update_chain_reg_state gs cid aid new_st) cid aid =
-         Some (ast\<lparr> as_reg_state := new_st \<rparr>)"
-  unfolding update_chain_reg_state_def Let_def
-  using assms by auto
 
 subsection \<open>Properties of update\_all\_chains\<close>
 
@@ -509,12 +468,6 @@ lemma update_all_chains_in_targets:
     and "gs_chains gs cid aid = Some ast"
   shows "gs_chains (update_all_chains gs aid new_st targets) cid aid =
          Some (ast\<lparr> as_reg_state := new_st \<rparr>)"
-  unfolding update_all_chains_def using assms by auto
-
-lemma update_all_chains_in_targets_none:
-  assumes "cid \<in> targets"
-    and "gs_chains gs cid aid = None"
-  shows "gs_chains (update_all_chains gs aid new_st targets) cid aid = None"
   unfolding update_all_chains_def using assms by auto
 
 lemma update_all_chains_outside_targets:
@@ -574,11 +527,10 @@ qed
 section \<open>Main Theorem: Cross-Chain Regulatory Consistency\<close>
 
 text \<open>
-  The central theorem of this theory. Under a valid global state
-  (all chains consistent, no outstanding locks), if a regulatory
-  action is applied via sync, the resulting state is also valid
-  (all chains consistent) and every connected chain reflects the
-  new regulatory state.
+  The central theorem of this theory. If a regulatory action is applied via
+  sync --- from an arbitrary global state --- every connected chain reflects
+  the new regulatory state; under a valid input state, validity is preserved
+  as well (\<^verbatim>\<open>valid_state_preservation\<close> below).
 
   This is the regulatory instantiation of the cross-domain consistency
   theorem from \<^verbatim>\<open>State_Preservation\<close>.thy.
@@ -589,21 +541,6 @@ text \<open>
   3. Showing \<^verbatim>\<open>update_all_chains\<close> updates every chain in the target set
   4. Combining these facts to establish the conclusion
 \<close>
-
-text \<open>
-  Auxiliary: update on a single chain preserves consistency for other assets.
-\<close>
-
-lemma update_chain_preserves_other_consistency:
-  assumes "consistent_state gs"
-    and "aid' \<noteq> aid"
-    and "get_reg_state gs c1 aid' = Some s1"
-    and "get_reg_state gs c2 aid' = Some s2"
-  shows "get_reg_state (update_chain_reg_state gs cid aid new_st) c1 aid' = Some s1
-       \<and> get_reg_state (update_chain_reg_state gs cid aid new_st) c2 aid' = Some s2"
-  using assms unfolding get_reg_state_def get_asset_state_def
-    update_chain_reg_state_def Let_def consistent_state_def
-  by auto
 
 text \<open>
   Auxiliary: \<^verbatim>\<open>release_lock\<close> does not change chains.
@@ -636,13 +573,10 @@ text \<open>
 \<close>
 
 theorem regulatory_homomorphism:
-  assumes valid: "valid_state gs"
-    and exists: "asset_exists gs source aid"
-    and current: "get_reg_state gs source aid = Some s"
+  assumes current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
     and synced: "sync source action aid gs = Some gs'"
     and connected: "c \<in> connected_chains gs aid"
-    and fin: "finite (connected_chains gs aid)"
   shows "get_reg_state gs' c aid = Some s'"
 proof -
   \<comment> \<open>Step 1: Unfold sync to extract intermediate states\<close>
@@ -712,11 +646,9 @@ text \<open>
 
 lemma sync_preserves_consistent_state:
   assumes valid: "valid_state gs"
-    and exists: "asset_exists gs source aid"
     and current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
     and synced: "sync source action aid gs = Some gs'"
-    and fin: "finite (connected_chains gs aid)"
   shows "consistent_state gs'"
 proof -
   \<comment> \<open>Unfold sync to extract the structure\<close>
@@ -837,7 +769,6 @@ text \<open>
 
 lemma sync_preserves_no_locks:
   assumes valid: "valid_state gs"
-    and exists: "asset_exists gs source aid"
     and current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
     and synced: "sync source action aid gs = Some gs'"
@@ -898,15 +829,13 @@ text \<open>
 
 theorem valid_state_preservation:
   assumes valid: "valid_state gs"
-    and exists: "asset_exists gs source aid"
     and current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
     and synced: "sync source action aid gs = Some gs'"
-    and fin: "finite (connected_chains gs aid)"
   shows "valid_state gs'"
   unfolding valid_state_def
   using sync_preserves_consistent_state[OF assms]
-        sync_preserves_no_locks[OF valid exists current trans synced]
+        sync_preserves_no_locks[OF assms]
   by auto
 
 
@@ -1192,15 +1121,21 @@ text \<open>
   ledger entry: a status tag plus auxiliary fields that carry the
   party / scope metadata associated with a non-trivial regulatory status
   (the seizing party for SEIZED, the restriction scope for RESTRICTED).
-  A type-level invariant (\<^verbatim>\<open>valid_daml_perm\<close>) carves out the bijection
-  domain by tying the auxiliary fields to the status tag.
+  The identifier values themselves are representative placeholders; what
+  the invariant tracks is their presence, and the layer-crossing content
+  lives in the status tag.
+  A type-level invariant (\<^verbatim>\<open>valid_daml_perm\<close>) ties the auxiliary fields to
+  the status tag; the bijection domain itself is the image of the
+  representation map (\<^verbatim>\<open>daml_states\<close>), every element of which satisfies
+  the invariant.
 
   The action vocabularies on the two layers coincide: both layers process
   the seven actions of \<^verbatim>\<open>reg_action\<close>, and the action map is the identity.
   All of the non-trivial content of the symmetric instance therefore lives
   in the layer-crossing state mapping. The roundtrip assumptions of
   \<^verbatim>\<open>symmetric_state_preservation\<close> become a pair of bijection conditions
-  between \<^verbatim>\<open>reg_state\<close> and the valid \<^verbatim>\<open>daml_perm\<close> records.
+  between \<^verbatim>\<open>reg_state\<close> and the image \<^verbatim>\<open>daml_states\<close> of the
+  representation map.
 \<close>
 
 datatype daml_status_tag =
@@ -1294,10 +1229,6 @@ qed
 lemma reg_to_daml_valid:
   "valid_daml_perm (reg_to_daml s)"
   unfolding valid_daml_perm_def by (cases s) auto
-
-lemma reg_to_daml_injective:
-  "reg_to_daml s1 = reg_to_daml s2 \<Longrightarrow> s1 = s2"
-  using daml_to_reg_to_daml_id by metis
 
 text \<open>
   The DAML side is a state machine on the image of \<^verbatim>\<open>reg_to_daml\<close>.
@@ -1505,9 +1436,8 @@ text \<open>
 text \<open>
   Backward state preservation. The source side is DAML and the target side
   matches \<^verbatim>\<open>reg_sm\<close>. \<^verbatim>\<open>unfold_locales\<close> auto-discharges all twelve
-  state-machine obligations (six target via \<^verbatim>\<open>reg_sm\<close>, six source via the
-  bundled \<^verbatim>\<open>daml_state_machine\<close> lemma combined with the individual
-  \<^verbatim>\<open>daml_*\<close> lemmas), so only the five preservation axioms remain pending.
+  state-machine obligations from the previously registered interpretations,
+  so only the five preservation axioms remain pending.
 \<close>
 
 interpretation backward_layer_preservation:
@@ -1730,8 +1660,9 @@ text \<open>
      and a structured DAML permission record (\<^verbatim>\<open>daml_perm\<close>) carrying
      auxiliary fields. The action vocabularies coincide so the action map
      is the identity; the non-trivial content is the bijection between
-     the enum and the valid records, with a type-level invariant
-     (\<^verbatim>\<open>valid_daml_perm\<close>) carving out the bijection domain.
+     the enum and the image \<^verbatim>\<open>daml_states\<close> of the representation map,
+     with a type-level invariant (\<^verbatim>\<open>valid_daml_perm\<close>) tying the auxiliary
+     fields to the status tag.
 
   10. The \<^verbatim>\<open>multi_domain_preservation\<close> locale is instantiated parametrically:
       for any finite domain set and valid global state, the abstract

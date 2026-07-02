@@ -58,7 +58,8 @@ text \<open>
   transitions.
 
   \<open>discharge_state_machine\<close> is the entry point for @{locale state_machine}
-  obligations (finiteness, terminal absorption, closure, domain);
+  obligations (finiteness, terminal containment, terminal absorption,
+  closure, domain);
   \<open>discharge_preservation\<close> is the entry point for
   @{locale state_preservation} obligations, whose unfolding contains the two
   sub-machines' obligations together with the morphism axioms

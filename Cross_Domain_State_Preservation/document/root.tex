@@ -8,6 +8,7 @@
 \isabellestyle{it}
 
 \begin{document}
+\emergencystretch=3em
 
 \title{Cross-Domain State Preservation Functor}
 \author{Jinwook Kim (Jay)}
@@ -30,14 +31,15 @@ data structure by lifting the merge and blinding operations of a Merkle
 interface to the global-state level, building directly on Lochbihler and
 Mari\'{c}'s \texttt{ADS\_Functor} entry, and instantiate the construction
 both on its blindable-position functor and on a recursive model of the Canton
-transaction tree.  The liveness locales abstract priority resolution,
-timeout-bounded lock release, and fair scheduling under an assume-guarantee
-fairness bound; the Byzantine threshold ($n \ge 3f+1$) is load-bearing,
+transaction tree.  The liveness locales abstract priority resolution and fair scheduling
+under an assume-guarantee fairness bound; the Byzantine threshold
+($n \ge 3f+1$) is load-bearing,
 yielding a fair schedule that makes the liveness layer inhabitable, witnessed
 by a non-degenerate four-node instance with one Byzantine node.  Every generic
 locale is instantiated on the regulatory state model of Oraclizer, a state
-synchronization oracle for tokenized assets, and, to exhibit domain
-independence, on a TCP connection tracker.  The synchronization model is
+synchronization oracle for tokenized assets; to exhibit domain independence,
+the generic safety layer is additionally instantiated on a TCP connection
+tracker.  The synchronization model is
 atomic; lifting it to a partially synchronous network is left to subsequent
 entries.
 \end{abstract}
@@ -46,28 +48,26 @@ entries.
 
 \section{Overview}
 
-\paragraph{Methodological positioning.}
-The title names a \emph{functor}, and the entry earns the term as a theorem
-rather than a slogan.  Regarding state machines as objects and the
-structure-preserving synchronization maps of \texttt{State\_Preservation.thy}
+\paragraph{Methodological positioning and contributions.}
+Regarding state machines as objects and the structure-preserving
+synchronization maps of \texttt{State\_Preservation.thy}
 as morphisms, \texttt{Functor\_Laws.thy} proves the three category axioms on
 these morphisms: identity is a preservation morphism
 (\texttt{preservation\_id}), preservation morphisms compose
 (\texttt{preservation\_compose}), and their composition is associative
-(\texttt{preservation\_assoc}).  Precisely, the three axioms establish the
-\emph{category} of state machines and preservation morphisms; the functorial
-reading is then carried at two places --- each transition system is a functor
-from its one-object action category into partial maps on states, with
-preservation morphisms as the structure-compatible maps between such functors,
-and Section~\ref{sec:hierarchy} exhibits a tower of degree-indexed functors
-with natural transformations between them.  This is the cross-domain counterpart of the
-``closed under composition'' structure of Lochbihler and Mari\'{c}'s
-\texttt{ADS\_Functor} entry, whose authenticated-data-structure functor is
-single-domain; the present entry carries the functorial reading across
-heterogeneous domains and couples it with that authenticated layer through two
-glue predicates, \texttt{state\_join} and \texttt{state\_refines}, that lift
-the ADS merge and blinding (partial-order) operations to the global-state
-level.
+(\texttt{preservation\_assoc}).  The functorial reading is carried at two
+further places: each transition system is a functor from its one-object
+action category into partial maps on states, its two functor laws carried by
+the identity word and word concatenation (\texttt{apply\_actions\_append});
+and \texttt{Hierarchy.thy} exhibits a tower of degree-indexed functors
+with natural transformations between them.  This is the cross-domain
+counterpart of the ``closed under composition'' structure of Lochbihler and
+Mari\'{c}'s \texttt{ADS\_Functor} entry, whose authenticated-data-structure
+functor is single-domain; the present entry carries the functorial reading
+across heterogeneous domains and couples it with that authenticated layer
+through two glue predicates, \texttt{state\_join} and \texttt{state\_refines},
+that lift the ADS merge and blinding (partial-order) operations to the
+global-state level.
 
 We claim no new proof technique.  The contribution is a mechanization, in
 three layers, of structure that, to the best of our knowledge, has not
@@ -79,190 +79,105 @@ above;
 --- from an \emph{arbitrary} finite-domain, lock-free initial global state,
 with no assumption that the
 cross-chain consistency invariant holds initially, the synchronization oracle
-reaches a valid state within a bounded number of steps
-(\texttt{oraclizer\_guarded\_bounded\_convergence}), upgrading the conditional
-safety of \texttt{conditional\_safety\_preservation} to convergence without an
-initial-consistency hypothesis; and
+reaches a valid state within a bounded number of evolution steps
+(\texttt{oraclizer\_guarded\_bounded\_convergence},
+\texttt{Functor\_Laws.thy}); and
 (iii)~a \emph{tower} of synchronization-degree functors connected by natural
 transformations (\texttt{degree\_natural\_transformation}) that are closed
-under composition (\texttt{nt\_compose}, via \texttt{nt\_vertical\_compose})
---- a hierarchy of functors with natural transformations between them, which
-the \texttt{ADS\_Functor} entry, to our knowledge, does not develop.
-Within the authenticated layer, the validity of an extracted cross-domain
-state is supplied by the extraction invariant
-(\texttt{extract\_preserves\_validity}); the \texttt{merkle\_interface} locale
---- through its mergeability assumption \texttt{merge\_respects\_hashes} and
-its lemmas \texttt{join} and \texttt{hash}, all invoked explicitly in the
-soundness proofs --- establishes the structural relations between extracted
-states (join and blinding refinement), not their validity.
+under composition (\texttt{nt\_compose}, via \texttt{nt\_vertical\_compose}),
+a layer which the \texttt{ADS\_Functor} entry, to our knowledge, does not
+develop (\texttt{Hierarchy.thy}).
 
-This AFP entry consists of ten theory files.  Four form the original two
-``generic locales + regulatory instances'' pairs, one for safety and one
-for liveness; four further theories add the compositional and functorial
-layer --- a generic safety/liveness composition with bounded convergence,
-the functor laws together with the authenticated-data-structure glue,
-the synchronization-degree hierarchy, and the authenticated-functor laws
-over a recursive model of the Canton transaction tree; a generic
-proof-automation theory contributes reusable discharge methods for the
-locale obligations; and an instance outside the regulatory domain (a TCP
-connection tracker) demonstrates that the generic layer carries no hidden
-regulatory assumptions.
+The entry consists of ten theory files; the theory text carries the
+detailed exposition alongside the formal material.
 
 \begin{description}
-\item[\texttt{State\_Preservation.thy}] defines domain-independent
-  locales for state machines, pairwise state preservation (with
-  naturality), symmetric bidirectional preservation, and multi-domain
-  preservation.  All locales are parameterized over abstract types and
-  can be instantiated with any domain that has finite states,
-  deterministic transitions, and optional terminal states.
+\item[\texttt{State\_Preservation.thy}] domain-independent locales for
+  state machines, pairwise state preservation (with naturality in both the
+  enabled and the disabled direction), symmetric bidirectional
+  preservation, and multi-domain preservation --- instantiable by any
+  domain with finite states and actions, deterministic transitions, and
+  optional terminal states.
 
-\item[\texttt{Regulatory\_Instance.thy}] instantiates the generic safety
-  framework with the regulatory state model.  It defines the five
-  regulatory states and seven regulatory actions, proves fundamental
-  properties (terminal absorption, universal reachability of
-  confiscation, transition exclusions with legal justification), models
-  a synchronization protocol with preemptive locking, and proves the
-  main safety theorems: \emph{regulatory homomorphism} (cross-chain
-  consistency after sync), \emph{valid state preservation} (sync
-  maintains the global validity invariant), and \emph{multi-domain
-  parametric instantiation}.  In addition, it instantiates
-  \texttt{state\_preservation} (\emph{escalation preservation}, see
-  Section~\ref{sec:escalation}) and
-  \texttt{symmetric\_state\_preservation} (\emph{onchain DAML bridge},
-  see Section~\ref{sec:bridge}) with concrete heterogeneous-action and
-  layer-crossing examples.
+\item[\texttt{Regulatory\_Instance.thy}] the regulatory safety instance:
+  five states, seven actions, transition exclusions with legal
+  justification, a synchronization protocol with preemptive locking, and
+  the main safety theorems --- \emph{regulatory homomorphism}, \emph{valid
+  state preservation}, and \emph{multi-domain parametric instantiation} ---
+  together with heterogeneous-action and layer-crossing bridge instances.
 
-\item[\texttt{Priority\_Resolution.thy}] defines domain-independent
-  locales for liveness properties under Byzantine faults:
-  \texttt{priority\_system} for deterministic selection from a finite
-  message set with injective priorities, and
-  \texttt{fair\_leader\_system} for starvation freedom under
-  periodic honest leader scheduling.  The locales are parameterized
-  over abstract types and impose no dependency on the regulatory
-  domain; they are reusable for any distributed system requiring
-  deterministic conflict resolution or fair scheduling.
+\item[\texttt{Priority\_Resolution.thy}] domain-independent liveness
+  locales: deterministic selection from a finite message set with
+  injective priorities (\texttt{priority\_system}), and starvation
+  freedom under periodic honest leader scheduling
+  (\texttt{fair\_leader\_system}).
 
-\item[\texttt{DQuencer\_Instance.thy}] instantiates the generic liveness
-  framework with the regulatory domain.  It defines authority levels
-  (\textsc{Regional}, \textsc{National}, \textsc{International}), a
-  four-component priority key with proven injectivity (under
-  well-formedness bounds), a Byzantine fault model with the BFT
-  threshold $n \geq 3f + 1$, and instantiates each of the two
-  liveness locales for the regulatory consensus system.  The
-  \texttt{priority\_system} instantiation is performed on the
-  \texttt{priority\_key} type as carrier, with the underlying
-  D-quencer message recovered via a unicity corollary inside a
-  well-formedness sublocale
-  (Section~\ref{sec:priority-instance}); the
-  \texttt{fair\_leader\_system} instantiation follows directly from the
-  leader schedule.  The theory proves the main liveness consequences
-  (\emph{select highest deterministic}, \emph{starvation freedom},
-  \emph{eventual completion}) and concludes with the
-  \emph{conditional safety preservation} theorem
-  (Section~\ref{sec:combined}), a conditional-safety corollary: a valid,
-  unlocked, transition-enabled state synchronizes successfully and stays
-  valid.  Its proof invokes only the safety side, so the corollary makes no
-  Byzantine, determinism, deadlock, or starvation claim of its own; those
-  liveness results are the separate theorems listed above.
+\item[\texttt{DQuencer\_Instance.thy}] the regulatory liveness instance:
+  a four-component priority key with proven injectivity under
+  well-formedness bounds, a Byzantine fault model with the BFT threshold
+  $n \geq 3f + 1$, the liveness consequences (\emph{select highest
+  deterministic}, \emph{starvation freedom}, \emph{eventual completion}),
+  and the safety-side corollary \emph{conditional safety preservation}.
 
-\item[\texttt{Proof\_Automation.thy}] provides reusable Eisbach discharge
-  methods (\texttt{discharge\_state\_machine},
-  \texttt{discharge\_preservation}) for the instance obligations of the
-  generic locales, driven by three named theorem collections
-  (\texttt{discharge\_simps}, \texttt{discharge\_intros},
-  \texttt{discharge\_dels}) into which an instance theory declares the
-  defining equations of its domain.  The theory depends only on
-  \texttt{State\_Preservation.thy} and Eisbach and carries no application
-  vocabulary; see the \emph{Proof automation} subsection below.
+\item[\texttt{Proof\_Automation.thy}] reusable Eisbach discharge methods
+  with entry points \texttt{discharge\_state\_machine} and
+  \texttt{discharge\_preservation}, driven by three named theorem
+  collections; see the \emph{Proof Automation} subsection below.
 
-\item[\texttt{Composition.thy}] provides domain-independent locales for
-  composing a guarded safety invariant with an eventual-progress scheduler
-  (\texttt{guarded\_invariant}, \texttt{eventual\_discharger},
-  \texttt{safety\_liveness\_composition}) and extends them with a
-  natural-number progress measure (\texttt{converging\_composition}) to derive
-  \emph{guarded bounded convergence}: from an arbitrary carrier state, not
-  assumed to satisfy the invariant, the system reaches an invariant-satisfying
-  state within a bounded number of steps
-  (\texttt{bounded\_convergence\_from\_arbitrary}).  The development commits to
-  no application vocabulary and depends only on
-  \texttt{State\_Preservation.thy}.
+\item[\texttt{Composition.thy}] domain-independent locales composing a
+  guarded safety invariant with an eventual-progress scheduler, extended
+  by a natural-number progress measure to \emph{guarded bounded
+  convergence} from an arbitrary carrier state
+  (\texttt{bounded\_convergence\_from\_arbitrary}).
 
-\item[\texttt{Functor\_Laws.thy}] establishes that cross-domain state
-  preservation is functorial, proving the three category axioms on
-  state-preservation morphisms (\texttt{preservation\_id},
-  \texttt{preservation\_compose}, \texttt{preservation\_assoc}).  It defines
-  two glue predicates (\texttt{state\_join}, \texttt{state\_refines}) lifting
-  the ADS merge and blinding order to the global-state level, an
-  \texttt{authenticated\_state} locale over the \texttt{merkle\_interface},
-  and two soundness theorems
-  (\texttt{authenticated\_preservation\_soundness},
-  \texttt{blinded\_view\_preserves\_validity}) whose proofs invoke the Merkle
-  interface explicitly.  It then instantiates \texttt{converging\_composition}
-  with the oracle's synchronization protocol and proves
-  \texttt{oraclizer\_guarded\_bounded\_convergence}: convergence to a valid
-  state from an arbitrary finite-domain state, with no initial consistency
-  assumption.
+\item[\texttt{Functor\_Laws.thy}] the category axioms, the ADS glue
+  predicates (\texttt{state\_join}, \texttt{state\_refines}), the
+  \texttt{authenticated\_state} locale over the \texttt{merkle\_interface}
+  with soundness theorems whose proofs invoke the Merkle interface
+  explicitly, and the oracle's convergence instantiation
+  (\texttt{oraclizer\_guarded\_bounded\_convergence}).
 
-\item[\texttt{Hierarchy.thy}] stratifies the construction by
-  \emph{synchronization degree}, building a tower of transition functors
-  related by a forgetful map (\texttt{degree\_forget}).  Each degree is a
-  genuine functor on the free category of regulatory action words --- it
-  preserves the identity word and word concatenation (\texttt{deg\_run\_Nil},
-  \texttt{deg\_run\_append}) and its action on a word collapses to the
-  composite regulatory transition broadcast once
-  (\texttt{deg\_run\_collapse}), not a vacuous fold.  The forgetful map is a
-  natural transformation between consecutive degrees, on the whole action
-  category and not merely its generators
-  (\texttt{degree\_natural\_transformation},
-  \texttt{degree\_forget\_natural\_run}), and natural transformations are
-  closed under composition (\texttt{nt\_vertical\_compose},
-  \texttt{nt\_compose}), so the whole degree ladder is structurally coherent.
-  The theory also proves reduction containment of the degree classes
-  (\texttt{reduction\_containment}) and a one-directional degree monotonicity
-  --- over-provisioning reconciles all required chains
-  (\texttt{over\_provisioning\_guarantees}) while under-provisioning guarantees
-  nothing (\texttt{no\_downward\_safety}); validity preservation itself is
-  degree-free (\texttt{processing\_preserves\_validity}, recorded in the
-  over-provisioning regime as the auxiliary \texttt{hierarchy\_monotonicity}).
-  It also shows well-definedness of the causal-consistency boundary
-  (\texttt{boundary\_well\_defined}).
+\item[\texttt{Hierarchy.thy}] the synchronization-degree tower: a
+  forgetful natural transformation closed under composition
+  (\texttt{degree\_forget}, \texttt{degree\_natural\_transformation},
+  \texttt{nt\_compose}), reduction containment, the causal-consistency
+  boundary, and a genuinely one-directional degree monotonicity
+  (\texttt{over\_provisioning\_guarantees}, \texttt{no\_downward\_safety}).
 
-\item[\texttt{External\_Instance.thy}] instantiates the generic locales on a
-  domain disjoint from the regulatory vocabulary: the TCP connection state
-  machine (an RFC~793 subset) observed by a stateful connection tracker.
-  It imports only the generic theory and the generic proof automation ---
-  not \texttt{Regulatory\_Instance.thy} --- and discharges its instances
-  with the generic methods; see the subsection
-  \emph{An instance outside the regulatory domain}.
+\item[\texttt{Canton\_Bridge.thy}] the categorical laws of the
+  authenticated layer (\texttt{cdsp\_ads\_compose},
+  \texttt{cdsp\_ads\_merge\_assoc}), sequence-level authenticity, and
+  instantiations on the blindable-position functor of
+  \texttt{ADS\_Functor.ADS\_Construction} and on a recursive model of the
+  Canton transaction tree, with a declared consensus-scope limit.
+
+\item[\texttt{External\_Instance.thy}] an instance outside the regulatory
+  domain --- the TCP connection state machine (an RFC~793 subset) observed
+  by a stateful connection tracker --- importing only the generic theories
+  and discharged by the generic methods: the evidence that the generic
+  layer carries no hidden regulatory assumptions.
 \end{description}
 
 \subsection{Theory Dependency Structure}
 
-The ten theories build up in two stages.  The four base theories form two
-generic-instance pairs that meet at \texttt{DQuencer\_Instance.thy}:
-\texttt{State\_Preservation.thy} is imported by
-\texttt{Regulatory\_Instance.thy}; \texttt{Priority\_Resolution.thy} depends
-only on \texttt{Main} and is deliberately kept independent of the regulatory
-domain to preserve reusability; \texttt{DQuencer\_Instance.thy} imports both
-\texttt{Priority\_Resolution.thy} and \texttt{Regulatory\_Instance.thy},
-serving as the join point where the liveness framework is applied to the
-regulatory model and combined with the safety results.  The compositional
-theories sit on top: \texttt{Composition.thy} imports
-\texttt{State\_Preservation.thy}; \texttt{Proof\_Automation.thy} imports
-\texttt{State\_Preservation.thy} and \texttt{HOL-Eisbach};
-\texttt{Functor\_Laws.thy} imports \texttt{Composition.thy},
-\texttt{Regulatory\_Instance.thy}, \texttt{DQuencer\_Instance.thy},
-\texttt{Proof\_Automation.thy}, and \texttt{ADS\_Functor.Merkle\_Interface};
+The four base theories form two generic--instance pairs that meet at
+\texttt{DQuencer\_Instance.thy}: \texttt{State\_Preservation.thy} is
+imported by \texttt{Regulatory\_Instance.thy}, and
+\texttt{Priority\_Resolution.thy}, which depends only on \texttt{Main}, is
+imported by \texttt{DQuencer\_Instance.thy} together with the regulatory
+instance.  The compositional theories sit on top: \texttt{Composition.thy}
+and \texttt{Proof\_Automation.thy} import
+\texttt{State\_Preservation.thy}; \texttt{Functor\_Laws.thy} imports both
+instances, \texttt{ADS\_Functor.Merkle\_Interface},
+\texttt{Composition.thy}, and \texttt{Proof\_Automation.thy};
 \texttt{Hierarchy.thy} and \texttt{Canton\_Bridge.thy} import
-\texttt{Functor\_Laws.thy} (\texttt{Canton\_Bridge.thy} additionally
-\texttt{ADS\_Functor.ADS\_Construction}); and
-\texttt{External\_Instance.thy} imports only
-\texttt{Proof\_Automation.thy} (hence, transitively, only the generic
-\texttt{State\_Preservation.thy}), deliberately independent of the
-regulatory instance.  The dependency
-on \texttt{ADS\_Functor} is the entry's only external session dependency
-beyond the Isabelle distribution (\texttt{HOL-Library},
-\texttt{HOL-Eisbach}).
+\texttt{Functor\_Laws.thy}; and \texttt{External\_Instance.thy} imports only
+\texttt{Proof\_Automation.thy}, deliberately independent of the regulatory
+instance.  The dependency on \texttt{ADS\_Functor} is the entry's only
+external session dependency beyond the Isabelle distribution
+(\texttt{HOL-Library}, \texttt{HOL-Eisbach}); \texttt{Canton\_Bridge.thy}
+additionally imports \texttt{ADS\_Functor.ADS\_Construction} and
+\texttt{ADS\_Functor.Canton\_Transaction\_Tree}.
 
 \subsection{Design Decisions}
 
@@ -288,22 +203,22 @@ decisions based on legal precedence and operational considerations:
   \emph{intended} exclusion of competing regulatory actions on the same
   asset rather than serialising them dynamically (there is no interleaving
   in the model to serialise); the dynamic correctness of contention-time
-  locking is deferred to subsequent work.  The guard does not address
+  locking is deferred to the preemptive-lock property.  The guard does not address
   double-spending, which is handled at a different layer.
 \item Deadlock (a concurrency phenomenon) does not arise within the model's
   scope: the atomic \texttt{sync} model has no concurrent lock contention.
-  Forced lock release under contention is out of scope, deferred to a
-  preemptive-lock-correctness property; the entry states no proved
+  Forced lock release under contention is out of scope, deferred to the
+  preemptive-lock property; the entry states no proved
   deadlock-freedom theorem.
 \end{itemize}
 
 \subsection{Proof Automation}
 
-The entry ships a reusable proof-automation layer
-(\texttt{Proof\_Automation.thy}): two Eisbach methods,
-\texttt{discharge\_state\_machine} and \texttt{discharge\_preservation},
-discharge the obligations of \texttt{state\_machine} and
-\texttt{state\_preservation} instances on finite, enumerated domains.  An
+The entry ships a reusable proof-automation layer,
+\texttt{Proof\_Automation.thy}: two Eisbach methods discharge the
+obligations of \texttt{state\_machine} and \texttt{state\_preservation}
+instances on finite, enumerated domains ---
+\texttt{discharge\_state\_machine} and \texttt{discharge\_preservation}.  An
 instance theory declares the defining equations of its state/action sets and
 transition functions into three named theorem collections
 (\texttt{discharge\_simps} for equational and conditional-rewrite content,
@@ -315,533 +230,22 @@ invocation.
 The methods are exercised against the entry's own instances, with the
 statements kept identical to their manual counterparts.  Four instances are
 discharged by pure search, with no registered interpretation to fall back
-on: the escalation-scoped DAML state machine (manual proof 22 lines, method
-one line; 6 obligations), the escalation-scoped layer-crossing bridge
-(manual 53 lines, method one line; 11 obligations), the composed three-domain
-morphism of Section~\ref{sec:escalation} (re-derived from atomic obligations
-without invoking \texttt{preservation\_compose}; 11 obligations), and a
-forward escalation-scoped bridge with no manual counterpart, which the
-method constructs outright.  Three further one-line restatements of the
-registered interpretations (escalation preservation and the two
-layer-crossing directions, manually 57, 42 and 25 lines) are discharged from
-the registrations.  Across the search-backed instances the methods close 39
-of 39 atomic obligations; no obligation was weakened or left to a manual
-fallback.  The methods and their collections are part of the entry's
-reusable surface: an importer instantiating the locales on its own domain
-populates the collections and reuses the same two entry points, as the
-instance outside the regulatory domain does below.
+on --- the escalation-scoped DAML state machine (6 obligations), the
+escalation-scoped layer-crossing bridge (11 obligations), the composed
+three-domain morphism re-derived from atomic obligations without invoking
+\texttt{preservation\_compose} (11 obligations), and a forward
+escalation-scoped bridge with no manual counterpart, which the method
+constructs outright (11 obligations) --- closing 39 of 39 atomic
+obligations, with no obligation weakened or left to a manual fallback.
+Three further one-line restatements of the registered interpretations are
+discharged from the registrations.  The methods and their collections are
+part of the entry's reusable surface: an importer instantiating the locales
+on its own domain populates the collections and reuses the same two entry
+points, as \texttt{External\_Instance.thy} does.
 
-The liveness model adopts an assume-guarantee approach for starvation
-freedom: rather than directly modeling the probabilistic guarantees of
-VRF-based leader election (which would require extensive probability
-theory infrastructure), the \texttt{fair\_leader\_system} locale
-assumes that within any \texttt{fairness\_bound} consecutive epochs, at
-least one epoch has an honest leader.  Under $f < n/3$ Byzantine
-faults, the probability that a Byzantine leader is elected $k$
-consecutive times is $(f/n)^k$, which decreases exponentially.  The
-fairness bound captures this as a deterministic upper bound, following
-standard assume-guarantee reasoning practice.  The Byzantine threshold is
-not decorative.  It guarantees that a fair schedule exists
-(\texttt{fair\_schedule\_exists}): honest-node existence
-(\texttt{honest\_nonempty}, in turn from \texttt{honest\_majority} and the
-threshold $n \ge 3f+1$) yields a constant witness schedule on an honest
-node.  This lemma is load-bearing, not idle: \texttt{liveness\_inhabitable}
-consumes it to show that \emph{every} D-quencer system admits an
-instantiation of the liveness locale, so the fair-leader assumption is
-satisfiable for every threshold-meeting system rather than merely
-postulated.  The whole chain --- threshold, \texttt{honest\_majority},
-\texttt{honest\_nonempty}, \texttt{fair\_schedule\_exists} --- is therefore
-load-bearing in the formal sense: deleting any link breaks the proof of
-\texttt{liveness\_inhabitable}.
-
-The liveness hosts are moreover inhabited by concrete global
-interpretations.  \texttt{singleton\_dq} discharges every assumption of the
-D-quencer liveness locale with a single-honest-node system, and
-\texttt{singleton\_dq\_priority} does the same for the priority sublocale.
-Because a zero-fault system meets the threshold only vacuously, a second
-interpretation \texttt{bft\_quorum} exercises it at the tight bound with a
-\emph{real} fault: four nodes, one of them Byzantine
-($4 \ge 3 \cdot 1 + 1$, $\texttt{card (byzantine\_nodes)} = 1 \le 1$), an
-honest super-majority of three scheduled on one honest node.  The assumption
-sets of the liveness locales are thus consistent absolutely --- witnessed
-both degenerately and with a genuine Byzantine fault --- not merely relative
-to a hypothetical deployment.
-
-\subsection{Heterogeneous-Action Instance: Escalation Preservation}
-\label{sec:escalation}
-
-The instantiation of \texttt{state\_preservation} provided in
-\texttt{Regulatory\_Instance.thy} models the situation where two chains
-share a regulatory state space but differ in their on-chain action
-vocabularies.  Some jurisdictions handle de-escalation
-(\textsc{Unfreeze}, \textsc{Unrestrict}, \textsc{Release}) exclusively
-through separate judicial procedures rather than as on-chain actions;
-the corresponding chain therefore exposes only the four escalation
-actions (\textsc{Freeze}, \textsc{Seize}, \textsc{Confiscate},
-\textsc{Restrict}) on chain.  We model this asymmetry by using two
-distinct action types: \texttt{reg\_action} for the source chain
-(seven constructors) and a dedicated four-constructor datatype
-\texttt{chain\_b\_action} for the target chain.
-
-The instantiation exploits two locale features simultaneously.  First,
-the source action set parameter \texttt{actions\textsubscript{s}} is
-instantiated with the strict subset
-$\{\textsc{Freeze}, \textsc{Seize}, \textsc{Confiscate}, \textsc{Restrict}\}$
-of \texttt{reg\_action}, scoping structural preservation to the
-escalation actions only.  Second, the source and target action types
-($\texttt{'a}$ vs.\ $\texttt{'b}$) carry different datatypes,
-exercising the locale's heterogeneous action signature.  The naturality
-conditions hold by case analysis on the four escalation actions and
-the five regulatory states, with the target chain's transition function
-defined to mirror the source on the escalation subset.  Sequential
-preservation follows as a direct corollary of the locale's main
-theorem: every escalation action sequence on the source chain
-produces, when mapped, an equivalent sequence on the target chain
-ending in the same regulatory state.
-
-This instance is more than a convenience: it isolates the locale's
-\texttt{actions\textsubscript{s}} parameter as the formal handle for
-expressing partial action vocabularies, a concern that recurs across
-multi-jurisdiction protocol coordination, escalation-only consensus
-systems, and any cross-domain mapping where the two domains expose
-different on-domain actions.
-
-A further point the instance makes explicit is the deliberate strength of
-the preservation condition: naturality is required in both the enabled and
-the disabled direction (the target must reflect undefinedness of the source
-transition), so a target domain that is strictly more permissive than the
-source on some action cannot be a morphism target.  The
-\texttt{actions\textsubscript{s}} parameter is the intended handle for
-scoping preservation to the action subset on which the two domains agree in
-permissiveness, exactly as this instance does.
-
-Composition is exercised on a concrete heterogeneous three-domain chain:
-the DAML permission ledger, restricted a fortiori to the escalation subset
-(\texttt{daml\_escalation\_state\_machine}), is carried by the
-layer-crossing map into the regulatory enum
-(\texttt{daml\_to\_reg\_escalation\_bridge}) and from there into
-Chain~B's four-action vocabulary, and the composite morphism
-DAML~$\to$~Chain~B is obtained by a single application of
-\texttt{preservation\_compose} (\texttt{daml\_to\_chain\_b\_composed}) ---
-no new naturality argument is needed.  In HOL a heterogeneous $N$-domain
-chain cannot be packed into one object, since the domains carry genuinely
-different state and action types; arbitrary finite heterogeneous chains are
-instead expressed as composites of pairwise morphisms, with associativity
-(\texttt{preservation\_assoc}) making longer path composites unambiguous.
-
-\subsection{Layer-Crossing Instance: Onchain DAML Bridge}
-\label{sec:bridge}
-
-The instantiation of \texttt{symmetric\_state\_preservation} provided
-in \texttt{Regulatory\_Instance.thy} models the bidirectional binding
-between two representations of the same regulatory state: the on-chain
-\texttt{reg\_state} enum and an off-chain DAML structured permission
-record (\texttt{daml\_perm}).  The DAML record carries a status tag
-together with auxiliary fields (\texttt{seized\_by},
-\texttt{restriction\_scope}) that hold the party / scope metadata
-required by the corresponding regulatory status; a type-level invariant
-\texttt{valid\_daml\_perm} ties the auxiliary fields to the status tag
-(non-\texttt{None} exactly when the status semantically requires them).
-
-The action vocabularies on the two layers coincide: both layers process
-the seven actions of \texttt{reg\_action}, so the action map is the
-identity in both directions.  All non-trivial content of the symmetric
-instance therefore lives in the layer-crossing state mapping: the
-bijection between the five-element \texttt{reg\_state} enum and the
-image of \texttt{reg\_to\_daml} in \texttt{daml\_perm}.  The roundtrip
-assumptions of \texttt{symmetric\_state\_preservation} reduce to two
-bijection conditions, both proved by case analysis (on
-\texttt{reg\_state} for one direction, on the status tag plus
-\texttt{valid\_daml\_perm} for the other).  As a corollary,
-\texttt{reg\_to\_daml} is injective on \texttt{reg\_states}, which is
-the formal expression of ``no information loss in the layer-crossing
-representation''.
-
-This is the abstraction that underlies the semantic interoperability
-between an on-chain settlement layer (where states are represented as
-enums on integer-valued storage slots) and an off-chain ledger built
-on DAML's permission model.  The structured-record side captures
-DAML's \emph{need-to-know} approach where party / scope metadata is
-bound to the entitlements implied by a regulatory status; the
-bijection guarantees that synchronizing in either direction is faithful.
-
-The domain guard carving out the valid records is load-bearing, and this is
-recorded permanently as a machine-checked witness
-(\texttt{guard\_is\_load\_bearing}): a record carrying the seized tag with no
-seizing party lies outside the bijection domain, the guarded DAML transition
-rejects \textsc{Release} on it, while the bare enum projection of the same
-record would accept the action --- so dropping the guard would break
-naturality exactly on such malformed records.  The guard is the boundary of
-the preservation guarantee, not a notational convenience.
-
-\subsection{Priority Instance: Well-Formed Messages}
-\label{sec:priority-instance}
-
-The \texttt{priority\_system} locale assumes priority injectivity
-unconditionally on its carrier type.  In the D-quencer setting,
-injectivity of \texttt{make\_priority\_key} holds only when the message
-fields satisfy two well-formedness bounds:
-$\texttt{msg\_timestamp} \le \texttt{max\_time}$ and
-$\texttt{dqm\_source\_node} \le \texttt{max\_node}$.  These bounds
-correspond to the system parameters of any concrete deployment (a
-fixed-precision time clock and a fixed roster of nodes), but they are
-not properties of the underlying \texttt{dq\_message} record type as
-such.
-
-To bridge this gap without imposing the well-formedness bounds at the
-type level, we instantiate \texttt{priority\_system} directly on the
-\texttt{priority\_key} type (the lexicographic four-tuple) with the
-identity function as the priority projection; injectivity is then
-satisfied by reflexivity on the carrier.  The connection back to
-\texttt{dq\_message} is made inside a sublocale
-\texttt{dquencer\_priority\_context} extending \texttt{dquencer\_system}
-with a fixed message set \texttt{msg\_set} satisfying the bounds, which
-defines the priority-key set
-$\texttt{msg\_priority\_keys} = \texttt{make\_priority\_key}~\texttt{max\_time}~\texttt{max\_node}\,\texttt{`}\,\texttt{msg\_set}$.
-
-A further sublocale \texttt{dquencer\_priority\_concrete} adds the
-priority-distinctness assumption on \texttt{msg\_set} (distinct
-messages produce distinct priority keys, a natural BFT-consensus
-precondition on authority / timestamp / severity / source-node
-tuples).  Under this assumption the priority key uniquely identifies
-its underlying message, captured by a definition
-\texttt{recover\_msg}\,$:: \texttt{priority\_key} \Rightarrow \texttt{dq\_message}$
-together with a unicity lemma derived from
-\texttt{priority\_key\_injectivity} and the distinctness hypothesis.
-
-The \texttt{dquencer\_system} locale itself is not modified.  Concrete
-deterministic-selection consequences for the D-quencer
-(\texttt{dq\_select\_highest\_deterministic},
-\texttt{dq\_select\_highest\_in\_set}, and the message-recovery
-corollary \texttt{dq\_select\_highest\_message}) are stated inside the
-sublocale; together they show that running the generic
-\texttt{select\_highest} on \texttt{msg\_priority\_keys} and then
-calling \texttt{recover\_msg} yields a deterministic choice of the
-highest-priority well-formed message in \texttt{msg\_set}.
-
-\subsection{Conditional Safety Preservation}
-\label{sec:combined}
-
-The \texttt{conditional\_safety\_preservation} theorem in
-\texttt{DQuencer\_Instance.thy} is a conditional-safety corollary.
-Concretely: given a valid global state, an asset present on the source
-chain in a regulatory state from which a transition is enabled, and
-the asset not currently locked, the synchronization function returns
-\texttt{Some} and the resulting global state is again valid.
-
-Its proof invokes only the safety side --- \texttt{lock\_acquire\_success}
-and \texttt{valid\_state\_preservation}, both from
-\texttt{Regulatory\_Instance.thy} --- and none of the two liveness
-interpretations (\texttt{dq\_priority} and \texttt{dq\_fair}).  We are
-deliberate about its scope: it does \emph{not}
-discharge the honest-node or fair-leader assumption, and it makes no
-Byzantine, determinism, deadlock, or starvation claim.  The unlocked
-precondition is the state that the atomic lock discipline re-establishes
-after each synchronization, but that connection is operational, not a logical
-consequence of this corollary.  The genuine fusion of safety and liveness
---- where the initial-validity hypothesis is dropped and convergence is
-driven by a well-founded measure on cross-chain inconsistency, under the
-fair-leader assumption --- is
-\texttt{oraclizer\_guarded\_bounded\_convergence}
-(Section~\ref{sec:convergence}).
-
-\subsection{Guarded Bounded Convergence}
-\label{sec:convergence}
-
-The safety results of the base entry are \emph{conditional}:
-\texttt{conditional\_safety\_preservation} assumes the global state is already valid.
-\texttt{Composition.thy} removes that assumption at the abstract level.  Its
-\texttt{converging\_composition} locale couples a guarded invariant with a
-bounded-fair discharger and a natural-number progress measure that every
-discharging step strictly decreases while the invariant fails; bounded
-fairness drives the measure to zero, and the zero set lies inside the
-invariant.  The result, \texttt{bounded\_convergence\_from\_arbitrary},
-reaches an invariant state from an arbitrary carrier state within
-\texttt{progress\_measure} $\times$ \texttt{window} steps.
-
-\texttt{Functor\_Laws.thy} discharges this locale for the oracle.  The
-progress measure is \texttt{inconsistency\_pairs}, the number of connected
-chain pairs that disagree on a shared asset; the critical step,
-\texttt{sync\_reduces\_inconsistency}, shows that synchronizing a disagreeing
-asset strictly decreases this count.  Interpreting
-\texttt{converging\_composition} inside the D-quencer liveness context (the
-fair-leader assumption) yields \texttt{oraclizer\_guarded\_bounded\_convergence}: from
-an arbitrary finite-domain, unlocked state --- with \emph{no} assumption of
-initial cross-chain consistency --- the oracle reaches a valid state within a
-bounded number of evolution steps.  This strengthens the conditional safety
-of Section~\ref{sec:combined} by dropping its initial-consistency hypothesis;
-it still operates under the fair-leader assumption.
-
-The realization map is pinned to \emph{terminal-faithful safe recovery}
-(\texttt{safe\_recovery}): a realized synchronization must not only reduce
-the measure but use \textsc{Confiscate} exactly on the assets that already
-carry the terminal state on some chain (\texttt{terminal\_present}).  This
-equivalence closes, in both directions, two degrees of freedom that a merely
-measure-reducing realization would leave open: resolving a plain
-\textsc{Active}/\textsc{Frozen} disagreement by broadcasting
-\textsc{Confiscated} (indiscriminate confiscation), and overwriting a
-recorded \textsc{Confiscated} holding with a non-terminal value
-(confiscation erasure).  A safe recovery exists in every inconsistent
-carrier state (\texttt{inconsistent\_has\_safe\_recovery}), so the headline
-convergence statement is unchanged.  Two safety theorems record the payload:
-along every recovery run, an asset that starts with no recorded confiscation
-never acquires one (\texttt{recovery\_no\_fresh\_terminal}), and on a
-terminal-bearing asset a safe recovery can only complete the confiscation
-(\texttt{recovery\_terminal\_completion}).  Both excluded behaviours are
-additionally pinned by machine-checked regression witnesses on concrete
-two-chain states (\texttt{blind\_confiscate\_excluded},
-\texttt{terminal\_overwrite\_excluded}).
-
-\subsection{Authenticated Cross-Domain State}
-\label{sec:authenticated}
-
-Beyond the functor laws, \texttt{Functor\_Laws.thy} couples the construction
-to an authenticated data structure.  The two glue predicates read the ADS
-operations at the global-state level:
-\texttt{state\_join}~\texttt{sa}~\texttt{sb}~\texttt{sab} says \texttt{sab} is
-the consistent combination of the partial views \texttt{sa} and \texttt{sb}
-(the state-level reading of the ADS merge), and the least such combination on
-revealed holdings (lock components unconstrained): \texttt{sab} carries the
-value of whichever view knows a chain, the two views agree wherever both are
-defined, and a containment clause forbids \texttt{sab} from revealing any
-chain beyond the union of the two views; and
-\texttt{state\_refines}~\texttt{sa}~\texttt{sb} says \texttt{sa} is a partial
-view of \texttt{sb} (the state-level reading of the ADS blinding order).  The
-\texttt{authenticated\_state} locale extends the \texttt{merkle\_interface}
-with an extraction map from authenticated values to global states.  Its two
-soundness theorems, \texttt{authenticated\_preservation\_soundness} and
-\texttt{blinded\_view\_preserves\_validity}, show that merging hash-compatible
-values yields a valid state that both inputs refine, and that a blinded view
-extracts to a valid refinement.  The proofs invoke the Merkle interface
-explicitly --- the mergeability assumption \texttt{merge\_respects\_hashes}
-and the lemmas \texttt{join} and \texttt{hash} of the \texttt{merkle\_interface}
-locale --- so the dependency is load-bearing rather than a mere import of a
-signature.  Validity itself comes from the extraction invariant
-(\texttt{extract\_preserves\_validity}); the glue predicates and the Merkle
-lemmas supply the structural relations between extracted states, not their
-validity.  The glue layer is abstract within one structural commitment:
-\texttt{state\_join} enforces a single consensus value per object identifier
-across both views.  Any system of that shape is a potential transplant
-target --- for instance Merkle-replicated registries, authenticated
-cross-shard asset records, or the public/witness layering of zero-knowledge
-proofs, where \texttt{state\_refines} would express that a public view is a
-blinding refinement of a full witness --- but this entry instantiates the
-layer only on the regulatory model; those domains are not formalized here.
-
-\texttt{Functor\_Laws.thy} discharges this locale's model obligation with the
-interpretation \texttt{oss\_authenticated}, so its soundness theorems are not
-vacuous.  The authenticated datum is a consensus regulatory state together with
-the set of chains that have revealed the shared asset in that state; the hash
-(\texttt{auth\_hash}) commits to the consensus state alone, the merge
-(\texttt{auth\_merge}) unions the revealed-chain sets when the consensus states
-agree, the blinding order (\texttt{auth\_bo}) forgets revealed chains, and the
-extraction map (\texttt{auth\_extract}) returns the global state in which every
-revealed chain holds the asset in the consensus state.  Because the hash fixes
-the consensus state, mergeable data never disagree, so the extracted join is
-consistent and the three coherence obligations
-(\texttt{extract\_respects\_merging}, \texttt{extract\_under\_blinding},
-\texttt{extract\_preserves\_validity}) hold non-vacuously, with
-\texttt{state\_join} realised as the union of revealed chains and
-\texttt{state\_refines} as their subset order.  A machine-checked regression
-witness (\texttt{rogue\_join\_excluded}) pins the containment clause of
-\texttt{state\_join}: a candidate join that extends the union of two views
-with a disagreeing holding on a chain revealed by neither view is itself
-inconsistent and is rejected as a join.  The instance is at once the
-oracle's concrete authenticated cross-domain state and a reusable pattern ---
-a consensus-committing hash over a revealed-participant set --- that an importer
-can transplant to the abstract domains just listed.
-
-\subsection{Authenticated Functor and the Canton Transaction Tree}
-\label{sec:canton}
-
-Beyond soundness, the authenticated layer of the previous subsection carries a
-functorial reading, and \texttt{Canton\_Bridge.thy} proves its categorical laws.
-Inside the \texttt{authenticated\_state} locale the blinding relation is a preorder
-on authenticated values and \texttt{state\_refines} is a preorder on global states;
-the extraction map is the composite functor from the first preorder to the second,
-sending each blinding morphism to a refinement morphism.  The headline law,
-\texttt{cdsp\_ads\_compose}, closes this functor under composition: two composable
-blindings $a \to b$ and $b \to c$ compose to $a \to c$ by transitivity of the
-blinding order, and the functor sends the composite to the composite refinement of
-the extracted states, with all three states valid.  It is the authenticated,
-cross-domain analogue of \texttt{preservation\_compose}.  The companion law,
-\texttt{cdsp\_ads\_merge\_assoc}, lifts the Merkle interface's merge associativity
-to the join algebra on extracted states: the three-way combination of authenticated
-views is independent of its bracketing, so the two groupings land on the same
-joined state.
-
-That single-step soundness is then raised to whole synchronization sequences.
-Along a \texttt{blinding\_path}, a list in which each element is a blinding of its
-successor, \texttt{sequence\_authenticity\_preservation} shows that every view
-extracts to a valid state and refines the most-revealed endpoint (validity and
-need-to-know together); \texttt{blinding\_path\_hash\_soundness} and
-\texttt{merge\_seq\_hash} show that the sequence commits to a single authenticating
-root in the blinding direction and in the merge direction respectively; and
-\texttt{sequence\_inclusion\_integrity} establishes inclusion integrity.  This
-sequence-level result is stated at the level of revealed holdings: a holding revealed
-by any view in the sequence is genuinely present at the endpoint with the same
-regulatory state, and no view fabricates a chain the endpoint does not authenticate.
-It is then sharpened to the concrete Merkle \emph{inclusion path} by instantiating the
-generic rose-tree inclusion-proof machinery of
-\texttt{ADS\_Functor.Inclusion\_Proof\_Construction} on the recursive view tree, with
-the discrete content embedding and hash.  An inclusion proof is a zipper in which the
-target subview is revealed while the path to the root and the off-path siblings are
-blinded: \texttt{reg\_view\_inclusion\_same\_hash} shows that every such proof commits to
-the same authenticating root hash as the fully revealed tree;
-\texttt{reg\_view\_inclusion\_blinding\_of} shows it is a blinding of the canonical
-inclusion-path tree, which carries that same root hash; and
-\texttt{reg\_view\_inclusion\_chains\_sound} shows its attested chains are contained in
-that tree's.  The
-instantiation adds no assumption, since the discrete content already satisfies the
-blinding-order locale.  Like the inclusion-proof construction it mirrors, the result
-characterises the proofs generated from a source view tree; it operates on the view
-tree, so the consensus scope limit recorded next is untouched.
-
-These sequence-level results are not vacuous.  \texttt{Canton\_Bridge.thy}
-instantiates the \texttt{authenticated\_state} locale directly on the
-blindable-position functor of \texttt{ADS\_Functor.ADS\_Construction}, in the
-interpretation \texttt{oss\_blindable}: an authenticated datum is either a revealed
-consensus state paired with its revealed-chain set or a hash-only commitment that
-reveals nothing, and the Merkle-interface obligation is discharged through
-\texttt{merkle\_blindable}, so no fresh interface proof is needed.  A
-machine-checked regression witness, \texttt{blinding\_path\_witness}, exhibits a
-genuinely increasing need-to-know sequence (a hash-only commitment, then a
-one-chain view, then a two-chain view, each blinding its successor) whose
-most-revealed endpoint extracts to a non-degenerate two-chain state, pinning the
-sequence-level theorems to a non-vacuous instance.
-
-Two further interpretations connect the layer to Canton's own transaction
-structure, both over concrete regulatory content rather than the opaque
-\texttt{view\_data} and \texttt{view\_metadata} types that the public Canton
-formalisation leaves as \texttt{typedecl}: reading a cross-domain state out of those
-opaque types would require an inadmissible axiom relating them to the regulatory
-model, which we do not introduce.  The interpretation \texttt{canton\_authenticated}
-mirrors the top-level shape of a Canton transaction, a single blindable position
-wrapping a metadata-and-views payload, transporting the three coherence obligations
-through the constructor bijection.  The interpretation \texttt{reg\_tx\_authenticated}
-keeps the public \emph{recursive} shape: it instantiates the content-agnostic
-rose-tree Merkle machinery (the \texttt{rose\_tree} datatype that the public Canton
-formalisation itself uses to build views) with concrete regulatory content, so that
-subviews nest and subview-level blinding stays alive, inheriting the Merkle
-interface with no new datatype and no new interface proof.  The honesty boundary is
-stated in the sources and held here.  The construction is \emph{recursive-faithful}
-but \emph{content-abstracted}, and the consensus \texttt{reg\_state} is modelled as
-a bare, non-independently-blindable field of the payload.  That modelling choice
-structurally forces a single consensus value per transaction --- a subview is
-reachable only by revealing the whole transaction, hence its consensus --- and this
-in turn yields validity with no added assumption; the machine-checked
-\texttt{single\_consensus\_load\_bearing} pins the point, exhibiting an inconsistent
-two-chain state that a per-node consensus would permit and that the recursive
-extraction never produces.  The accompanying price is a declared scope limit: the
-case in which a view is revealed while the consensus is blinded lies outside this
-model, because Canton's \texttt{common\_metadata} is independently blindable whereas
-the bare field here is not.  Lifting that case is left as future work on the public
-ground, and the single remaining question for the Canton authors is one of model
-fidelity --- whether the concrete payload faithfully abstracts their datatype --- which is
-a sanity check rather than a proof gap.
-
-\subsection{The Synchronization-Degree Hierarchy}
-\label{sec:hierarchy}
-
-\texttt{Hierarchy.thy} stratifies the functor by \emph{synchronization
-degree}, the breadth of cross-chain coupling an asset requires.  A degree-$k$
-system keeps the chains $0 \dots k$ of an asset in lockstep around a hub
-chain, giving a tower of transition functors $F\,0, F\,1, F\,2, \dots$ in
-which the weaker functor is obtained from the stronger one by forgetting the
-top coupled chain (\texttt{degree\_forget}).  This forgetful map is a genuine
-natural transformation between consecutive degrees: its naturality square
---- forget after a transition equals a transition after the forget ---
-commutes (\texttt{degree\_natural\_transformation}).  Natural transformations
-of degree functors are closed under composition
-(\texttt{nt\_vertical\_compose}), so the two-step demotion is again natural
-(\texttt{nt\_compose}) and the whole ladder is structurally coherent rather
-than a point-to-point collection of maps.  Degree demotion is
-information-discarding: \texttt{degree\_forget\_refines} shows it yields a
-blinding refinement in the exact sense of \texttt{state\_refines}, tying the
-hierarchy back to the authenticated glue of
-Section~\ref{sec:authenticated}.
-
-The monotonicity payload follows.  The degree classes are nested
-(\texttt{reduction\_containment}).  The degree monotonicity is genuinely
-one-directional: over-provisioning reconciles all of the asset's required
-chains (\texttt{over\_provisioning\_guarantees}), while under-provisioning
-carries no such guarantee (\texttt{no\_downward\_safety}), so the degree
-hypothesis is load-bearing exactly in this over-/under-provisioning regime
-pair.  Validity preservation itself holds independently of the degrees
-(\texttt{processing\_preserves\_validity}); the auxiliary lemma
-\texttt{hierarchy\_monotonicity} records that validity preservation in the
-over-provisioning regime and follows directly, its provisioning hypothesis
-notational rather than load-bearing.  A causal-consistency boundary, grounded
-in a strict timestamp order, separates the lower degrees from the
-higher and is shown to be well-defined
-on asset/system pairs (\texttt{boundary\_well\_defined}).  This tower of
-functors with natural transformations between them is a layer that, to our
-knowledge, the \texttt{ADS\_Functor} entry does not develop.
-
-The degree-class layer is parametric in the degree assignment: the assignment
-of required degrees to assets is operational data, so the layer is developed
-in a context fixing an arbitrary
-$\texttt{asset\_degree} :: \texttt{asset\_id} \Rightarrow \texttt{nat}$, and
-every theorem above holds for every assignment.  A concrete example
-assignment witnesses non-vacuity
-(\texttt{example\_degree\_over\_provisioning}), and a static-promotion
-corollary (\texttt{static\_promotion\_safety}) records that the
-over-provisioning guarantee transfers verbatim to any re-assignment within
-the system's capability.  In-flight promotion --- a re-assignment crossing a
-live synchronization --- is out of scope for this entry; subsequent work on
-retry-queue semantics covers it.
-
-\subsection{An Instance Outside the Regulatory Domain}
-\label{sec:external}
-
-The generic locales are advertised as domain-independent;
-\texttt{External\_Instance.thy} substantiates the claim with an instance
-from a domain disjoint from the regulatory vocabulary: the TCP connection
-state machine, in a six-state, five-event subset of RFC~793 (single-endpoint
-view: passive and active open, handshake completion, FIN-initiated teardown,
-RST abort), synchronized into a stateful connection tracker (conntrack).
-The theory imports only the generic theory and the generic proof automation
---- it does not import \texttt{Regulatory\_Instance.thy} --- so the
-instantiation itself is the evidence that the locale layer carries no hidden
-regulatory assumptions.
-
-The instance reuses both structural patterns of the regulatory development
-outside their original domain.  The tracker state is a structured record (a
-phase tag plus peer-endpoint metadata) whose well-formedness invariant ties
-the auxiliary field to the tag, mirroring the DAML permission record; the
-tracker's state space is the image of the representation map and its
-transition function is the lift of the endpoint transition through that map.
-The tracker observes a strict subset of the endpoint's events (\textsc{rst}
-is not tracked: aborted connections are expired by the tracker's timeout
-machinery rather than by following the reset packet), so the morphism's
-source action set is instantiated with that subset, mirroring the
-escalation instance.  Two modelling notes fix the terminal semantics:
-\textsc{closed} is terminal because a re-connection is a new connection
-identity (a new tracker entry), and a \textsc{rst} in \textsc{listen} is
-ignored, as in RFC~793.
-
-All three instances --- the endpoint machine, the tracker machine, and the
-preservation morphism \texttt{tcp\_conntrack\_preservation} --- are
-discharged by the generic methods of Section
-``\emph{Proof Automation}'' with the theory's own collection declarations,
-demonstrating that the automation, too, works outside the domain it was
-developed in.  The locale's sequential payload specializes to the expected
-statement (\texttt{tracked\_sequence\_mirrored}): every tracked packet
-sequence accepted by the endpoint is mirrored, packet for packet, by the
-tracker.
-
-\subsection{Beyond the Atomic Sync Model}
-
-The atomic sync model is the natural locale-based abstraction for
-proving structural correctness of cross-domain state preservation
-inside a single AFP entry.  Lifting the model to a partially
-synchronous network with message delays, redelivery, and out-of-order
-arrival is the next step.  The locales in this entry are designed to
-support that lift: \texttt{state\_preservation} carries the structural
-correctness condition that any concrete protocol must preserve, and
-\texttt{fair\_leader\_system} provides an operational abstraction through
-which atomic sync can be realized as a sequence of bounded-duration steps.  We leave the
-construction of the lift to subsequent entries.
+The synchronization model is atomic; lifting it to a partially synchronous
+network with message delays, redelivery, and out-of-order arrival is left
+to subsequent entries.
 
 % include generated text of all theories
 \input{session}

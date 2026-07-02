@@ -31,8 +31,9 @@
        well-formed message set with distinct priority keys and provides
        a definition \<^verbatim>\<open>recover_msg\<close> mapping each priority key in the
        induced priority-key set back to its unique message via the
-       priority-key distinctness assumption and the
-       \<^verbatim>\<open>priority_key_injectivity\<close> lemma.
+       priority-key distinctness assumption; the well-formedness bounds
+       feed the field-level injectivity lemma \<^verbatim>\<open>priority_key_injectivity\<close>,
+       lifted into the context as \<^verbatim>\<open>msg_priority_key_field_injective\<close>.
     2. fair_leader_system (dq_fair): instantiated within a sublocale
        dquencer_liveness extending dquencer_system with a leader schedule
        and pending-count function satisfying the locale assumptions.
@@ -48,8 +49,8 @@
        the model's scope; forced lock release under contention is deferred
        to the preemptive-lock property.
     4. Starvation freedom: under the fair leader assumption, every pending
-       regulatory request is processed within bounded time.
-    5. Combined safety (conditional): conditional_safety_preservation restates
+       regulatory request is processed within a bounded number of epochs.
+    5. Conditional safety: conditional_safety_preservation restates
        valid_state_preservation under an unlocked precondition. Its proof
        uses only the safety side and does not fuse liveness; the genuine
        fusion is oraclizer_guarded_bounded_convergence (Functor_Laws.thy).
@@ -69,8 +70,9 @@
       reduces to reflexivity. The corresponding D-quencer message is
       recovered via the definition \<^verbatim>\<open>recover_msg\<close> inside the
       \<^verbatim>\<open>dquencer_priority_concrete\<close> sublocale, which relies on the
-      priority-key distinctness hypothesis (\<^verbatim>\<open>msg_set_priority_distinct\<close>)
-      and the existing \<^verbatim>\<open>priority_key_injectivity\<close> lemma.
+      priority-key distinctness hypothesis (\<^verbatim>\<open>msg_set_priority_distinct\<close>);
+      the well-formedness bounds enter through the field-level injectivity
+      lift (\<^verbatim>\<open>msg_priority_key_field_injective\<close>).
 *)
 
 theory DQuencer_Instance
@@ -99,7 +101,8 @@ lemma authority_rank_injective:
 
 text \<open>
   Action severity determines priority among actions from the same
-  authority level. Stronger enforcement actions (CONFISCATE, SEIZE)
+  authority level and timestamp (it is the third component of the
+  lexicographic key). Stronger enforcement actions (CONFISCATE, SEIZE)
   take precedence over weaker ones (RESTRICT, UNFREEZE). This reflects
   the legal principle that more conservative (asset-protective) actions
   prevail when conflicting orders must be ranked against one another.
@@ -215,7 +218,6 @@ locale dquencer_system =
   assumes finite_nodes: "finite nodes"
     and bft_threshold: "card nodes \<ge> 3 * f_max + 1"
     and byzantine_bound: "card (byzantine_nodes nodes) \<le> f_max"
-    and nonempty_nodes: "nodes \<noteq> {}"
     and fairness_positive: "fairness_bound > 0"
 begin
 
@@ -331,6 +333,22 @@ lemma msg_priority_keys_finite:
   "finite msg_set \<Longrightarrow> finite msg_priority_keys"
   unfolding msg_priority_keys_def by simp
 
+text \<open>The well-formedness bounds are what make the priority key faithful to
+  the message fields: under them, equal keys force equal priority-relevant
+  fields.  This lifts @{thm [source] priority_key_injectivity} into the
+  context, consuming the bounds.\<close>
+
+lemma msg_priority_key_field_injective:
+  assumes "m1 \<in> msg_set" and "m2 \<in> msg_set"
+    and "make_priority_key max_time max_node m1 = make_priority_key max_time max_node m2"
+  shows "dqm_authority_level m1 = dqm_authority_level m2
+       \<and> msg_timestamp m1 = msg_timestamp m2
+       \<and> msg_action m1 = msg_action m2
+       \<and> dqm_source_node m1 = dqm_source_node m2"
+  using priority_key_injectivity[OF assms(3)]
+        msg_set_well_formed[OF assms(1)] msg_set_well_formed[OF assms(2)]
+  by blast
+
 end
 
 text \<open>
@@ -404,10 +422,8 @@ text \<open>
 \<close>
 
 corollary dq_select_highest_deterministic:
-  assumes "finite msg_set"
-  shows "\<exists>!k. dq_priority.select_highest msg_priority_keys = Some k"
-  using dq_priority.select_highest_deterministic
-        [OF msg_priority_keys_finite[OF assms] msg_priority_keys_nonempty] .
+  "\<exists>!k. dq_priority.select_highest msg_priority_keys = Some k"
+  using dq_priority.select_highest_deterministic[OF msg_priority_keys_nonempty] .
 
 corollary dq_select_highest_in_set:
   assumes "finite msg_set"
@@ -422,6 +438,33 @@ corollary dq_select_highest_message:
   shows "recover_msg k \<in> msg_set
        \<and> make_priority_key max_time max_node (recover_msg k) = k"
   using recover_msg_correct[OF dq_select_highest_in_set[OF assms]] .
+
+text \<open>The recovered message is maximal: no well-formed message in the set
+  carries a strictly higher priority key.  This projects the key-level
+  maximality of \<^verbatim>\<open>select_highest\<close> back onto messages, closing the loop of
+  the ``highest-priority message'' reading.\<close>
+
+corollary dq_select_highest_message_maximal:
+  assumes "finite msg_set"
+    and "dq_priority.select_highest msg_priority_keys = Some k"
+  shows "\<forall>m \<in> msg_set. make_priority_key max_time max_node m
+           \<le> make_priority_key max_time max_node (recover_msg k)"
+proof -
+  have max: "\<forall>k' \<in> msg_priority_keys. k' \<le> k"
+    using dq_priority.select_highest_is_max
+            [OF msg_priority_keys_finite[OF assms(1)] msg_priority_keys_nonempty assms(2)]
+    by simp
+  have rk: "make_priority_key max_time max_node (recover_msg k) = k"
+    using recover_msg_correct[OF dq_select_highest_in_set[OF assms]] by simp
+  show ?thesis
+  proof
+    fix m assume "m \<in> msg_set"
+    then have "make_priority_key max_time max_node m \<in> msg_priority_keys"
+      unfolding msg_priority_keys_def by simp
+    with max rk show "make_priority_key max_time max_node m
+        \<le> make_priority_key max_time max_node (recover_msg k)" by simp
+  qed
+qed
 
 end
 
@@ -461,8 +504,6 @@ begin
 interpretation dq_fair: fair_leader_system
   leader_schedule "\<lambda>n. ni_behavior n = Honest" pending_count fairness_bound
 proof unfold_locales
-  show "0 < fairness_bound" using fairness_positive .
-next
   show "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
                     ni_behavior (leader_schedule e) = Honest"
     using fair_leader .
@@ -492,12 +533,12 @@ corollary dq_starvation_bound:
 end
 
 
-section \<open>Combined Safety and Liveness\<close>
+section \<open>Conditional Safety alongside the Liveness Results\<close>
 
 text \<open>
   This section records how the safety result of Property 1 (cross-domain
   state preservation) sits alongside the liveness results of Property 2
-  (deterministic selection, timeout-bounded locking, fair scheduling).
+  (deterministic selection and fair scheduling).
 
   The theorem below, \<^verbatim>\<open>conditional_safety_preservation\<close>, is a \<^emph>\<open>conditional
   safety\<close> statement: from a valid global state in which the target asset
@@ -511,9 +552,9 @@ text \<open>
   (\<^verbatim>\<open>dq_select_highest_deterministic\<close> and
   \<^verbatim>\<open>dq_starvation_bound\<close>), each stated in its own right.
 
-  The genuine fusion of the two sides --- safety made \<^emph>\<open>unconditional\<close> by a
-  well-founded progress measure on cross-chain inconsistency, under the
-  fair-leader assumption --- is
+  The genuine fusion of the two sides --- safety freed of its initial-validity
+  hypothesis by a well-founded progress measure on cross-chain inconsistency,
+  under the fair-leader assumption --- is
   \<^verbatim>\<open>oraclizer_guarded_bounded_convergence\<close> in \<^verbatim>\<open>Functor_Laws.thy\<close>, which
   drops the initial-validity hypothesis assumed here.
 \<close>
@@ -532,7 +573,6 @@ theorem conditional_safety_preservation:
     and current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
     and not_locked: "\<not> is_locked gs aid"
-    and fin: "finite (connected_chains gs aid)"
   shows "\<exists>gs'. sync source action aid gs = Some gs' \<and> valid_state gs'"
 proof -
   from not_locked obtain gs_locked where
@@ -548,7 +588,7 @@ proof -
   then obtain gs' where synced: "sync source action aid gs = Some gs'"
     by auto
   have "valid_state gs'"
-    using valid_state_preservation[OF valid exists current trans synced fin] .
+    using valid_state_preservation[OF valid current trans synced] .
   with synced show ?thesis by auto
 qed
 
@@ -560,13 +600,17 @@ text \<open>
     invariant is preserved.
 
   \<^enum> \<^bold>\<open>Determinism\<close> (Property 2): Conflicting regulatory actions
-    are resolved by a total order on priority keys. The BFT
-    consensus output is unique. The \<^verbatim>\<open>priority_system\<close> locale is
+    are resolved by a total order on priority keys. The consensus
+    output --- abstracted here as deterministic priority selection ---
+    is unique. The \<^verbatim>\<open>priority_system\<close> locale is
     instantiated on the \<^verbatim>\<open>priority_key\<close> type as carrier (with the
     corresponding messages recovered inside
     \<^verbatim>\<open>dquencer_priority_concrete\<close> via \<^verbatim>\<open>recover_msg\<close>), yielding
     deterministic selection from any finite non-empty set of valid
-    candidate messages.
+    candidate messages.  Priority here resolves conflicts \<^emph>\<open>among
+    regulatory messages\<close>; precedence of regulatory actions over ordinary
+    (non-regulatory) transactions is not modelled --- the message universe
+    of this theory contains regulatory actions only.
 
   \<^enum> \<^bold>\<open>Deadlock\<close> (Property 2, scope note): deadlock is a concurrency
     phenomenon. The atomic sync model has no concurrent lock contention
@@ -577,7 +621,10 @@ text \<open>
 
   \<^enum> \<^bold>\<open>Starvation freedom\<close> (Property 2): Under the fair leader
     assumption, every pending regulatory request is processed
-    within a bounded number of epochs.
+    within a bounded number of epochs.  The pending-count assumptions
+    encode a closed system --- no new requests arrive within the analysis
+    horizon; liveness under continuous arrivals belongs to the partially
+    synchronous lift left to subsequent entries.
 
   Open work for subsequent entries:
     - Compositional assurance across heterogeneous verification regimes

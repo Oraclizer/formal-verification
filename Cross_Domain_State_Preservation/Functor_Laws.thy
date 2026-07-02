@@ -375,9 +375,11 @@ lemmas [discharge_dels] =
 
 text \<open>
   The comparison lemmas.  The first three restate instances proved manually
-  in this theory; the method rediscovers each proof from the collections
-  alone (none of these instances is registered, so \<open>unfold_locales\<close> receives
-  every obligation atomically).
+  in this theory; none of these instances is itself registered, so the goal
+  is not discharged wholesale by a registration --- sub-machine obligations
+  already available from prior registrations are absorbed by
+  \<open>unfold_locales\<close>, and the method closes every remaining obligation from
+  the collections alone.
 \<close>
 
 lemma daml_escalation_state_machine_via_method:
@@ -525,6 +527,15 @@ text \<open>
   \<open>merge_respects_hashes\<close> and \<open>hash\<close>, and use \<open>join\<close> to exhibit the join as a
   refinement of each input — so the Merkle interface is used in the proofs, not
   merely imported.
+
+  Reuse beyond the regulatory instance: the glue layer commits only to a
+  single authoritative value per object identifier, so any system of that
+  shape is a potential transplant target --- for instance Merkle-replicated
+  registries, authenticated cross-shard asset records, or the public/witness
+  layering of zero-knowledge proofs, where \<open>state_refines\<close> would express
+  that a public view is a blinding refinement of a full witness.  The
+  present entry instantiates the layer only on the regulatory state model;
+  those other domains are not formalized here.
 \<close>
 
 text \<open>The extraction map is named \<open>extract_map\<close> rather than \<open>extract\<close>, because
@@ -569,8 +580,8 @@ text \<open>
 
 theorem authenticated_preservation_soundness:
   assumes mab: "m a b = Some ab"
-    and ea: "extract_map a = Some sa" and va: "valid_state sa"
-    and eb: "extract_map b = Some sb" and vb: "valid_state sb"
+    and ea: "extract_map a = Some sa"
+    and eb: "extract_map b = Some sb"
   shows "\<exists>sab. extract_map ab = Some sab \<and> valid_state sab
               \<and> state_refines sa sab \<and> state_refines sb sab"
 proof -
@@ -606,7 +617,7 @@ text \<open>
 \<close>
 
 theorem blinded_view_preserves_validity:
-  assumes boab: "bo a b" and eb: "extract_map b = Some sb" and vb: "valid_state sb"
+  assumes boab: "bo a b" and eb: "extract_map b = Some sb"
   shows "\<exists>sa. extract_map a = Some sa \<and> valid_state sa \<and> state_refines sa sb"
 proof -
   have hab: "h a = h b" using bo_hash_eq[OF boab] .
@@ -678,7 +689,7 @@ text \<open>The extraction map.  \<^term>\<open>auth_state r P\<close> is the gl
 definition auth_state :: "reg_state \<Rightarrow> chain_id set \<Rightarrow> global_state" where
   "auth_state r P =
      \<lparr> gs_chains = (\<lambda>c a. if c \<in> P \<and> a = 0
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = r \<rparr>
+                          then Some \<lparr> as_reg_state = r \<rparr>
                           else None),
        gs_locks = (\<lambda>a. False) \<rparr>"
 
@@ -707,6 +718,14 @@ proof -
     by (simp add: no_locked_without_reason_def is_locked_def auth_state_def)
   ultimately show ?thesis by (simp add: valid_state_def)
 qed
+
+text \<open>A concrete global witness for the multi-domain locale: the two-chain
+  authenticated state instantiates it outright, with no ambient hypotheses.\<close>
+
+lemma reg_multi_domain_concrete:
+  "multi_domain_preservation {0, Suc 0} reg_states reg_actions reg_transition
+     reg_terminal (reg_domain_state (auth_state ACTIVE {0, Suc 0}))"
+  by (rule reg_multi_domain_instantiation[OF _ auth_state_valid]) simp
 
 text \<open>The merge of two views with the same consensus state extracts to the join
   of the two extracted states: the union of revealed chains, agreeing on \<open>r\<close>.\<close>
@@ -799,9 +818,9 @@ text \<open>
 definition rogue_join_state :: global_state where
   "rogue_join_state =
      \<lparr> gs_chains = (\<lambda>c a. if a = 0 \<and> (c = 0 \<or> c = Suc 0)
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = ACTIVE \<rparr>
+                          then Some \<lparr> as_reg_state = ACTIVE \<rparr>
                           else if a = 0 \<and> c = 7
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = FROZEN \<rparr>
+                          then Some \<lparr> as_reg_state = FROZEN \<rparr>
                           else None),
        gs_locks = (\<lambda>a. False) \<rparr>"
 
@@ -1527,9 +1546,9 @@ text \<open>
 definition mixed_pair_state :: "reg_state \<Rightarrow> reg_state \<Rightarrow> global_state" where
   "mixed_pair_state v0 v1 =
      \<lparr> gs_chains = (\<lambda>c a. if a = 0 \<and> c = 0
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = v0 \<rparr>
+                          then Some \<lparr> as_reg_state = v0 \<rparr>
                           else if a = 0 \<and> c = Suc 0
-                          then Some \<lparr> as_asset_id = 0, as_reg_state = v1 \<rparr>
+                          then Some \<lparr> as_reg_state = v1 \<rparr>
                           else None),
        gs_locks = (\<lambda>a. False) \<rparr>"
 
@@ -1597,6 +1616,23 @@ definition oss_realize ::
   "oss_realize ev gs =
      (if consistent_state gs then None else Some (SOME p. safe_recovery gs p))"
 
+text \<open>The carrier is inhabited: every authenticated extraction with a finite
+  revealed-chain set lies in it, so the convergence development below ranges
+  over a non-empty carrier.\<close>
+
+lemma auth_state_in_oss_carrier:
+  assumes "finite P"
+  shows "auth_state r P \<in> oss_carrier"
+proof -
+  have "{(c, aid). asset_exists (auth_state r P) c aid} = P \<times> {0}"
+    by (auto simp: asset_exists_def get_asset_state_def auth_state_def split: if_splits)
+  then have "finite_domain (auth_state r P)"
+    unfolding finite_domain_def using assms by simp
+  moreover have "no_locked_without_reason (auth_state r P)"
+    by (simp add: no_locked_without_reason_def is_locked_def auth_state_def)
+  ultimately show ?thesis by (simp add: oss_carrier_def)
+qed
+
 lemma oss_step_closed:
   assumes "gs \<in> oss_carrier" and "oss_step gs p = Some gs'"
   shows "gs' \<in> oss_carrier"
@@ -1617,18 +1653,14 @@ lemma oss_guarded_preservation:
 proof -
   obtain src act aid where p: "p = (src, act, aid)" by (cases p)
   with synced have s: "sync src act aid gs = Some gs'" by (simp add: oss_step_def)
-  from carr have nl: "no_locked_without_reason gs" and fd: "finite_domain gs"
-    by (simp_all add: oss_carrier_def)
+  from carr have nl: "no_locked_without_reason gs"
+    by (simp add: oss_carrier_def)
   have valid: "valid_state gs" using cons nl by (simp add: valid_state_def)
   from sync_components[OF s] obtain current_st new_st gs_locked where
     cur: "get_reg_state gs src aid = Some current_st"
     and tr: "reg_transition current_st act = Some new_st" by blast
-  have ex: "asset_exists gs src aid"
-    using cur unfolding asset_exists_def get_reg_state_def get_asset_state_def
-    by (auto split: option.splits)
-  have finc: "finite (connected_chains gs aid)" using connected_chains_finite[OF fd] .
   show ?thesis
-    using sync_preserves_consistent_state[OF valid ex cur tr s finc] .
+    using sync_preserves_consistent_state[OF valid cur tr s] .
 qed
 
 lemma oss_realize_discharges:
@@ -1646,19 +1678,6 @@ proof -
     unfolding reducing_sync_def by (auto split: prod.splits)
   then have "oss_guard gs opn" by (auto simp: oss_guard_def)
   then show ?thesis by (simp add: oss_ops_def)
-qed
-
-lemma oss_realize_progresses:
-  assumes "consistent_state gs" and "oss_realize ev gs = Some opn"
-  shows "\<exists>gs'. oss_step gs opn = Some gs' \<and> consistent_state gs'"
-  using assms by (simp add: oss_realize_def)
-
-lemma oss_measure_zero_inv:
-  assumes "gs \<in> oss_carrier" and "inconsistency_pairs gs = 0"
-  shows "consistent_state gs"
-proof -
-  from assms(1) have "finite_domain gs" by (simp add: oss_carrier_def)
-  then show ?thesis using assms(2) inconsistency_pairs_zero_iff_consistent by blast
 qed
 
 lemma oss_discharge_progresses:
@@ -1691,8 +1710,9 @@ text \<open>
   oraclizer data above forms a @{locale converging_composition}: the honest
   leader within every fairness window discharges a measure-reducing
   synchronization.  The fairness assumption is exactly the \<open>fair_leader\<close>
-  assumption of @{locale dquencer_liveness} and the window positivity is its
-  \<open>fairness_positive\<close> assumption (inherited from @{locale dquencer_system}).
+  assumption of @{locale dquencer_liveness}; window positivity is derived
+  from bounded occurrence inside the composition locale
+  (\<open>window_positive\<close>), so no positivity obligation remains here.
 \<close>
 
 text \<open>
@@ -1792,21 +1812,12 @@ next
           \<Longrightarrow> oss_guard s opn \<Longrightarrow> oss_step s opn = Some s' \<Longrightarrow> consistent_state s'"
     using oss_guarded_preservation by blast
 next
-  show "0 < fairness_bound" using fairness_positive .
-next
   show "\<forall>t. \<exists>t'. t \<le> t' \<and> t' < t + fairness_bound \<and> ni_behavior (leader_schedule t') = Honest"
     using fair_leader .
 next
   show "\<And>s ev opn. s \<in> oss_carrier \<Longrightarrow> ni_behavior ev = Honest \<Longrightarrow> oss_realize ev s = Some opn
           \<Longrightarrow> opn \<in> oss_ops \<and> oss_guard s opn"
     using oss_realize_discharges by blast
-next
-  show "\<And>s ev opn. s \<in> oss_carrier \<Longrightarrow> consistent_state s \<Longrightarrow> ni_behavior ev = Honest
-          \<Longrightarrow> oss_realize ev s = Some opn \<Longrightarrow> \<exists>s'. oss_step s opn = Some s' \<and> consistent_state s'"
-    using oss_realize_progresses by blast
-next
-  show "\<And>s. s \<in> oss_carrier \<Longrightarrow> inconsistency_pairs s = 0 \<Longrightarrow> consistent_state s"
-    using oss_measure_zero_inv by blast
 next
   show "\<And>s ev. s \<in> oss_carrier \<Longrightarrow> \<not> consistent_state s \<Longrightarrow> ni_behavior ev = Honest
           \<Longrightarrow> \<exists>opn s'. oss_realize ev s = Some opn \<and> oss_step s opn = Some s'
@@ -1821,8 +1832,8 @@ text \<open>
   oraclizer reaches, within @{term "inconsistency_pairs gs\<^sub>0 * fairness_bound"}
   evolution steps, a state that is valid (consistent and unlocked).  Contrast
   @{thm [source] conditional_safety_preservation}, which assumes @{term "valid_state gs"}:
-  the convergence layer upgrades conditional safety to unconditional bounded
-  convergence.
+  the convergence layer frees the safety guarantee of its initial-validity
+  hypothesis, at the price of the fair-leader context.
 \<close>
 
 theorem oraclizer_guarded_bounded_convergence:
@@ -1853,9 +1864,11 @@ text \<open>
   recorded confiscation never acquires one, no matter how the run is
   scheduled.  Together with @{thm [source] recovery_terminal_completion} ---
   on a terminal-bearing asset a safe recovery can only complete the
-  confiscation --- this pins the recovery layer to the two behaviours the
-  regulatory semantics admits, excluding both indiscriminate confiscation
-  and confiscation erasure.
+  confiscation --- this pins the recovery layer, on the terminal axis, to the
+  two behaviours the regulatory semantics admits for \<^const>\<open>CONFISCATED\<close>:
+  indiscriminate confiscation and confiscation erasure are both excluded.
+  On the non-terminal axis the broadcast value is constrained by the source
+  chain's transition table, not by the target chains'.
 \<close>
 
 lemma oss_evolve_step_no_fresh_terminal:
@@ -1931,8 +1944,8 @@ text \<open>
   so they establish the consistency of their conclusions only relative to the
   host locale's assumptions.  The interpretations below discharge those
   assumptions globally, with no ambient hypotheses: a single-honest-node
-  system with zero Byzantine budget, unit lock timeout and unit fairness
-  window, scheduled constantly on its one node, with no pending requests.
+  system with zero Byzantine budget and a unit fairness window, scheduled
+  constantly on its one node, with no pending requests.
   Every assumption of @{locale dquencer_system} and @{locale dquencer_liveness}
   holds outright (the BFT threshold reads \<open>1 \<ge> 3 \<cdot> 0 + 1\<close>, the Byzantine
   census is empty, and the constant schedule meets every unit fairness
@@ -1970,9 +1983,8 @@ text \<open>
 
 definition singleton_msg :: dq_message where
   "singleton_msg =
-     \<lparr> msg_action = FREEZE, msg_asset_id = 0, msg_authority = 0, msg_timestamp = 0,
-       msg_source = 0, msg_targets = {}, dqm_authority_level = National,
-       dqm_source_node = 0 \<rparr>"
+     \<lparr> msg_action = FREEZE, msg_timestamp = 0,
+       dqm_authority_level = National, dqm_source_node = 0 \<rparr>"
 
 interpretation singleton_dq_priority: dquencer_priority_concrete
   "{singleton_node}" 0 1 0 0 "{singleton_msg}"
@@ -2024,5 +2036,48 @@ interpretation bft_quorum: dquencer_liveness
   by unfold_locales
      (auto simp: quorum_card quorum_byz_card quorum_finite quorum_nonempty
            quorum_leader_def)
+
+text \<open>
+  Deterministic selection is exercised on a genuine conflict: two well-formed
+  messages from different authorities over the four-node quorum system.  The
+  international confiscation outranks the regional unfreeze in the
+  lexicographic priority order, and selection picks it deterministically ---
+  the conflict-resolution reading of Property~2 on a non-degenerate
+  candidate set.
+\<close>
+
+definition conflict_msg_intl :: dq_message where
+  "conflict_msg_intl =
+     \<lparr> msg_action = CONFISCATE, msg_timestamp = 0,
+       dqm_authority_level = International, dqm_source_node = 0 \<rparr>"
+
+definition conflict_msg_regional :: dq_message where
+  "conflict_msg_regional =
+     \<lparr> msg_action = UNFREEZE, msg_timestamp = 0,
+       dqm_authority_level = Regional, dqm_source_node = 0 \<rparr>"
+
+interpretation conflict_dq_priority: dquencer_priority_concrete
+  quorum_nodes 1 1 0 0 "{conflict_msg_intl, conflict_msg_regional}"
+  by unfold_locales
+     (auto simp: quorum_card quorum_byz_card quorum_finite quorum_nonempty
+                 conflict_msg_intl_def conflict_msg_regional_def
+                 make_priority_key_def)
+
+lemma conflict_selection_deterministic:
+  "dq_priority.select_highest conflict_dq_priority.msg_priority_keys
+   = Some (make_priority_key 0 0 conflict_msg_intl)"
+proof -
+  have keys: "conflict_dq_priority.msg_priority_keys
+      = {make_priority_key 0 0 conflict_msg_intl,
+         make_priority_key 0 0 conflict_msg_regional}"
+    by (simp add: conflict_dq_priority.msg_priority_keys_def)
+  have ki: "make_priority_key 0 0 conflict_msg_intl = (3, 0, 7, 0)"
+    by (simp add: conflict_msg_intl_def make_priority_key_def)
+  have kr: "make_priority_key 0 0 conflict_msg_regional = (1, 0, 2, 0)"
+    by (simp add: conflict_msg_regional_def make_priority_key_def)
+  show ?thesis
+    unfolding dq_priority.select_highest_def keys ki kr
+    by (auto intro!: the_equality simp: less_eq_prod_def)
+qed
 
 end

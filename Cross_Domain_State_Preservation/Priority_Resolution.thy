@@ -7,26 +7,23 @@
   Priority Resolution and Liveness — Generic Theory
 
   This theory defines generic locales for priority-based deterministic
-  selection, timeout-bounded lock release, and starvation freedom under
-  fair leader scheduling. These are reusable, domain-independent
-  abstractions for the order- and bound-theoretic content of these three
-  liveness concerns: a total order on priorities yields a deterministic
-  choice, a timeout bound yields eventual release, and a fairness bound
+  selection and starvation freedom under fair leader scheduling. These
+  are reusable, domain-independent abstractions for the order- and
+  bound-theoretic content of these two liveness concerns: a total order
+  on priorities yields a deterministic choice, and a fairness bound
   yields bounded progress. The locales are stated over abstract carriers;
   they do not themselves model concurrent execution, message interleaving,
   or network failure, and the synchronization model that instantiates them
   (Regulatory_Instance.thy) is atomic.
 
-  Each concern — deterministic ordering, eventual lock release, and
-  bounded-fairness progress — is captured by a minimal locale with clean
-  assumptions, enabling domain-independent proofs that any conforming
-  system can instantiate.
+  Each concern — deterministic ordering and bounded-fairness progress —
+  is captured by a minimal locale with clean assumptions, enabling
+  domain-independent proofs that any conforming system can instantiate.
 
   This theory is domain-independent. The D-quencer regulatory consensus
-  in DQuencer_Instance.thy provides a concrete instantiation of all
-  three locales, but they apply to any system with linearly ordered
-  priorities, timeout-based locking, and periodic honest leader
-  scheduling.
+  in DQuencer_Instance.thy provides a concrete instantiation of both
+  locales, but they apply to any system with linearly ordered
+  priorities and periodic honest leader scheduling.
 
   Methodological lineage:
     State_Preservation.thy in this entry abstracts cross-domain state
@@ -100,7 +97,7 @@ definition select_highest :: "'m set \<Rightarrow> 'm option" where
      else Some (THE m. m \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority m)))"
 
 theorem select_highest_deterministic:
-  assumes fin: "finite S" and ne: "S \<noteq> {}"
+  assumes ne: "S \<noteq> {}"
   shows "\<exists>!m. select_highest S = Some m"
 proof -
   from ne obtain v where hv: "select_highest S = Some v"
@@ -170,14 +167,24 @@ locale fair_leader_system =
     and is_honest :: "'n \<Rightarrow> bool"
     and pending :: "nat \<Rightarrow> nat"
     and fairness_bound :: nat
-  assumes fairness_bound_positive: "fairness_bound > 0"
-    and fair_leader:
+  assumes fair_leader:
       "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and> is_honest (leader_at e)"
     and honest_progress:
       "\<lbrakk> is_honest (leader_at e); pending e > 0 \<rbrakk> \<Longrightarrow> pending (Suc e) < pending e"
     and non_honest_bounded:
       "pending (Suc e) \<le> pending e"
 begin
+
+text \<open>Positivity of the fairness bound is implied by fairness itself: the
+  window starting at any epoch must be non-empty to contain an honest slot.
+  It is therefore derived rather than assumed.\<close>
+
+lemma fairness_bound_positive: "fairness_bound > 0"
+proof -
+  obtain e where "(0::nat) \<le> e" and "e < 0 + fairness_bound"
+    using fair_leader by blast
+  then show ?thesis by simp
+qed
 
 text \<open>
   Pending count is monotonically non-increasing.

@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.5.0
-**Last updated:** 2026-06-29
+**Version:** 0.5.2
+**Last updated:** 2026-07-03
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -18,7 +18,7 @@ This document tracks the correspondence between formally verified model elements
 This mapping covers:
 
 - **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
-- **Property 2 (D-quencer Determinism, Deadlock Freedom, Starvation Freedom)**: liveness
+- **Property 2 (D-quencer Determinism and Starvation Freedom)**: liveness (deadlock is a scope note, not a proved result; see the Deadlock section below)
 - **Cross-Domain State Preservation Functor**: functor laws (identity / composition / associativity over state-preservation morphisms), authenticated cross-domain state soundness via the Merkle interface, and guarded bounded convergence with terminal-faithful safe recovery
 - **Authenticated Functor and Canton Instantiation**: composite functor laws over the authenticated extraction map, sequence-level authenticity preservation (validity, need-to-know, hash soundness, state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree
 - **Synchronization-Degree Hierarchy**: composable natural transformations between degree functors and degree-class monotonicity (over-provisioning safe, under-provisioning unsafe)
@@ -128,13 +128,13 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 |---|---|---|
 | `priority_system` locale | Generic priority-based selection interface | Reusable across any linorder-keyed selection |
 | `select_highest_deterministic` theorem | BFT consensus output uniqueness | Guarantees deterministic consensus result |
-| `bft_select` function | D-quencer consensus output function (Rust) | Filters valid messages + sorts by priority + returns highest |
+| `dq_select_highest_deterministic` corollary | D-quencer consensus output function (Rust) | Runs the generic `select_highest` on the D-quencer priority-key set and recovers the unique highest-priority well-formed message (via `recover_msg`); maximality over the whole message set is `dq_select_highest_message_maximal` |
 
 ## BFT Consensus Configuration
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `dquencer_system` locale | D-quencer system parameters | BFT threshold, lock timeout, fairness bound, max bounds |
+| `dquencer_system` locale | D-quencer system parameters | BFT threshold, fairness bound, max time/node bounds |
 | `bft_threshold: card nodes ≥ 3 * f_max + 1` | Network configuration constraint | Standard BFT (n ≥ 3f+1); enforced at genesis |
 | `byzantine_bound: card byzantine_nodes ≤ f_max` | Byzantine fault assumption | Not directly enforced; ensured by honest majority assumption |
 | `honest_majority` theorem | Security invariant | Honest nodes > 2f (derived from BFT threshold) |
@@ -221,9 +221,10 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 | `degree_natural_transformation` | Degree demotion / blinding map (Rust) | The degree-forgetting map is a natural transformation between adjacent degree functors with commuting squares; OSS degree demotion must commute with processing |
 | `nt_compose` / `nt_vertical_compose` | Multi-step degree demotion | Demotion across multiple degrees composes as a natural transformation; OSS may demote across several degree levels at once |
 | `degree_forget_refines` | Demoted-view refinement | Degree demotion produces a blinding refinement of the original state; demoted views are partial views of the full state |
-| `hierarchy_monotonicity` | Capability-vs-requirement check (Rust) | When system capability degree ≥ asset required degree, processing preserves validity (**over-provisioning is safe**); OSS must verify capability dominates requirement before processing |
-| `over_provisioning_guarantees` | Cross-chain agreement under over-provisioning | All required chains holding the asset agree on its regulatory state after processing |
+| `over_provisioning_guarantees` | Capability-vs-requirement check (Rust) | When system capability degree ≥ asset required degree, all required chains holding the asset agree on its regulatory state after processing (**over-provisioning is safe**); OSS must verify capability dominates requirement before processing |
+| `over_provisioning_reconciles` | Reconciliation from an arbitrary state (Rust) | From an arbitrary hub-defined state (no validity assumed), over-provisioning still drives every required chain to the hub value; shows the degree hypothesis is load-bearing, not decorative |
 | `no_downward_safety` | Under-provisioning rejection (Rust) | Under-provisioning (required degree > capability) admits a state defeating every guarantee; OSS must refuse to process assets whose required degree exceeds system capability |
+| `hierarchy_monotonicity` | (auxiliary) | A degree-free alias of `processing_preserves_validity` carrying no provisioning hypothesis; the capability-sensitive guarantees are the three rows above |
 | `boundary_well_defined` | Causal-consistency boundary check | The boundary separating adjacent degree classes is single-valued and induced by a strict happened-before order; OSS causal ordering must respect this boundary |
 | `static_promotion_safety` | Static degree re-assignment (governance) | A static re-assignment within system capability transfers the guarantee verbatim; governance-time degree changes are safe within capability |
 
@@ -393,6 +394,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.5.2 | 2026-07-03 | Documentation-honesty pass following the submission-confirmation full audit (2026-07-02 to 07-03). Corrected stale prose that outlived the dead-mechanism removal: dropped "Deadlock Freedom" from the Property 2 coverage title (deadlock is a scope note, no theorem is stated), replaced the non-existent `bft_select` row with the actual `dq_select_highest_deterministic` corollary, and removed the `lock timeout` parameter from the `dquencer_system` row (the vestigial `lock_timeout`/`timeout_positive` pair was removed from the locale). Retitled the degree-monotonicity rows so `over_provisioning_guarantees` carries the capability-vs-requirement headline, added the `over_provisioning_reconciles` row (load-bearing degree hypothesis from an arbitrary state), and recorded `hierarchy_monotonicity` as a degree-free auxiliary alias. Model-level facts unchanged; all theories remain `sorry`/`oops`-free. |
 | 0.5.1 | 2026-06-25 | Added `Canton_Bridge.thy` path-level Merkle inclusion mappings (`reg_view_inclusion_same_hash` / `reg_view_inclusion_blinding_of` / `reg_view_inclusion_chains_sound`): the recursive view tree is instantiated on the entry's generic rose-tree inclusion-proof (zipper) machinery, sharpening sequence-level inclusion to the concrete Merkle path with no added assumption. Monotone addition; no change to existing theories, theorems, assumptions, or dispositions. |
 | 0.5.0 | 2026-06-24 | Added `Canton_Bridge.thy` mappings: composite functor laws over the authenticated extraction map, sequence-level authenticity preservation (validity / need-to-know / hash soundness / state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree, with the declared model-fidelity boundary. Monotone addition; no change to existing theories, theorems, assumptions, or dispositions. |
 | 0.4.1 | 2026-06-23 | Editorial pass: generalized infrastructure-specific references in the implementation-target column (storage engine, a force-transfer signature, the BLS library reference). No change to theorems, assumptions, mappings, or dispositions. |

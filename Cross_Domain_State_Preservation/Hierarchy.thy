@@ -45,9 +45,12 @@
   (reduction_containment), and a genuinely one-directional degree monotonicity
   --- over-provisioning reconciles all of an asset's required chains
   (over_provisioning_guarantees) while under-provisioning carries no such
-  guarantee (no_downward_safety).  Validity preservation itself is degree-free
-  (processing_preserves_validity), recorded in the over-provisioning regime as
-  the auxiliary lemma hierarchy_monotonicity.  The causal-consistency boundary
+  guarantee (no_downward_safety); a companion theorem
+  (over_provisioning_reconciles) shows the degree hypothesis load-bearing
+  from an arbitrary hub-defined state.  Validity preservation itself is
+  degree-free (processing_preserves_validity); the auxiliary lemma
+  hierarchy_monotonicity is its degree-free alias and carries no
+  provisioning hypothesis.  The causal-consistency boundary
   that separates degree 1 from degree 2 (boundary_well_defined) is grounded in
   a strict timestamp order.  A concrete example assignment witnesses
   non-vacuity, and a static-promotion corollary (static_promotion_safety)
@@ -379,14 +382,17 @@ next
 qed
 
 text \<open>
-  Decision B: natural transformations of degree functors compose.  The
+  Natural transformations of degree functors compose.  The
   two-step demotion \<open>F (k+2) \<Rightarrow> F k\<close> is a natural transformation, obtained by
   vertically composing \<open>F (k+2) \<Rightarrow> F (k+1)\<close> with \<open>F (k+1) \<Rightarrow> F k\<close>.  This is
   what lifts the degree ladder from a point-to-point collection of forgetful
   maps to a structurally coherent tower: the whole chain
-  \<open>S\<^sub>3 \<Rightarrow> S\<^sub>2 \<Rightarrow> S\<^sub>1 \<Rightarrow> S\<^sub>0\<close> is natural at once.  This is a layer that, to our
-  knowledge, \<^verbatim>\<open>ADS_Functor\<close> does not develop: it closes functors under
-  composition but does not build a hierarchy of functors with natural
+  \<open>S\<^sub>3 \<Rightarrow> S\<^sub>2 \<Rightarrow> S\<^sub>1 \<Rightarrow> S\<^sub>0\<close> is natural at once.  The degree functors share one
+  action category as common source, so vertical composition is the only
+  composition that arises for this tower; horizontal composition and
+  whiskering do not typecheck here and are not claimed.  This is a layer
+  that, to our knowledge, \<^verbatim>\<open>ADS_Functor\<close> does not develop: it closes functors
+  under composition but does not build a hierarchy of functors with natural
   transformations between them.
 \<close>
 
@@ -594,8 +600,7 @@ lemma deg_run_nondegenerate:
   assumes "get_reg_state gs 0 0 = Some ACTIVE"
   shows "deg_run k 0 [FREEZE, CONFISCATE] gs = Some (broadcast_le k 0 CONFISCATED gs)"
     and "deg_run k 0 [FREEZE] gs = Some (broadcast_le k 0 FROZEN gs)"
-    and "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs
-         \<or> (\<forall>c\<le>k. \<not> asset_exists gs c 0)"
+    and "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs"
 proof -
   have f1: "reg_transition ACTIVE FREEZE = Some FROZEN" by simp
   have f2: "reg_transition FROZEN CONFISCATE = Some CONFISCATED" by simp
@@ -605,28 +610,16 @@ proof -
     using deg_run_collapse[OF assms, of k FREEZE "[CONFISCATE]"] rc by simp
   show "deg_run k 0 [FREEZE] gs = Some (broadcast_le k 0 FROZEN gs)"
     using deg_run_collapse[OF assms, of k FREEZE "[]"] rf by simp
-  show "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs
-        \<or> (\<forall>c\<le>k. \<not> asset_exists gs c 0)"
-  proof (cases "\<exists>c\<le>k. asset_exists gs c 0")
-    case True
-    then obtain c where ck: "c \<le> k" and ae: "asset_exists gs c 0" by blast
-    from ae obtain s where s: "get_reg_state gs c 0 = Some s"
-      by (auto simp: asset_exists_def get_reg_state_def get_asset_state_def split: option.splits)
-    have c1: "get_reg_state (broadcast_le k 0 CONFISCATED gs) c 0 = Some CONFISCATED"
-      using ck s by (simp add: broadcast_le_reg_in)
-    have c2: "get_reg_state (broadcast_le k 0 FROZEN gs) c 0 = Some FROZEN"
-      using ck s by (simp add: broadcast_le_reg_in)
-    have "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs"
-    proof
-      assume "broadcast_le k 0 CONFISCATED gs = broadcast_le k 0 FROZEN gs"
-      then have "get_reg_state (broadcast_le k 0 CONFISCATED gs) c 0
-               = get_reg_state (broadcast_le k 0 FROZEN gs) c 0" by simp
-      with c1 c2 show False by simp
-    qed
-    then show ?thesis by blast
-  next
-    case False
-    then show ?thesis by blast
+  have c1: "get_reg_state (broadcast_le k 0 CONFISCATED gs) 0 0 = Some CONFISCATED"
+    using assms by (simp add: broadcast_le_reg_in)
+  have c2: "get_reg_state (broadcast_le k 0 FROZEN gs) 0 0 = Some FROZEN"
+    using assms by (simp add: broadcast_le_reg_in)
+  show "broadcast_le k 0 CONFISCATED gs \<noteq> broadcast_le k 0 FROZEN gs"
+  proof
+    assume "broadcast_le k 0 CONFISCATED gs = broadcast_le k 0 FROZEN gs"
+    then have "get_reg_state (broadcast_le k 0 CONFISCATED gs) 0 0
+             = get_reg_state (broadcast_le k 0 FROZEN gs) 0 0" by simp
+    with c1 c2 show False by simp
   qed
 qed
 
@@ -831,7 +824,7 @@ text \<open>
   preserves global validity when it processes an asset.  This is a
   \<^emph>\<open>degree-free\<close> fact: its proof is exactly
   @{thm [source] processing_preserves_validity}, and it carries no provisioning
-  hypothesis (an earlier redundant one was removed).  It is therefore recorded
+  hypothesis.  It is therefore recorded
   as an auxiliary lemma aliasing that fact, \<^emph>\<open>not\<close> the headline monotonicity
   result.  The genuinely
   degree-sensitive, one-directional monotonicity is carried by
@@ -904,6 +897,40 @@ next
 qed
 
 text \<open>
+  The degree hypothesis is load-bearing in its own right: from an
+  \<^emph>\<open>arbitrary\<close> hub-defined state --- with no validity assumption, so the
+  chains may well disagree beforehand --- over-provisioning alone drives
+  every required chain to the hub value.  Without it, \<open>no_downward_safety\<close>
+  below exhibits the failure on exactly such a disagreeing state, so the
+  contrast pair is matched: both directions speak about arbitrary states.
+\<close>
+
+theorem over_provisioning_reconciles:
+  assumes deg: "asset_degree aid \<le> d"
+    and hub: "get_reg_state gs 0 aid = Some v"
+  shows "guarantees_preservation d gs aid"
+proof -
+  have proc: "process_at_degree d gs aid = broadcast_le d aid v gs"
+    using hub by (simp add: process_at_degree_def)
+  show ?thesis
+    unfolding guarantees_preservation_def
+  proof (intro allI impI)
+    fix c1 c2
+    assume c1d: "c1 \<le> asset_degree aid" and c2d: "c2 \<le> asset_degree aid"
+       and d1: "get_reg_state (process_at_degree d gs aid) c1 aid \<noteq> None"
+       and d2: "get_reg_state (process_at_degree d gs aid) c2 aid \<noteq> None"
+    from c1d deg have l1: "c1 \<le> d" by simp
+    from c2d deg have l2: "c2 \<le> d" by simp
+    have "get_reg_state (process_at_degree d gs aid) c1 aid = Some v"
+      using l1 d1 unfolding proc by (auto simp: broadcast_le_reg_in split: option.splits)
+    moreover have "get_reg_state (process_at_degree d gs aid) c2 aid = Some v"
+      using l2 d2 unfolding proc by (auto simp: broadcast_le_reg_in split: option.splits)
+    ultimately show "get_reg_state (process_at_degree d gs aid) c1 aid
+                     = get_reg_state (process_at_degree d gs aid) c2 aid" by simp
+  qed
+qed
+
+text \<open>
   No downward safety.  Under-provisioning carries no preservation guarantee:
   if the asset's required degree exceeds the system's capability, then some
   state defeats every preservation claim.  The witness places the hub at
@@ -918,8 +945,8 @@ theorem no_downward_safety:
   assumes "asset_degree aid > system_degree"
   shows "\<not> (\<forall>gs. guarantees_preservation system_degree gs aid)"
 proof -
-  define ast0 where "ast0 = \<lparr> as_asset_id = aid, as_reg_state = ACTIVE \<rparr>"
-  define ast1 where "ast1 = \<lparr> as_asset_id = aid, as_reg_state = FROZEN \<rparr>"
+  define ast0 where "ast0 = \<lparr> as_reg_state = ACTIVE \<rparr>"
+  define ast1 where "ast1 = \<lparr> as_reg_state = FROZEN \<rparr>"
   define gs0 where "gs0 =
      \<lparr> gs_chains = (\<lambda>c. if c = 0 then (\<lambda>a. if a = aid then Some ast0 else None)
                          else if c = Suc system_degree then (\<lambda>a. if a = aid then Some ast1 else None)
@@ -962,9 +989,11 @@ text \<open>
 
 text \<open>
   The degree index corresponds to the product's synchronization-degree
-  hierarchy: \<open>F k\<close> realises sync degree \<open>S\<^sub>k\<close> for \<open>k \<le> 3\<close> (S0 static,
-  S1 unidirectional observation, S2 bidirectional coupling, S3 atomic state
-  binding), with the causal boundary at \<open>k = 2\<close>, the S1/S2 transition below.
+  hierarchy \<open>S\<^sub>0\<close>..\<open>S\<^sub>3\<close>: \<open>F k\<close> formalizes the \<^emph>\<open>coupling breadth\<close> of degree
+  \<open>k\<close> --- the containment and monotonicity structure of the ladder --- while
+  the per-degree synchronization semantics itself (static, unidirectional
+  observation, bidirectional coupling, atomic state binding) is abstracted.
+  The causal boundary sits at \<open>k = 2\<close>, the S1/S2 transition below.
 \<close>
 
 definition requires_causal :: "asset_id \<Rightarrow> bool" where
@@ -977,7 +1006,8 @@ theorem boundary_well_defined:
   "(causal_consistent_at aid d \<longleftrightarrow> (2 \<le> asset_degree aid \<longrightarrow> 2 \<le> d))
    \<and> (asset_degree aid \<le> d \<longrightarrow> causal_consistent_at aid d)
    \<and> (\<forall>t1 t2. lamport_hb t1 t2 \<longrightarrow> \<not> lamport_hb t2 t1)
-   \<and> (\<forall>t. \<not> lamport_hb t t)"
+   \<and> (\<forall>t. \<not> lamport_hb t t)
+   \<and> (\<forall>t1 t2 t3. lamport_hb t1 t2 \<longrightarrow> lamport_hb t2 t3 \<longrightarrow> lamport_hb t1 t3)"
   by (auto simp: causal_consistent_at_def requires_causal_def lamport_hb_def)
 
 end

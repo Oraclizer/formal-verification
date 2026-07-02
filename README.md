@@ -18,7 +18,7 @@ This repository contains machine-checked proofs of safety and liveness propertie
 The core abstractions are two hierarchies of Isabelle/HOL locales:
 
 - **Cross-Domain State Preservation** (Property 1): A hierarchy of state-machine locales (pairwise state preservation with naturality, symmetric bidirectional preservation, multi-domain preservation) whose naturality condition guarantees structural preservation of transitions across domains.
-- **Priority Resolution and Liveness Locales** (Property 2): Captures deterministic ordering, eventual (timeout-bounded) lock release, and starvation freedom as reusable, domain-independent abstractions. They are order- and bound-theoretic and do not themselves model concurrent execution or message interleaving; the instantiating synchronization model is atomic.
+- **Priority Resolution and Liveness Locales** (Property 2): Captures deterministic ordering and starvation freedom as reusable, domain-independent abstractions. They are order- and bound-theoretic and do not themselves model concurrent execution or message interleaving; the instantiating synchronization model is atomic.
 
 `conditional_safety_preservation` is a conditional-safety corollary: from a valid, unlocked global state a synchronization succeeds and the result is again valid (`valid_state_preservation`). Its proof uses only the safety side; the deterministic and starvation-free results of Property 2 are separate theorems (`select_highest_deterministic`, `starvation_bound`). The genuine fusion of safety and liveness (convergence from an arbitrary state, driven by a well-founded measure on cross-chain inconsistency under the fair-leader assumption) is `oraclizer_guarded_bounded_convergence`. Deadlock is out of scope: the atomic sync model has no concurrent lock contention, and forced lock release under contention is deferred to a preemptive-lock layer.
 
@@ -52,9 +52,9 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 - Preemptive locking: a guard expressing intended exclusion of competing regulatory actions (atomic model; a second acquire while held returns `None`)
 - Synchronization protocol: lock → update all connected chains → unlock
 
-### Property 2: D-quencer Determinism, Deadlock Freedom, Starvation Freedom ✅
+### Property 2: D-quencer Determinism and Starvation Freedom ✅
 
-**Status:** Complete (2026-04-02). No `sorry` or `oops`. Consolidated with Property 1 in the current entry revision, now under editor review.
+**Status:** Complete (2026-04-02). No `sorry` or `oops`. Consolidated with Property 1 in the current entry revision, now under editor review. Deadlock is a scope note, not a proved result: the atomic `sync` model has no concurrent lock contention, so no deadlock-freedom theorem is stated (forced lock release under contention is deferred to a preemptive-lock layer).
 
 **What is proven:**
 
@@ -73,8 +73,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 - 3 authority levels: Regional, National, International (RCP jurisdictional hierarchy)
 - 4-component priority key: (authority_rank, inverted_timestamp, action_severity, inverted_node_id)
 - BFT threshold: n ≥ 3f + 1 (standard Byzantine fault tolerance)
-- Timeout-based locking (models VRF-randomized leader election abstractly)
-- Fair leader assumption: within any `fairness_bound` epochs, at least one honest leader is elected
+- Fair leader assumption: within any `fairness_bound` epochs, at least one honest leader is elected (an assume-guarantee abstraction of VRF-based leader election)
 
 **Design pattern.** The liveness proof uses assume-guarantee reasoning: the fairness assumption abstracts VRF randomness as a deterministic condition. The Byzantine threshold is load-bearing rather than decorative: `liveness_inhabitable` derives, from `fair_schedule_exists` (which rests on `honest_nonempty`, `honest_majority`, and the threshold `n ≥ 3f+1`), that the fair-leader assumption is satisfiable for every D-quencer system, and `bft_quorum` exhibits a non-degenerate four-node instance with one Byzantine node. `conditional_safety_preservation` is a conditional-safety corollary, not the place where the two sides fuse; the unconditional fusion is `oraclizer_guarded_bounded_convergence`.
 
@@ -126,9 +125,10 @@ This layer lays a synchronization-degree hierarchy over the cross-domain functor
 |---|---|
 | `degree_natural_transformation` | The degree-forgetting map is a natural transformation between adjacent degree functors, with commuting naturality squares |
 | `nt_compose` / `nt_vertical_compose` | Natural transformations of degree functors are closed under composition |
-| `hierarchy_monotonicity` | When the system's capability degree dominates the asset's required degree, processing preserves global validity (**over-provisioning is safe**) |
-| `over_provisioning_guarantees` | Under over-provisioning, all required chains holding the asset agree on its regulatory state after processing |
+| `over_provisioning_guarantees` | Under over-provisioning, all required chains holding the asset agree on its regulatory state after processing (**over-provisioning is safe**) |
+| `over_provisioning_reconciles` | From an arbitrary hub-defined state (no validity assumed), over-provisioning still drives every required chain to the hub value, so the degree hypothesis is load-bearing in its own right |
 | `no_downward_safety` | Under under-provisioning (required degree exceeds system capability) there is a state that defeats every preservation guarantee (**under-provisioning is unsafe**) |
+| `hierarchy_monotonicity` | Degree-free validity preservation: an auxiliary alias of `processing_preserves_validity` carrying no provisioning hypothesis (the genuinely degree-sensitive results are the two theorems above) |
 | `boundary_well_defined` | The causal-consistency boundary is single-valued, met under over-provisioning, and induced by a strict happened-before order |
 | `static_promotion_safety` | A static re-assignment of an asset's degree within system capability transfers the over-provisioning guarantee verbatim |
 

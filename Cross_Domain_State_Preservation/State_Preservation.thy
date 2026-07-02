@@ -19,8 +19,8 @@
   Regulatory_Instance.thy provides concrete instances for all four
   locales defined here (state_machine, state_preservation,
   symmetric_state_preservation, multi_domain_preservation), but the
-  locales apply to any domain with finite states, deterministic
-  transitions, and optional terminal states.
+  locales apply to any domain with finite states and actions,
+  deterministic transitions, and optional terminal states.
 
   Methodological lineage:
     Our use of locales for compositional, reusable abstractions follows
@@ -79,6 +79,23 @@ text \<open>Note: @{thm apply_actions.simps(1)} already provides the simp rule
 lemma apply_actions_terminal:
   "\<lbrakk> s \<in> terminal; a \<in> actions \<rbrakk> \<Longrightarrow> apply_actions s (a # as) = None"
   by (simp add: terminal_absorbing)
+
+text \<open>Concatenation of action words is the Kleisli composition of the two
+  segment maps: together with @{thm apply_actions.simps(1)} (the identity
+  word), this is the functor reading of a transition system on the free
+  monoid of action words.\<close>
+
+lemma apply_actions_append:
+  "apply_actions s (as @ bs) =
+     (case apply_actions s as of None \<Rightarrow> None | Some s' \<Rightarrow> apply_actions s' bs)"
+  by (induction as arbitrary: s) (auto split: option.splits)
+
+text \<open>Outside the state set no action sequence makes progress: the domain
+  discipline \<^verbatim>\<open>transition_domain\<close> lifts from single transitions to words.\<close>
+
+lemma apply_actions_outside_domain:
+  "s \<notin> states \<Longrightarrow> apply_actions s (a # as) = None"
+  by (simp add: transition_domain)
 
 end
 
@@ -251,6 +268,34 @@ lemma state_map_injective:
   "\<lbrakk> s1 \<in> states\<^sub>s; s2 \<in> states\<^sub>s; state_map s1 = state_map s2 \<rbrakk> \<Longrightarrow> s1 = s2"
   using roundtrip_state_src by metis
 
+text \<open>The roundtrip pair upgrades injectivity to a bijection between the two
+  state sets and between the two action sets --- the formal content of ``no
+  information loss'' for bidirectional synchronization.\<close>
+
+lemma state_map_bij: "bij_betw state_map states\<^sub>s states\<^sub>t"
+proof (rule bij_betw_byWitness[where f' = state_map_inv])
+  show "\<forall>s \<in> states\<^sub>s. state_map_inv (state_map s) = s"
+    using roundtrip_state_src by blast
+  show "\<forall>t \<in> states\<^sub>t. state_map (state_map_inv t) = t"
+    using roundtrip_state_tgt by blast
+  show "state_map ` states\<^sub>s \<subseteq> states\<^sub>t"
+    using forward.state_map_well_defined by auto
+  show "state_map_inv ` states\<^sub>t \<subseteq> states\<^sub>s"
+    using backward.state_map_well_defined by auto
+qed
+
+lemma action_map_bij: "bij_betw action_map actions\<^sub>s actions\<^sub>t"
+proof (rule bij_betw_byWitness[where f' = action_map_inv])
+  show "\<forall>a \<in> actions\<^sub>s. action_map_inv (action_map a) = a"
+    using roundtrip_action_src by blast
+  show "\<forall>b \<in> actions\<^sub>t. action_map (action_map_inv b) = b"
+    using roundtrip_action_tgt by blast
+  show "action_map ` actions\<^sub>s \<subseteq> actions\<^sub>t"
+    using forward.action_map_well_defined by auto
+  show "action_map_inv ` actions\<^sub>t \<subseteq> actions\<^sub>s"
+    using backward.action_map_well_defined by auto
+qed
+
 end
 
 
@@ -300,6 +345,38 @@ definition consensus_state :: "'id \<Rightarrow> 's option" where
     (if connected_domains aid = {} then None
      else domain_state (SOME d. d \<in> connected_domains aid) aid)"
 
+text \<open>The finiteness of the domain roster bounds every connected set.\<close>
+
+lemma connected_domains_finite: "finite (connected_domains aid)"
+proof -
+  have "connected_domains aid \<subseteq> domains"
+    unfolding connected_domains_def by auto
+  then show ?thesis using fin_domains by (rule finite_subset)
+qed
+
+text \<open>The consensus state is well-defined: by \<^verbatim>\<open>consistent_init\<close> the choice
+  of witnessing domain is immaterial, so the \<^verbatim>\<open>SOME\<close> in the definition is
+  sound --- every connected domain reports the consensus value.\<close>
+
+lemma consensus_state_well_defined:
+  assumes "d \<in> connected_domains aid"
+  shows "consensus_state aid = domain_state d aid"
+proof -
+  have some_in: "(SOME d'. d' \<in> connected_domains aid) \<in> connected_domains aid"
+    using assms by (rule someI)
+  from assms have ne: "connected_domains aid \<noteq> {}" by auto
+  obtain s where s: "domain_state d aid = Some s"
+    using assms unfolding connected_domains_def by auto
+  obtain s' where s': "domain_state (SOME d'. d' \<in> connected_domains aid) aid = Some s'"
+    using some_in unfolding connected_domains_def by auto
+  have "d \<in> domains" "(SOME d'. d' \<in> connected_domains aid) \<in> domains"
+    using assms some_in unfolding connected_domains_def by auto
+  then have "s' = s" using consistent_init s s' by blast
+  then show ?thesis
+    unfolding consensus_state_def using ne s s' by simp
+qed
+
+
 text \<open>
   After synchronizing an action on an asset, all connected domains
   reflect the new state. This is the cross-domain consistency theorem.
@@ -319,6 +396,20 @@ where
                 if aid' = aid \<and> d \<in> connected_domains aid
                 then Some s'
                 else ds d aid')))"
+
+text \<open>Terminal states admit no synchronization: the state-machine assumption
+  \<^verbatim>\<open>sm\<close> transports terminal absorption to \<^verbatim>\<open>sync_all\<close>.\<close>
+
+lemma sync_all_terminal_none:
+  assumes "domain_state source aid = Some s"
+    and "s \<in> terminal" and "action \<in> actions"
+  shows "sync_all source action aid domain_state = None"
+proof -
+  have "transition s action = None"
+    using state_machine.terminal_absorbing[OF sm assms(2) assms(3)] .
+  then show ?thesis
+    unfolding sync_all_def using assms(1) by simp
+qed
 
 text \<open>
   The cross-domain consistency theorem: after \<^verbatim>\<open>sync_all\<close>, every connected

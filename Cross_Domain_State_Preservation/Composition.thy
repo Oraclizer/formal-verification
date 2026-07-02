@@ -59,9 +59,22 @@ locale eventual_discharger =
   fixes schedule :: "nat \<Rightarrow> 'event"
     and discharges :: "'event \<Rightarrow> bool"
     and window :: "nat"
-  assumes window_positive: "window > 0"
-    and bounded_occurrence:
+  assumes bounded_occurrence:
       "\<forall>t. \<exists>t'. t \<le> t' \<and> t' < t + window \<and> discharges (schedule t')"
+begin
+
+text \<open>Window positivity is implied by bounded occurrence: the window starting
+  at any time index must be non-empty to contain a discharging slot.  It is
+  therefore derived rather than assumed.\<close>
+
+lemma window_positive: "window > 0"
+proof -
+  obtain t' where "(0::nat) \<le> t'" and "t' < 0 + window"
+    using bounded_occurrence by blast
+  then show ?thesis by simp
+qed
+
+end
 
 
 section \<open>Compositional Safety and Liveness\<close>
@@ -69,10 +82,10 @@ section \<open>Compositional Safety and Liveness\<close>
 text \<open>
   The composition couples a guarded invariant with an eventual discharger
   through a realization map \<^term>\<open>realize\<close> that turns a discharging event, in
-  the current state, into an operation.  The two coupling assumptions state
-  that (i) any realized operation is admissible and guarded, and (ii) from an
-  invariant-satisfying state a realized operation makes invariant-preserving
-  progress.
+  the current state, into an operation.  The coupling assumption states that
+  any realized operation is admissible and guarded; invariant preservation
+  along a trajectory then follows from the guard, and progress is supplied by
+  the measure discharge of the converging extension below.
 \<close>
 
 locale safety_liveness_composition =
@@ -90,9 +103,6 @@ locale safety_liveness_composition =
   assumes realize_discharges:
       "\<lbrakk> s \<in> carrier; discharges ev; realize ev s = Some opn \<rbrakk>
        \<Longrightarrow> opn \<in> ops \<and> guard s opn"
-    and realize_progresses:
-      "\<lbrakk> s \<in> carrier; inv s; discharges ev; realize ev s = Some opn \<rbrakk>
-       \<Longrightarrow> \<exists>s'. step s opn = Some s' \<and> inv s'"
 begin
 
 text \<open>
@@ -268,39 +278,6 @@ proof -
   ultimately show ?thesis by (simp add: run_def)
 qed
 
-text \<open>
-  The eventuality form retained under the convergence fallback: from an
-  invariant carrier state the system stays, at every horizon, in an
-  invariant carrier state.
-\<close>
-
-theorem unconditional_invariant_eventuality:
-  assumes "s \<in> carrier" and "inv s"
-  shows "\<exists>t s'. evolves_to s t s' \<and> inv s' \<and> s' \<in> carrier"
-proof -
-  have "inv (run s 0) \<and> run s 0 \<in> carrier" using invariant_preserved[OF assms] by blast
-  then have "evolves_to s 0 (run s 0) \<and> inv (run s 0) \<and> run s 0 \<in> carrier"
-    by (simp add: evolves_to_def)
-  then show ?thesis by blast
-qed
-
-text \<open>
-  Liveness within the safe region: from an invariant carrier state, a
-  realized discharging operation makes progress to another invariant carrier
-  state.  This couples \<^term>\<open>realize_progresses\<close> with closure and admissibility.
-\<close>
-
-lemma safe_region_progress:
-  assumes "s \<in> carrier" and "inv s" and "discharges ev" and "realize ev s = Some opn"
-  shows "\<exists>s'. step s opn = Some s' \<and> inv s' \<and> s' \<in> carrier"
-proof -
-  obtain s' where st: "step s opn = Some s'" and inv': "inv s'"
-    using realize_progresses[OF assms(1,2,3,4)] by blast
-  have op_in: "opn \<in> ops" using realize_discharges[OF assms(1,3,4)] by simp
-  have "s' \<in> carrier" using safe.step_closed[OF assms(1) op_in st] .
-  with st inv' show ?thesis by blast
-qed
-
 end
 
 
@@ -332,13 +309,27 @@ locale converging_composition =
     and window :: "nat"
     and realize :: "'event \<Rightarrow> 's \<Rightarrow> 'op option" +
   fixes progress_measure :: "'s \<Rightarrow> nat"
-  assumes measure_zero_inv:
-      "\<lbrakk> s \<in> carrier; progress_measure s = 0 \<rbrakk> \<Longrightarrow> inv s"
-    and discharge_progresses:
+  assumes discharge_progresses:
       "\<lbrakk> s \<in> carrier; \<not> inv s; discharges ev \<rbrakk>
        \<Longrightarrow> \<exists>opn s'. realize ev s = Some opn \<and> step s opn = Some s'
                    \<and> progress_measure s' < progress_measure s"
 begin
+
+text \<open>The zero set of the measure lies inside the invariant --- derived
+  rather than assumed: at measure zero a failing invariant would admit a
+  discharging step whose target measure lies strictly below zero.\<close>
+
+lemma measure_zero_inv:
+  assumes "s \<in> carrier" and "progress_measure s = 0"
+  shows "inv s"
+proof (rule ccontr)
+  assume ninv: "\<not> inv s"
+  obtain t where "discharges (schedule t)"
+    using live.bounded_occurrence by blast
+  then obtain opn s' where "progress_measure s' < progress_measure s"
+    using discharge_progresses[OF assms(1) ninv] by blast
+  with assms(2) show False by simp
+qed
 
 definition convergence_bound :: "'s \<Rightarrow> nat" where
   "convergence_bound s = progress_measure s * window"
@@ -432,7 +423,7 @@ proof (induction m arbitrary: s k rule: less_induct)
 qed
 
 text \<open>
-  Guarded bounded convergence (Plan A).  From an arbitrary carrier state —
+  Guarded bounded convergence.  From an arbitrary carrier state —
   with no assumption that the invariant holds — the system reaches, within
   \<^term>\<open>convergence_bound s\<close> evolution steps, a state satisfying the invariant.
 \<close>

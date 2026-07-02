@@ -137,7 +137,7 @@ proof -
   thus ?thesis using boad by blast
 qed
 
-text \<open>The functor's action on the monoidal (merge) product: a merge of two views is
+text \<open>The functor's action on the merge (join) product: a merge of two views is
   sent to a join of the two extracted states, with the joined state valid and
   refining each input.  This lifts @{thm [source] extract_respects_merging} to a
   theorem carrying validity, and is exactly
@@ -149,8 +149,7 @@ lemma cdsp_ads_merge:
     and ea: "extract_map a = Some sa" and eb: "extract_map b = Some sb"
   shows "\<exists>sab. extract_map ab = Some sab \<and> valid_state sab
             \<and> state_refines sa sab \<and> state_refines sb sab"
-  using authenticated_preservation_soundness[OF mab ea
-          extract_preserves_validity[OF ea] eb extract_preserves_validity[OF eb]]
+  using authenticated_preservation_soundness[OF mab ea eb]
   by blast
 
 text \<open>Associativity of the lifted merge/join algebra.  The ADS merge is associative
@@ -158,7 +157,11 @@ text \<open>Associativity of the lifted merge/join algebra.  The ADS merge is as
   authenticated views is independent of the bracketing: both \<open>(a \<bullet> b) \<bullet> c\<close> and
   \<open>a \<bullet> (b \<bullet> c)\<close> land on the same merged value, hence (the extraction being a
   function) on the same joined state.  This is the substantive ``associativity
-  preserved'' of the composite functor.\<close>
+  preserved'' of the composite functor.  Commutativity and idempotence of the
+  lifted combination descend directly from the interface laws
+  (@{thm [source] mk.commute}, @{thm [source] mk.idem}) with the extraction a
+  function; associativity is the one law that needs the rearrangement below,
+  so it is the law recorded as a theorem.\<close>
 
 theorem cdsp_ads_merge_assoc:
   assumes mab: "m a b = Some ab" and mabc: "m ab c = Some abc"
@@ -181,10 +184,14 @@ text \<open>
   Four authenticity properties are shown to hold not across a single blinding or
   merge step but along the \emph{whole} synchronization sequence:
 
-    \<^enum> \<^bold>\<open>validity\<close> --- every view in the sequence extracts to a valid state
-        (theorem \<open>sequence_authenticity_preservation\<close>);
+    \<^enum> \<^bold>\<open>validity\<close> --- every view in the sequence extracts to a valid state,
+        along a blinding path (theorem \<open>sequence_authenticity_preservation\<close>)
+        and along a merge fold (theorem \<open>sequence_merge_soundness\<close>);
     \<^enum> \<^bold>\<open>need-to-know (refinement)\<close> --- every view is a partial view refining the
-        most-revealed endpoint (theorem \<open>sequence_authenticity_preservation\<close>);
+        most-revealed endpoint (theorem \<open>sequence_authenticity_preservation\<close>,
+        extended to arbitrary blinding-step reachability by corollary
+        \<open>reachable_view_authenticity\<close>); dually, every contributor to a merge
+        fold refines the combined view (theorem \<open>sequence_merge_soundness\<close>);
     \<^enum> \<^bold>\<open>hash soundness\<close> --- the whole sequence commits to one authenticating root,
         in both the blinding direction (theorem \<open>blinding_path_hash_soundness\<close>)
         and the merge direction (theorem \<open>merge_seq_hash\<close>);
@@ -419,8 +426,7 @@ next
   have mseq: "merge_seq (x # y # ys) = Some xz" using mz mxz by simp
   obtain sxz where exz: "extract_map xz = Some sxz" and vxz: "valid_state sxz"
     and rx: "state_refines sx sxz" and rz: "state_refines sz sxz"
-    using authenticated_preservation_soundness[OF mxz ex extract_preserves_validity[OF ex]
-            ez extract_preserves_validity[OF ez]] by blast
+    using authenticated_preservation_soundness[OF mxz ex ez] by blast
   have "\<forall>w \<in> set (x # y # ys). \<exists>sw. extract_map w = Some sw \<and> state_refines sw sxz"
   proof
     fix w assume "w \<in> set (x # y # ys)"
@@ -1226,9 +1232,9 @@ definition rogue_inconsistent_state :: global_state where
   "rogue_inconsistent_state =
      \<lparr> gs_chains = (\<lambda>c a.
           if a = 0 \<and> c = 0
-            then Some \<lparr> as_asset_id = 0, as_reg_state = ACTIVE \<rparr>
+            then Some \<lparr> as_reg_state = ACTIVE \<rparr>
           else if a = 0 \<and> c = Suc 0
-            then Some \<lparr> as_asset_id = 0, as_reg_state = FROZEN \<rparr>
+            then Some \<lparr> as_reg_state = FROZEN \<rparr>
           else None),
        gs_locks = (\<lambda>_. False) \<rparr>"
 
