@@ -33,8 +33,8 @@ Mari\'{c}'s \texttt{ADS\_Functor} entry, and instantiate the construction
 both on its blindable-position functor and on a recursive model of the Canton
 transaction tree.  The liveness locales abstract priority resolution and fair scheduling
 under an assume-guarantee fairness bound; the Byzantine threshold
-($n \ge 3f+1$) is load-bearing,
-yielding a fair schedule that makes the liveness layer inhabitable, witnessed
+($n \ge 3f+1$) supplies an in-roster honest node whose constant schedule
+makes the liveness layer inhabitable, witnessed
 by a non-degenerate four-node instance with one Byzantine node.  Every generic
 locale is instantiated on the regulatory state model of Oraclizer, a state
 synchronization oracle for tokenized assets; to exhibit domain independence,
@@ -141,7 +141,8 @@ detailed exposition alongside the formal material.
   forgetful natural transformation closed under composition
   (\texttt{degree\_forget}, \texttt{degree\_natural\_transformation},
   \texttt{nt\_compose}), reduction containment, the causal-consistency
-  boundary, and a genuinely one-directional degree monotonicity
+  boundary (grounded in a strict timestamp order), and a genuinely
+  one-directional degree monotonicity
   (\texttt{over\_provisioning\_guarantees}, \texttt{no\_downward\_safety}).
 
 \item[\texttt{Canton\_Bridge.thy}] the categorical laws of the
@@ -189,9 +190,9 @@ decisions based on legal precedence and operational considerations:
   four escalation actions \textsc{Freeze}, \textsc{Seize},
   \textsc{Confiscate}, \textsc{Restrict} and their de-escalation
   counterparts \textsc{Unfreeze}, \textsc{Unrestrict}, \textsc{Release}.
-  \textsc{Recover} and \textsc{Liquidate}, two of the product's six
-  enforcement actions, are excluded as they involve force transfers or
-  external DEX interactions rather than regulatory state transitions.
+  \textsc{Recover} and \textsc{Liquidate} are excluded as they involve
+  force transfers or external DEX interactions rather than regulatory
+  state transitions.
 \item The direct transition \textsc{Seized} $\to$ \textsc{Frozen} is
   excluded because seizure is a strictly stronger legal constraint than
   freezing; relaxation requires explicit release first.
@@ -249,13 +250,5 @@ to subsequent entries.
 
 % include generated text of all theories
 \input{session}
-
-\section{Acknowledgments}
-
-The regulatory state model (five states, seven actions, and the
-transition exclusions) is motivated by the Regulatory Compliance
-Protocol (RCP), a framework developed by the Oraclizer research team
-that systematically classifies requirements from 15 global financial
-regulatory authorities for tokenized capital markets.
 
 \end{document}

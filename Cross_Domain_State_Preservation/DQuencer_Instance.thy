@@ -569,7 +569,6 @@ text \<open>
 
 theorem conditional_safety_preservation:
   assumes valid: "valid_state gs"
-    and exists: "asset_exists gs source aid"
     and current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
     and not_locked: "\<not> is_locked gs aid"
@@ -581,7 +580,7 @@ proof -
   from valid current trans lock have
     "\<exists>gs'. sync source action aid gs = Some gs'"
     unfolding sync_def
-    using exists current trans lock
+    using current trans lock
     by (auto simp: get_reg_state_def get_asset_state_def
              split: option.splits
              intro!: exI)
@@ -593,7 +592,10 @@ proof -
 qed
 
 text \<open>
-  Summary of what Properties 1 + 2 together establish:
+  This entry groups its regulatory results into two properties: Property 1,
+  cross-domain state preservation (the safety side), and Property 2,
+  deterministic selection and fair scheduling (the liveness side).
+  Summary of what they together establish:
 
   \<^enum> \<^bold>\<open>Safety\<close> (Property 1): After synchronization, all connected
     chains agree on the regulatory state. The global validity
@@ -627,10 +629,9 @@ text \<open>
     synchronous lift left to subsequent entries.
 
   Open work for subsequent entries:
-    - Compositional assurance across heterogeneous verification regimes
-      (Canton + OSS + EVM).
+    - Compositional assurance across heterogeneous verification regimes.
     - Refinement: formal correspondence between these models and the
-      Rust / Solidity implementation.
+      deployed implementation.
 \<close>
 
 end

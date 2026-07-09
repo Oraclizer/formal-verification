@@ -380,6 +380,8 @@ qed
 text \<open>
   After synchronizing an action on an asset, all connected domains
   reflect the new state. This is the cross-domain consistency theorem.
+  Connectivity (\<^verbatim>\<open>connected_domains\<close>) is read from the locale-fixed
+  \<^verbatim>\<open>domain_state\<close>; the theorems below apply \<^verbatim>\<open>sync_all\<close> to that same map.
 \<close>
 
 definition sync_all ::

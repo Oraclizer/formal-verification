@@ -334,9 +334,6 @@ qed
 definition convergence_bound :: "'s \<Rightarrow> nat" where
   "convergence_bound s = progress_measure s * window"
 
-lemma progress_measure_wf: "wf (measure progress_measure)"
-  by (rule wf_measure)
-
 text \<open>
   The core convergence lemma, by strong induction on the measure.  From any
   carrier state with measure \<^term>\<open>m\<close>, an invariant state is reached within

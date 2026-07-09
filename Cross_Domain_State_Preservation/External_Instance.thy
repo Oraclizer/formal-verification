@@ -99,7 +99,9 @@ text \<open>
   well-formedness invariant ties the auxiliary field to the tag --- the peer
   is recorded exactly while a connection attempt or connection exists ---
   mirroring the layer-crossing pattern of the regulatory development.  The
-  tracker's state space is the image of the representation map, and its
+  peer identifier value itself is a representative placeholder, exactly as
+  in the DAML permission record; what the invariant tracks is its presence.
+  The tracker's state space is the image of the representation map, and its
   transition function is the lift of the endpoint transition through that
   map, guarded by the image domain.
 \<close>

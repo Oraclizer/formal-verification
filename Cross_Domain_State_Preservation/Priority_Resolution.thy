@@ -13,8 +13,9 @@
   on priorities yields a deterministic choice, and a fairness bound
   yields bounded progress. The locales are stated over abstract carriers;
   they do not themselves model concurrent execution, message interleaving,
-  or network failure, and the synchronization model that instantiates them
-  (Regulatory_Instance.thy) is atomic.
+  or network failure, and the synchronization model underlying their
+  instantiation (Regulatory_Instance.thy, instantiated in
+  DQuencer_Instance.thy) is atomic.
 
   Each concern — deterministic ordering and bounded-fairness progress —
   is captured by a minimal locale with clean assumptions, enabling

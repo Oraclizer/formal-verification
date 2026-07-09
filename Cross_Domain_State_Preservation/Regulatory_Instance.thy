@@ -930,24 +930,6 @@ lemma chain_b_terminal:
   unfolding reg_terminal_def
   by (cases a) (auto simp: confiscated_terminal)
 
-lemma chain_b_state_machine:
-  "state_machine reg_states chain_b_actions chain_b_transition reg_terminal"
-proof -
-  have f1: "finite reg_states" unfolding reg_states_def by auto
-  have f2: "finite chain_b_actions" unfolding chain_b_actions_def by auto
-  have f3: "reg_terminal \<subseteq> reg_states"
-    unfolding reg_terminal_def reg_states_def by auto
-  have f4: "\<And>s a. s \<in> reg_terminal \<Longrightarrow> a \<in> chain_b_actions \<Longrightarrow> chain_b_transition s a = None"
-    using chain_b_terminal by auto
-  have f5: "\<And>s a s'. s \<in> reg_states \<Longrightarrow> a \<in> chain_b_actions \<Longrightarrow>
-    chain_b_transition s a = Some s' \<Longrightarrow> s' \<in> reg_states"
-    using chain_b_transition_closed by auto
-  have f6: "\<And>s a. (s :: reg_state) \<notin> reg_states \<Longrightarrow> chain_b_transition s a = None"
-    using reg_states_UNIV by auto
-  show ?thesis
-    by (intro state_machine.intro) (use f1 f2 f3 f4 f5 f6 in auto)
-qed
-
 text \<open>
   The naturality conditions of \<^verbatim>\<open>state_preservation\<close> hold for the
   escalation subset. Both directions (\<^verbatim>\<open>Some\<close> and \<^verbatim>\<open>None\<close> branches) follow
@@ -987,34 +969,12 @@ text \<open>
 \<close>
 
 text \<open>
-  Source and target state-machine bundles for the heterogeneous-action
-  instance. The target side reuses the existing \<^verbatim>\<open>chain_b_state_machine\<close>
-  lemma; the source side is on the escalation subset of \<^verbatim>\<open>reg_actions\<close>
-  rather than the full action set, so we discharge it inline.
+  Both state-machine sides of the heterogeneous-action instance --- the
+  source on the escalation subset of \<^verbatim>\<open>reg_actions\<close> and Chain~B's target ---
+  have their obligations discharged inline by \<^theory_text>\<open>unfold_locales\<close>
+  in the interpretation below, drawing on the closure and terminal lemmas
+  above.
 \<close>
-
-lemma escalation_source_state_machine:
-  "state_machine reg_states escalation_actions reg_transition reg_terminal"
-proof unfold_locales
-  show "finite reg_states" unfolding reg_states_def by auto
-next
-  show "finite escalation_actions" unfolding escalation_actions_def by auto
-next
-  show "reg_terminal \<subseteq> reg_states" unfolding reg_terminal_def reg_states_def by auto
-next
-  fix s a
-  assume "s \<in> reg_terminal" "a \<in> escalation_actions"
-  then show "reg_transition s a = None"
-    unfolding reg_terminal_def by (auto simp: confiscated_terminal)
-next
-  fix s a s'
-  assume "s \<in> reg_states" "a \<in> escalation_actions" "reg_transition s a = Some s'"
-  then show "s' \<in> reg_states" using reg_transition_closed by auto
-next
-  fix s :: reg_state and a :: reg_action
-  assume "s \<notin> reg_states"
-  then show "reg_transition s a = None" using reg_states_UNIV by auto
-qed
 
 text \<open>
   Heterogeneous-action instance: the source action set is the
@@ -1276,28 +1236,6 @@ qed
 lemma daml_transition_outside_states:
   "p \<notin> daml_states \<Longrightarrow> daml_transition p a = None"
   unfolding daml_transition_def by simp
-
-lemma daml_state_machine:
-  "state_machine daml_states reg_actions daml_transition daml_terminal"
-proof
-  show "finite daml_states" by (rule daml_states_finite)
-next
-  show "finite reg_actions" unfolding reg_actions_def by auto
-next
-  show "daml_terminal \<subseteq> daml_states" by (rule daml_terminal_subset)
-next
-  fix s a
-  assume "s \<in> daml_terminal" "a \<in> reg_actions"
-  then show "daml_transition s a = None" by (rule daml_terminal_absorbing)
-next
-  fix s a s'
-  assume "s \<in> daml_states" "a \<in> reg_actions" "daml_transition s a = Some s'"
-  then show "s' \<in> daml_states" by (rule daml_transition_closed)
-next
-  fix s :: daml_perm and a :: reg_action
-  assume "s \<notin> daml_states"
-  then show "daml_transition s a = None" by (rule daml_transition_outside_states)
-qed
 
 text \<open>
   Forward naturality: \<^verbatim>\<open>reg_to_daml\<close> commutes with transitions.

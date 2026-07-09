@@ -198,6 +198,17 @@ text \<open>The carrier of the degree-\<open>k\<close> functor: states supported
 definition deg_carrier :: "nat \<Rightarrow> global_state set" where
   "deg_carrier k = {gs. \<forall>c aid. asset_exists gs c aid \<longrightarrow> c \<le> k}"
 
+text \<open>The carrier is inhabited --- a non-vacuity witness for the degree
+  functors: every authenticated extraction supported on chains \<open>0..k\<close>
+  lies in it.\<close>
+
+lemma deg_carrier_inhabited:
+  assumes "P \<subseteq> {0..k}"
+  shows "auth_state r P \<in> deg_carrier k"
+  using assms
+  by (auto simp: deg_carrier_def asset_exists_def get_asset_state_def auth_state_def
+           split: if_splits)
+
 
 section \<open>Degree Functors and Their Natural Transformations\<close>
 

@@ -14,10 +14,12 @@
     * preservation morphisms compose                 (preservation_compose)
     * morphism composition is associative            (preservation_assoc)
 
-  Together these force the term "Functor" to be a theorem rather than a
-  slogan: the cross-domain construction is a functor on the category whose
-  objects are state machines and whose morphisms are the structure-preserving
-  synchronization maps of State_Preservation.thy.
+  Together these establish the category whose objects are state machines and
+  whose morphisms are the structure-preserving synchronization maps of
+  State_Preservation.thy.  The functorial reading itself is carried by the
+  transition systems (each is a functor from its one-object action category
+  into partial maps on states, via the identity word and word concatenation)
+  and by the degree-indexed functor tower of Hierarchy.thy.
 
   The second part composes this functorial structure with Lochbihler and
   Maric's authenticated-data-structure interface (ADS_Functor.Merkle_Interface).
@@ -887,19 +889,6 @@ lemma connected_chains_get_reg_state:
   unfolding connected_chains_def asset_exists_def get_reg_state_def get_asset_state_def
   by (auto split: option.splits)
 
-text \<open>On a finite-domain state, the connected-chain set of any asset is finite.\<close>
-
-lemma connected_chains_finite:
-  assumes "finite_domain gs"
-  shows "finite (connected_chains gs aid)"
-proof -
-  have "connected_chains gs aid \<subseteq> fst ` {(c, a). asset_exists gs c a}"
-    by (auto simp: connected_chains_def image_iff)
-  moreover have "finite (fst ` {(c, a). asset_exists gs c a})"
-    using assms unfolding finite_domain_def by simp
-  ultimately show ?thesis by (rule finite_subset)
-qed
-
 text \<open>On a finite-domain state, the inconsistency set is finite.\<close>
 
 lemma inconsistency_set_finite:
@@ -1719,11 +1708,12 @@ text \<open>
   The fairness assumption of @{locale dquencer_liveness} is satisfiable in
   every D-quencer system: the BFT threshold yields an honest node
   (@{thm [source] dquencer_system.honest_nonempty}), and the constant
-  schedule on that node meets every fairness window.  This grounds the
-  assume-guarantee abstraction: the fair-leader hypothesis is the
-  deterministic residue of VRF-based election, and the system's own
-  threshold already supplies a witness schedule, so the hypothesis is
-  satisfiable rather than merely plausible.
+  schedule on that node --- a schedule drawn from the system's own roster ---
+  meets every fairness window.  This grounds the assume-guarantee
+  abstraction: the fair-leader hypothesis is the deterministic residue of
+  VRF-based election, and the system's own threshold already supplies a
+  roster-drawn witness schedule, so the hypothesis is satisfiable rather
+  than merely plausible.
 \<close>
 
 context dquencer_system
@@ -1731,68 +1721,48 @@ begin
 
 lemma fair_schedule_exists:
   "\<exists>sched :: nat \<Rightarrow> node_info.
-     \<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
-                 ni_behavior (sched e) = Honest"
+     range sched \<subseteq> nodes \<and>
+     (\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
+                  ni_behavior (sched e) = Honest)"
 proof -
-  obtain h where "h \<in> honest_nodes nodes"
-    using honest_nonempty by blast
-  then have hb: "ni_behavior h = Honest" by (simp add: honest_nodes_def)
+  obtain h where hin: "h \<in> honest_nodes nodes" using honest_nonempty by blast
+  then have hb: "ni_behavior h = Honest" and hn: "h \<in> nodes"
+    by (simp_all add: honest_nodes_def)
   define sched :: "nat \<Rightarrow> node_info" where "sched = (\<lambda>_. h)"
-  have body: "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound
-               \<and> ni_behavior (sched e) = Honest"
-  proof
-    fix epoch :: nat
-    have "epoch \<le> epoch \<and> epoch < epoch + fairness_bound
-          \<and> ni_behavior (sched epoch) = Honest"
-      using fairness_positive hb by (simp add: sched_def)
-    then show "\<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound
-                 \<and> ni_behavior (sched e) = Honest"
-      by blast
-  qed
-  show ?thesis
-    by (rule exI[where P = "\<lambda>s :: nat \<Rightarrow> node_info.
-                              \<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound
-                                \<and> ni_behavior (s e) = Honest"
-                 and x = sched, OF body])
+  have "range sched \<subseteq> nodes" using hn by (auto simp: sched_def)
+  moreover have "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound
+                   \<and> ni_behavior (sched e) = Honest"
+    using fairness_positive hb by (auto simp: sched_def)
+  ultimately show ?thesis by blast
 qed
 
 text \<open>
-  \<^bold>\<open>The Byzantine threshold is load-bearing.\<close>  The fair schedule witnessed
-  above is not idle: it instantiates the assume-guarantee liveness locale.  For
-  \<^emph>\<open>every\<close> D-quencer system the threshold therefore guarantees that
-  @{locale dquencer_liveness} is inhabitable --- the fair-leader assumption is
-  satisfiable rather than merely postulated.  This is the downstream consumer
-  that makes the entire Byzantine chain load-bearing: deleting any of
-  @{thm [source] bft_threshold}, @{thm [source] honest_majority},
-  @{thm [source] honest_nonempty}, or @{thm [source] fair_schedule_exists}
-  breaks the proof below.  This load-bearing role is for the inhabitability
-  result (\<^verbatim>\<open>liveness_inhabitable\<close>, a satisfiability witness for the
-  locale, terminal); the headline bounded-convergence theorem does not route
-  through it, being driven instead by the cross-chain inconsistency measure.
+  \<^bold>\<open>What the Byzantine threshold contributes here.\<close>  The threshold guarantees
+  an honest node \<^emph>\<open>within the roster\<close>
+  (@{thm [source] honest_nonempty}, via @{thm [source] honest_majority}), and
+  the constant schedule on that node witnesses the fair-leader hypothesis
+  with a schedule drawn from the roster --- so for \<^emph>\<open>every\<close> D-quencer system
+  @{locale dquencer_liveness} is inhabitable by the system's own nodes
+  (\<^verbatim>\<open>liveness_inhabitable\<close>, a satisfiability witness for the locale,
+  terminal; the in-roster conjunct is what the threshold buys).  The scope of
+  this role is deliberately narrow: the headline bounded-convergence theorem
+  below consumes the fair-leader assumption directly and does not route
+  through this witness, being driven instead by the cross-chain inconsistency
+  measure, and the honest \<^emph>\<open>majority\<close> beyond non-emptiness is not consumed
+  by the inhabitability result.
 \<close>
 
 theorem liveness_inhabitable:
   "\<exists>(ls :: nat \<Rightarrow> node_info) (pc :: nat \<Rightarrow> nat).
-     dquencer_liveness nodes f_max fairness_bound ls pc"
+     range ls \<subseteq> nodes \<and> dquencer_liveness nodes f_max fairness_bound ls pc"
 proof -
-  obtain sched :: "nat \<Rightarrow> node_info" where fair:
-      "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
+  obtain sched :: "nat \<Rightarrow> node_info" where rng: "range sched \<subseteq> nodes"
+    and fair: "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
                     ni_behavior (sched e) = Honest"
-    using fair_schedule_exists by metis
+    using fair_schedule_exists by blast
   have "dquencer_liveness nodes f_max fairness_bound sched (\<lambda>_. 0)"
-  proof unfold_locales
-    show "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
-                      ni_behavior (sched e) = Honest"
-      using fair .
-  next
-    fix e :: nat
-    assume "0 < (\<lambda>_::nat. 0::nat) e"
-    then show "(\<lambda>_::nat. 0::nat) (Suc e) < (\<lambda>_::nat. 0::nat) e" by simp
-  next
-    fix e :: nat
-    show "(\<lambda>_::nat. 0::nat) (Suc e) \<le> (\<lambda>_::nat. 0::nat) e" by simp
-  qed
-  thus ?thesis by blast
+    by unfold_locales (use fair in auto)
+  then show ?thesis using rng by blast
 qed
 
 end
