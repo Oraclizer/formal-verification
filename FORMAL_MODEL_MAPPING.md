@@ -1,6 +1,6 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.5.5
+**Version:** 0.5.6
 **Last updated:** 2026-07-20
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
@@ -183,7 +183,7 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
 | `merkle_interface_auth` | State-keyed reveal-set algebraic witness | `auth_hash = fst` commits only to the regulatory state; the chain set is manipulated by blinding and merge and is not itself cryptographically committed by this instance |
-| `authenticated_preservation_soundness` | Cross-chain view merge in OSS State DB (Rust) | Merging two authenticated views yields a valid join refining each input view; OSS merge of partial chain views must preserve this |
+| `authenticated_preservation_soundness` | Cross-chain view merge in OSS State DB (Rust) | Merging two authenticated views yields a valid join that each input view refines; OSS merge of partial chain views must preserve this |
 | `blinded_view_preserves_validity` | Need-to-know disclosure of cross-domain state (Rust) | A blinded view extracts to a valid state refining the original; supports selective disclosure (e.g. regulator-only views) without breaking validity |
 | `state_refines_*` (refl / trans / preserves_consistency) | Partial-view refinement relation | OSS partial-view semantics; refinement is reflexive, transitive, and preserves consistency |
 | `rogue_join_excluded` | Join admission control in OSS State DB | A rogue view adding a FROZEN holding on an unrevealed chain is rejected as a join; OSS must reject inconsistent merges |
@@ -373,7 +373,7 @@ Until formal refinement proofs (model → code) are available, the following pla
 
 | Theorem | Test Strategy | Status |
 |---|---|---|
-| `authenticated_preservation_soundness` | Property test: random pairs of authenticated views merge to a valid join refining each input | Planned |
+| `authenticated_preservation_soundness` | Property test: random pairs of authenticated views merge to a valid join that each input refines | Planned |
 | `blinded_view_preserves_validity` | Property test: blinded views extract to valid states refining the original | Planned |
 | `oraclizer_guarded_bounded_convergence` | Reference-model test: an explicitly supplied safe-recovery witness yields a valid state within the computed bound; this does not validate an executable selector | Planned |
 | `safe_recovery_sync_no_fresh_terminal` | Integration test: recovery never introduces a fresh CONFISCATED holding | Planned |
@@ -399,6 +399,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.5.6 | 2026-07-20 | Editorial: refinement-direction glosses aligned with the formal reading of `state_refines` (a partial view refines the fuller view), matching the theory sources. No change to theorems, assumptions, mappings, or dispositions. |
 | 0.5.5 | 2026-07-20 | Editorial: numbered property labels replaced with the property names throughout the current document (coverage list, section headings, assumption and test tables); historical change-log rows retained verbatim. No change to theorems, assumptions, mappings, or dispositions. |
 | 0.5.4 | 2026-07-19 | Scope and contract correction: retained the timestamp and source-node bounds of `priority_key_injectivity`; separated the formal coupling-breadth hierarchy from the product's S0--S3 operational meanings and left that refinement open; described the external domain-independence instance as a TCP-inspired toy endpoint/abstract tracker rather than an RFC 793 or concrete conntrack model; classified regulatory actions, genesis enforcement, tests, and external cryptography as open implementation or refinement obligations; consolidated the gap and assumption-scope description. |
 | 0.5.3 | 2026-07-19 | Scope and theorem-contract correction: described Property 2 as aggregate pending-count progress; removed unsupported VRF probability and implementation-completeness claims; recorded in-roster fairness, request-identity/network/lock/refinement gaps, and the non-constructive `oss_realize` boundary; scoped authenticated mapping to an extractable sub-preorder and a state-keyed reveal-set witness; described the hierarchy as a timestamp-order degree boundary; synchronized theorem descriptions with the roster, selection, merge, associativity, and conditional-safety contracts. |

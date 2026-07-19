@@ -83,7 +83,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 
 **Status:** Mechanized and `sorry`/`oops`-free. Included in the full ten-theory AFP resubmission candidate; not yet uploaded.
 
-This layer establishes that the cross-domain state-preservation construction is a **functor**: it proves the category laws over state-preservation morphisms (identity preservation, composition preservation, associativity), and composes the construction with Lochbihler and Marić's Merkle interface (AFP entry [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html)) to obtain **authenticated cross-domain state soundness**. The Merkle interface is exercised inside the proofs (it is a formal dependency, not merely imported): merged authenticated values are shown to admit a valid join refining each input view, and blinded (need-to-know) views are shown to extract to valid states that refine the originals.
+This layer establishes that the cross-domain state-preservation construction is a **functor**: it proves the category laws over state-preservation morphisms (identity preservation, composition preservation, associativity), and composes the construction with Lochbihler and Marić's Merkle interface (AFP entry [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html)) to obtain **authenticated cross-domain state soundness**. The Merkle interface is exercised inside the proofs (it is a formal dependency, not merely imported): merged authenticated values are shown to admit a valid join that each input view refines, and blinded (need-to-know) views are shown to extract to valid states that refine the originals.
 
 | Theorem | Statement |
 |---|---|
@@ -91,7 +91,7 @@ This layer establishes that the cross-domain state-preservation construction is 
 | `preservation_compose` | The composite of two state-preservation morphisms is again a state-preservation morphism |
 | `preservation_assoc` | Composition of state-preservation morphisms is associative |
 | `merkle_interface_auth` | A state-keyed reveal-set witness forms a Merkle interface: the hash commits to the regulatory state, while blinding and merge operate on the revealed-chain set |
-| `authenticated_preservation_soundness` | Merging two authenticated views yields a valid join refining each input view |
+| `authenticated_preservation_soundness` | Merging two authenticated views yields a valid join that each input view refines |
 | `blinded_view_preserves_validity` | A blinded authenticated value extracts to a valid state refining the original (need-to-know guarantee) |
 | `oraclizer_guarded_bounded_convergence` | From any finite-domain, unlocked global state, an existential run selected through `SOME` reaches a valid state within the bound |
 | `safe_recovery_sync_no_fresh_terminal` | A safe-recovery synchronization never makes a terminal (confiscated) state appear on an asset that did not already carry it |
@@ -110,7 +110,7 @@ On the extractable sub-preorder, the authenticated extraction map preserves blin
 | `cdsp_ads_compose` | Composable blinding morphisms compose, and the extraction functor sends the composite to the composite of the extracted refinements |
 | `cdsp_ads_merge_assoc` | The lifted merge of authenticated views is associative (composite-functor associativity) |
 | `sequence_authenticity_preservation` | Along a blinding path, every intermediate view extracts to a valid state refining the most-revealed endpoint |
-| `sequence_merge_soundness` | A non-empty list of partial views over one committed object folds into a valid combined view refining every contributor |
+| `sequence_merge_soundness` | A non-empty list of partial views over one committed object folds into a valid combined view that every contributor refines |
 | `sequence_inclusion_integrity` | Every holding revealed by any view in a sequence is included in the endpoint with the same regulatory state |
 | `reg_tx_authenticated` (`interpretation`) | Cross-domain state preservation is instantiated on a recursive model of the Canton transaction tree (public rose-tree machinery, concrete content) |
 | `reg_view_inclusion_same_hash` / `reg_view_inclusion_blinding_of` | Path-level Merkle inclusion: each inclusion proof (target subview revealed, path to root and off-path siblings blinded) commits to the same authenticating root hash as the full view tree and is a blinding of it; no added assumption |
