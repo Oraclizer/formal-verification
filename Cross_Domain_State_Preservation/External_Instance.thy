@@ -8,9 +8,11 @@
   Regulatory Domain
 
   This theory instantiates the generic locales of State_Preservation.thy on
-  a domain with no connection to the regulatory vocabulary: the TCP
-  connection state machine (a subset of RFC 793) as observed by a stateful
-  connection tracker (conntrack).  The theory imports only the generic
+  a domain with no connection to the regulatory vocabulary: a TCP-inspired
+  toy endpoint lifecycle and an abstract tracker record.  The state and event
+  names are drawn from RFC 793, but the model is not trace-conformant to that
+  specification and is not a model of a concrete conntrack implementation.
+  The theory imports only the generic
   locale layer and the generic proof automation; it does not depend on
   Regulatory_Instance.thy, which is itself the evidence that the framework
   carries no hidden regulatory assumptions.
@@ -34,17 +36,16 @@ theory External_Instance
   imports Proof_Automation
 begin
 
-section \<open>The TCP Endpoint State Machine (RFC 793 Subset)\<close>
+section \<open>A TCP-Inspired Endpoint State Machine\<close>
 
 text \<open>
-  A single-endpoint view of the TCP connection lifecycle, restricted to six
-  states and five packet events.  The transitions follow RFC~793: a passive
-  open receives a \<open>SYN\<close> in \<^emph>\<open>listen\<close>; an active open in \<^emph>\<open>SYN-sent\<close> is
-  completed by the peer's \<open>SYN+ACK\<close>; the passive side completes the
-  handshake on the final \<open>ACK\<close>; a \<open>FIN\<close> begins the teardown, and the
-  acknowledgement of the \<open>FIN\<close> closes the connection (the two \<open>FIN-WAIT\<close>
-  stages of RFC~793 are folded into one, a standard simplification of the
-  one-endpoint view).  A \<open>RST\<close> aborts any connection in flight.
+  A toy single-endpoint lifecycle, restricted to six states and five packet
+  events and using names inspired by RFC~793.  It is not an RFC~793 subset or
+  a trace-conformant TCP model: in particular, \<open>FIN-WAIT\<close> followed by \<open>ACK\<close>
+  goes directly to \<open>CLOSED\<close>, deliberately collapsing the peer-FIN and
+  TIME-WAIT stages.  The purpose is only to instantiate the generic locales
+  outside the regulatory vocabulary.  A \<open>RST\<close> aborts any modeled connection
+  in flight.
 
   Two modelling notes.  First, \<open>CLOSED\<close> is terminal: a re-connection is a
   new connection identity (a new tracker entry), not a transition of the old
@@ -151,13 +152,12 @@ definition ct_terminal :: "ct_entry set" where
 section \<open>The Tracked Event Subset and the Tracker Transition\<close>
 
 text \<open>
-  The tracker observes the wire-visible handshake and teardown packets and
-  does not track \<open>RST\<close>: an aborted connection is expired by the tracker's
-  timeout machinery rather than by following the reset packet, the standard
-  conntrack behaviour.  The source action set of the preservation morphism
-  is therefore the strict subset of tracked events --- the action-scoping
-  pattern --- and the tracker has its own event alphabet, mapped
-  one-to-one from that subset.
+  The abstract tracker observes the modeled handshake and teardown events but
+  excludes \<open>RST\<close> by design.  This is an action-scoping choice, not a claim
+  about a concrete operating-system conntrack implementation.  The source
+  action set of the preservation morphism is therefore the strict subset of
+  tracked events, and the tracker has its own event alphabet, mapped one-to-one
+  from that subset.
 \<close>
 
 datatype ct_event = CT_SYN | CT_SYNACK | CT_ACK | CT_FIN

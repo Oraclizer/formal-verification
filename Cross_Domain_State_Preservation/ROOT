@@ -19,3 +19,4 @@ session Cross_Domain_State_Preservation (AFP) = "HOL-Library" +
     Canton_Bridge
   document_files
     "root.tex"
+    "root.bib"

@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.5.2
-**Last updated:** 2026-07-03
+**Version:** 0.5.4
+**Last updated:** 2026-07-19
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -10,17 +10,16 @@ This document tracks the correspondence between formally verified model elements
 
 1. **Design reference:** Implementation code should match the verified model's state transition rules, liveness parameters, and degree-hierarchy guarantees.
 2. **Traceability:** External reviewers can verify that the implementation follows the formal specification.
-3. **Gap tracking:** Identifies where the model makes assumptions that the implementation must satisfy through other means. Assumption explicitness is treated as a design property, not a limitation.
-4. **Assumption scope:** Documents, for each model assumption, whether it is discharged within the current proofs or handled at the implementation layer. Assumption explicitness is treated as a design property, not a limitation.
+3. **Gap tracking and assumption scope:** Documents where assumptions are discharged at the model level and where an external or refinement obligation remains open. Assumption explicitness is treated as a design property, not a limitation.
 
 ## Coverage Scope
 
 This mapping covers:
 
 - **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
-- **Property 2 (D-quencer Determinism and Starvation Freedom)**: liveness (deadlock is a scope note, not a proved result; see the Deadlock section below)
+- **Property 2 (Deterministic Selection and Aggregate Pending-Count Progress)**: finite maximum selection and closed-count progress (deadlock and individual request fairness are not proved)
 - **Cross-Domain State Preservation Functor**: functor laws (identity / composition / associativity over state-preservation morphisms), authenticated cross-domain state soundness via the Merkle interface, and guarded bounded convergence with terminal-faithful safe recovery
-- **Authenticated Functor and Canton Instantiation**: composite functor laws over the authenticated extraction map, sequence-level authenticity preservation (validity, need-to-know, hash soundness, state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree
+- **Authenticated Functor and Canton Instantiation**: extraction laws on the extractable sub-preorder, authenticity along blinding paths and merge folds (validity, need-to-know, hash soundness, state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree
 - **Synchronization-Degree Hierarchy**: composable natural transformations between degree functors and degree-class monotonicity (over-provisioning safe, under-provisioning unsafe)
 - **Domain-Independence Instance**: an out-of-regulatory-domain instance discharging the generic locales
 - **Proof Automation**: reusable Eisbach discharge methods for the generic locale obligations
@@ -35,7 +34,10 @@ The current proofs do **not** establish:
 
 - Correspondence between the Isabelle/HOL model and the Rust implementation (refinement proof; addressed during refinement-proof work using Creusot/Kani).
 - Probabilistic properties of VRF-based leader election (abstracted as the deterministic `fair_leader` assumption; see Assumption Gap Analysis below).
-- Network-level properties such as message loss, partial synchrony, or dynamic topology changes (handled at the implementation layer; see Assumption Disposition below).
+- Individual request starvation freedom or request-identity service order; the liveness theorems use only an aggregate pending count.
+- Concurrent lock contention, permanent-lock recovery, or deadlock freedom; locking is atomic and Boolean in the model.
+- An executable recovery, queue, priority, or BFT algorithm for convergence; `oss_realize` uses existential choice and ignores its event when selecting recovery.
+- Network-level properties such as message loss, partial synchrony, or dynamic topology changes; these remain unverified external/refinement obligations.
 - Properties of unverified external components: P2P networking, external cryptographic libraries (BLS), UI, database layer.
 
 ---
@@ -49,7 +51,7 @@ The current proofs do **not** establish:
 | Formal Model (`Regulatory_Instance.thy`) | Implementation Target | Notes |
 |---|---|---|
 | `datatype reg_state = ACTIVE \| FROZEN \| SEIZED \| CONFISCATED \| RESTRICTED` | `enum RegState` in Solidity (ERC-TRUST Core) + `RegState` enum in OSS (Rust) | Direct 1:1 mapping across both layers |
-| `CONFISCATED` as terminal state | `require(state != RegState.CONFISCATED)` guard in Solidity; `match` arm returning `Err(TerminalState)` in Rust | Enforced by `confiscated_terminal` theorem |
+| `CONFISCATED` as terminal state | Planned `require(state != RegState.CONFISCATED)` guard in Solidity and `match` arm returning `Err(TerminalState)` in Rust | `confiscated_terminal` proves model-level terminality; implementation correspondence remains unverified |
 
 ### Regulatory Actions
 
@@ -70,8 +72,8 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 | Exclusion | Formal Justification | Implementation Note |
 |---|---|---|
-| RECOVER excluded from state machine | Force transfer operation, not a state transition | Implemented as a force-transfer operation |
-| LIQUIDATE excluded from state machine | Force transfer + external DEX interaction | Implemented in ERC-TRUST Extensions |
+| RECOVER excluded from state machine | Force transfer operation, not a state transition | Planned as a separate force-transfer operation; implementation/refinement evidence is not part of this document |
+| LIQUIDATE excluded from state machine | Force transfer + external DEX interaction | Planned outside the core transition model; implementation/refinement evidence is not part of this document |
 | SEIZED → FROZEN direct transition | Seizure is strictly stronger than freezing (legal precedence) | Path: RELEASE → ACTIVE → FREEZE |
 | FROZEN → RESTRICTED direct transition | Must pass through ACTIVE | Path: UNFREEZE → ACTIVE → RESTRICT |
 
@@ -81,14 +83,14 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `acquire_lock` / `release_lock` | OSS preemptive lock (Rust) | Model assumes atomic lock; implementation uses distributed locking. Refinement of atomicity is the subject of the preemptive-lock layer |
+| `acquire_lock` / `release_lock` | Planned distributed lock (Rust) | The formal model has an atomic Boolean guard. No model-to-code refinement, contention protocol, timeout, or rollback property is proved here |
 | `is_locked` predicate | Lock status check in OSS State DB | |
 
 ### Sync Operation
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `sync` function (5-step protocol) | OSS sync workflow (Rust) | Model steps: verify → check transition → lock → update all → unlock. Implementation uses BVC (Bind-Verify-Commit) 3-phase execution which collectively satisfies the model's atomic sync specification |
+| `sync` function (5-step protocol) | Planned OSS sync workflow (Rust) | Model steps: verify → check transition → lock → update all → unlock. BVC is a candidate refinement target; no proof currently shows that an implementation satisfies the atomic model |
 | `connected_chains` | OSS chain registry | Set of chains holding a given asset; registry-backed dynamic lookup replaces the model's finite set |
 | `update_all_chains` | OSS cross-chain message broadcast | Model is synchronous; implementation is asynchronous with finality tracking. Propagation failure recovery is the subject of the cross-chain finality layer |
 
@@ -119,7 +121,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 |---|---|---|
 | `priority_key = nat × nat × nat × nat` | 4-tuple priority encoding in D-quencer (Rust) | Rust's derived `Ord` for tuples matches Isabelle's product linorder |
 | `make_priority_key max_time max_node msg` | `compute_priority_key(msg)` in D-quencer | 4 components: authority, inverted timestamp, action severity, inverted node ID |
-| `priority_key_injectivity` theorem | Tiebreaking guarantee | Distinct messages never share the same priority key; refinement-annotation candidate for a Creusot precondition |
+| `priority_key_injectivity` theorem | Bounded tiebreaking guarantee | If timestamp and source node are within the supplied upper bounds, messages that differ in authority, timestamp, action, or source node have different keys; the bounds are required because natural-number subtraction saturates at zero |
 | `action_severity` (7 levels from UNRESTRICT=1 to CONFISCATE=7) | Action severity config in D-quencer | Stronger enforcement actions take precedence |
 
 ### Selection Algorithm
@@ -127,38 +129,38 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 | Formal Model (`Priority_Resolution.thy`) | Implementation Target | Notes |
 |---|---|---|
 | `priority_system` locale | Generic priority-based selection interface | Reusable across any linorder-keyed selection |
-| `select_highest_deterministic` theorem | BFT consensus output uniqueness | Guarantees deterministic consensus result |
-| `dq_select_highest_deterministic` corollary | D-quencer consensus output function (Rust) | Runs the generic `select_highest` on the D-quencer priority-key set and recovers the unique highest-priority well-formed message (via `recover_msg`); maximality over the whole message set is `dq_select_highest_message_maximal` |
+| `select_highest_deterministic` theorem | Planned finite-set priority selector | A finite non-empty set has one selected member whose priority is maximal; this is not a consensus-protocol theorem |
+| `dq_select_highest_deterministic` corollary | Planned D-quencer priority selector (Rust) | Runs `select_highest` on a finite D-quencer message set and returns the unique selected member with maximal priority; BFT execution is outside the theorem |
 
 ## BFT Consensus Configuration
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
 | `dquencer_system` locale | D-quencer system parameters | BFT threshold, fairness bound, max time/node bounds |
-| `bft_threshold: card nodes ≥ 3 * f_max + 1` | Network configuration constraint | Standard BFT (n ≥ 3f+1); enforced at genesis |
-| `byzantine_bound: card byzantine_nodes ≤ f_max` | Byzantine fault assumption | Not directly enforced; ensured by honest majority assumption |
+| `bft_threshold: card nodes ≥ 3 * f_max + 1` | Planned network configuration constraint | Standard static cardinality premise (n ≥ 3f+1); a genesis/configuration enforcement check remains unverified |
+| `byzantine_bound: card byzantine_nodes ≤ f_max` | Byzantine fault assumption | Assumed directly; together with the threshold it yields `honest_majority`, not conversely |
 | `honest_majority` theorem | Security invariant | Honest nodes > 2f (derived from BFT threshold) |
 
 ## Deadlock (Out of Scope)
 
-The atomic `sync` model has no concurrent lock contention, so deadlock does not arise within the model's scope; forced lock release under contention is deferred to a preemptive-lock layer. No deadlock formal model is mapped here.
+The atomic `sync` model has no concurrent lock contention, so deadlock does not arise within the model's scope. No forced-release, timeout, or deadlock formal model is mapped here.
 
-## Starvation Freedom
+## Aggregate Pending-Count Progress
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `fair_leader_system` locale | D-quencer VRF-based leader election + epoch management (Rust) | Abstracts VRF randomness as deterministic fairness assumption; see rationale in Assumption Gap Analysis |
-| `fairness_bound: nat, fairness_bound > 0` | VRF election parameters | Probability of Byzantine leaders k times in a row is `(f/n)^k`, abstracted as deterministic bound |
-| `fair_leader` assumption | Honest leader within bounded epochs | Holds probabilistically under BFT threshold |
-| `honest_progress` assumption | Honest leader reduces pending count | Must be enforced in D-quencer implementation; synchronous network precondition |
-| `starvation_bound` theorem | Pending count strictly decreases within fairness bound | Implementation: monitoring dashboard for pending count trends |
-| `eventual_completion` theorem | All pending requests eventually processed | By well-founded induction on pending count |
+| `fair_leader_system` locale | Planned leader scheduling / epoch management | Deterministically assumes an honest-tagged leader in every bounded window; no VRF distribution or network semantics are present |
+| `fairness_bound: nat, fairness_bound > 0` | Planned scheduling parameter | A logical window bound derived positive from the fairness assumption, not a probabilistic security parameter |
+| `dquencer_liveness.fair_leader` assumption | In-roster schedule with honest-tagged leader within bounded epochs | Assumed; the BFT-count threshold only supplies a constant in-roster satisfiability witness, not an operational leader-election guarantee |
+| `honest_progress` assumption | Honest-tagged scheduled event reduces aggregate pending count | Assumed; request identity, queue order, admission, and network delivery are not modelled |
+| `starvation_bound` theorem | Aggregate pending count strictly decreases within fairness bound | Does not identify the discharged request |
+| `eventual_completion` theorem | Aggregate pending count eventually reaches zero | Closed-count result by well-founded induction; does not cover continuous arrivals or per-request fairness |
 
 ## Combined Safety + Liveness
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `conditional_safety_preservation` theorem | Conditional safety: from valid + unlocked, sync succeeds and preserves validity | Restates `valid_state_preservation` under the unlocked precondition; its proof uses only the safety side (no liveness interpretations). The unconditional fusion of safety and liveness is `oraclizer_guarded_bounded_convergence` |
+| `conditional_safety_preservation` theorem | Conditional safety: from valid state + enabled transition, sync succeeds and preserves validity | Validity itself supplies the no-lock fact. The proof uses only the safety side; bounded convergence is a separate fair-discharge composition |
 | `liveness_inhabitable` theorem | Satisfiability of the fair-leader assumption | Derives a roster-drawn fair schedule (`range ls ⊆ nodes`) from the in-roster honest node the BFT threshold guarantees (via `fair_schedule_exists`); a satisfiability witness for the liveness locale — the convergence headline consumes the fair-leader assumption directly rather than routing through this witness; `bft_quorum` is a non-degenerate (n=4, f=1) witness |
 
 ---
@@ -179,7 +181,7 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `merkle_interface_auth` | Authenticated state commitment over (regulatory state, chain-set) pairs | OSS State DB commitment layer; the concrete triple (hash, blinding-order, merge) forms a Merkle interface (`ADS_Functor` dependency) |
+| `merkle_interface_auth` | State-keyed reveal-set algebraic witness | `auth_hash = fst` commits only to the regulatory state; the chain set is manipulated by blinding and merge and is not itself cryptographically committed by this instance |
 | `authenticated_preservation_soundness` | Cross-chain view merge in OSS State DB (Rust) | Merging two authenticated views yields a valid join refining each input view; OSS merge of partial chain views must preserve this |
 | `blinded_view_preserves_validity` | Need-to-know disclosure of cross-domain state (Rust) | A blinded view extracts to a valid state refining the original; supports selective disclosure (e.g. regulator-only views) without breaking validity |
 | `state_refines_*` (refl / trans / preserves_consistency) | Partial-view refinement relation | OSS partial-view semantics; refinement is reflexive, transitive, and preserves consistency |
@@ -189,8 +191,8 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 | Formal Model | Implementation Target | Notes |
 |---|---|---|
-| `oraclizer_guarded_bounded_convergence` | OSS recovery / reconciliation loop (Rust) | From any finite-domain, unlocked state (no initial consistency assumed) the system reaches a valid state within a bounded number of evolution steps; bounds the OSS reconciliation loop |
-| `inconsistent_has_safe_recovery` | OSS recovery action selection (Rust) | Any inconsistent, unlocked state admits a terminal-faithful safe recovery; recovery selection must always find a measure-reducing, terminal-faithful step |
+| `oraclizer_guarded_bounded_convergence` | Planned recovery/refinement target | Proves an existential bounded run. `oss_realize` uses `SOME` and does not derive recovery from the scheduled event, queue, priority selection, or BFT execution |
+| `inconsistent_has_safe_recovery` | Planned recovery-selection specification | Any inconsistent finite-domain unlocked state admits a terminal-faithful safe recovery; no executable selector or model-to-code refinement is supplied |
 | `sync_reduces_inconsistency` | Recovery progress measure | A synchronization on a disagreeing asset strictly decreases the inconsistency measure; OSS reconciliation must make monotone progress |
 | `safe_recovery_sync_no_fresh_terminal` | Recovery confiscation guard (Rust) | A safe recovery never makes CONFISCATED appear on an asset that did not already carry it; implementation must not synthesize confiscations during recovery |
 | `blind_confiscate_excluded` / `terminal_overwrite_excluded` | Recovery action validation | Indiscriminate confiscation and confiscation erasure are both excluded as safe recoveries; OSS recovery validation must reject both |
@@ -202,8 +204,8 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 | Formal Model (`Canton_Bridge.thy`) | Implementation Target | Notes |
 |---|---|---|
-| `cdsp_ads_compose` / `cdsp_ads_merge_assoc` | OSS authenticated commitment layer (Rust) | The extraction map is a composite functor from the ADS blinding preorder to the cross-domain refinement preorder; composing two domain views composes their authenticated refinements, and the lifted merge is associative |
-| `sequence_authenticity_preservation` / `sequence_merge_soundness` | OSS multi-step view reconciliation (Rust) | Single-step authenticity generalizes to a whole synchronization sequence: every partial view along a path of blindings, and an n-ary fold of merges, extracts to a valid state refining the endpoint |
+| `cdsp_ads_compose` / `cdsp_ads_merge_assoc` | Planned authenticated commitment layer (Rust) | On extractable endpoints/sub-preorder, composing blinding morphisms composes extracted refinements, and lifted merge is associative; extraction is partial in the generic locale |
+| `sequence_authenticity_preservation` / `sequence_merge_soundness` | Planned authenticated-view handling | Guarantees range over a blinding path and an n-ary merge fold, not a protocol execution trace |
 | `sequence_inclusion_integrity` | OSS revealed-holding inclusion check | Any holding revealed by a view in a sequence is included in the most-revealed endpoint with the same regulatory state (state-level inclusion, sharpened to concrete Merkle-path inclusion by the inclusion-proof instantiation below) |
 | `oss_blindable` | OSS State DB commitment over the ADS blindable functor | Instantiation on the concrete blindable-position functor of `ADS_Functor`, beyond the bespoke interface |
 | `reg_tx_authenticated` / `demo_subview_disclosure` | OSS / Canton bridge transaction commitment (Rust) | Instantiation on a recursive model of the Canton transaction tree (public rose-tree Merkle machinery, concrete content); subview-level selective disclosure is preserved in the proofs |
@@ -217,18 +219,18 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 | Formal Model (`Hierarchy.thy`) | Implementation Target | Notes |
 |---|---|---|
-| degree functors `F k` (degree-indexed) | OSS degree-classed processing paths (Rust) | Per-degree processing functor; OSS routes assets to a degree-appropriate path |
+| degree functors `F k` (degree-indexed) | Candidate coupling-breadth abstraction for OSS degree-classed processing paths | `k` records chains `0..k` coupled around a hub; no refinement to the product's S0--S3 operational meanings has been proved |
 | `degree_natural_transformation` | Degree demotion / blinding map (Rust) | The degree-forgetting map is a natural transformation between adjacent degree functors with commuting squares; OSS degree demotion must commute with processing |
 | `nt_compose` / `nt_vertical_compose` | Multi-step degree demotion | Demotion across multiple degrees composes as a natural transformation; OSS may demote across several degree levels at once |
 | `degree_forget_refines` | Demoted-view refinement | Degree demotion produces a blinding refinement of the original state; demoted views are partial views of the full state |
-| `over_provisioning_guarantees` | Capability-vs-requirement check (Rust) | When system capability degree ≥ asset required degree, all required chains holding the asset agree on its regulatory state after processing (**over-provisioning is safe**); OSS must verify capability dominates requirement before processing |
+| `over_provisioning_guarantees` | Valid-state preservation corollary | Stated with a capability premise, but the proof obtains agreement from the valid-state premise; use `over_provisioning_reconciles` for the load-bearing degree result |
 | `over_provisioning_reconciles` | Reconciliation from an arbitrary state (Rust) | From an arbitrary hub-defined state (no validity assumed), over-provisioning still drives every required chain to the hub value; shows the degree hypothesis is load-bearing, not decorative |
 | `no_downward_safety` | Under-provisioning rejection (Rust) | Under-provisioning (required degree > capability) admits a state defeating every guarantee; OSS must refuse to process assets whose required degree exceeds system capability |
 | `hierarchy_monotonicity` | (auxiliary) | A degree-free alias of `processing_preserves_validity` carrying no provisioning hypothesis; the capability-sensitive guarantees are the three rows above |
-| `boundary_well_defined` | Causal-consistency boundary check | The boundary separating adjacent degree classes is single-valued and induced by a strict happened-before order; OSS causal ordering must respect this boundary |
+| `boundary_well_defined` | Timestamp-order degree-boundary specification | Combines the degree-2 threshold with strict order on integer timestamps; it does not formalize distributed causality, traces, or causal preservation |
 | `static_promotion_safety` | Static degree re-assignment (governance) | A static re-assignment within system capability transfers the guarantee verbatim; governance-time degree changes are safe within capability |
 
-**Note.** In-flight promotion (a re-assignment crossing a live synchronization) is out of scope for this layer.
+**Product-fidelity boundary.** The formal hierarchy proves properties of a coupling-breadth index. It does not formalize the product's S0--S3 operational meanings, including directional observation, bidirectional causal execution, atomic binding, or mutual rollback. A refinement from those meanings to `F k`, as well as in-flight promotion across a live synchronization, remains open.
 
 ---
 
@@ -236,7 +238,7 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 | Formal Model (`External_Instance.thy`) | Implementation Target | Notes |
 |---|---|---|
-| `tcp_state_machine` / `conntrack_state_machine` | (No Oraclizer implementation target) | An out-of-regulatory-domain instance (TCP/RFC 793 endpoint vs. connection tracker) discharging the generic state-machine locale; demonstrates the framework carries no hidden regulatory assumptions |
+| `tcp_state_machine` / `conntrack_state_machine` | (No Oraclizer implementation target) | An out-of-regulatory-domain toy endpoint/tracker instance discharging the generic state-machine locale; it borrows RFC 793 names but is not trace-conformant to RFC 793 and is not a concrete conntrack model |
 | `tcp_conntrack_preservation` | (No Oraclizer implementation target) | The representation map is a full state-preservation morphism over the tracked event subset; evidence of framework generality, not a deployed component |
 | `tracked_sequence_mirrored` | (No Oraclizer implementation target) | Any tracked packet sequence accepted by the endpoint is mirrored step-for-step by the tracker |
 
@@ -253,77 +255,78 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 ## Assumption Gap Analysis
 
-The formal model makes simplifying assumptions. This section documents each assumption and how the implementation addresses the gap. Assumption explicitness is a design property: it makes the scope of mechanical verification transparent.
+The formal model makes simplifying assumptions. Because this document is pre-implementation, the tables record proposed mitigation targets and whether any refinement evidence exists; they do not claim that an implementation already discharges the gap.
 
 ### Property 1 Assumptions
 
 | Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
-| Synchronous execution (lock → update → unlock is atomic) | Asynchronous cross-chain communication with variable finality | OSS BVC (Bind-Verify-Commit) 3-phase execution collectively satisfies atomicity; per-chain finality tracked; commits only after all chains finalize | Handled at the implementation layer (BVC phased execution and per-chain finality tracking) |
-| Honest nodes | Byzantine nodes possible | D-quencer BFT consensus with slashing | Discharged by the D-quencer liveness proof (Property 2) |
-| Finite chain set | Chain set can change over time | RWA Registry manages chain membership; new chains require governance approval | Handled at the implementation layer (RWA Registry membership management) |
-| Lock acquisition is instant | Network latency exists | Timeout-based lock expiration with automatic rollback | Handled at the implementation layer (timeout-based lock expiration with rollback) |
+| Synchronous execution (lock → update → unlock is atomic) | Target deployment is expected to be asynchronous | BVC is a proposed refinement target with finality tracking | Open: no implementation or refinement proof currently establishes atomicity |
+| Honest nodes | Not an assumption of the Property 1 safety locales | N/A | N/A for Property 1; D-quencer node tags belong to Property 2 and do not discharge safety assumptions |
+| Finite chain set | A deployment may change membership over time | Registry-governed membership is a proposed design | Open: dynamic-topology refinement is unverified |
+| Lock acquisition is atomic | A deployment may have latency and contention | Timeout/rollback is a proposed design | Open: no contention, timeout, rollback, or atomicity refinement is proved |
 
 ### Property 2 Assumptions
 
 | Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
-| `fair_leader` deterministic guarantee | VRF-based probabilistic leader election | VRF + leader rotation enforcement + view change mechanisms + L3 force inclusion for extreme cases | Deterministic abstraction retained in the proofs (see rationale below); the probabilistic VRF behaviour is provided at the implementation layer |
-| `honest_progress` (honest leader reduces pending) | Synchronous network with non-empty valid request queue | Standard BFT liveness model; bounded request arrival via admission control | Handled at the implementation layer (admission control bounding request arrival) |
-| `non_honest_bounded` (closed system) | Dynamic request arrival | Admission control bounds the active request set | Handled at the implementation layer (admission control) |
-| Atomic lock acquisition (Property 2) | Distributed lock contention | Lock queue + timeout + automatic release | Handled at the implementation layer (lock queue with timeout and automatic release) |
+| `fair_leader` deterministic guarantee | A target may use probabilistic leader election | VRF, rotation, view change, and force inclusion are proposed external mechanisms | Open: no probability model, independence assumption, or implementation/refinement evidence |
+| `honest_progress` (honest-tagged event reduces pending count) | A target would have a request queue and network | Admission control and BFT liveness are proposed obligations | Open: request identities, queue service, and network progress are unverified |
+| `non_honest_bounded` / aggregate non-increase | A target may receive dynamic arrivals | Admission control is a proposed mechanism | Open: continuous-arrival and per-request liveness are unverified |
+| Atomic lock acquisition | A target may have distributed contention | Lock queue, timeout, and release are proposed mechanisms | Open: no lock-refinement evidence |
 
 ### Functor / Convergence Layer Assumptions
 
 | Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
-| Atomic single evolution step | OSS reconciliation runs as discrete asynchronous rounds | Each reconciliation round corresponds to one evolution step; round boundaries enforce atomicity per step | Handled at the implementation layer (reconciliation-round boundaries enforce per-step atomicity) |
-| Finite-domain global state | Chain/asset domains grow over time | RWA Registry bounds the active domain at any instant; convergence bound recomputed as domain changes | Handled at the implementation layer (RWA Registry bounds the active domain) |
-| Bounded fairness window (from D-quencer) | VRF-based probabilistic fairness | Inherits the `fair_leader` deterministic abstraction from Property 2 | Same as the Property 2 fair-leader disposition (see rationale below) |
+| Atomic single evolution step | A target recovery loop may run asynchronously | Round boundaries are a proposed refinement design | Open: no model-to-code refinement |
+| Finite-domain global state | Chain/asset domains may grow over time | Registry snapshots and bound recomputation are proposed | Open: dynamic-domain convergence is unverified |
+| Bounded fairness window (from D-quencer) | A target may use probabilistic leader election | Reuses the deterministic `fair_leader` assumption | Open: same external fairness obligation as Property 2 |
+| Existential recovery choice | An implementation needs a constructive selector | A terminal-faithful measure-reducing selector must be designed and refined | Open: `oss_realize` uses `SOME` and ignores the event for selection |
 
 ### Synchronization-Degree Hierarchy Assumptions
 
 | Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
-| Static degree assignment | Degrees may need re-assignment during operation | `static_promotion_safety` covers governance-time re-assignment within capability; in-flight promotion is out of scope | Discharged in current proofs for governance-time re-assignment (`static_promotion_safety`); in-flight promotion is out of scope of this layer |
-| System capability degree known and fixed | Capability may vary across deployments | Capability declared at genesis / governance; `hierarchy_monotonicity` requires capability ≥ requirement before processing | Handled at the implementation layer (capability declared at genesis / governance) |
+| Static degree assignment | Degrees may need re-assignment during operation | `static_promotion_safety` proves the model-level static transfer within capability | Model-level static case proved; operational governance mapping and in-flight promotion remain unverified |
+| System capability degree known and fixed | Capability may vary across deployments | Genesis/governance declaration is proposed | Open: no implementation/refinement evidence; `hierarchy_monotonicity` itself is degree-free |
 
 ### Rationale for the Deterministic `fair_leader` Abstraction
 
-The `fair_leader` assumption requires that within any `fairness_bound` consecutive epochs, at least one epoch has an honest leader. This is stated deterministically, but actual VRF leader election is probabilistic: under f < n/3 Byzantine faults, the probability of k consecutive Byzantine leaders is `(f/n)^k`, which decreases exponentially but is not zero.
+The `fair_leader` assumption requires the schedule to stay inside the roster and every `fairness_bound` window to contain an honest-tagged leader. It is a deterministic premise. The formalization defines no probability space, sampling distribution, independence property, VRF mechanism, network schedule, or adversarial execution from which that premise could be derived.
 
 The deterministic abstraction is retained for the following reasons:
 
-- Direct probabilistic verification in Isabelle/HOL would require HOL-Probability and substantially complicate the proof. It would also change the nature of the result from "liveness guaranteed" to "liveness almost surely", which is a weaker claim.
-- The deterministic abstraction belongs to the Heard-Of model tradition (Charron-Bost & Schiper 2009). Wanner et al. (SRDS 2020) applied this tradition to log replication protocols in Isabelle/HOL with successful academic reception.
-- Probabilistic interpretation of VRF randomness is composable as an independent module on top of the deterministic guarantee. The `fairness_bound` k is an operational parameter chosen so that `(f/n)^k` is negligibly small (e.g., k=10 gives probability < 0.002% under f/n ≤ 1/3).
-- Extreme failure cases (very long runs of Byzantine leaders) are covered at the implementation layer by view change mechanisms and L3 force inclusion.
+- It isolates exactly the bounded-occurrence premise consumed by the aggregate pending-count proof.
+- The static BFT-count assumptions imply that the roster contains an honest-tagged node, so a constant in-roster schedule witnesses locale satisfiability. They do not establish that an operational election mechanism produces that schedule.
+- A probabilistic or implementation interpretation would require a separate model and a refinement/composition theorem. No such theorem is part of this entry.
+- View change, force inclusion, admission control, and network timing remain proposed external mechanisms, not verified dispositions.
 
-This abstraction is a separation of concerns: the Isabelle/HOL proof establishes liveness conditional on the deterministic fairness, and the implementation provides the fairness through VRF + view change + force inclusion. Probabilistic composition with the model is possible but deferred.
+The Isabelle/HOL result is therefore conditional: if the deterministic in-roster fairness and aggregate-progress premises hold, the pending count decreases and reaches zero in the closed count model. Establishing those premises for VRF/BFT/network code is deferred and unverified.
 
 ---
 
 ## Assumption Disposition (current scope)
 
-This section records, for each model assumption, whether it is discharged within the current proofs or handled at the implementation layer.
+This section distinguishes model-level discharge from open external/refinement obligations. No row asserts implementation coverage while the project remains pre-implementation.
 
 | Model Assumption | Disposition |
 |---|---|
-| Honest nodes (Property 1) | Discharged in current proofs by the D-quencer liveness proof (Property 2, Byzantine consensus with f < n/3) |
-| Conditional safety (consistency assumed at start) | Discharged in current proofs by guarded bounded convergence: the system converges to a valid state from an arbitrary unlocked state |
-| Atomic sync: lock acquisition and release atomicity | Handled at the implementation layer (timeout-based locking with automatic rollback) |
-| Atomic sync: cross-chain propagation success | Handled at the implementation layer (pending sync queue with finality tracking) |
-| Fair leader (deterministic) | Deterministic abstraction retained in the proofs (see rationale above); the probabilistic VRF behaviour is provided at the implementation layer |
-| Honest progress (synchronous network) | Handled at the implementation layer (admission control and the cross-chain timing model) |
-| Closed system (no dynamic arrivals) | Handled at the implementation layer (admission control) |
-| Finite connected_chains (static topology) | Handled at the implementation layer (RWA Registry membership management) |
-| Static degree assignment (hierarchy layer) | Discharged in current proofs for governance-time re-assignment (`static_promotion_safety`); in-flight promotion is out of scope of this layer |
+| Honest nodes (Property 1) | N/A: Property 1 safety does not assume honest nodes |
+| Conditional safety / initial inconsistency | Model-level existential bounded convergence proved for finite-domain unlocked states; no executable recovery refinement |
+| Atomic sync: lock acquisition and release | Open external/refinement obligation; timeout/rollback is only a proposed design |
+| Atomic sync: cross-chain propagation | Open external/refinement obligation; finality tracking is only a proposed design |
+| Fair leader (deterministic) | Assumed; in-roster satisfiability witness proved, operational VRF/BFT realization unverified |
+| Honest aggregate progress | Assumed; request/service/network realization unverified |
+| Closed pending-count model | Assumed; dynamic arrivals and request-identity fairness unverified |
+| Finite connected chains / static topology | Assumed; dynamic-topology refinement unverified |
+| Static degree assignment | Model-level static transfer within capability proved; operational and in-flight changes unverified |
 
 The CDSP paper states the following open questions:
 
 1. **Partial synchrony extension**: Generalize `fair_leader` and `honest_progress` to partial synchrony. Related work: Castro & Liskov PBFT, HotStuff. Potential approach: Heard-Of model with partial synchrony variants.
 2. **Dynamic topology**: Extend `multi_domain_preservation` to handle chains joining/leaving the connected set. Requires invariant-preserving topology updates.
-3. **Open system starvation freedom**: Generalize the `non_honest_bounded` assumption. Standard approach: admission control bounds + amortized analysis.
+3. **Open-system and request-identity liveness**: Add request identities, arrivals, queue/service semantics, and a fairness property stronger than aggregate count decrease.
 4. **Model-implementation refinement**: Establishing correspondence between the Isabelle/HOL model and the Rust implementation. This document is the starting point.
 
 ---
@@ -334,7 +337,7 @@ During refinement-proof work, the following scope applies:
 
 - **In Creusot scope**: Function-level pre/postconditions derived from model theorems (state transition correctness, priority key injectivity, lock effectiveness predicate, no self-loops, degree capability-vs-requirement check, recovery confiscation guard).
 - **In Kani scope**: Bounded model checking for concurrency-sensitive code (lock acquisition races, consensus message ordering, timeout expiration races, reconciliation-round atomicity).
-- **Out of both scopes**: Probabilistic VRF properties, network-level timing, cryptographic primitives (BLS signature correctness is assumed from an external BLS signature library). These are handled either by probabilistic verification tools or by acceptance as unverified external components.
+- **Out of both scopes**: Probabilistic VRF properties, network-level timing, and cryptographic primitives such as BLS signature correctness. These remain open external obligations; a future target would need separate evidence or an explicit unverified-component boundary.
 
 Specific theorems treated as refinement-annotation candidates are listed under the "refinement-annotation candidate for Creusot" and "refinement-annotation candidate for Kani model checking" notes in the mapping tables above.
 
@@ -342,7 +345,7 @@ Specific theorems treated as refinement-annotation candidates are listed under t
 
 ## Theorem-to-Test Correspondence
 
-Until formal refinement proofs (model → code) are available, the following test strategy bridges the gap. All tests will be implemented using `cargo test` + `proptest` for property-based testing.
+Until formal refinement proofs (model → code) are available, the following planned tests can provide non-proof consistency checks; they do not establish refinement. The proposed implementation vehicle is `cargo test` plus `proptest` for property-based testing.
 
 ### Property 1 Theorems
 
@@ -360,10 +363,10 @@ Until formal refinement proofs (model → code) are available, the following tes
 | Theorem | Test Strategy | Status |
 |---|---|---|
 | `select_highest_deterministic` | Unit test: given same message set, D-quencer produces identical output across runs | Planned |
-| `priority_key_injectivity` | Unit test: distinct messages (by any of 4 fields) produce distinct priority keys | Planned |
-| `starvation_bound` | Integration test: repeated Byzantine leader attempts; verify honest leader within `fairness_bound` | Planned |
-| `eventual_completion` | Integration test: simulated load with pending requests; verify queue drains | Planned |
-| `conditional_safety_preservation` | End-to-end test: from a valid, unlocked state with an enabled transition, verify sync succeeds and the result is valid (the corollary's conditional-safety scope) | Planned |
+| `priority_key_injectivity` | Unit/property test: within timestamp/node upper bounds, any modeled field difference changes the key; add negative tests showing out-of-bound subtraction can saturate and therefore must be rejected before key construction | Planned |
+| `starvation_bound` | Model/reference test: under a supplied fair schedule and monotone count trace, verify a positive aggregate count decreases within the bound | Planned |
+| `eventual_completion` | Model/reference test: a closed aggregate pending-count trace reaches zero | Planned |
+| `conditional_safety_preservation` | End-to-end refinement target: from a valid state with an enabled transition, verify sync succeeds and the result is valid | Planned |
 
 ### Functor / Convergence and Hierarchy Theorems
 
@@ -371,9 +374,10 @@ Until formal refinement proofs (model → code) are available, the following tes
 |---|---|---|
 | `authenticated_preservation_soundness` | Property test: random pairs of authenticated views merge to a valid join refining each input | Planned |
 | `blinded_view_preserves_validity` | Property test: blinded views extract to valid states refining the original | Planned |
-| `oraclizer_guarded_bounded_convergence` | Integration test: random unlocked inconsistent state reaches a valid state within the computed bound | Planned |
+| `oraclizer_guarded_bounded_convergence` | Reference-model test: an explicitly supplied safe-recovery witness yields a valid state within the computed bound; this does not validate an executable selector | Planned |
 | `safe_recovery_sync_no_fresh_terminal` | Integration test: recovery never introduces a fresh CONFISCATED holding | Planned |
-| `hierarchy_monotonicity` | Property test: over-provisioned processing preserves validity | Planned |
+| `hierarchy_monotonicity` | Property test: processing preserves validity independently of degree | Planned |
+| `over_provisioning_reconciles` | Property test: from a hub-defined state, sufficient capability reconciles every required chain to the hub value | Planned |
 | `no_downward_safety` | Property test: under-provisioned processing exhibits a guarantee-defeating state | Planned |
 
 ---
@@ -386,7 +390,7 @@ This document is updated when:
 - Implementation code is written that corresponds to model elements
 - A model-implementation gap is discovered
 - Model assumptions change
-- An assumption disposition changes (discharged in current proofs vs. handled at the implementation layer)
+- An assumption disposition changes (model-level discharge vs. open external/refinement obligation)
 
 Changes are committed with the message format: `mapping update: [reason]`
 
@@ -394,6 +398,8 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.5.4 | 2026-07-19 | Post-fix clean-room closure: retained the timestamp and source-node bounds of `priority_key_injectivity`; separated the formal coupling-breadth hierarchy from the product's S0--S3 operational meanings and left that refinement open; relabelled the external domain-independence instance as a TCP-inspired toy endpoint/abstract tracker rather than an RFC 793 or concrete conntrack model; removed remaining implementation-complete dispositions for regulatory actions, genesis enforcement, tests, and external cryptography; consolidated the duplicated gap/assumption-scope purpose item. |
+| 0.5.3 | 2026-07-19 | AFP resubmission honesty pass: retitled Property 2 to aggregate pending-count progress; removed unformalized VRF probability claims and implementation-complete dispositions; recorded in-roster fairness, request-identity/network/lock/refinement gaps, and the non-constructive `oss_realize` boundary; scoped the authenticated mapping to an extractable sub-preorder and a state-keyed reveal-set witness; renamed the hierarchy claim to a timestamp-order degree boundary; synchronized theorem descriptions with the strengthened roster, selection, merge, associativity, and conditional-safety contracts. |
 | 0.5.2 | 2026-07-03 | Documentation correction: dropped "Deadlock Freedom" from the Property 2 coverage title (deadlock is a scope note, no theorem is stated), replaced the non-existent `bft_select` row with the actual `dq_select_highest_deterministic` corollary, and removed the `lock timeout` parameter from the `dquencer_system` row (the vestigial `lock_timeout`/`timeout_positive` pair was removed from the locale). Retitled the degree-monotonicity rows so `over_provisioning_guarantees` carries the capability-vs-requirement headline, added the `over_provisioning_reconciles` row (load-bearing degree hypothesis from an arbitrary state), and recorded `hierarchy_monotonicity` as a degree-free auxiliary alias. Model-level facts unchanged; all theories remain `sorry`/`oops`-free. |
 | 0.5.1 | 2026-06-25 | Added `Canton_Bridge.thy` path-level Merkle inclusion mappings (`reg_view_inclusion_same_hash` / `reg_view_inclusion_blinding_of` / `reg_view_inclusion_chains_sound`): the recursive view tree is instantiated on the entry's generic rose-tree inclusion-proof (zipper) machinery, sharpening sequence-level inclusion to the concrete Merkle path with no added assumption. Monotone addition; no change to existing theories, theorems, assumptions, or dispositions. |
 | 0.5.0 | 2026-06-24 | Added `Canton_Bridge.thy` mappings: composite functor laws over the authenticated extraction map, sequence-level authenticity preservation (validity / need-to-know / hash soundness / state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree, with the declared model-fidelity boundary. Monotone addition; no change to existing theories, theorems, assumptions, or dispositions. |

@@ -51,7 +51,7 @@
         FROZEN → RESTRICTED (must return to ACTIVE first).
     - Synchronization correctness: regulatory_homomorphism (after sync, all
       connected chains agree); sync_isolation (other assets unaffected);
-      preemptive locking guards the sync function (a second acquire while the
+      an atomic lock guard protects the sync function (a second acquire while the
       lock is held fails), expressing the intended exclusion of competing
       regulatory actions under the atomic model (no dynamic serialisation).
     - valid_state_preservation: sync preserves the global validity invariant
@@ -859,13 +859,13 @@ text \<open>
     a separate datatype \<^verbatim>\<open>chain_b_action\<close> with four constructors. This
     exercises the locale's heterogeneous source / target action types
     (\<^verbatim>\<open>'a\<close> vs.\ \<^verbatim>\<open>'b\<close>).
-  \<^item> The locale parameter \<^verbatim>\<open>actions\<^sub>s\<close> is instantiated with a strict subset
+  \<^item> The locale parameter \<^verbatim>\<open>actions_s\<close> is instantiated with a strict subset
     of the full \<^verbatim>\<open>reg_action\<close> set, namely the four escalation actions.
     De-escalation actions exist in \<^verbatim>\<open>reg_action\<close> as a datatype but are
     out of scope for this synchronisation instance.
 
   The naturality assumption then has to hold only on the escalation subset,
-  which is exactly the design intent of the locale's \<^verbatim>\<open>actions\<^sub>s\<close> parameter:
+  which is exactly the design intent of the locale's \<^verbatim>\<open>actions_s\<close> parameter:
   the user can scope structural preservation to a subset of source actions
   rather than to the full source action type.
 \<close>
@@ -909,7 +909,7 @@ fun escalation_action_map :: "reg_action \<Rightarrow> chain_b_action" where
 | "escalation_action_map UNRESTRICT = B_FREEZE"
 | "escalation_action_map RELEASE    = B_FREEZE"
   \<comment> \<open>The last three clauses are unused by the locale instance, since
-      \<^verbatim>\<open>actions\<^sub>s = escalation_actions\<close> excludes the de-escalation actions.
+      \<^verbatim>\<open>actions_s = escalation_actions\<close> excludes the de-escalation actions.
       They are present only to make the function total on \<^verbatim>\<open>reg_action\<close>.\<close>
 
 text \<open>
@@ -963,7 +963,7 @@ proof -
 qed
 
 text \<open>
-  The escalation instance: \<^verbatim>\<open>state_preservation\<close> with \<^verbatim>\<open>actions\<^sub>s\<close> the
+  The escalation instance: \<^verbatim>\<open>state_preservation\<close> with \<^verbatim>\<open>actions_s\<close> the
   escalation subset of \<^verbatim>\<open>reg_action\<close>, target action type \<^verbatim>\<open>chain_b_action\<close>,
   and identity state map (both chains share the regulatory state space).
 \<close>
@@ -1574,7 +1574,7 @@ text \<open>
   4. The synchronization protocol (lock, then update, then unlock) preserves
      cross-chain consistency for the same asset while isolating other assets.
 
-  5. Preemptive locking guards the sync function against a second action
+  5. The atomic lock guard protects the sync function against a second action
      while the lock is held; under the atomic model this expresses the
      intended exclusion of competing regulatory actions on the same asset
      (NOT double-spend prevention — that is handled at a different layer).
@@ -1590,7 +1590,7 @@ text \<open>
      \<^verbatim>\<open>state_preservation\<close> with the four-action escalation subset of
      \<^verbatim>\<open>reg_action\<close> on the source side, the dedicated four-constructor
      datatype \<^verbatim>\<open>chain_b_action\<close> on the target side, and the identity state
-     map. This exercises both the locale's \<^verbatim>\<open>actions\<^sub>s\<close> subset parameter
+     map. This exercises both the locale's \<^verbatim>\<open>actions_s\<close> subset parameter
      and the heterogeneous source / target action types.
 
   9. The layer-crossing instance (\<^verbatim>\<open>onchain_daml_bridge\<close>) instantiates
@@ -1599,7 +1599,7 @@ text \<open>
      auxiliary fields. The action vocabularies coincide so the action map
      is the identity; the non-trivial content is the bijection between
      the enum and the image \<^verbatim>\<open>daml_states\<close> of the representation map,
-     with a type-level invariant (\<^verbatim>\<open>valid_daml_perm\<close>) tying the auxiliary
+     with a carrier predicate (\<^verbatim>\<open>valid_daml_perm\<close>) tying the auxiliary
      fields to the status tag.
 
   10. The \<^verbatim>\<open>multi_domain_preservation\<close> locale is instantiated parametrically:

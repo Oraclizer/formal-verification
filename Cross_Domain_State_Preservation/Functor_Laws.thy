@@ -136,8 +136,27 @@ theorem preservation_assoc:
   assumes "state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>b A\<^sub>b T\<^sub>b F\<^sub>b f f'"
       and "state_preservation S\<^sub>b A\<^sub>b T\<^sub>b F\<^sub>b S\<^sub>c A\<^sub>c T\<^sub>c F\<^sub>c g g'"
       and "state_preservation S\<^sub>c A\<^sub>c T\<^sub>c F\<^sub>c S\<^sub>d A\<^sub>d T\<^sub>d F\<^sub>d k k'"
-  shows "((k \<circ> g) \<circ> f = k \<circ> (g \<circ> f)) \<and> ((k' \<circ> g') \<circ> f' = k' \<circ> (g' \<circ> f'))"
-  by (simp add: comp_assoc)
+  shows "state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>d A\<^sub>d T\<^sub>d F\<^sub>d
+           ((k \<circ> g) \<circ> f) ((k' \<circ> g') \<circ> f')
+       \<and> state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>d A\<^sub>d T\<^sub>d F\<^sub>d
+           (k \<circ> (g \<circ> f)) (k' \<circ> (g' \<circ> f'))
+       \<and> ((k \<circ> g) \<circ> f = k \<circ> (g \<circ> f))
+       \<and> ((k' \<circ> g') \<circ> f' = k' \<circ> (g' \<circ> f'))"
+proof -
+  have kg: "state_preservation S\<^sub>b A\<^sub>b T\<^sub>b F\<^sub>b S\<^sub>d A\<^sub>d T\<^sub>d F\<^sub>d
+      (k \<circ> g) (k' \<circ> g')"
+    using preservation_compose[OF assms(2) assms(3)] .
+  have gf: "state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>c A\<^sub>c T\<^sub>c F\<^sub>c
+      (g \<circ> f) (g' \<circ> f')"
+    using preservation_compose[OF assms(1) assms(2)] .
+  have left: "state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>d A\<^sub>d T\<^sub>d F\<^sub>d
+      ((k \<circ> g) \<circ> f) ((k' \<circ> g') \<circ> f')"
+    using preservation_compose[OF assms(1) kg] .
+  have right: "state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>d A\<^sub>d T\<^sub>d F\<^sub>d
+      (k \<circ> (g \<circ> f)) (k' \<circ> (g' \<circ> f'))"
+    using preservation_compose[OF gf assms(3)] .
+  from left right show ?thesis by (simp add: comp_assoc)
+qed
 
 
 section \<open>Composition Exercised: A Heterogeneous Three-Domain Chain\<close>
@@ -530,6 +549,11 @@ text \<open>
   refinement of each input — so the Merkle interface is used in the proofs, not
   merely imported.
 
+  Because \<open>extract_map\<close> is partial, this construction is functorial on
+  the extractable values and the blinding morphisms whose relevant endpoints
+  extract.  It is not a total object map over every value in the ambient ADS
+  carrier unless a concrete instance separately establishes total extraction.
+
   Reuse beyond the regulatory instance: the glue layer commits only to a
   single authoritative value per object identifier, so any system of that
   shape is a potential transplant target --- for instance Merkle-replicated
@@ -585,6 +609,7 @@ theorem authenticated_preservation_soundness:
     and ea: "extract_map a = Some sa"
     and eb: "extract_map b = Some sb"
   shows "\<exists>sab. extract_map ab = Some sab \<and> valid_state sab
+              \<and> state_join sa sb sab
               \<and> state_refines sa sab \<and> state_refines sb sab"
 proof -
   \<comment> \<open>ADS lemma 1: a merge exists, so the hashes agree (mergeability).\<close>
@@ -606,7 +631,7 @@ proof -
   have "h b = h ab" using bo_hash_eq[OF bob] .
   then have rb: "state_refines sb sab"
     using extract_under_blinding[OF \<open>h b = h ab\<close> bob esab] eb by auto
-  from esab vsab ra rb show ?thesis by blast
+  from esab vsab sj ra rb show ?thesis by blast
 qed
 
 text \<open>
@@ -644,7 +669,8 @@ text \<open>
   An authenticated datum is a pair \<^term>\<open>(r, P)\<close>: a consensus regulatory state
   \<open>r\<close> together with the set \<open>P\<close> of chains that have revealed --- are known to
   hold --- the shared asset in that state.  The hash @{term auth_hash} commits to
-  the consensus state \<open>r\<close> alone, so two data are mergeable exactly when they
+  the consensus state \<open>r\<close> alone, so this is a state-keyed reveal-set witness,
+  not a commitment to the chain set itself.  Two data are mergeable exactly when they
   agree on \<open>r\<close>; the merge @{term auth_merge} then unions the revealed-chain sets,
   and the blinding order @{term auth_bo} forgets some of them.  This is the
   state-level reading the glue layer asks for: @{term auth_merge} realises the
@@ -1576,14 +1602,16 @@ qed
 section \<open>The Oraclizer as a Converging Composition\<close>
 
 text \<open>
-  We package the oraclizer synchronization protocol as the data of a
+  We package an abstract convergence specification as the data of a
   @{locale converging_composition}: the carrier is the set of finite-domain,
   unlocked global states; the operations are synchronization triples; the
   invariant is cross-chain consistency; the progress measure is the
-  inconsistency count; and the realization map picks, in any inconsistent
-  state, a terminal-faithful safe recovery --- a synchronization that reduces
+  inconsistency count; and the realization map uses Hilbert choice, in any
+  inconsistent state, to pick a terminal-faithful safe recovery --- a synchronization that reduces
   the measure and uses \<^const>\<open>CONFISCATE\<close> exactly on terminal-bearing assets
   (existence guaranteed by @{thm [source] inconsistent_has_safe_recovery}).
+  The event argument does not compute that recovery, so this is an existential
+  fair-discharge model rather than an executable queue, priority, or BFT algorithm.
 \<close>
 
 definition oss_carrier :: "global_state set" where
@@ -1696,8 +1724,8 @@ section \<open>Guarded Bounded Convergence for the Oraclizer\<close>
 text \<open>
   Inside the D-quencer liveness context (a fair-leader assumption over a
   Byzantine-threshold cardinality bound), the
-  oraclizer data above forms a @{locale converging_composition}: the honest
-  leader within every fairness window discharges a measure-reducing
+  abstract data above forms a @{locale converging_composition}: an honest-tagged
+  event within every fairness window gates an existential measure-reducing
   synchronization.  The fairness assumption is exactly the \<open>fair_leader\<close>
   assumption of @{locale dquencer_liveness}; window positivity is derived
   from bounded occurrence inside the composition locale
@@ -1710,10 +1738,10 @@ text \<open>
   (@{thm [source] dquencer_system.honest_nonempty}), and the constant
   schedule on that node --- a schedule drawn from the system's own roster ---
   meets every fairness window.  This grounds the assume-guarantee
-  abstraction: the fair-leader hypothesis is the deterministic residue of
-  VRF-based election, and the system's own threshold already supplies a
-  roster-drawn witness schedule, so the hypothesis is satisfiable rather
-  than merely plausible.
+  abstraction: the system's own threshold supplies an in-roster honest-node
+  witness for a constant schedule, so the deterministic hypothesis is
+  satisfiable.  This is not a derivation from VRF probabilities or a model of
+  adversarial consensus execution.
 \<close>
 
 context dquencer_system
@@ -1761,7 +1789,7 @@ proof -
                     ni_behavior (sched e) = Honest"
     using fair_schedule_exists by blast
   have "dquencer_liveness nodes f_max fairness_bound sched (\<lambda>_. 0)"
-    by unfold_locales (use fair in auto)
+    by unfold_locales (use rng fair in auto)
   then show ?thesis using rng by blast
 qed
 
@@ -1783,7 +1811,7 @@ next
     using oss_guarded_preservation by blast
 next
   show "\<forall>t. \<exists>t'. t \<le> t' \<and> t' < t + fairness_bound \<and> ni_behavior (leader_schedule t') = Honest"
-    using fair_leader .
+    using fair_leader by blast
 next
   show "\<And>s ev opn. s \<in> oss_carrier \<Longrightarrow> ni_behavior ev = Honest \<Longrightarrow> oss_realize ev s = Some opn
           \<Longrightarrow> opn \<in> oss_ops \<and> oss_guard s opn"
@@ -1799,8 +1827,11 @@ text \<open>
   The headline of this entry's convergence layer.  From an \emph{arbitrary}
   finite-domain, unlocked global state --- in particular with \emph{no}
   assumption that the cross-chain consistency invariant holds initially --- the
-  oraclizer reaches, within @{term "inconsistency_pairs gs\<^sub>0 * fairness_bound"}
-  evolution steps, a state that is valid (consistent and unlocked).  Contrast
+  model has an existential run that reaches, within
+  @{term "inconsistency_pairs gs\<^sub>0 * fairness_bound"} evolution steps, a
+  state that is valid (consistent and unlocked).  The selected safe recovery
+  is supplied non-constructively by \<open>SOME\<close>; this theorem is not an
+  executable recovery procedure.  Contrast
   @{thm [source] conditional_safety_preservation}, which assumes @{term "valid_state gs"}:
   the convergence layer frees the safety guarantee of its initial-validity
   hypothesis, at the price of the fair-leader context.
@@ -2001,11 +2032,40 @@ lemma quorum_byzantine_eq:
 lemma quorum_byz_card: "card (byzantine_nodes quorum_nodes) = 1"
   by (simp add: quorum_byzantine_eq)
 
+lemma quorum_leader_in_nodes: "range quorum_leader \<subseteq> quorum_nodes"
+  by (auto simp: quorum_leader_def quorum_nodes_def)
+
 interpretation bft_quorum: dquencer_liveness
   quorum_nodes 1 1 0 0 quorum_leader "\<lambda>e. 1 - e"
-  by unfold_locales
-     (auto simp: quorum_card quorum_byz_card quorum_finite quorum_nonempty
-           quorum_leader_def)
+proof unfold_locales
+  show "finite quorum_nodes" by (rule quorum_finite)
+next
+  show "3 * (1::nat) + 1 \<le> card quorum_nodes"
+    using quorum_card by simp
+next
+  show "card (byzantine_nodes quorum_nodes) \<le> (1::nat)"
+    using quorum_byz_card by simp
+next
+  show "0 < (1::nat)" by simp
+next
+  show "range quorum_leader \<subseteq> quorum_nodes \<and>
+      (\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + (1::nat) \<and>
+                   ni_behavior (quorum_leader e) = Honest)"
+  proof
+    show "range quorum_leader \<subseteq> quorum_nodes"
+      by (rule quorum_leader_in_nodes)
+    show "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + (1::nat) \<and>
+                   ni_behavior (quorum_leader e) = Honest"
+      by (auto simp: quorum_leader_def)
+  qed
+next
+  fix e
+  assume "ni_behavior (quorum_leader e) = Honest" "0 < 1 - e"
+  then show "1 - Suc e < 1 - e" by auto
+next
+  fix e
+  show "1 - Suc e \<le> 1 - e" by auto
+qed
 
 text \<open>
   Deterministic selection is exercised on a genuine conflict: two well-formed

@@ -12,13 +12,14 @@
   public components:
 
     * Composite functor laws.  The authenticated extraction map is a functor
-      from the ADS blinding preorder to the cross-domain refinement preorder.
+      from the extractable part of the ADS blinding preorder to the
+      cross-domain refinement preorder.
       We prove the category axioms for this composite (identity, composition,
       associativity), and the associativity of the lifted merge/join algebra.
 
-    * Sequence-level authenticity.  The single-step soundness theorems are
-      generalised to whole synchronization sequences: a path of blindings, and
-      an n-ary fold of merges.
+    * Path- and fold-level authenticity.  The single-step soundness theorems
+      are generalised to a path of blindings and an n-ary fold of merges; these
+      lists are not protocol execution traces.
 
     * Concrete and recursive instantiation.  The authenticated_state structure
       is instantiated on the ADS blindable-position functor
@@ -56,9 +57,11 @@ text \<open>
   blinding relation \<^term>\<open>bo a b\<close>, a preorder (reflexive and transitive by the
   Merkle interface).  The cross-domain layer supplies another thin category:
   objects are global states and the morphism \<open>s \<rightarrow> s'\<close> is \<^term>\<open>state_refines s s'\<close>,
-  also a preorder.  The extraction map \<^term>\<open>extract_map\<close> is the composite functor
-  from the first category to the second: it sends a value to the state it
-  extracts to, and a blinding morphism to a refinement morphism.  The next four
+  also a preorder.  Because \<^term>\<open>extract_map\<close> is partial, its extractable
+  values and endpoint-extractable blinding morphisms form the relevant
+  sub-preorder.  On that domain the extraction map is the composite functor:
+  it sends a value to the state it extracts to, and a blinding morphism to a
+  refinement morphism.  The next four
   results are the category axioms of this composite functor together with the
   associativity of the lifted merge (join) algebra.
 \<close>
@@ -80,7 +83,8 @@ text \<open>The functor's action on a single morphism: a blinding \<open>a \<rig
   refinement \<open>extract a \<rightarrow> extract b\<close>, with both extracted states valid.  This is
   @{thm [source] blinded_view_preserves_validity} with the validity hypothesis on
   \<open>b\<close> discharged internally from @{thm [source] extract_preserves_validity}, so the
-  morphism map is total on the blinding preorder.\<close>
+  morphism map is total on the downward blinding closure of extractable
+  endpoints.\<close>
 
 lemma cdsp_ads_morphism:
   assumes bo: "bo a b" and eb: "extract_map b = Some sb"
@@ -148,6 +152,7 @@ lemma cdsp_ads_merge:
   assumes mab: "m a b = Some ab"
     and ea: "extract_map a = Some sa" and eb: "extract_map b = Some sb"
   shows "\<exists>sab. extract_map ab = Some sab \<and> valid_state sab
+            \<and> state_join sa sb sab
             \<and> state_refines sa sab \<and> state_refines sb sab"
   using authenticated_preservation_soundness[OF mab ea eb]
   by blast
@@ -178,11 +183,11 @@ qed
 end
 
 
-section \<open>Authenticity preserved along whole synchronization sequences\<close>
+section \<open>Authenticity along blinding paths and merge folds\<close>
 
 text \<open>
-  Four authenticity properties are shown to hold not across a single blinding or
-  merge step but along the \emph{whole} synchronization sequence:
+  Four authenticity properties are shown to hold not only across a single
+  blinding or merge step but along a blinding path or merge fold:
 
     \<^enum> \<^bold>\<open>validity\<close> --- every view in the sequence extracts to a valid state,
         along a blinding path (theorem \<open>sequence_authenticity_preservation\<close>)
@@ -192,7 +197,7 @@ text \<open>
         extended to arbitrary blinding-step reachability by corollary
         \<open>reachable_view_authenticity\<close>); dually, every contributor to a merge
         fold refines the combined view (theorem \<open>sequence_merge_soundness\<close>);
-    \<^enum> \<^bold>\<open>hash soundness\<close> --- the whole sequence commits to one authenticating root,
+    \<^enum> \<^bold>\<open>hash soundness\<close> --- each path or fold shares one authenticating root,
         in both the blinding direction (theorem \<open>blinding_path_hash_soundness\<close>)
         and the merge direction (theorem \<open>merge_seq_hash\<close>);
     \<^enum> \<^bold>\<open>inclusion integrity\<close> --- theorem \<open>sequence_inclusion_integrity\<close>.
@@ -234,12 +239,12 @@ proof -
 qed
 
 text \<open>
-  Sequence-level need-to-know preservation.  Given a synchronization sequence
+  Path-level need-to-know preservation.  Given an authenticated-view list
   presented as a blinding path whose most-revealed endpoint (the last element)
   extracts to a valid cross-domain state, \emph{every} intermediate view extracts
   to a valid state that refines the endpoint.  Authenticity (validity together
   with the refinement guarantee of a partial view) is preserved along the whole
-  sequence, not merely across one blinding step.  This generalises
+  path, not merely across one blinding step.  This generalises
   @{thm [source] blinded_view_preserves_validity}.
 \<close>
 
@@ -262,7 +267,7 @@ text \<open>
   Hash soundness along the sequence.  Every view in a blinding path commits to the
   same root hash as the most-revealed endpoint; a blinded view cannot present a
   different root.  This is the sequence-level form of the ADS guarantee
-  @{thm [source] bo_hash_eq}: along the whole synchronization sequence there is a
+  @{thm [source] bo_hash_eq}: along the blinding path there is a
   single authenticating root, so any inclusion claim made anywhere along the
   sequence is checked against the same commitment.
 \<close>
@@ -285,7 +290,7 @@ text \<open>
   along the sequence can therefore exhibit a holding that the endpoint does not
   authenticate.  Together with @{thm [source] blinding_path_hash_soundness} (one
   root for the whole sequence) this is the state-level reading of inclusion-proof
-  integrity preserved across the synchronization sequence.
+  integrity preserved across the authenticated-view path.
 
   At this abstract layer inclusion reduces to the refinement guarantee
   (@{thm [source] sequence_authenticity_preservation}) read through
@@ -381,12 +386,12 @@ proof (induction xs rule: merge_seq.induct)
 qed simp_all
 
 text \<open>
-  Sequence-level merging soundness.  A whole synchronization sequence of partial
-  authenticated views over the same committed object (all sharing a hash) folds
+  Merge-fold soundness.  A non-empty list of partial authenticated views over
+  the same committed object (all sharing a hash) folds
   into a single combined view that extracts to a valid cross-domain state
   refining every contributor.  This is the n-ary generalisation of
   @{thm [source] authenticated_preservation_soundness}: re-revealing along the
-  entire sequence preserves validity and reconstructs a consistent joint view.
+  entire fold preserves validity and reconstructs a consistent joint view.
 \<close>
 
 theorem sequence_merge_soundness:

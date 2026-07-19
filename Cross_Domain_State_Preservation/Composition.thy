@@ -52,7 +52,8 @@ section \<open>Eventual Dischargers\<close>
 text \<open>
   A scheduler that, within every window of length \<^term>\<open>window\<close>, produces at
   least one discharging event.  This is a bounded-fairness abstraction:
-  progress-bearing events are never starved beyond \<^term>\<open>window\<close> time units.
+  each bounded window contains at least one progress-bearing event.  This
+  condition does not identify queued requests or establish per-request service.
 \<close>
 
 locale eventual_discharger =

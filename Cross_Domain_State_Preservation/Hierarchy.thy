@@ -12,6 +12,10 @@
 
   Each synchronization degree k models a coupling breadth: a degree-k system
   keeps chains 0..k of an asset in lockstep around a hub chain (chain 0).
+  This index does not formalize the product's S0--S3 operational meanings,
+  such as directional observation, bidirectional causal execution, atomic
+  binding, or mutual rollback; connecting those meanings to F k requires a
+  separate refinement.
   This yields a tower of transition functors F 0, F 1, F 2, F 3, ... with the
   weaker functor obtained from the stronger one by forgetting the top coupled
   chain.  Each F k is a genuine functor on the free category of regulatory
@@ -50,7 +54,7 @@
   from an arbitrary hub-defined state.  Validity preservation itself is
   degree-free (processing_preserves_validity); the auxiliary lemma
   hierarchy_monotonicity is its degree-free alias and carries no
-  provisioning hypothesis.  The causal-consistency boundary
+  provisioning hypothesis.  The timestamp-order degree boundary
   that separates degree 1 from degree 2 (boundary_well_defined) is grounded in
   a strict timestamp order.  A concrete example assignment witnesses
   non-vacuity, and a static-promotion corollary (static_promotion_safety)
@@ -801,7 +805,7 @@ next
   ultimately show ?thesis using Some by (simp add: process_at_degree_def valid_state_def)
 qed
 
-text \<open>The timestamp order \<^verbatim>\<open>lamport_hb\<close> underlying the causal boundary is
+text \<open>The timestamp order \<^verbatim>\<open>lamport_hb\<close> underlying the degree boundary is
   likewise independent of the degree assignment; it is a plain strict order on
   integer timestamps, not a distributed causal order.\<close>
 
@@ -987,15 +991,16 @@ proof -
 qed
 
 text \<open>
-  The causal-consistency boundary.  The classes \<open>S\<^sub>1\<close> and \<open>S\<^sub>2\<close> are separated by
-  whether the asset requires \<^emph>\<open>causal\<close> consistency, in the sense of Lamport's
-  happened-before order: assets at degree \<open>\<ge> 2\<close> do, lower ones do not.  We model
-  happened-before by the strict timestamp order and show the boundary is
+  The timestamp-order degree boundary.  The classes \<open>S\<^sub>1\<close> and
+  \<open>S\<^sub>2\<close> are separated by a degree-2 threshold.  The legacy identifiers
+  \<open>requires_causal\<close> and \<open>causal_consistent_at\<close> label that threshold, but
+  the formal relation is only the strict order on integer timestamps, not a
+  distributed happened-before relation.  We show the boundary is
   well-defined on \<open>(asset, system)\<close> pairs: the requirement is a single-valued
   function of the asset's degree, it is met whenever the system over-provisions
   the asset, and the underlying happened-before relation is a strict partial
   order (irreflexive and asymmetric; in fact linear, as timestamps are
-  linearly ordered), so the causal boundary it induces is itself well-formed.
+  linearly ordered), so the timestamp-order boundary is well-formed.
 \<close>
 
 text \<open>
@@ -1004,7 +1009,7 @@ text \<open>
   \<open>k\<close> --- the containment and monotonicity structure of the ladder --- while
   the per-degree synchronization semantics itself (static, unidirectional
   observation, bidirectional coupling, atomic state binding) is abstracted.
-  The causal boundary sits at \<open>k = 2\<close>, the S1/S2 transition below.
+  The timestamp-order boundary sits at \<open>k = 2\<close>, the S1/S2 transition below.
 \<close>
 
 definition requires_causal :: "asset_id \<Rightarrow> bool" where

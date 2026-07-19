@@ -7,9 +7,9 @@
   Priority Resolution and Liveness — Generic Theory
 
   This theory defines generic locales for priority-based deterministic
-  selection and starvation freedom under fair leader scheduling. These
+  selection and aggregate pending-count progress under fair leader scheduling. These
   are reusable, domain-independent abstractions for the order- and
-  bound-theoretic content of these two liveness concerns: a total order
+  bound-theoretic content of these two concerns: a total order
   on priorities yields a deterministic choice, and a fairness bound
   yields bounded progress. The locales are stated over abstract carriers;
   they do not themselves model concurrent execution, message interleaving,
@@ -98,17 +98,37 @@ definition select_highest :: "'m set \<Rightarrow> 'm option" where
      else Some (THE m. m \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority m)))"
 
 theorem select_highest_deterministic:
-  assumes ne: "S \<noteq> {}"
-  shows "\<exists>!m. select_highest S = Some m"
+  assumes fin: "finite S" and ne: "S \<noteq> {}"
+  shows "\<exists>!m. select_highest S = Some m
+              \<and> m \<in> S
+              \<and> (\<forall>m' \<in> S. priority m' \<le> priority m)"
 proof -
-  from ne obtain v where hv: "select_highest S = Some v"
-    unfolding select_highest_def by simp
+  from highest_priority_exists[OF fin ne] have uniq:
+    "\<exists>!m. m \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority m)" .
+  then obtain v where vmax: "v \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority v)"
+    and vuniq: "\<And>w. w \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority w) \<Longrightarrow> w = v"
+    by blast
+  have the_v: "(THE m. m \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority m)) = v"
+  proof (rule the_equality)
+    show "v \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority v)"
+      using vmax .
+  next
+    fix w
+    assume "w \<in> S \<and> (\<forall>m' \<in> S. priority m' \<le> priority w)"
+    then show "w = v" by (rule vuniq)
+  qed
+  have hv: "select_highest S = Some v"
+    unfolding select_highest_def using ne the_v by simp
   show ?thesis
   proof (rule ex1I[of _ v])
-    show "select_highest S = Some v" by (rule hv)
+    show "select_highest S = Some v \<and> v \<in> S
+        \<and> (\<forall>m' \<in> S. priority m' \<le> priority v)"
+      using hv vmax by blast
   next
-    fix w assume "select_highest S = Some w"
-    with hv show "w = v" by simp
+    fix w
+    assume "select_highest S = Some w \<and> w \<in> S
+        \<and> (\<forall>m' \<in> S. priority m' \<le> priority w)"
+    then show "w = v" using vuniq by blast
   qed
 qed
 
@@ -145,22 +165,21 @@ qed
 end
 
 
-section \<open>Fair Leader Starvation Freedom\<close>
+section \<open>Fair-Leader Aggregate Progress\<close>
 
 text \<open>
   A leader-based system where an honest leader always processes at
   least one pending request, and a fairness assumption guarantees
   that honest leaders appear periodically.
 
-  The fairness assumption is a sufficient condition that abstracts
-  over the probabilistic guarantees of VRF-based leader election.
-  Under \<^term>\<open>f < n/3\<close> Byzantine faults, the probability that a
-  Byzantine leader is elected k consecutive times is \<^term>\<open>(f/n)^k\<close>,
-  which decreases exponentially. The fairness bound k captures this
-  as a deterministic assumption.
+  The fairness assumption is deterministic: it requires an honest-tagged
+  leader in every bounded window.  This theory provides no probability
+  space, independence assumption, VRF semantics, or derivation of that
+  condition from a Byzantine threshold.
 
-  The key theorem: under the fairness assumption, any pending request
-  is processed within a bounded number of epochs.
+  The key theorem: under the fairness assumption, a positive aggregate
+  pending count strictly decreases within a bounded number of epochs.
+  Individual request identities and their service order are not modelled.
 \<close>
 
 locale fair_leader_system =
@@ -284,10 +303,11 @@ proof -
 qed
 
 text \<open>
-  Corollary: all pending requests are eventually processed.
-  By induction on the pending count (which is a natural number
-  and thus a well-founded decreasing measure), repeated application
-  of \<^verbatim>\<open>starvation_bound\<close> drives the count to zero.
+  Corollary: the aggregate pending count eventually reaches zero in this
+  closed count model.  By induction on the pending count (which is a natural
+  number and thus a well-founded decreasing measure), repeated application
+  of \<^verbatim>\<open>starvation_bound\<close> drives the count to zero.  The statement
+  does not identify requests or cover continuous arrivals.
 \<close>
 
 theorem eventual_completion:

@@ -47,23 +47,25 @@
     3. Deadlock: out of scope (not a proved result). The atomic sync model
        has no concurrent lock contention, so deadlock does not arise within
        the model's scope; forced lock release under contention is deferred
-       to the preemptive-lock property.
-    4. Starvation freedom: under the fair leader assumption, every pending
-       regulatory request is processed within a bounded number of epochs.
+       to a future concurrent refinement.
+    4. Aggregate progress: under the fair leader assumption, a positive
+       pending count decreases within a bounded number of epochs.
     5. Conditional safety: conditional_safety_preservation restates
-       valid_state_preservation under an unlocked precondition. Its proof
+       valid_state_preservation; validity itself supplies the no-lock fact. Its proof
        uses only the safety side and does not fuse liveness; the genuine
        fusion is oraclizer_guarded_bounded_convergence (Functor_Laws.thy).
 
   Design decisions:
     - Byzantine model: f < n/3 (standard BFT threshold).
-    - Starvation freedom uses assume-guarantee reasoning: the fairness
-      assumption (honest leader within k epochs) abstracts VRF randomness.
+    - Aggregate progress uses assume-guarantee reasoning: the fairness
+      assumption requires an in-roster honest leader within k epochs. It is
+      not derived from a VRF distribution in this theory.
     - Priority uses nat tuples for automatic linorder from Isabelle's
       product order, avoiding manual linorder instance registration.
     - Message type extends oss_message via record inheritance.
-    - BFT consensus is abstracted (no BLS signature formalization):
-      only the determinism property of consensus output is modeled.
+    - BFT consensus is abstracted (no BLS signature formalization): the
+      theory models a static roster/count threshold and deterministic
+      priority-key selection, not a consensus execution.
     - The priority_system instantiation is performed on the
       \<^verbatim>\<open>priority_key\<close> type as carrier with the identity priority
       projection, so the locale's unconditional injectivity assumption
@@ -422,8 +424,13 @@ text \<open>
 \<close>
 
 corollary dq_select_highest_deterministic:
-  "\<exists>!k. dq_priority.select_highest msg_priority_keys = Some k"
-  using dq_priority.select_highest_deterministic[OF msg_priority_keys_nonempty] .
+  assumes "finite msg_set"
+  shows "\<exists>!k. dq_priority.select_highest msg_priority_keys = Some k
+              \<and> k \<in> msg_priority_keys
+              \<and> (\<forall>k' \<in> msg_priority_keys. k' \<le> k)"
+  using dq_priority.select_highest_deterministic
+    [OF msg_priority_keys_finite[OF assms] msg_priority_keys_nonempty]
+  by simp
 
 corollary dq_select_highest_in_set:
   assumes "finite msg_set"
@@ -469,17 +476,17 @@ qed
 end
 
 
-section \<open>Fair Leader Starvation Freedom Instantiation\<close>
+section \<open>Fair-Leader Aggregate-Progress Instantiation\<close>
 
 text \<open>
-  We instantiate the \<^verbatim>\<open>fair_leader_system\<close> locale with the
-  D-quencer's leader election and pending request processing.
+  We instantiate the \<^verbatim>\<open>fair_leader_system\<close> locale with an
+  in-roster leader schedule and an aggregate pending-count evolution.
 
-  The fairness assumption abstracts VRF randomness: within any
+  The fairness assumption requires that within any
   \<^verbatim>\<open>fairness_bound\<close> consecutive epochs, at least one epoch has
-  an honest leader. Under \<^term>\<open>f < n/3\<close>, the probability of
-  \<^term>\<open>fairness_bound\<close> consecutive Byzantine leaders is
-  \<^term>\<open>(f/n)^fairness_bound < (1/3)^fairness_bound\<close>.
+  an honest-tagged leader and that every scheduled leader belongs to the
+  locale's roster.  No probability distribution, independence assumption,
+  VRF mechanism, or network execution is formalized.
 \<close>
 
 text \<open>
@@ -492,8 +499,9 @@ locale dquencer_liveness = dquencer_system +
   fixes leader_schedule :: "nat \<Rightarrow> node_info"
     and pending_count :: "nat \<Rightarrow> nat"
   assumes fair_leader:
-    "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
-                 ni_behavior (leader_schedule e) = Honest"
+    "range leader_schedule \<subseteq> nodes \<and>
+     (\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
+                  ni_behavior (leader_schedule e) = Honest)"
     and honest_processes:
     "\<lbrakk> ni_behavior (leader_schedule e) = Honest; pending_count e > 0 \<rbrakk>
      \<Longrightarrow> pending_count (Suc e) < pending_count e"
@@ -506,7 +514,7 @@ interpretation dq_fair: fair_leader_system
 proof unfold_locales
   show "\<forall>epoch. \<exists>e. epoch \<le> e \<and> e < epoch + fairness_bound \<and>
                     ni_behavior (leader_schedule e) = Honest"
-    using fair_leader .
+    using fair_leader by blast
 next
   fix e
   assume "ni_behavior (leader_schedule e) = Honest" "0 < pending_count e"
@@ -519,9 +527,10 @@ next
 qed
 
 text \<open>
-  Concrete starvation freedom for the D-quencer:
-  if there are pending regulatory requests, at least one will
-  be processed within \<^verbatim>\<open>fairness_bound\<close> epochs.
+  Concrete aggregate progress for the D-quencer abstraction: if the pending
+  count is positive, it strictly decreases within
+  \<^verbatim>\<open>fairness_bound\<close> epochs.  This does not identify which request
+  is discharged.
 \<close>
 
 corollary dq_starvation_bound:
@@ -541,8 +550,8 @@ text \<open>
   (deterministic selection and fair scheduling).
 
   The theorem below, \<^verbatim>\<open>conditional_safety_preservation\<close>, is a \<^emph>\<open>conditional
-  safety\<close> statement: from a valid global state in which the target asset
-  is unlocked and a transition is enabled, the synchronization function
+  safety\<close> statement: from a valid global state and an enabled transition,
+  validity itself implies that the target asset is unlocked; the synchronization function
   succeeds and preserves the global validity invariant. Its proof uses
   only the safety side (\<^verbatim>\<open>lock_acquire_success\<close> and
   \<^verbatim>\<open>valid_state_preservation\<close>); it does not invoke the liveness
@@ -571,9 +580,10 @@ theorem conditional_safety_preservation:
   assumes valid: "valid_state gs"
     and current: "get_reg_state gs source aid = Some s"
     and trans: "reg_transition s action = Some s'"
-    and not_locked: "\<not> is_locked gs aid"
   shows "\<exists>gs'. sync source action aid gs = Some gs' \<and> valid_state gs'"
 proof -
+  have not_locked: "\<not> is_locked gs aid"
+    using valid unfolding valid_state_def no_locked_without_reason_def by blast
   from not_locked obtain gs_locked where
     lock: "acquire_lock gs aid = Some gs_locked"
     using lock_acquire_success by auto
@@ -618,15 +628,15 @@ text \<open>
     phenomenon. The atomic sync model has no concurrent lock contention
     (lock holding is a boolean without contended holders), so deadlock does
     not arise within the model's scope; forced lock release under contention
-    is out of scope, deferred to the preemptive-lock property. The theory
+    is out of scope, deferred to a future concurrent refinement. The theory
     states no proved deadlock-freedom theorem.
 
-  \<^enum> \<^bold>\<open>Starvation freedom\<close> (Property 2): Under the fair leader
-    assumption, every pending regulatory request is processed
+  \<^enum> \<^bold>\<open>Aggregate pending-count progress\<close> (Property 2): Under the
+    fair-leader assumption, a positive pending count strictly decreases
     within a bounded number of epochs.  The pending-count assumptions
     encode a closed system --- no new requests arrive within the analysis
-    horizon; liveness under continuous arrivals belongs to the partially
-    synchronous lift left to subsequent entries.
+    horizon; individual request fairness, continuous arrivals, and a
+    partially synchronous network lift are not established here.
 
   Open work for subsequent entries:
     - Compositional assurance across heterogeneous verification regimes.

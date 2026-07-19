@@ -1,8 +1,9 @@
 # Contributing
 
 This repository is the public mirror of an academic verification artifact: a set of
-Isabelle/HOL theories submitted to the [Archive of Formal Proofs](https://www.isa-afp.org/)
-and currently under editor review. It is maintained as a single-author scholarly entry rather
+Isabelle/HOL theories prepared as a ten-theory resubmission candidate for the
+[Archive of Formal Proofs](https://www.isa-afp.org/). An earlier submission exists, but the
+current candidate has not yet been uploaded. It is maintained as a single-author scholarly entry rather
 than as a conventional open-source project that merges external pull requests. Please keep this
 context in mind when engaging with the repository.
 
@@ -20,12 +21,12 @@ or the framing of the formalization are exactly the kind of engagement this entr
 
 ## On code contributions
 
-Because the theories are an AFP submission under review, changes to the `.thy` sources are
+Because the theories form an AFP resubmission candidate, changes to the `.thy` sources are
 handled through the AFP process and the entry's authorship, not through ad-hoc merges here.
 We do not generally accept pull requests that add new locales, instances, or theorems. If you
 believe a proof change is warranted (a fix for an unsound step, a meaningful simplification, or
 a generalization), please open an issue first to discuss it before preparing any patch. This
-keeps the public mirror consistent with the version under review at the AFP.
+keeps the public mirror consistent with the audited candidate.
 
 ## Reporting issues
 
@@ -51,7 +52,7 @@ isabelle build -d . -d /path/to/afp/thys Cross_Domain_State_Preservation
 isabelle build -d . -d /path/to/afp/thys -o document=pdf Cross_Domain_State_Preservation
 ```
 
-- **Isabelle version:** 2025-2 or later.
+- **Isabelle version:** exactly 2025-2 for the audited build.
 - All theories build without `sorry` or `oops`; independent confirmation of this is welcome.
 
 ## Code style (for reference)
