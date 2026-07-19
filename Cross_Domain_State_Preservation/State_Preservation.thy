@@ -24,7 +24,7 @@
 
   Methodological lineage:
     Our use of locales for compositional, reusable abstractions follows
-    the methodological tradition exemplified in the AFP by Lochbihler's
+    the methodological tradition exemplified in the AFP by Lochbihler and Maric's
     ADS_Functor entry. The technical content of this theory is independent
     of ADS_Functor; the connection is one of design philosophy (locale-based
     reusable abstractions over functor-shaped data), not formal dependency.

@@ -15,24 +15,20 @@
 \maketitle
 
 \begin{abstract}
-We mechanize cross-domain state preservation in Isabelle/HOL.  Preservation
-morphisms have identity and composition laws, and their composition is
-associative.  An authenticated layer lifts merge and blinding from the
-\texttt{ADS\_Functor} Merkle interface; its extraction laws apply on
-extractable endpoints and are instantiated on blindable positions and a
-recursive Canton transaction-tree model.  A degree-indexed tower supplies
-composable natural transformations and separates a load-bearing
-over-provisioning reconciliation theorem from degree-free validity
-preservation.  A guarded composition proves the existence of a bounded run
-from any finite-domain unlocked state to a valid state under deterministic
-fair discharge; recovery is selected non-constructively and is not an
-executable protocol.  The priority layer proves unique maximal selection for
-finite non-empty candidate sets and aggregate pending-count decrease under an
-in-roster fair-leader assumption.  Static Byzantine-count assumptions provide
-an honest-tagged roster witness, but no VRF, BFT execution, network, or
-request-identity semantics are formalized.  Concrete instances cover a
-regulatory state model and a TCP-inspired toy endpoint/tracker example.  The
-synchronization model is atomic and excludes concurrent lock contention.
+We formalize cross-domain state preservation in Isabelle/HOL as morphisms
+with identity, composition, and associativity laws.  An authenticated lift
+based on \texttt{ADS\_Functor} is defined on extractable endpoints, and a
+degree-indexed tower supplies composable forgetful natural transformations.
+From a finite-domain unlocked state, a guarded composition admits an
+existential bounded run to validity within the stated deterministic
+guard/recovery/progress model and the liveness locale's in-roster fair-leader,
+honest-processing, and pending-non-increase assumptions; the recovery choice
+is non-executable.  A separate priority layer proves unique maximal selection
+for finite non-empty sets with injective priorities and aggregate pending-count
+decrease under the same three scheduling/count assumptions.  The model is
+atomic and includes no network or adversarial BFT execution, probabilistic
+leader election, request-identity fairness, concurrent lock protocol, or
+model-to-code refinement.
 \end{abstract}
 
 \tableofcontents
@@ -64,8 +60,9 @@ We claim no new proof technique.  The contribution is a mechanization in
 three layers:
 (i)~the cross-domain state-preservation \emph{functor} and its category axioms,
 above;
-(ii)~\emph{guarded bounded convergence} under a deterministic in-roster
-fair-leader assumption in a static roster/count context
+  (ii)~\emph{guarded bounded convergence} within the stated deterministic
+  guard/recovery/progress model and the liveness locale's in-roster fair-leader,
+  honest-processing, and pending-non-increase assumptions
 --- from an \emph{arbitrary} finite-domain, unlocked initial global state,
 with no assumption that the
 cross-chain consistency invariant holds initially, there exists a run reaching
@@ -100,14 +97,17 @@ detailed exposition alongside the formal material.
   aggregate-progress
   locales: deterministic selection from a finite message set with
   injective priorities (\texttt{priority\_system}), and bounded aggregate
-  pending-count decrease under periodic honest-tagged scheduling
+  pending-count decrease under periodic in-roster honest-tagged scheduling,
+  honest-slot progress, and global pending-count non-increase
   (\texttt{fair\_leader\_system}).
 
 \item[\texttt{DQuencer\_Instance.thy}] the regulatory scheduling instance:
   a four-component priority key with proven injectivity under
   well-formedness bounds, a Byzantine fault model with the BFT threshold
-  $n \geq 3f + 1$, unique maximal finite-set selection, bounded aggregate
-  pending-count decrease, closed-count completion,
+  $n \geq 3f + 1$, unique maximal finite-set selection under injective
+  priorities, bounded aggregate pending-count decrease and closed-count
+  completion under in-roster fairness, honest processing, and pending-count
+  non-increase,
   and the safety-side corollary \emph{conditional safety preservation}.
 
 \item[\texttt{Proof\_Automation.thy}] reusable Eisbach discharge methods
@@ -276,8 +276,9 @@ Isabelle/HOL.
 
 The entry establishes kernel-checked model-level laws for preservation
 morphisms, authenticated extractable views, degree-indexed forgetting,
-finite-set priority selection, aggregate fair-discharge progress, and bounded
-existential recovery.  Its explicit boundaries are equally part of the
+finite-set priority selection under injective priorities, aggregate
+pending-count progress under explicit scheduling/count assumptions, and
+bounded existential recovery.  Its explicit boundaries are equally part of the
 result: no model-to-code refinement, probabilistic leader election, BFT or
 network execution, request-identity fairness, or concurrent lock protocol is
 claimed.

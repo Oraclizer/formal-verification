@@ -8,7 +8,7 @@
 
   This theory instantiates the generic locales from State_Preservation.thy
   with the regulatory state model of Oraclizer, a state synchronization
-  oracle for tokenized assets across blockchain networks and off-chain
+  state-synchronization layer for tokenized assets across blockchain networks and off-chain
   ledgers.
 
   Regulatory states: ACTIVE, FROZEN, SEIZED, CONFISCATED, RESTRICTED

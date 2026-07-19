@@ -7,11 +7,13 @@
   Priority Resolution and Liveness — Generic Theory
 
   This theory defines generic locales for priority-based deterministic
-  selection and aggregate pending-count progress under fair leader scheduling. These
+  selection and aggregate pending-count progress under fair leader scheduling,
+  honest-slot progress, and global pending-count non-increase. These
   are reusable, domain-independent abstractions for the order- and
   bound-theoretic content of these two concerns: a total order
-  on priorities yields a deterministic choice, and a fairness bound
-  yields bounded progress. The locales are stated over abstract carriers;
+  on priorities yields a deterministic choice, while fair scheduling,
+  honest-slot progress, and global non-increase yield bounded progress.
+  The locales are stated over abstract carriers;
   they do not themselves model concurrent execution, message interleaving,
   or network failure, and the synchronization model underlying their
   instantiation (Regulatory_Instance.thy, instantiated in
@@ -169,16 +171,17 @@ section \<open>Fair-Leader Aggregate Progress\<close>
 
 text \<open>
   A leader-based system where an honest leader always processes at
-  least one pending request, and a fairness assumption guarantees
-  that honest leaders appear periodically.
+  least one pending request, a fairness assumption guarantees that honest
+  leaders appear periodically, and the aggregate pending count never increases.
 
   The fairness assumption is deterministic: it requires an honest-tagged
   leader in every bounded window.  This theory provides no probability
   space, independence assumption, VRF semantics, or derivation of that
   condition from a Byzantine threshold.
 
-  The key theorem: under the fairness assumption, a positive aggregate
-  pending count strictly decreases within a bounded number of epochs.
+  The key theorem: under the fair-leader, honest-progress, and global
+  non-increase assumptions, a positive aggregate pending count strictly
+  decreases within a bounded number of epochs.
   Individual request identities and their service order are not modelled.
 \<close>
 

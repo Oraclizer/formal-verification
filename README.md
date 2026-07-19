@@ -13,18 +13,18 @@ Formal verification artifacts for the [Oraclizer](https://oraclizer.io) oracle s
 This repository contains machine-checked model-level proofs for cross-domain state synchronization. The proofs establish two independent but complementary guarantees, and build on them a functor-level treatment of cross-domain state preservation together with a synchronization-degree hierarchy:
 
 1. **Safety**: Regulatory actions (freeze, seize, confiscate, etc.) applied on one blockchain network are faithfully reflected across all connected networks, preserving the structure of state transitions.
-2. **Deterministic selection and aggregate progress**: finite non-empty candidate sets have a unique maximum, and under a deterministic in-roster fair-leader assumption a positive pending count decreases within a bounded window and eventually reaches zero in the closed count model. Individual request fairness, concurrent lock persistence, VRF/BFT execution, and network behaviour are not proved.
+2. **Deterministic selection and aggregate progress**: finite non-empty candidate sets with injective priorities have a unique maximum. Under deterministic in-roster fair leadership, honest scheduled processing, and global pending-count non-increase, a positive pending count decreases within a bounded window and eventually reaches zero in the closed count model. Individual request fairness, concurrent lock persistence, VRF/BFT execution, and network behaviour are not proved.
 
 The core abstractions are two hierarchies of Isabelle/HOL locales:
 
 - **Cross-Domain State Preservation** (Property 1): A hierarchy of state-machine locales (pairwise state preservation with naturality, symmetric bidirectional preservation, multi-domain preservation) whose naturality condition guarantees structural preservation of transitions across domains.
 - **Priority Resolution and Aggregate-Progress Locales** (Property 2): Capture deterministic maximum selection and bounded aggregate pending-count progress as reusable, domain-independent abstractions. They are order- and bound-theoretic and do not model request identities, concurrent execution, or message interleaving; the instantiating synchronization model is atomic.
 
-`conditional_safety_preservation` is a conditional-safety corollary: from a valid global state and an enabled transition, validity supplies the no-lock fact, synchronization succeeds, and the result is again valid (`valid_state_preservation`). Its proof uses only the safety side; deterministic selection and aggregate progress are separate theorems (`select_highest_deterministic`, `starvation_bound`). `oraclizer_guarded_bounded_convergence` combines guarded safety with an existential, `SOME`-selected safe recovery under a deterministic fair-discharge schedule. It is not an executable queue, recovery, or BFT algorithm. Deadlock is out of scope because the atomic sync model has no concurrent lock contention.
+`conditional_safety_preservation` is a conditional-safety corollary: from a valid global state and an enabled transition, validity supplies the no-lock fact, synchronization succeeds, and the result is again valid (`valid_state_preservation`). Its proof uses only the safety side; deterministic selection and aggregate progress are separate theorems (`select_highest_deterministic`, `starvation_bound`). `oraclizer_guarded_bounded_convergence` combines guarded safety with an existential, `SOME`-selected safe recovery under the explicit guard, progress-measure, recovery, and in-roster fair-discharge assumptions of its locale. It is not an executable queue, recovery, or BFT algorithm. Deadlock is out of scope because the atomic sync model has no concurrent lock contention.
 
 Every generic locale in both hierarchies is instantiated with a concrete example drawn from the regulatory model.
 
-**Design lineage.** Our use of locales for compositional, reusable abstractions follows the methodological tradition exemplified in the AFP by Lochbihler's [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html) entry, which structured authenticated data structures through composable building blocks. The functor-level layer in this repository couples the cross-domain state-preservation construction with that Merkle interface as an explicit formal dependency (see below); the safety and liveness core remains independent of `ADS_Functor`.
+**Design lineage.** Our use of locales for compositional, reusable abstractions follows the methodological tradition exemplified in the AFP by Lochbihler and Marić's [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html) entry, which structured authenticated data structures through composable building blocks. The functor-level layer in this repository couples the cross-domain state-preservation construction with that Merkle interface as an explicit formal dependency (see below); the safety and liveness core remains independent of `ADS_Functor`.
 
 ## Verified Properties
 
@@ -63,8 +63,8 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 | `select_highest_deterministic` | Given a finite non-empty message set with injective priorities, the highest-priority message is uniquely determined |
 | `select_highest_in_set` | The selected message is always a member of the input set |
 | `select_highest_is_max` | The selected message has the maximum priority among all messages in the set |
-| `starvation_bound` | Under the fair-leader assumption, a positive aggregate pending count strictly decreases within `fairness_bound` epochs |
-| `eventual_completion` | The aggregate pending count eventually reaches zero in the closed count model; request identities and continuous arrivals are not represented |
+| `starvation_bound` | Under periodic in-roster honest leadership, honest-slot progress, and global pending-count non-increase, a positive aggregate pending count strictly decreases within `fairness_bound` epochs |
+| `eventual_completion` | Under the same three assumptions, the aggregate pending count eventually reaches zero in the closed count model; request identities and continuous arrivals are not represented |
 | `priority_key_injectivity` | Within the stated timestamp and source-node upper bounds, the D-quencer priority key uniquely identifies messages that differ in authority/timestamp/action/node |
 | `honest_majority` | Under the BFT threshold n ≥ 3f + 1, the number of honest nodes exceeds 2f |
 | `conditional_safety_preservation` | From a valid global state and an enabled transition, synchronization succeeds and preserves validity; validity itself implies no outstanding lock |
@@ -74,14 +74,16 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 - 4-component priority key: (authority_rank, inverted_timestamp, action_severity, inverted_node_id)
 - Static BFT-count assumptions: n ≥ 3f + 1 and at most f roster members tagged Byzantine; adversarial protocol behaviour is not modelled
 - Fair-leader assumption: the schedule stays inside the roster and every `fairness_bound` window contains an honest-tagged leader
+- Honest-progress assumption: a scheduled honest leader strictly decreases a positive pending count at the next epoch
+- Global non-increase assumption: the aggregate pending count never increases, including at non-honest slots
 
-**Design pattern.** The proof uses assume-guarantee reasoning: bounded fair leadership and honest progress are deterministic assumptions, not consequences of a VRF probability model. The static threshold guarantees an honest node inside the roster (`honest_nonempty`), from which `fair_schedule_exists` constructs a constant roster-drawn witness and `liveness_inhabitable` proves the locale assumptions satisfiable (`range ls ⊆ nodes`); `bft_quorum` is a non-degenerate four-node cardinality witness. The convergence theorem consumes the fair-leader assumption directly and uses an existential safe-recovery choice; it does not route priority, queue identity, or consensus execution into recovery selection.
+**Design pattern.** The proof uses assume-guarantee reasoning: bounded fair leadership, honest progress, and global pending-count non-increase are deterministic assumptions, not consequences of a VRF probability model. The static threshold guarantees an honest node inside the roster (`honest_nonempty`), from which `fair_schedule_exists` constructs a constant roster-drawn witness and `liveness_inhabitable` proves the locale assumptions satisfiable (`range ls ⊆ nodes`); `bft_quorum` is a non-degenerate four-node cardinality witness. The convergence theorem is stated in that full liveness locale; its convergence interpretation consumes the fair-leader component directly and uses an existential safe-recovery choice, without routing priority, queue identity, or consensus execution into recovery selection.
 
 ### Cross-Domain State Preservation Functor ✅
 
 **Status:** Mechanized and `sorry`/`oops`-free. Included in the full ten-theory AFP resubmission candidate; not yet uploaded.
 
-This layer establishes that the cross-domain state-preservation construction is a **functor**: it proves the category laws over state-preservation morphisms (identity preservation, composition preservation, associativity), and composes the construction with Lochbihler's Merkle interface (AFP entry [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html)) to obtain **authenticated cross-domain state soundness**. The Merkle interface is exercised inside the proofs (it is a formal dependency, not merely imported): merged authenticated values are shown to admit a valid join refining each input view, and blinded (need-to-know) views are shown to extract to valid states that refine the originals.
+This layer establishes that the cross-domain state-preservation construction is a **functor**: it proves the category laws over state-preservation morphisms (identity preservation, composition preservation, associativity), and composes the construction with Lochbihler and Marić's Merkle interface (AFP entry [`ADS_Functor`](https://www.isa-afp.org/entries/ADS_Functor.html)) to obtain **authenticated cross-domain state soundness**. The Merkle interface is exercised inside the proofs (it is a formal dependency, not merely imported): merged authenticated values are shown to admit a valid join refining each input view, and blinded (need-to-know) views are shown to extract to valid states that refine the originals.
 
 | Theorem | Statement |
 |---|---|
@@ -257,7 +259,7 @@ The candidate includes all ten theories in `ROOT`. Upload, submission, and any a
 
 - Kim, Jinwook (2026). *The Cross-Domain State Preservation Functor: A Mechanized Theory of Regulatory State Synchronization in Isabelle/HOL.* arXiv:2604.03844 [cs.CR]. [https://arxiv.org/abs/2604.03844](https://arxiv.org/abs/2604.03844)
 - Kim, Jinwook and Hong, Jonghun (2026). *A Regulatory Compliance Protocol for Asset Interoperability Between Traditional and Decentralized Finance in Tokenized Capital Markets.* arXiv:2603.29278 [cs.CY]. [https://arxiv.org/abs/2603.29278](https://arxiv.org/abs/2603.29278)
-- Lochbihler, A. (2020). *Formalization of Authenticated Data Structures as Functors in Isabelle/HOL.* FMBC 2020. [AFP Entry: ADS_Functor](https://www.isa-afp.org/entries/ADS_Functor.html)
+- Lochbihler, Andreas and Marić, Ognjen (2020). *Authenticated Data Structures as Functors in Isabelle/HOL.* FMBC 2020. [AFP Entry: ADS_Functor](https://www.isa-afp.org/entries/ADS_Functor.html)
 
 ## Related Resources
 

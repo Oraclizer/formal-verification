@@ -18,16 +18,18 @@
   separate refinement.
   This yields a tower of transition functors F 0, F 1, F 2, F 3, ... with the
   weaker functor obtained from the stronger one by forgetting the top coupled
-  chain.  Each F k is a genuine functor on the free category of regulatory
-  action words: it preserves the identity word and word concatenation
+  chain.  The word-level construction fixes one asset; for each such asset,
+  F k is a genuine functor on the free category of regulatory action words:
+  it preserves the identity word and word concatenation
   (deg_run_Nil, deg_run_append), and --- the non-degenerate content --- its
   action on a word collapses to the composite regulatory transition broadcast
   once (deg_run_collapse, via the broadcast-overwrite and hub-tracking lemmas),
   so it is not a vacuous fold over an index set.  The forgetful map
   degree_forget is a natural transformation between consecutive degrees: its
   single-step naturality square commutes (degree_natural_transformation) and,
-  by induction over action words, the naturality holds on the whole action
-  category (degree_forget_natural_run), not merely on generators.  Natural
+  by induction over action words, the naturality holds on the corresponding
+  fixed-asset action-word category (degree_forget_natural_run), not merely on
+  generators.  Natural
   transformations are closed under composition (nt_compose / nt_vertical_compose),
   so the whole ladder F (k+2) => F (k+1) => F k is structurally coherent, not
   merely a point-to-point collection of forgetful maps.  This functor-tower
@@ -427,14 +429,13 @@ section \<open>Functoriality of the Degree Transition Functor on Action Words\<c
 
 text \<open>
   The natural-transformation results above operate on single regulatory
-  operations.  To make \<^const>\<open>F\<close> a functor in the genuine sense --- and the
-  degree demotion a natural transformation on the whole one-object action
-  category, not only on its generators --- we must extend the transition step
-  to action \<^emph>\<open>words\<close> and prove it preserves the category structure (identity
-  word and word concatenation).  The action category is the free monoid of
-  regulatory action sequences; its non-degenerate content is supplied by the
-  regulatory transition relation, which composes the sequence into a single
-  composite state.
+  operations.  For each fixed asset, we extend the transition step to action
+  \<^emph>\<open>words\<close> and prove that it preserves the category structure (identity
+  word and word concatenation).  The resulting fixed-asset action category is
+  the free monoid of regulatory action sequences; its non-degenerate content
+  is supplied by the regulatory transition relation, which composes the
+  sequence into a single composite state.  This construction does not cover
+  words whose generators mix asset identifiers.
 \<close>
 
 fun reg_run :: "reg_state \<Rightarrow> reg_action list \<Rightarrow> reg_state option" where
@@ -666,16 +667,16 @@ proof -
 qed
 
 text \<open>
-  Naturality on the whole action category.  The single-step square above
-  lifts, by induction on the action word, to the statement that degree
-  demotion commutes with running an \<^emph>\<open>entire\<close> word: forgetting the top chain
+  Naturality on a fixed asset's action-word category.  The single-step square
+  above lifts, by induction on the action word, to the statement that degree
+  demotion commutes with running an \<^emph>\<open>entire\<close> fixed-asset word: forgetting the top chain
   and then running at degree \<open>k\<close> equals running at degree \<^term>\<open>Suc k\<close> and then
   forgetting.  Together with the functor laws @{thm [source] deg_run_Nil} and
   @{thm [source] deg_run_append}, this promotes
   @{thm [source] degree_natural_transformation} from a square on generators to
   a genuine natural transformation between the degree functors
-  \<^term>\<open>F (Suc k)\<close> and \<^term>\<open>F k\<close> on the free action category --- the
-  functor-tower structure the entry claims.
+  \<^term>\<open>F (Suc k)\<close> and \<^term>\<open>F k\<close> on that fixed-asset free action
+  category.  Mixed-asset words are outside the theorem's scope.
 \<close>
 
 theorem degree_forget_natural_run:

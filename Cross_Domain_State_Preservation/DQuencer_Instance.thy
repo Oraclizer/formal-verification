@@ -48,8 +48,9 @@
        has no concurrent lock contention, so deadlock does not arise within
        the model's scope; forced lock release under contention is deferred
        to a future concurrent refinement.
-    4. Aggregate progress: under the fair leader assumption, a positive
-       pending count decreases within a bounded number of epochs.
+    4. Aggregate progress: under in-roster fair leadership, honest scheduled
+       processing, and global pending-count non-increase, a positive pending
+       count decreases within a bounded number of epochs.
     5. Conditional safety: conditional_safety_preservation restates
        valid_state_preservation; validity itself supplies the no-lock fact. Its proof
        uses only the safety side and does not fuse liveness; the genuine
@@ -58,8 +59,10 @@
   Design decisions:
     - Byzantine model: f < n/3 (standard BFT threshold).
     - Aggregate progress uses assume-guarantee reasoning: the fairness
-      assumption requires an in-roster honest leader within k epochs. It is
-      not derived from a VRF distribution in this theory.
+      assumption requires an in-roster honest leader within k epochs, an
+      honest scheduled leader decreases a positive pending count, and the
+      count never increases. These conditions are not derived from a VRF
+      distribution in this theory.
     - Priority uses nat tuples for automatic linorder from Isabelle's
       product order, avoiding manual linorder instance registration.
     - Message type extends oss_message via record inheritance.
@@ -563,7 +566,8 @@ text \<open>
 
   The genuine fusion of the two sides --- safety freed of its initial-validity
   hypothesis by a well-founded progress measure on cross-chain inconsistency,
-  under the fair-leader assumption --- is
+  under the explicit guard, recovery, progress, and in-roster fair-discharge
+  assumptions of its locale --- is
   \<^verbatim>\<open>oraclizer_guarded_bounded_convergence\<close> in \<^verbatim>\<open>Functor_Laws.thy\<close>, which
   drops the initial-validity hypothesis assumed here.
 \<close>
@@ -631,8 +635,9 @@ text \<open>
     is out of scope, deferred to a future concurrent refinement. The theory
     states no proved deadlock-freedom theorem.
 
-  \<^enum> \<^bold>\<open>Aggregate pending-count progress\<close> (Property 2): Under the
-    fair-leader assumption, a positive pending count strictly decreases
+  \<^enum> \<^bold>\<open>Aggregate pending-count progress\<close> (Property 2): Under
+    in-roster fair leadership, honest scheduled processing, and global
+    pending-count non-increase, a positive pending count strictly decreases
     within a bounded number of epochs.  The pending-count assumptions
     encode a closed system --- no new requests arrive within the analysis
     horizon; individual request fairness, continuous arrivals, and a

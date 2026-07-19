@@ -1722,12 +1722,13 @@ qed
 section \<open>Guarded Bounded Convergence for the Oraclizer\<close>
 
 text \<open>
-  Inside the D-quencer liveness context (a fair-leader assumption over a
-  Byzantine-threshold cardinality bound), the
-  abstract data above forms a @{locale converging_composition}: an honest-tagged
-  event within every fairness window gates an existential measure-reducing
-  synchronization.  The fairness assumption is exactly the \<open>fair_leader\<close>
-  assumption of @{locale dquencer_liveness}; window positivity is derived
+  The D-quencer liveness context packages in-roster fair-leader,
+  honest-processing, and pending-count non-increase assumptions over a
+  Byzantine-threshold cardinality bound.  The convergence interpretation uses
+  its fair-leader component: an honest-tagged event within every fairness
+  window gates an existential measure-reducing synchronization.  This
+  scheduling premise is exactly the \<open>fair_leader\<close> assumption of
+  @{locale dquencer_liveness}; window positivity is derived
   from bounded occurrence inside the composition locale
   (\<open>window_positive\<close>), so no positivity obligation remains here.
 \<close>
@@ -1774,10 +1775,11 @@ text \<open>
   (\<^verbatim>\<open>liveness_inhabitable\<close>, a satisfiability witness for the locale,
   terminal; the in-roster conjunct is what the threshold buys).  The scope of
   this role is deliberately narrow: the headline bounded-convergence theorem
-  below consumes the fair-leader assumption directly and does not route
-  through this witness, being driven instead by the cross-chain inconsistency
-  measure, and the honest \<^emph>\<open>majority\<close> beyond non-emptiness is not consumed
-  by the inhabitability result.
+  is stated in the full liveness locale, while its convergence interpretation
+  consumes the fair-leader component directly and does not route through this
+  witness, being driven instead by the cross-chain inconsistency measure.  The
+  honest \<^emph>\<open>majority\<close> beyond non-emptiness is not consumed by the
+  inhabitability result.
 \<close>
 
 theorem liveness_inhabitable:
@@ -1834,7 +1836,8 @@ text \<open>
   executable recovery procedure.  Contrast
   @{thm [source] conditional_safety_preservation}, which assumes @{term "valid_state gs"}:
   the convergence layer frees the safety guarantee of its initial-validity
-  hypothesis, at the price of the fair-leader context.
+  hypothesis inside the full @{locale dquencer_liveness} context; its
+  convergence interpretation uses the fair-leader component of that context.
 \<close>
 
 theorem oraclizer_guarded_bounded_convergence:
