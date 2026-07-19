@@ -199,7 +199,7 @@ locale fair_leader_system =
 begin
 
 text \<open>Positivity of the fairness bound is implied by fairness itself: the
-  window starting at any epoch must be non-empty to contain an honest slot.
+  window starting at any epoch must be non-empty to contain an honest epoch.
   It is therefore derived rather than assumed.\<close>
 
 lemma fairness_bound_positive: "fairness_bound > 0"

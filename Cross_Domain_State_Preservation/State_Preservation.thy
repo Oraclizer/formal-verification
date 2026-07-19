@@ -73,7 +73,7 @@ lemma apply_actions_closed:
    \<Longrightarrow> s' \<in> states"
   by (induction as arbitrary: s) (auto split: option.splits dest: transition_closed)
 
-text \<open>Note: @{thm apply_actions.simps(1)} already provides the simp rule
+text \<open>Note: @{thm [source] apply_actions.simps(1)} already provides the simp rule
   \<^term>\<open>apply_actions s [] = Some s\<close>, so no separate [simp] lemma is needed.\<close>
 
 lemma apply_actions_terminal:
@@ -81,7 +81,7 @@ lemma apply_actions_terminal:
   by (simp add: terminal_absorbing)
 
 text \<open>Concatenation of action words is the Kleisli composition of the two
-  segment maps: together with @{thm apply_actions.simps(1)} (the identity
+  segment maps: together with @{thm [source] apply_actions.simps(1)} (the identity
   word), this is the functor reading of a transition system on the free
   monoid of action words.\<close>
 
@@ -108,16 +108,8 @@ text \<open>
   transition yields the same result as transitioning after synchronization.
 
   More precisely: for state machines (\<^verbatim>\<open>S_src\<close>, \<^verbatim>\<open>T_src\<close>) and (\<^verbatim>\<open>S_tgt\<close>, \<^verbatim>\<open>T_tgt\<close>)
-  connected by sync (mapping source states to target states), the following diagram commutes:
-
-    \<^verbatim>\<open>s_src\<close>  --\<^verbatim>\<open>T_src\<close>(a)-->  \<^verbatim>\<open>s_src\<close>'
-      |                      |
-    sync                   sync
-      |                      |
-      v                      v
-    \<^verbatim>\<open>s_tgt\<close>  --\<^verbatim>\<open>T_tgt\<close>(a)-->  \<^verbatim>\<open>s_tgt\<close>'
-
-  That is: sync (\<^verbatim>\<open>T_src\<close> s a) = \<^verbatim>\<open>T_tgt\<close> (sync s) a
+  connected by sync (mapping source states to target states), the naturality
+  square commutes: sync (\<^verbatim>\<open>T_src\<close> s a) = \<^verbatim>\<open>T_tgt\<close> (sync s) a
 
   This is the structural preservation guarantee: a transition performed
   at the source domain, when synchronized, produces the same result as
@@ -308,11 +300,11 @@ text \<open>
   the same state.
 
   The key property: if one domain transitions, the synchronization
-  brings ALL other domains to the same resulting state.
+  brings \<^emph>\<open>all\<close> other domains to the same resulting state.
 
   We model this as: all domains are instances of the same abstract
   state machine, connected by identity-like state/action maps.
-  The "same abstract state machine" assumption holds when the
+  The ``same abstract state machine'' assumption holds when the
   protocol enforces a uniform state model across all domains.
 \<close>
 

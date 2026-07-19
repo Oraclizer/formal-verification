@@ -53,17 +53,17 @@
       connected chains agree); sync_isolation (other assets unaffected);
       an atomic lock guard protects the sync function (a second acquire while the
       lock is held fails), expressing the intended exclusion of competing
-      regulatory actions under the atomic model (no dynamic serialisation).
+      regulatory actions under the atomic model (no dynamic serialization).
     - valid_state_preservation: sync preserves the global validity invariant
       (consistent_state and no_locked_without_reason).
 
   Design decisions (justified by legal precedence and operational scope):
-    - RECOVER and LIQUIDATE excluded from reg_action (force transfer / external
+    - RECOVER and LIQUIDATE excluded from reg_action (forced transfer / external
       DEX semantics, not state transitions; modelled at a different layer).
     - SEIZED → FROZEN excluded (legally, SEIZED is a stronger constraint).
     - FROZEN → RESTRICTED excluded (must go through ACTIVE).
     - Locking scope: the guard expresses the intended exclusion of competing
-      regulatory actions (atomic model, no interleaving to serialise), not
+      regulatory actions (atomic model, no interleaving to serialize), not
       double-spend prevention.
 *)
 
@@ -83,9 +83,9 @@ text \<open>
   \<^const>\<open>SEIZE\<close>, \<^const>\<open>CONFISCATE\<close>, \<^const>\<open>RESTRICT\<close>) and their
   de-escalation counterparts (\<^const>\<open>UNFREEZE\<close>, \<^const>\<open>UNRESTRICT\<close>,
   \<^const>\<open>RELEASE\<close>).  RECOVER and LIQUIDATE, two of the product's six
-  enforcement actions, are excluded from \<open>reg_action\<close>: they involve force
-  transfers or external DEX interactions rather than regulatory state
-  transitions, and are modelled at a different layer.
+  enforcement actions, are excluded from \<open>reg_action\<close>: they involve forced
+  transfers or external decentralized-exchange (DEX) interactions rather than
+  regulatory state transitions, and are modelled at a different layer.
 \<close>
 
 text \<open>
@@ -93,7 +93,7 @@ text \<open>
   (state, action) combinations. The transition table encodes legal
   precedence: seizure is stronger than freezing, confiscation is terminal
   and universally reachable, and intermediate states must return to
-  Active before lateral transitions.
+  ACTIVE before lateral transitions.
 \<close>
 
 fun reg_transition :: "reg_state \<Rightarrow> reg_action \<Rightarrow> reg_state option" where
@@ -162,7 +162,7 @@ subsection \<open>SEIZED to FROZEN exclusion\<close>
 text \<open>
   SEIZED is a strictly stronger constraint than FROZEN. Direct
   transition from SEIZED to FROZEN is legally nonsensical (cannot
-  "weaken" a court-ordered seizure to a mere freeze). The path
+  ``weaken'' a court-ordered seizure to a mere freeze). The path
   is: RELEASE then ACTIVE then FREEZE.
 \<close>
 
@@ -294,7 +294,7 @@ next
     using reg_states_UNIV by auto
 qed
 
-section \<open>Asset and Global State Modeling\<close>
+section \<open>Asset and Global State Modelling\<close>
 
 type_synonym asset_id = nat
 type_synonym chain_id = nat
@@ -507,7 +507,7 @@ text \<open>
   If a lock is held, a further lock acquisition on the same asset fails
   (\<^verbatim>\<open>acquire_lock\<close> returns \<^verbatim>\<open>None\<close>).  In the atomic model this guard
   expresses the intended mutual exclusion of regulatory actions on an asset;
-  there is no concurrent execution in the model to serialise.
+  there is no concurrent execution in the model to serialize.
 \<close>
 
 lemma lock_acquire_success:
@@ -563,10 +563,6 @@ lemma acquire_lock_chains:
   shows "gs_chains gs' = gs_chains gs"
   using assms unfolding acquire_lock_def is_locked_def
   by (auto split: if_splits)
-
-text \<open>
-  Auxiliary: \<^verbatim>\<open>connected_chains\<close> uses original gs, not locked gs.
-\<close>
 
 text \<open>
   The cross-chain regulatory homomorphism theorem.
@@ -852,7 +848,7 @@ text \<open>
   whose jurisdiction handles de-escalation (UNFREEZE, UNRESTRICT, RELEASE)
   exclusively through separate judicial procedures rather than as on-chain
   actions; correspondingly, Chain B's on-chain action vocabulary is the
-  four-action escalation subset only. The synchronisation map between the
+  four-action escalation subset only. The synchronization map between the
   two chains is therefore non-trivial in two ways:
 
   \<^item> The source action type is \<^verbatim>\<open>reg_action\<close> and the target action type is
@@ -862,7 +858,7 @@ text \<open>
   \<^item> The locale parameter \<^verbatim>\<open>actions_s\<close> is instantiated with a strict subset
     of the full \<^verbatim>\<open>reg_action\<close> set, namely the four escalation actions.
     De-escalation actions exist in \<^verbatim>\<open>reg_action\<close> as a datatype but are
-    out of scope for this synchronisation instance.
+    out of scope for this synchronization instance.
 
   The naturality assumption then has to hold only on the escalation subset,
   which is exactly the design intent of the locale's \<^verbatim>\<open>actions_s\<close> parameter:
@@ -873,7 +869,7 @@ text \<open>
 datatype chain_b_action = B_FREEZE | B_SEIZE | B_CONFISCATE | B_RESTRICT
 
 text \<open>
-  The escalation subset of \<^verbatim>\<open>reg_action\<close> that this instance synchronises
+  The escalation subset of \<^verbatim>\<open>reg_action\<close> that this instance synchronizes
   across to Chain B.
 \<close>
 
@@ -963,12 +959,6 @@ proof -
 qed
 
 text \<open>
-  The escalation instance: \<^verbatim>\<open>state_preservation\<close> with \<^verbatim>\<open>actions_s\<close> the
-  escalation subset of \<^verbatim>\<open>reg_action\<close>, target action type \<^verbatim>\<open>chain_b_action\<close>,
-  and identity state map (both chains share the regulatory state space).
-\<close>
-
-text \<open>
   Both state-machine sides of the heterogeneous-action instance --- the
   source on the escalation subset of \<^verbatim>\<open>reg_actions\<close> and Chain~B's target ---
   have their obligations discharged inline by \<^theory_text>\<open>unfold_locales\<close>
@@ -982,7 +972,7 @@ text \<open>
   \<^verbatim>\<open>chain_b_actions\<close>, and the state map is the identity. Both source and
   target state machines share the regulatory state space, so two of the
   state-machine obligations (\<^verbatim>\<open>finite reg_states\<close> and
-  \<^verbatim>\<open>reg_terminal \<subseteq> reg_states\<close>) collapse between source and target; the
+  \<open>reg_terminal \<subseteq> reg_states\<close>) collapse between source and target; the
   proof structure below reflects this by issuing each \<^verbatim>\<open>show\<close> exactly once
   for the merged obligation.
 \<close>
@@ -1302,10 +1292,7 @@ qed
 
 text \<open>
   Forward state preservation: \<^verbatim>\<open>reg_to_daml\<close> as a structure-preserving map.
-\<close>
-
-text \<open>
-  Forward state preservation. The source state machine is on
+  The source state machine is on
   \<^verbatim>\<open>(reg_states, reg_actions, reg_transition, reg_terminal)\<close>, which exactly
   matches the \<^verbatim>\<open>reg_sm\<close> interpretation; consequently \<^verbatim>\<open>unfold_locales\<close>
   auto-discharges all six source state-machine obligations. The target side
@@ -1368,11 +1355,7 @@ qed
 
 text \<open>
   Backward state preservation: \<^verbatim>\<open>daml_to_reg\<close> as a structure-preserving map
-  on the image of \<^verbatim>\<open>reg_to_daml\<close>.
-\<close>
-
-text \<open>
-  Backward state preservation. The source side is DAML and the target side
+  on the image of \<^verbatim>\<open>reg_to_daml\<close>.  The source side is DAML and the target side
   matches \<^verbatim>\<open>reg_sm\<close>. \<^verbatim>\<open>unfold_locales\<close> auto-discharges all twelve
   state-machine obligations from the previously registered interpretations,
   so only the five preservation axioms remain pending.
@@ -1456,8 +1439,8 @@ text \<open>
   We now instantiate the \<^verbatim>\<open>multi_domain_preservation\<close> locale from
   \<^verbatim>\<open>State_Preservation\<close>.thy with the regulatory state machine.
 
-  The instantiation is parametric: given ANY finite set of domains
-  and ANY initial \<^verbatim>\<open>domain_state\<close> function satisfying the consistency
+  The instantiation is parametric: given \<^emph>\<open>any\<close> finite set of domains
+  and \<^emph>\<open>any\<close> initial \<^verbatim>\<open>domain_state\<close> function satisfying the consistency
   precondition, the locale is satisfied. This proves that the
   abstract framework applies to the concrete regulatory model
   without fixing a specific topology.
@@ -1577,13 +1560,13 @@ text \<open>
   5. The atomic lock guard protects the sync function against a second action
      while the lock is held; under the atomic model this expresses the
      intended exclusion of competing regulatory actions on the same asset
-     (NOT double-spend prevention — that is handled at a different layer).
+     (\<^emph>\<open>not\<close> double-spend prevention — that is handled at a different layer).
 
   6. The \<^verbatim>\<open>regulatory_homomorphism\<close> theorem establishes that after sync,
      all connected chains agree on the new regulatory state.
 
   7. The \<^verbatim>\<open>valid_state_preservation\<close> theorem establishes that sync preserves
-     the global validity invariant: \<^verbatim>\<open>consistent_state\<close> AND no outstanding
+     the global validity invariant: \<^verbatim>\<open>consistent_state\<close> and no outstanding
      locks. This closes the inductive invariant.
 
   8. The heterogeneous-action instance (\<^verbatim>\<open>escalation_preservation\<close>) instantiates

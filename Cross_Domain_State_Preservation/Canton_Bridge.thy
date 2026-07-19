@@ -18,7 +18,7 @@
       associativity), and the associativity of the lifted merge/join algebra.
 
     * Path- and fold-level authenticity.  The single-step soundness theorems
-      are generalised to a path of blindings and an n-ary fold of merges; these
+      are generalized to a path of blindings and an n-ary fold of merges; these
       lists are not protocol execution traces.
 
     * Concrete and recursive instantiation.  The authenticated_state structure
@@ -39,7 +39,7 @@ theory Canton_Bridge
     "ADS_Functor.Canton_Transaction_Tree"
 begin
 
-section \<open>Auxiliary list predicate for synchronization sequences\<close>
+section \<open>Auxiliary List Predicate for Synchronization Sequences\<close>
 
 text \<open>A blinding path: each element of the list is a blinding of its successor.
   As blindings narrow what is revealed, the last element is the most-revealed
@@ -49,7 +49,7 @@ definition blinding_path :: "('d \<Rightarrow> 'd \<Rightarrow> bool) \<Rightarr
   "blinding_path bl xs \<longleftrightarrow> (\<forall>i. Suc i < length xs \<longrightarrow> bl (xs ! i) (xs ! Suc i))"
 
 
-section \<open>Composite functor laws: cross-domain preservation after the ADS Merkle functor\<close>
+section \<open>Composite Functor Laws: Cross-Domain Preservation after the ADS Merkle Functor\<close>
 
 text \<open>
   Inside @{locale authenticated_state} the ADS layer supplies a thin category:
@@ -61,8 +61,8 @@ text \<open>
   values and endpoint-extractable blinding morphisms form the relevant
   sub-preorder.  On that domain the extraction map is the composite functor:
   it sends a value to the state it extracts to, and a blinding morphism to a
-  refinement morphism.  The next four
-  results are the category axioms of this composite functor together with the
+  refinement morphism.  The results
+  below are the category axioms of this composite functor together with the
   associativity of the lifted merge (join) algebra.
 \<close>
 
@@ -143,7 +143,7 @@ qed
 
 text \<open>The functor's action on the merge (join) product: a merge of two views is
   sent to a join of the two extracted states, with the joined state valid and
-  refining each input.  This lifts @{thm [source] extract_respects_merging} to a
+  each input refining it.  This lifts @{thm [source] extract_respects_merging} to a
   theorem carrying validity, and is exactly
   @{thm [source] authenticated_preservation_soundness} read as the product map of
   the composite functor.\<close>
@@ -183,7 +183,7 @@ qed
 end
 
 
-section \<open>Authenticity along blinding paths and merge folds\<close>
+section \<open>Authenticity along Blinding Paths and Merge Folds\<close>
 
 text \<open>
   Four authenticity properties are shown to hold not only across a single
@@ -202,7 +202,7 @@ text \<open>
         and the merge direction (theorem \<open>merge_seq_hash\<close>);
     \<^enum> \<^bold>\<open>inclusion integrity\<close> --- theorem \<open>sequence_inclusion_integrity\<close>.
 
-  \<^bold>\<open>Scope qualifier (read carefully).\<close>  The inclusion result is \<^emph>\<open>state-level\<close>: it
+  \<^bold>\<open>Scope qualifier.\<close>  The inclusion result is \<^emph>\<open>state-level\<close>: it
   is about \<^emph>\<open>revealed holdings\<close> --- a holding exhibited by any view in the sequence
   is genuinely present in the endpoint with the same regulatory state, and no view
   fabricates a chain the endpoint does not authenticate.  This is \<^emph>\<open>not\<close> a claim about
@@ -214,7 +214,7 @@ text \<open>
 context authenticated_state
 begin
 
-subsection \<open>Need-to-know blinding along a sequence\<close>
+subsection \<open>Need-to-Know Blinding along a Sequence\<close>
 
 text \<open>Along a blinding path, an earlier (more blinded) element blinds any later
   element: the blinding relation is monotone along the path by transitivity.\<close>
@@ -244,7 +244,7 @@ text \<open>
   extracts to a valid cross-domain state, \emph{every} intermediate view extracts
   to a valid state that refines the endpoint.  Authenticity (validity together
   with the refinement guarantee of a partial view) is preserved along the whole
-  path, not merely across one blinding step.  This generalises
+  path, not merely across one blinding step.  This generalizes
   @{thm [source] blinded_view_preserves_validity}.
 \<close>
 
@@ -338,12 +338,12 @@ proof -
   from cdsp_ads_morphism[OF this eb] show ?thesis by blast
 qed
 
-subsection \<open>Re-revealing merge along a sequence\<close>
+subsection \<open>Re-revealing Merge along a Sequence\<close>
 
 text \<open>The n-ary right fold of the (locale) merge along a non-empty sequence of
   authenticated views.  It is defined with the locale merge \<^term>\<open>m\<close> fixed, so its
-  induction principle keeps \<^term>\<open>m\<close> in place (a theory-level fold parameterised by
-  the merge would generalise it away under induction).\<close>
+  induction principle keeps \<^term>\<open>m\<close> in place (a theory-level fold parameterized by
+  the merge would generalize it away under induction).\<close>
 
 fun merge_seq :: "'d list \<Rightarrow> 'd option" where
   "merge_seq [] = None"
@@ -389,7 +389,7 @@ text \<open>
   Merge-fold soundness.  A non-empty list of partial authenticated views over
   the same committed object (all sharing a hash) folds
   into a single combined view that extracts to a valid cross-domain state
-  refining every contributor.  This is the n-ary generalisation of
+  that every contributor refines.  This is the n-ary generalization of
   @{thm [source] authenticated_preservation_soundness}: re-revealing along the
   entire fold preserves validity and reconstructs a consistent joint view.
 \<close>
@@ -453,7 +453,7 @@ qed
 end
 
 
-section \<open>Instantiation on the ADS blindable-position functor\<close>
+section \<open>Instantiation on the ADS Blindable-Position Functor\<close>
 
 text \<open>
   We instantiate @{locale authenticated_state} on a concrete ADS construction:
@@ -476,8 +476,8 @@ lemma auth_state_empty_eq: "auth_state r {} = auth_state r' {}"
 
 text \<open>Extraction: a revealed datum yields its cross-domain state; a hash-only
   commitment yields the empty (no-chains) view, which is valid and refines every
-  state.  The commitment must still extract to a state -- a blinding of a value
-  must itself be extractable -- so it maps to the empty view rather than to
+  state.  The commitment must still extract to a state --- a blinding of a value
+  must itself be extractable --- so it maps to the empty view rather than to
   \<^term>\<open>None\<close>.\<close>
 
 fun bl_extract :: "(reg_state \<times> chain_id set, reg_state) blindable\<^sub>m \<Rightarrow> global_state option" where
@@ -603,8 +603,9 @@ next
   qed
 qed
 
-text \<open>Non-degeneracy of the blindable instance: revealed two-chain views merge
-  to their union, and a hash-only commitment merges back to the revealed view.\<close>
+text \<open>Non-degeneracy of the blindable instance: two revealed single-chain views
+  merge to their two-chain union, and a hash-only commitment merges back to the
+  revealed view.\<close>
 
 lemma oss_blindable_nontrivial:
   "merge_blindable auth_hash auth_merge (Unblinded (ACTIVE, {0})) (Unblinded (ACTIVE, {Suc 0}))
@@ -616,7 +617,7 @@ lemma oss_blindable_nontrivial:
 
 text \<open>
   Regression witness exhibiting a non-vacuous instance for the sequence-level
-  results above.  The generalised predicate @{const blinding_path} is satisfied by a genuinely
+  results above.  The generalized predicate @{const blinding_path} is satisfied by a genuinely
   increasing need-to-know sequence at this instance: a hash-only commitment, then a
   one-chain revealed view, then a two-chain revealed view, each blinding its
   successor.  The most-revealed endpoint extracts to a non-degenerate two-chain
@@ -640,10 +641,10 @@ lemma blinding_path_witness_endpoint:
   by (simp_all add: auth_state_connected)
 
 
-section \<open>Instantiation on the top-level Canton transaction commitment\<close>
+section \<open>Instantiation on the Top-Level Canton Transaction Commitment\<close>
 
 text \<open>
-  Theory @{theory ADS_Functor.Canton_Transaction_Tree} formalises the production
+  Theory @{theory ADS_Functor.Canton_Transaction_Tree} formalizes the production
   Canton transaction tree as an authenticated data structure, but over abstract
   content: @{typ view_data}, @{typ view_metadata}, @{typ common_metadata} and
   @{typ participant_metadata} are introduced by @{command typedecl} and carry no
@@ -775,14 +776,14 @@ lemma canton_authenticated_nontrivial:
   by (simp_all add: rtx_merge_def rtx_extract_def auth_merge_def auth_hash_def insert_commute)
 
 
-section \<open>Recursive instantiation on the Canton transaction tree\<close>
+section \<open>Recursive Instantiation on the Canton Transaction Tree\<close>
 
 text \<open>
   The coarse instance @{term canton_authenticated} above models a Canton transaction
   as one top-level blindable over an abstract payload.  Here we keep the public
   \<^emph>\<open>recursive\<close> shape: a view is the rose tree @{type rose_tree\<^sub>m} of
   @{theory ADS_Functor.ADS_Construction} --- the very datatype the public Canton
-  formalisation uses to build \<open>view\<^sub>m\<close> (\<open>view\<^sub>m \<cong> view_content rose_tree\<^sub>m\<close>, with
+  formalization uses to build \<open>view\<^sub>m\<close> (\<open>view\<^sub>m \<cong> view_content rose_tree\<^sub>m\<close>, with
   \<open>merge_view = merge_tree \<dots>\<close>).  We instantiate that content-agnostic machine with
   concrete regulatory content: each node carries the \<^typ>\<open>chain_id\<close> it attests, and
   the children are its subviews.  No new datatype, no new Merkle proof: the interface
@@ -804,14 +805,14 @@ lemma merkle_reg_view: "merkle_interface rv_hash rv_bo rv_merge"
 text \<open>Extraction collects the attested chains from every revealed node, recursing
   into subviews; a blinded node contributes nothing.  By the Merkle property a
   subview is reachable only through its (revealed) parent.  Lemma
-  \<open>reg_chains_blinding\<close> below makes this monotone: blinding a node can only shrink
+  \<open>reg_chains_blinding\<close> below makes this precise: blinding a node can only shrink
   the attested-chain set.\<close>
 
 fun reg_chains :: "reg_view \<Rightarrow> chain_id set" where
   "reg_chains (Tree\<^sub>m (Unblinded (c, kids))) = insert c (\<Union>x\<in>set kids. reg_chains x)"
 | "reg_chains (Tree\<^sub>m (Blinded _)) = {}"
 
-subsection \<open>Extraction commutes with blinding and merge\<close>
+subsection \<open>Extraction Commutes with Blinding and Merge\<close>
 
 text \<open>A pointwise containment along a list lifts to the union of the collected
   chains.\<close>
@@ -821,7 +822,7 @@ lemma UN_reg_chains_mono:
   shows "(\<Union>x\<in>set xs. reg_chains x) \<subseteq> (\<Union>y\<in>set ys. reg_chains y)"
   using assms by (induction xs ys rule: list_all2_induct) auto
 
-text \<open>Positional characterisation of the ADS list merge (used for the children
+text \<open>Positional characterization of the ADS list merge (used for the children
   lists of a rose-tree node).  The length alignment is \emph{derived}, not assumed:
   the lemmas \<open>merge_list_NC\<close> / \<open>merge_list_CN\<close> below reject lists of different
   length, exactly because the list hash (@{term \<open>map\<close>}) commits to the length.\<close>
@@ -964,7 +965,7 @@ proof (induction a arbitrary: b ab rule: rose_tree\<^sub>m.induct)
 qed
 
 text \<open>
-  Regression witnesses for the recursive structure.  First, deep-nested chains are
+  Regression witnesses for the recursive structure.  First, deeply nested chains are
   not dropped: extraction genuinely recurses into subviews.  Second, list-merge
   length alignment is enforced (mismatched lengths are rejected), so it is derived
   from the hash rather than assumed.  Third, a blinded node contributes nothing.
@@ -986,7 +987,7 @@ lemma merge_list_length_aligned:
   by simp_all
 
 
-subsection \<open>The recursive transaction-tree instance\<close>
+subsection \<open>The Recursive Transaction-Tree Instance\<close>
 
 text \<open>
   A Canton transaction wraps its consensus metadata and its view list in one
@@ -997,7 +998,7 @@ text \<open>
   product/list/blindable building blocks, so the Merkle interface is inherited
   (lemma \<open>merkle_reg_tx\<close> below).
 
-  \<^bold>\<open>Honesty (model-fidelity boundary, read carefully).\<close>  The recursive view structure
+  \<^bold>\<open>Model-fidelity boundary.\<close>  The recursive view structure
   is now \<^emph>\<open>faithful\<close>: subviews nest as in Canton, and subview-level blinding is alive
   (the witnesses below).  Two points remain modelling choices, \<^emph>\<open>not\<close> a 1:1 match with
   Canton's datatype.  First, leaf content is concrete \<^typ>\<open>chain_id\<close>/\<^typ>\<open>reg_state\<close>,
@@ -1009,7 +1010,7 @@ text \<open>
   by revealing the whole transaction, hence its consensus), which in turn gives
   validity with no assumption.  The price is a scope limit: the case ``a view is
   revealed while the consensus is blinded'' is \<^emph>\<open>out of this model's scope\<close>.  Lifting
-  it would require an independently-blindable consensus and a fresh consistency
+  it would require an independently blindable consensus and a fresh consistency
   argument; that is recorded as future work and as the residual fidelity check for
   the Canton authors, not closed here.
 \<close>
@@ -1263,7 +1264,7 @@ lemma reg_tx_authenticated_nontrivial:
   by (simp_all add: merge_discrete_def merge_list_Cons merge_tree.simps merge_rt_F\<^sub>m_def)
 
 
-section \<open>Path-level Merkle inclusion for the recursive view tree\<close>
+section \<open>Path-Level Merkle Inclusion for the Recursive View Tree\<close>
 
 text \<open>
   The sequence-level result @{thm [source] authenticated_state.sequence_inclusion_integrity}
@@ -1276,7 +1277,7 @@ text \<open>
   revealed while every node on the path to the root and all off-path siblings are blinded
   (\<open>blind_path\<close>).  Because the discrete content already satisfies the blinding-order locale
   (@{thm [source] blinding_of_on_discrete}), the two soundness results transfer with no new
-  assumption.  This is the same construction the public Canton formalisation applies to its
+  assumption.  This is the same construction the public Canton formalization applies to its
   own view tree; it operates on the view rose tree, so the consensus scope limit of the
   preceding section is untouched.
 \<close>

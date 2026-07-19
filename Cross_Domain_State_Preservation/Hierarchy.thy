@@ -7,7 +7,7 @@
   Cross-Domain State Preservation Functor — Sync Degree Hierarchy
 
   This theory layers a degree stratification on top of the functorial
-  cross-domain construction of Functor_Laws.thy, formalising the
+  cross-domain construction of Functor_Laws.thy, formalizing the
   monotonicity of the synchronization degree hierarchy.
 
   Each synchronization degree k models a coupling breadth: a degree-k system
@@ -816,7 +816,7 @@ definition lamport_hb :: "timestamp \<Rightarrow> timestamp \<Rightarrow> bool" 
 text \<open>
   The degree-class layer, parametric in the degree assignment.  Everything
   proved inside this context holds for an \<^emph>\<open>arbitrary\<close> assignment
-  \<open>asset_degree\<close>; on export each constant and theorem generalises over the
+  \<open>asset_degree\<close>; on export each constant and theorem generalizes over the
   assignment.
 \<close>
 
@@ -993,7 +993,7 @@ qed
 
 text \<open>
   The timestamp-order degree boundary.  The classes \<open>S\<^sub>1\<close> and
-  \<open>S\<^sub>2\<close> are separated by a degree-2 threshold.  The legacy identifiers
+  \<open>S\<^sub>2\<close> are separated by a degree-2 threshold.  The identifiers
   \<open>requires_causal\<close> and \<open>causal_consistent_at\<close> label that threshold, but
   the formal relation is only the strict order on integer timestamps, not a
   distributed happened-before relation.  We show the boundary is
@@ -1010,7 +1010,7 @@ text \<open>
   \<open>k\<close> --- the containment and monotonicity structure of the ladder --- while
   the per-degree synchronization semantics itself (static, unidirectional
   observation, bidirectional coupling, atomic state binding) is abstracted.
-  The timestamp-order boundary sits at \<open>k = 2\<close>, the S1/S2 transition below.
+  The timestamp-order boundary sits at \<open>k = 2\<close>, the \<open>S\<^sub>1\<close>/\<open>S\<^sub>2\<close> transition below.
 \<close>
 
 definition requires_causal :: "asset_id \<Rightarrow> bool" where
@@ -1049,8 +1049,8 @@ text \<open>
   different assignment parameter, so as long as the promoted degree stays
   within the system's capability, the over-provisioning guarantee transfers
   verbatim to the new assignment.  In-flight promotion (a re-assignment
-  crossing a live synchronization) is out of scope for this entry; subsequent
-  work on retry-queue semantics covers it.
+  crossing a live synchronization) is out of scope for this entry;
+  retry-queue semantics is left to subsequent work.
 \<close>
 
 corollary static_promotion_safety:

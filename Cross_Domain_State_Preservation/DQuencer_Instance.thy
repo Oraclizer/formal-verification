@@ -17,7 +17,7 @@
   static Byzantine-threshold assumption, a cardinality bound (f < n/3) on
   a two-valued node tag, with conflicting regulatory actions from multiple
   jurisdictions resolved by a total priority order. BLS, VRF, network
-  messaging, and adversarial node behaviour are not formalized (see the
+  messaging, and adversarial node behavior are not formalized (see the
   design decisions below).
 
   Locale instantiations provided in this theory:
@@ -89,8 +89,7 @@ section \<open>Authority Level and Action Severity\<close>
 text \<open>
   Regulatory authority hierarchy. International authorities (e.g., FATF)
   take precedence over national (e.g., SEC), which take precedence over
-  regional authorities. This reflects the RCP framework's jurisdictional
-  priority model.
+  regional authorities.
 \<close>
 
 datatype authority_level = Regional | National | International
@@ -105,7 +104,7 @@ lemma authority_rank_injective:
   by (cases a1; cases a2; auto)
 
 text \<open>
-  Action severity determines priority among actions from the same
+  Action severity determines priority among actions sharing the same
   authority level and timestamp (it is the third component of the
   lexicographic key). Stronger enforcement actions (CONFISCATE, SEIZE)
   take precedence over weaker ones (RESTRICT, UNFREEZE). This reflects
@@ -142,7 +141,7 @@ text \<open>
      so we invert to make larger = higher in the nat order)
 
   For timestamp and \<^verbatim>\<open>node_id\<close> inversion, we use \<^term>\<open>max_val - actual_val\<close>
-  to convert "smaller is better" to "larger is better" for compatibility
+  to convert ``smaller is better'' to ``larger is better'' for compatibility
   with the nat product order where larger = higher.
 \<close>
 
@@ -255,7 +254,7 @@ text \<open>
   \<^verbatim>\<open>Priority_Resolution.thy\<close> with D-quencer message priorities.
 
   The priority function maps messages to \<^verbatim>\<open>priority_key\<close> (which is
-  \<^verbatim>\<open>nat \<times> nat \<times> nat \<times> nat\<close> with the built-in lexicographic order).
+  \<^typ>\<open>nat \<times> nat \<times> nat \<times> nat\<close> with the built-in lexicographic order).
 
   Injectivity follows from: distinct messages have either different
   authority levels, different timestamps, different actions, or

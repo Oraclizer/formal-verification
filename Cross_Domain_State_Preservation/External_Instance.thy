@@ -44,13 +44,13 @@ text \<open>
   a trace-conformant TCP model: in particular, \<open>FIN-WAIT\<close> followed by \<open>ACK\<close>
   goes directly to \<open>CLOSED\<close>, deliberately collapsing the peer-FIN and
   TIME-WAIT stages.  The purpose is only to instantiate the generic locales
-  outside the regulatory vocabulary.  A \<open>RST\<close> aborts any modeled connection
+  outside the regulatory vocabulary.  An \<open>RST\<close> aborts any modelled connection
   in flight.
 
   Two modelling notes.  First, \<open>CLOSED\<close> is terminal: a re-connection is a
   new connection identity (a new tracker entry), not a transition of the old
-  one.  Second, a \<open>RST\<close> in \<^emph>\<open>listen\<close> is ignored by RFC~793; the partial
-  transition function returns \<open>None\<close> there, as for every other
+  one.  Second, an \<open>RST\<close> in \<open>LISTEN\<close> is ignored under RFC~793; the partial
+  transition function returns \<open>None\<close> there, as it does for every other
   state/event pair the subset does not admit.
 \<close>
 
@@ -152,7 +152,7 @@ definition ct_terminal :: "ct_entry set" where
 section \<open>The Tracked Event Subset and the Tracker Transition\<close>
 
 text \<open>
-  The abstract tracker observes the modeled handshake and teardown events but
+  The abstract tracker observes the modelled handshake and teardown events but
   excludes \<open>RST\<close> by design.  This is an action-scoping choice, not a claim
   about a concrete operating-system conntrack implementation.  The source
   action set of the preservation morphism is therefore the strict subset of

@@ -65,7 +65,7 @@ text \<open>
 subsection \<open>Identity morphism\<close>
 
 text \<open>The identity pair \<^term>\<open>(id, id)\<close> is a state-preservation morphism from any
-  object to itself: \<open>F\<close> sends identities to identities.\<close>
+  object to itself: the construction sends identities to identities.\<close>
 
 theorem preservation_id:
   assumes "state_machine states actions transition terminal"
@@ -79,7 +79,7 @@ subsection \<open>Composition of morphisms\<close>
 
 text \<open>The composite of two state-preservation morphisms is a state-preservation
   morphism: the naturality square of the second morphism is stacked on that of
-  the first.  This is the cross-domain analogue of "closed under composition".\<close>
+  the first.  This is the cross-domain analogue of ``closed under composition''.\<close>
 
 theorem preservation_compose:
   assumes f: "state_preservation S\<^sub>a A\<^sub>a T\<^sub>a F\<^sub>a S\<^sub>b A\<^sub>b T\<^sub>b F\<^sub>b f f'"
@@ -472,7 +472,7 @@ text \<open>
   state-level reading of equal hashes (mergeability).  Without the containment
   clause a candidate join could carry an arbitrary holding on a chain outside
   both views and still be accepted; the regression witness
-  \<open>rogue_join_excluded\<close> below records that such a candidate is now rejected.
+  \<open>rogue_join_excluded\<close> below records that such a candidate is rejected.
 
   \<^term>\<open>state_refines sa sb\<close> says that \<open>sa\<close> is a partial view of \<open>sb\<close>: every
   chain known to \<open>sa\<close> is known to \<open>sb\<close> with the same regulatory state.  This is
@@ -536,17 +536,17 @@ text \<open>
   state out of an authenticated value.  The three coherence assumptions tie the
   authenticated layer to the state-glue layer:
 
-    * \<open>extract_respects_merging\<close>: merging hash-compatible authenticated values
-      yields a state that is the join of the extracted views;
-    * \<open>extract_under_blinding\<close>: a blinding of an authenticated value extracts to
-      a refinement of the extracted state;
-    * \<open>extract_preserves_validity\<close>: every extracted state is valid.
+  \<^item> \<open>extract_respects_merging\<close>: merging hash-compatible authenticated values
+    yields a state that is the join of the extracted views;
+  \<^item> \<open>extract_under_blinding\<close>: a blinding of an authenticated value extracts to
+    a refinement of the extracted state;
+  \<^item> \<open>extract_preserves_validity\<close>: every extracted state is valid.
 
   The merging and blinding assumptions are guarded by the hash-equality
   condition \<^term>\<open>h a = h b\<close>, which is the ADS notion of mergeability.  The two
   soundness theorems below discharge this condition from the ADS lemmas
-  \<open>merge_respects_hashes\<close> and \<open>hash\<close>, and use \<open>join\<close> to exhibit the join as a
-  refinement of each input — so the Merkle interface is used in the proofs, not
+  \<open>merge_respects_hashes\<close> and \<open>hash\<close>, and use \<open>join\<close> to show that each input
+  view refines the join --- so the Merkle interface is used in the proofs, not
   merely imported.
 
   Because \<open>extract_map\<close> is partial, this construction is functorial on
@@ -597,8 +597,8 @@ qed
 
 text \<open>
   Soundness of authenticated preservation under merging.  If two authenticated
-  values merge, then their extracted states have a valid join, and that join
-  refines each input view.  The proof calls \<open>merge_respects_hashes\<close> (to certify
+  values merge, then their extracted states have a valid join, which each
+  input view refines.  The proof calls \<open>merge_respects_hashes\<close> (to certify
   mergeability as hash-equality), \<open>join\<close> (to obtain the blinding relation of each
   input to the merge), and \<open>hash\<close> (via @{thm [source] bo_hash_eq}, to transport
   that blinding relation to the extracted states).
@@ -657,7 +657,7 @@ qed
 end
 
 
-section \<open>Authenticated Cross-Domain State: the Oraclizer Instance\<close>
+section \<open>Authenticated Cross-Domain State: The Oraclizer Instance\<close>
 
 text \<open>
   We discharge the model obligation of @{locale authenticated_state} by
@@ -673,7 +673,7 @@ text \<open>
   not a commitment to the chain set itself.  Two data are mergeable exactly when they
   agree on \<open>r\<close>; the merge @{term auth_merge} then unions the revealed-chain sets,
   and the blinding order @{term auth_bo} forgets some of them.  This is the
-  state-level reading the glue layer asks for: @{term auth_merge} realises the
+  state-level reading the glue layer asks for: @{term auth_merge} realizes the
   ADS \<open>join\<close>, @{term auth_bo} the ADS blinding order, and @{term auth_extract}
   sends \<^term>\<open>(r, P)\<close> to the global state in which every chain of \<open>P\<close> holds the
   asset in state \<open>r\<close>.  Because the hash fixes \<open>r\<close>, merging never forces two
@@ -1002,7 +1002,7 @@ text \<open>
   The following lemmas isolate the effect of a successful synchronization on
   the regulatory states and on asset existence.  They are proved without
   assuming the input state is valid (consistent and unlocked), because the
-  convergence argument starts from an arbitrary state.  The existing theorem
+  convergence argument starts from an arbitrary state.  The theorem
   @{thm [source] regulatory_homomorphism} establishes the analogous fact under
   the @{term valid_state} hypothesis; here we re-establish the parts needed for
   convergence with no such hypothesis.
@@ -1553,7 +1553,7 @@ proof
 qed
 
 text \<open>
-  Machine-checked regression witnesses for the two excluded behaviours.  The
+  Machine-checked regression witnesses for the two excluded behaviors.  The
   two-chain builder places the given regulatory values on chains \<open>0\<close> and
   \<^term>\<open>Suc 0\<close> of asset \<open>0\<close>; both witnesses evaluate by unfolding.
 \<close>
@@ -1583,7 +1583,7 @@ lemma blind_confiscate_excluded:
 
 text \<open>Confiscation erasure is excluded: on a \<^const>\<open>CONFISCATED\<close>/\<^const>\<open>ACTIVE\<close>
   disagreement the terminal state is present, so no non-\<^const>\<open>CONFISCATE\<close>
-  broadcast is a safe recovery --- a recorded confiscation cannot be revived
+  broadcast is a safe recovery --- a recorded confiscation cannot be erased
   by overwriting it with a non-terminal value.\<close>
 
 lemma terminal_overwrite_excluded:
@@ -1772,8 +1772,8 @@ text \<open>
   the constant schedule on that node witnesses the fair-leader hypothesis
   with a schedule drawn from the roster --- so for \<^emph>\<open>every\<close> D-quencer system
   @{locale dquencer_liveness} is inhabitable by the system's own nodes
-  (\<^verbatim>\<open>liveness_inhabitable\<close>, a satisfiability witness for the locale,
-  terminal; the in-roster conjunct is what the threshold buys).  The scope of
+  (\<^verbatim>\<open>liveness_inhabitable\<close>, a satisfiability witness for the locale;
+  the in-roster conjunct is what the threshold buys).  The scope of
   this role is deliberately narrow: the headline bounded-convergence theorem
   is stated in the full liveness locale, while its convergence interpretation
   consumes the fair-leader component directly and does not route through this
@@ -1869,7 +1869,7 @@ text \<open>
   scheduled.  Together with @{thm [source] recovery_terminal_completion} ---
   on a terminal-bearing asset a safe recovery can only complete the
   confiscation --- this pins the recovery layer, on the terminal axis, to the
-  two behaviours the regulatory semantics admits for \<^const>\<open>CONFISCATED\<close>:
+  two behaviors the regulatory semantics admits for \<^const>\<open>CONFISCATED\<close>:
   indiscriminate confiscation and confiscation erasure are both excluded.
   On the non-terminal axis the broadcast value is constrained by the source
   chain's transition table, not by the target chains'.

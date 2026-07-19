@@ -42,7 +42,7 @@ as morphisms, \texttt{Functor\_Laws.thy} proves the three category axioms on
 these morphisms: identity is a preservation morphism
 (\texttt{preservation\_id}), preservation morphisms compose
 (\texttt{preservation\_compose}), and their composition is associative
-(\texttt{preservation\_assoc}).  The functorial reading is carried at two
+(\texttt{preservation\_assoc}).  The functorial reading is carried in two
 further places: each transition system is a functor from its one-object
 action category into partial maps on states, its two functor laws carried by
 the identity word and word concatenation (\texttt{apply\_actions\_append});
@@ -194,16 +194,17 @@ nor a verification of TCP or a concrete connection tracker.
 \subsection{Design Decisions}
 
 The regulatory state model incorporates several deliberate design
-decisions based on legal precedence and operational considerations:
+decisions based on the relative precedence of legal constraints and on
+operational considerations:
 
 \begin{itemize}
 \item The state machine models seven regulatory \texttt{reg\_action}s: the
   four escalation actions \textsc{Freeze}, \textsc{Seize},
-  \textsc{Confiscate}, \textsc{Restrict} and their de-escalation
+  \textsc{Confiscate}, \textsc{Restrict}, and the three de-escalation
   counterparts \textsc{Unfreeze}, \textsc{Unrestrict}, \textsc{Release}.
   \textsc{Recover} and \textsc{Liquidate} are excluded as they involve
-  force transfers or external DEX interactions rather than regulatory
-  state transitions.
+  forced transfers or external decentralized-exchange (DEX) interactions
+  rather than regulatory state transitions.
 \item The direct transition \textsc{Seized} $\to$ \textsc{Frozen} is
   excluded because seizure is a strictly stronger legal constraint than
   freezing; relaxation requires explicit release first.
@@ -213,8 +214,8 @@ decisions based on legal precedence and operational considerations:
   function: \texttt{sync} acquires the lock, updates, and releases in a
   single atomic step.  Under this atomic abstraction the guard expresses the
   \emph{intended} exclusion of competing regulatory actions on the same
-  asset rather than serialising them dynamically (there is no interleaving
-  in the model to serialise); the dynamic correctness of contention-time
+  asset rather than serializing them dynamically (there is no interleaving
+  in the model to serialize); the dynamic correctness of contention-time
   locking is outside this entry.  The guard does not address
   double-spending, which is handled at a different layer.
 \item Deadlock (a concurrency phenomenon) does not arise within the model's
@@ -225,7 +226,7 @@ decisions based on legal precedence and operational considerations:
 
 \subsection{Proof Automation}
 
-The entry ships a reusable proof-automation layer,
+The entry provides a reusable proof-automation layer,
 \texttt{Proof\_Automation.thy}: two Eisbach methods discharge the
 obligations of \texttt{state\_machine} and \texttt{state\_preservation}
 instances on finite, enumerated domains ---
@@ -261,7 +262,7 @@ to subsequent entries.
 % include generated text of all theories
 \input{session}
 
-\section*{AI-assisted Review Disclosure}
+\section*{Disclosure of AI Assistance}
 
 Large language models (Anthropic Claude and OpenAI Codex) were used extensively
 in the development of this entry: drafting and revising the Isabelle/HOL

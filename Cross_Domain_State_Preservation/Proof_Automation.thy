@@ -23,7 +23,9 @@ begin
 section \<open>Discharge Methods for Instance Obligations\<close>
 
 text \<open>
-  Two named theorem collections feed the methods.  \<open>discharge_simps\<close> holds
+  Two named theorem collections feed the methods with facts, and a third,
+  \<open>discharge_dels\<close>, suppresses default rewrites that would defeat them.
+  \<open>discharge_simps\<close> holds
   the equational content of a concrete instance: defining equations of the
   state/action/terminal sets, finiteness facts, terminal-absorption
   equations, and naturality equations of structured state maps (conditional
