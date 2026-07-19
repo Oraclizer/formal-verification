@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.5.4
-**Last updated:** 2026-07-19
+**Version:** 0.5.5
+**Last updated:** 2026-07-20
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -16,8 +16,8 @@ This document tracks the correspondence between formally verified model elements
 
 This mapping covers:
 
-- **Property 1 (Cross-Domain State Preservation Homomorphism)**: safety
-- **Property 2 (Deterministic Selection and Aggregate Pending-Count Progress)**: finite maximum selection and closed-count progress (deadlock and individual request fairness are not proved)
+- **Cross-Domain State Preservation Homomorphism**: safety
+- **Deterministic Selection and Aggregate Pending-Count Progress**: finite maximum selection and closed-count progress (deadlock and individual request fairness are not proved)
 - **Cross-Domain State Preservation Functor**: functor laws (identity / composition / associativity over state-preservation morphisms), authenticated cross-domain state soundness via the Merkle interface, and guarded bounded convergence with terminal-faithful safe recovery
 - **Authenticated Functor and Canton Instantiation**: extraction laws on the extractable sub-preorder, authenticity along blinding paths and merge folds (validity, need-to-know, hash soundness, state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree
 - **Synchronization-Degree Hierarchy**: composable natural transformations between degree functors and degree-class monotonicity (over-provisioning safe, under-provisioning unsafe)
@@ -42,7 +42,7 @@ The current proofs do **not** establish:
 
 ---
 
-# Property 1: State Preservation (Safety)
+# State Preservation (Safety)
 
 ## State Transition Model
 
@@ -104,7 +104,7 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 
 ---
 
-# Property 2: Priority Resolution and Liveness
+# Deterministic Selection and Aggregate Pending-Count Progress
 
 ## Priority Key Construction
 
@@ -258,16 +258,16 @@ The atomic `sync` model has no concurrent lock contention, so deadlock does not 
 
 The formal model makes simplifying assumptions. Because this document is pre-implementation, the tables record proposed mitigation targets and whether any refinement evidence exists; they do not claim that an implementation already discharges the gap.
 
-### Property 1 Assumptions
+### State-Preservation Assumptions
 
 | Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
 | Synchronous execution (lock → update → unlock is atomic) | Target deployment is expected to be asynchronous | BVC is a proposed refinement target with finality tracking | Open: no implementation or refinement proof currently establishes atomicity |
-| Honest nodes | Not an assumption of the Property 1 safety locales | N/A | N/A for Property 1; D-quencer node tags belong to Property 2 and do not discharge safety assumptions |
+| Honest nodes | Not an assumption of the state-preservation safety locales | N/A | N/A for the safety layer; D-quencer node tags belong to the selection/progress layer and do not discharge safety assumptions |
 | Finite chain set | A deployment may change membership over time | Registry-governed membership is a proposed design | Open: dynamic-topology refinement is unverified |
 | Lock acquisition is atomic | A deployment may have latency and contention | Timeout/rollback is a proposed design | Open: no contention, timeout, rollback, or atomicity refinement is proved |
 
-### Property 2 Assumptions
+### Selection and Aggregate-Progress Assumptions
 
 | Model Assumption | Implementation Reality | Gap Mitigation | Disposition |
 |---|---|---|---|
@@ -282,7 +282,7 @@ The formal model makes simplifying assumptions. Because this document is pre-imp
 |---|---|---|---|
 | Atomic single evolution step | A target recovery loop may run asynchronously | Round boundaries are a proposed refinement design | Open: no model-to-code refinement |
 | Finite-domain global state | Chain/asset domains may grow over time | Registry snapshots and bound recomputation are proposed | Open: dynamic-domain convergence is unverified |
-| Bounded fairness window (from D-quencer) | A target may use probabilistic leader election | Reuses the deterministic `fair_leader` assumption | Open: same external fairness obligation as Property 2 |
+| Bounded fairness window (from D-quencer) | A target may use probabilistic leader election | Reuses the deterministic `fair_leader` assumption | Open: same external fairness obligation as the selection/progress layer |
 | Existential recovery choice | An implementation needs a constructive selector | A terminal-faithful measure-reducing selector must be designed and refined | Open: `oss_realize` uses `SOME` and ignores the event for selection |
 
 ### Synchronization-Degree Hierarchy Assumptions
@@ -313,7 +313,7 @@ This section distinguishes model-level discharge from open external/refinement o
 
 | Model Assumption | Disposition |
 |---|---|
-| Honest nodes (Property 1) | N/A: Property 1 safety does not assume honest nodes |
+| Honest nodes (state-preservation layer) | N/A: the safety locales do not assume honest nodes |
 | Conditional safety / initial inconsistency | Model-level existential bounded convergence proved for finite-domain unlocked states; no executable recovery refinement |
 | Atomic sync: lock acquisition and release | Open external/refinement obligation; timeout/rollback is only a proposed design |
 | Atomic sync: cross-chain propagation | Open external/refinement obligation; finality tracking is only a proposed design |
@@ -348,7 +348,7 @@ Specific theorems treated as refinement-annotation candidates are listed under t
 
 Until formal refinement proofs (model → code) are available, the following planned tests can provide non-proof consistency checks; they do not establish refinement. The proposed implementation vehicle is `cargo test` plus `proptest` for property-based testing.
 
-### Property 1 Theorems
+### State-Preservation Theorems
 
 | Theorem | Test Strategy | Status |
 |---|---|---|
@@ -359,7 +359,7 @@ Until formal refinement proofs (model → code) are available, the following pla
 | `valid_state_preservation` | Integration test: valid_state holds before and after sync | Planned |
 | `sync_isolation` | Integration test: sync on asset A does not affect asset B | Planned |
 
-### Property 2 Theorems
+### Selection and Aggregate-Progress Theorems
 
 | Theorem | Test Strategy | Status |
 |---|---|---|
@@ -399,6 +399,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.5.5 | 2026-07-20 | Editorial: numbered property labels replaced with the property names throughout the current document (coverage list, section headings, assumption and test tables); historical change-log rows retained verbatim. No change to theorems, assumptions, mappings, or dispositions. |
 | 0.5.4 | 2026-07-19 | Scope and contract correction: retained the timestamp and source-node bounds of `priority_key_injectivity`; separated the formal coupling-breadth hierarchy from the product's S0--S3 operational meanings and left that refinement open; described the external domain-independence instance as a TCP-inspired toy endpoint/abstract tracker rather than an RFC 793 or concrete conntrack model; classified regulatory actions, genesis enforcement, tests, and external cryptography as open implementation or refinement obligations; consolidated the gap and assumption-scope description. |
 | 0.5.3 | 2026-07-19 | Scope and theorem-contract correction: described Property 2 as aggregate pending-count progress; removed unsupported VRF probability and implementation-completeness claims; recorded in-roster fairness, request-identity/network/lock/refinement gaps, and the non-constructive `oss_realize` boundary; scoped authenticated mapping to an extractable sub-preorder and a state-keyed reveal-set witness; described the hierarchy as a timestamp-order degree boundary; synchronized theorem descriptions with the roster, selection, merge, associativity, and conditional-safety contracts. |
 | 0.5.2 | 2026-07-03 | Documentation contract correction: aligned Property 2 with the available deterministic selection and aggregate-progress results; distinguished model-level safety facts from open implementation and refinement obligations; separated the degree-free validity alias from capability-sensitive reconciliation and under-provisioning results. |
