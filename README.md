@@ -17,8 +17,8 @@ This repository contains machine-checked model-level proofs for cross-domain sta
 
 The core abstractions are two hierarchies of Isabelle/HOL locales:
 
-- **Cross-Domain State Preservation** (Property 1): A hierarchy of state-machine locales (pairwise state preservation with naturality, symmetric bidirectional preservation, multi-domain preservation) whose naturality condition guarantees structural preservation of transitions across domains.
-- **Priority Resolution and Aggregate-Progress Locales** (Property 2): Capture deterministic maximum selection and bounded aggregate pending-count progress as reusable, domain-independent abstractions. They are order- and bound-theoretic and do not model request identities, concurrent execution, or message interleaving; the instantiating synchronization model is atomic.
+- **Cross-Domain State Preservation**: A hierarchy of state-machine locales (pairwise state preservation with naturality, symmetric bidirectional preservation, multi-domain preservation) whose naturality condition guarantees structural preservation of transitions across domains.
+- **Priority Resolution and Aggregate-Progress Locales**: Capture deterministic maximum selection and bounded aggregate pending-count progress as reusable, domain-independent abstractions. They are order- and bound-theoretic and do not model request identities, concurrent execution, or message interleaving; the instantiating synchronization model is atomic.
 
 `conditional_safety_preservation` is a conditional-safety corollary: from a valid global state and an enabled transition, validity supplies the no-lock fact, synchronization succeeds, and the result is again valid (`valid_state_preservation`). Its proof uses only the safety side; deterministic selection and aggregate progress are separate theorems (`select_highest_deterministic`, `starvation_bound`). `oraclizer_guarded_bounded_convergence` combines guarded safety with an existential, `SOME`-selected safe recovery under the explicit guard, progress-measure, recovery, and in-roster fair-discharge assumptions of its locale. It is not an executable queue, recovery, or BFT algorithm. Deadlock is out of scope because the atomic sync model has no concurrent lock contention.
 
@@ -28,7 +28,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 
 ## Verified Properties
 
-### Property 1: Cross-Domain State Preservation Homomorphism ✅
+### Cross-Domain State Preservation Homomorphism ✅
 
 **Status:** Mechanized and `sorry`/`oops`-free. Included in the full ten-theory AFP resubmission candidate; that candidate has not yet been uploaded.
 
@@ -52,7 +52,7 @@ Every generic locale in both hierarchies is instantiated with a concrete example
 - Atomic lock guard: a second acquire while the Boolean lock is held returns `None`; distributed contention and timeout recovery are outside the model
 - Synchronization protocol: lock → update all connected chains → unlock
 
-### Property 2: Deterministic Selection and Aggregate Pending-Count Progress ✅
+### Deterministic Selection and Aggregate Pending-Count Progress ✅
 
 **Status:** Mechanized and `sorry`/`oops`-free. Included in the full ten-theory AFP resubmission candidate. Deadlock is a scope note, not a proved result: the atomic `sync` model has no concurrent lock contention, so no deadlock-freedom theorem is stated.
 
@@ -155,12 +155,12 @@ The repository and the current resubmission candidate contain all ten theories l
 ```
 .
 ├── Cross_Domain_State_Preservation/   # AFP entry
-│   ├── State_Preservation.thy         # Property 1 generic theory
+│   ├── State_Preservation.thy         # Generic state-preservation theory
 │   │                                  #   4 locales: state_machine,
 │   │                                  #   state_preservation,
 │   │                                  #   symmetric_state_preservation,
 │   │                                  #   multi_domain_preservation
-│   ├── Regulatory_Instance.thy        # Property 1 regulatory instance
+│   ├── Regulatory_Instance.thy        # Regulatory state-preservation instance
 │   │                                  #   State machine interpretation,
 │   │                                  #   synchronization protocol,
 │   │                                  #   regulatory homomorphism,
@@ -170,10 +170,10 @@ The repository and the current resubmission candidate contain all ten theories l
 │   │                                  #     (escalation preservation),
 │   │                                  #   layer-crossing instance
 │   │                                  #     (onchain DAML bridge)
-│   ├── Priority_Resolution.thy        # Property 2 generic theory
+│   ├── Priority_Resolution.thy        # Generic priority-resolution theory
 │   │                                  #   2 locales: priority_system,
 │   │                                  #   fair_leader_system
-│   ├── DQuencer_Instance.thy          # Property 2 D-quencer instance
+│   ├── DQuencer_Instance.thy          # D-quencer priority-resolution instance
 │   │                                  #   Authority levels, priority keys,
 │   │                                  #   BFT system locale,
 │   │                                  #   liveness instantiation,
@@ -249,7 +249,7 @@ The generated PDF will be in the session output directory.
 
 An initial version was submitted to the [Archive of Formal Proofs](https://www.isa-afp.org/) under the entry name `Cross_Domain_State_Preservation`. This repository is the full ten-theory resubmission candidate.
 
-- **Initial submission date:** 2026-03-25 (Property 1)
+- **Initial submission date:** 2026-03-25 (state-preservation core)
 - **Current candidate status:** Prepared for resubmission; not yet uploaded or listed as an AFP entry
 - **Submission URL:** [AFP Submission](https://www.isa-afp.org/submission/?id=2026-03-25_06-34-01_784)
 
