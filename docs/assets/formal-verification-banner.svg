@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 220" role="img" aria-labelledby="title desc">
+  <title id="title">Oraclizer Formal Verification</title>
+  <desc id="desc">Cross-Domain State Preservation in Isabelle/HOL</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101425"/>
+      <stop offset="1" stop-color="#1b2945"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a7cff"/>
+      <stop offset="1" stop-color="#55c7e8"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="220" rx="24" fill="url(#bg)"/>
+  <path d="M0 174 C170 121 325 223 510 163 C690 105 830 174 960 118 V220 H0Z" fill="#151e35" opacity=".9"/>
+  <g transform="translate(62 35)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="72" cy="73" r="62" stroke="url(#line)" stroke-width="4"/>
+    <circle cx="45" cy="48" r="9" stroke="#c3b7ff" stroke-width="4"/>
+    <circle cx="103" cy="48" r="9" stroke="#79d4ed" stroke-width="4"/>
+    <circle cx="74" cy="104" r="9" stroke="#ffffff" stroke-width="4"/>
+    <path d="M53 54 67 95M95 55 80 95M54 48h40" stroke="url(#line)" stroke-width="4"/>
+    <path d="m55 126 17 12 18-12" stroke="#8fdef1" stroke-width="4"/>
+  </g>
+  <g fill="#f7f8ff" font-family="Inter,Segoe UI,Arial,sans-serif">
+    <text x="238" y="88" font-size="48" font-weight="750" letter-spacing="1">FORMAL VERIFICATION</text>
+    <text x="241" y="129" font-size="22" font-weight="550" fill="#b9cdf4" letter-spacing=".5">CROSS-DOMAIN STATE PRESERVATION</text>
+    <text x="242" y="168" font-size="17" fill="#b6bdd2">Isabelle/HOL | ten-theory candidate | explicit assurance boundaries</text>
+  </g>
+</svg>

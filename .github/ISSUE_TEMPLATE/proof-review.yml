@@ -1,0 +1,39 @@
+name: Proof or model review
+description: Report a counterexample, invalid result, assumption concern, or reproduction failure
+title: "[Proof] "
+body:
+  - type: input
+    id: commit
+    attributes:
+      label: Exact commit
+      placeholder: 40-character Git commit
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Theory and formal item
+      placeholder: Theory.thy, theorem or locale name
+    validations:
+      required: true
+  - type: textarea
+    id: concern
+    attributes:
+      label: Concern or counterexample
+      description: State the claim, assumptions, and smallest challenge precisely.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include Isabelle version, AFP revision, command, and a minimal theory snippet when applicable.
+    validations:
+      required: true
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Security confirmation
+      options:
+        - label: This report contains no sensitive exploit or private deployment details.
+          required: true

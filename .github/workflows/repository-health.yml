@@ -1,0 +1,32 @@
+name: Repository health
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "codex/**"
+  workflow_dispatch:
+
+concurrency:
+  group: repository-health-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  public-surface:
+    name: Public repository surface
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Verify public surface and local links
+        run: node scripts/verify-repository-health.mjs
+
+  # The lightweight repository check does not replace the declared
+  # Isabelle 2025-2 plus AFP session build.

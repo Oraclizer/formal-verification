@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Oraclizer/formal-verification/security/advisories/new
+    about: Report sensitive vulnerabilities privately.
+  - name: Support boundary
+    url: https://github.com/Oraclizer/formal-verification/blob/main/SUPPORT.md
+    about: Check supported and unsupported requests before opening an issue.

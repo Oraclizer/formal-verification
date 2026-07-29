@@ -7,6 +7,19 @@ current candidate has not yet been uploaded. It is maintained as a single-author
 than as a conventional open-source project that merges external pull requests. Please keep this
 context in mind when engaging with the repository.
 
+Read the [Code of Conduct](CODE_OF_CONDUCT.md), [Security
+policy](SECURITY.md), and [Governance](GOVERNANCE.md) before contributing.
+
+## Choose the right channel
+
+| Contribution | Channel |
+| --- | --- |
+| Counterexample, proof, locale, or assumption challenge | Proof-review issue form |
+| Documentation, link, citation, or rendering defect | Documentation issue form |
+| Potentially exploitable or sensitive vulnerability | Private path in `SECURITY.md` |
+| Build or usage question | `SUPPORT.md` |
+| Material theory or architecture proposal | Issue first, before a Pull Request |
+
 ## What is most welcome
 
 The highest-value contribution is scrutiny of the proofs themselves:
@@ -32,9 +45,11 @@ keeps the public mirror consistent with the audited candidate.
 
 Please open an issue with:
 
+- The exact commit.
 - The specific theorem, lemma, or locale affected.
 - A minimal reproduction (an Isabelle theory snippet if applicable).
 - Your Isabelle version.
+- The AFP revision and build command when reproduction depends on AFP.
 
 ## Building and checking the proofs
 
@@ -55,6 +70,34 @@ isabelle build -d . -d /path/to/afp/thys -o document=pdf Cross_Domain_State_Pres
 - **Isabelle version:** exactly 2025-2 for the audited build.
 - All theories build without `sorry` or `oops`; independent confirmation of this is welcome.
 
+Before submitting documentation or repository changes, also run:
+
+```bash
+node scripts/verify-repository-health.mjs
+```
+
+This lightweight check validates the public repository surface. It does not
+replace the Isabelle build.
+
+## Pull Request requirements
+
+A Pull Request should:
+
+- address one reviewable issue;
+- explain the affected theorem, assumption, public claim, or document;
+- preserve Isabelle `2025-2` and the declared AFP dependency unless the change
+  is an intentional migration;
+- include the exact proof build result when theories or document sources
+  change;
+- update `FORMAL_MODEL_MAPPING.md` when an assumption, result, or
+  implementation target changes;
+- contain no generated Isabelle output, credentials, private correspondence,
+  machine-local paths, or unrelated artifacts;
+- distinguish model-level evidence from implementation or deployment claims.
+
+Maintainers may request a smaller patch, further mechanization, or AFP review.
+A passing check does not guarantee acceptance or merge.
+
 ## Code style (for reference)
 
 These conventions describe the existing sources, for readers studying or independently checking them:
@@ -69,4 +112,11 @@ These conventions describe the existing sources, for readers studying or indepen
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the BSD 3-Clause License.
+By submitting a contribution, you represent that you have the right to submit
+it, that it does not knowingly contain confidential or incompatibly licensed
+material, and that it may be distributed under the BSD 3-Clause License.
+
+Meaningful contributions may be credited through Git history, acknowledgments,
+release notes, or a security advisory. State a preferred credit name if it
+differs from your GitHub identity. Submission does not create an employment,
+agency, support, acceptance, or publication obligation.

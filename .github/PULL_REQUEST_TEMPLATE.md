@@ -1,0 +1,27 @@
+## Summary
+
+Describe the smallest reviewable change and link the issue.
+
+## Artifact impact
+
+- [ ] No theory, theorem, locale, or assumption changes
+- [ ] Theory or proof changed; exact Isabelle build result is included
+- [ ] `FORMAL_MODEL_MAPPING.md` updated where required
+- [ ] Paper or citation metadata updated where required
+- [ ] Model-level and implementation-level claims remain distinct
+
+Explain the affected formal items and public claims:
+
+## Verification
+
+- [ ] Isabelle `2025-2` session build, or an explicit documentation-only N/A
+- [ ] AFP revision recorded for proof-affecting changes
+- [ ] `node scripts/verify-repository-health.mjs`
+- [ ] No `sorry`, `oops`, credentials, local paths, or generated Isabelle output
+
+Paste concise results or link the exact Continuous Integration run.
+
+## Reviewer focus
+
+Identify the assumption, proof step, model boundary, or rendering detail that
+deserves the closest review.
