@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification: Cross-Domain State Preservation in Isabelle/HOL" width="860">
+  <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification: The Cross-Domain State Preservation Functor in Isabelle/HOL" width="860">
 
   <p><strong>Machine-checked model-level foundations for cross-domain state preservation.</strong></p>
 
