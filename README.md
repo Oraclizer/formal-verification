@@ -16,10 +16,12 @@
   [Paper](docs/document.pdf)
 </div>
 
-> This repository proves properties of an abstract Isabelle/HOL model. It does
-> not prove a refinement to Rust, Solidity, EVM bytecode, a bridge, a network,
-> a BFT implementation, or a deployed system. It is not a security audit,
-> production certification, or legal-compliance determination.
+> **Mechanized assurance.** This ten-theory Isabelle/HOL artifact is
+> `sorry`/`oops`-free and reproducibly checks under Isabelle2025-2. It
+> establishes the model-level results summarized below, with theorem assumptions
+> and implementation correspondences tracked explicitly in
+> [Verified model-level results](#verified-model-level-results) and
+> [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md).
 
 ## What this artifact is
 
@@ -211,3 +213,4 @@ limitations. [DISCLAIMER.md](DISCLAIMER.md) summarizes the model, academic,
 implementation, and deployment boundaries without replacing the license.
 
 Maintainer: Jinwook Kim (Jay), `jay@oraclizer.io`.
+
