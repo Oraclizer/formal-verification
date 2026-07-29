@@ -16,7 +16,6 @@
   [Paper](docs/document.pdf)
 </div>
 
-> [!IMPORTANT]
 > This repository proves properties of an abstract Isabelle/HOL model. It does
 > not prove a refinement to Rust, Solidity, EVM bytecode, a bridge, a network,
 > a BFT implementation, or a deployed system. It is not a security audit,
