@@ -34,10 +34,19 @@ deployment, audit, legal opinion, or model-to-code refinement.
 
 ## Artifact index
 
-| Session | Scope | Authoritative source | Reading copy |
-| --- | --- | --- | --- |
-| `Cross_Domain_State_Preservation` | Ten-theory foundation for preservation morphisms, priority and conditional progress, authenticated views, guarded convergence, and synchronization-degree hierarchy | [`Cross_Domain_State_Preservation/ROOT`](Cross_Domain_State_Preservation/ROOT) | [`Cross_Domain_State_Preservation.pdf`](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) |
-| `Regulatory_Action_Composition` | Standalone theory over the published regulatory instance: outcomes, pair commutativity, provenance, transfer gates, traces, atomic queues, and finite normal forms | [`Regulatory_Action_Composition/ROOT`](Regulatory_Action_Composition/ROOT) | [`Regulatory_Action_Composition.pdf`](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) |
+| Session | Source | PDF |
+| --- | --- | --- |
+| CDSP | [Session ROOT](Cross_Domain_State_Preservation/ROOT) | [Reading copy](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) |
+| RAC | [Session ROOT](Regulatory_Action_Composition/ROOT) | [Reading copy](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) |
+
+**Scope**
+
+- **CDSP:** Ten-theory foundation for preservation morphisms, priority and
+  conditional progress, authenticated views, guarded convergence, and the
+  synchronization-degree hierarchy.
+- **RAC:** Standalone theory over the published regulatory instance, covering
+  outcomes, pair commutativity, provenance, transfer gates, traces, atomic
+  queues, and finite normal forms.
 
 The sessions share a repository because RAC reuses the concrete regulatory
 machine from CDSP. They remain separate release and review units. RAC does not
