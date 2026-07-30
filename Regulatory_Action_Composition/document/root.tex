@@ -2,6 +2,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{isabelle,isabellesym}
 \usepackage{amsmath,amssymb}
+\usepackage{microtype}
 \usepackage{pdfsetup}
 
 \urlstyle{rm}
@@ -43,36 +44,44 @@ level, while preserving a distinction between an undefined legal transition
 and an operational failure outside the state machine.
 
 The session is a standalone artifact built on the published
-\texttt{Cross\_Domain\_State\_Preservation} session.  It imports only the
-concrete regulatory instance from that session; it does not import or extend
-the authenticated-data-structure functor layer.  The shared base supplies the
-five states, seven transition labels, transition function, and atomic global
-state abstraction~\cite{cdsp}.  The regulatory interpretation is motivated by
-the protocol model described in the related RCP paper~\cite{rcp}.
+\emph{Cross-Domain State Preservation} (CDSP) session
+(\texttt{Cross\_\allowbreak Domain\_\allowbreak State\_\allowbreak
+Preservation}).  It imports only the concrete regulatory instance from that
+session; it does not import or extend the authenticated-data-structure
+functor layer.  The shared base supplies the five states, seven transition
+labels, transition function, and atomic global state
+abstraction~\cite{cdsp}.  The regulatory interpretation is motivated by the
+protocol model described in the related RCP paper~\cite{rcp}.
 
 \subsection{Checked result groups}
 
-\begin{description}
-\item[Outcome semantics.] Applied, rejected, and operational-failure outcomes
-  remain distinct, with rejected and failed commands leaving the modeled
-  state unchanged.
-\item[Pair classification.] The complete set of 21 unordered pairs of
-  distinct labels is partitioned into 12 commuting and 9 noncommuting pairs;
-  every noncommuting pair has a concrete state witness.
-\item[Terminality and provenance.] Confiscation is absorbing for arbitrary
-  action words, while the reachable restrictive states carry checked
-  provenance constraints.
-\item[Legal-effect and transfer layer.] Six typed legal-effect descriptors
-  cover state transitions and the separate enforcement-transfer path.
-  Ordinary transfers use both the regulatory-state gate and a current-policy
-  condition.
-\item[Trace and synchronization.] Command queues preserve order and input
-  identity, record execution outcome, leave unrelated assets unchanged, and
-  preserve validity after each completed atomic synchronization step.
-\item[Finite normal forms.] Exactly 60 distinct state-transformation vectors
-  are reachable; every action word evaluates to one of them and the set is
-  closed under every transition label.
-\end{description}
+\paragraph{Outcome semantics.}
+Applied, rejected, and operational-failure outcomes remain distinct, with
+rejected and failed commands leaving the modeled state unchanged.
+
+\paragraph{Pair classification.}
+The complete set of 21 unordered pairs of distinct labels is partitioned into
+12 commuting and 9 noncommuting pairs; every noncommuting pair has a concrete
+state witness.
+
+\paragraph{Terminality and provenance.}
+Confiscation is absorbing for arbitrary action words, while the reachable
+restrictive states carry checked provenance constraints.
+
+\paragraph{Legal-effect and transfer layer.}
+Six typed legal-effect descriptors cover state transitions and the separate
+enforcement-transfer path.  Ordinary transfers use both the regulatory-state
+gate and a current-policy condition.
+
+\paragraph{Trace and synchronization.}
+Command queues preserve order and input identity, record execution outcome,
+leave unrelated assets unchanged, and preserve validity after each completed
+atomic synchronization step.
+
+\paragraph{Finite normal forms.}
+Exactly 60 distinct state-transformation vectors are reachable; every action
+word evaluates to one of them and the set is closed under every transition
+label.
 
 \subsection{Assurance boundary}
 

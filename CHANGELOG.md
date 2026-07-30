@@ -5,6 +5,9 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Improved the RAC reading copy by making its exact parent-session identifier
+  safely breakable and replacing narrow description-list blocks with
+  full-width result-group paragraphs.
 - Defined the repository as a production-maintained public research surface
   while keeping implementation, deployment, audit, legal, and refinement
   readiness explicitly outside that designation.
