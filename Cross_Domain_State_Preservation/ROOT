@@ -1,6 +1,6 @@
-chapter AFP
+chapter Oraclizer
 
-session Cross_Domain_State_Preservation (AFP) = "HOL-Library" +
+session Cross_Domain_State_Preservation = "HOL-Library" +
   options [timeout = 1200]
   sessions
     "HOL-Library"

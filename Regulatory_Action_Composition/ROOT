@@ -1,0 +1,9 @@
+chapter Oraclizer
+
+session Regulatory_Action_Composition = Cross_Domain_State_Preservation +
+  options [timeout = 1200]
+  theories
+    Regulatory_Action_Composition
+  document_files
+    "root.tex"
+    "root.bib"

@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.5.6
-**Last updated:** 2026-07-20
+**Version:** 0.6.0
+**Last updated:** 2026-07-31
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -17,6 +17,7 @@ This document tracks the correspondence between formally verified model elements
 This mapping covers:
 
 - **Cross-Domain State Preservation Homomorphism**: safety
+- **Regulatory Action Composition**: applied/rejected/failure outcome semantics, complete action-pair classification, legal-effect descriptors, transfer gates, trace/frame properties, completed atomic queues, and finite transformation normal forms
 - **Deterministic Selection and Aggregate Pending-Count Progress**: finite maximum selection and closed-count progress (deadlock and individual request fairness are not proved)
 - **Cross-Domain State Preservation Functor**: functor laws (identity / composition / associativity over state-preservation morphisms), authenticated cross-domain state soundness via the Merkle interface, and guarded bounded convergence with terminal-faithful safe recovery
 - **Authenticated Functor and Canton Instantiation**: extraction laws on the extractable sub-preorder, authenticity along blinding paths and merge folds (validity, need-to-know, hash soundness, state-level inclusion), and instantiation on the concrete ADS blindable functor and a recursive model of the Canton transaction tree
@@ -101,6 +102,57 @@ These exclusions are formally justified in `Regulatory_Instance.thy`:
 | `global_state` record | OSS State DB (embedded key-value store) | |
 | `valid_state` invariant | Runtime invariant check | `consistent_state ∧ no_locked_without_reason` |
 | `consistent_state` | Cross-chain state consistency check | All chains agree on regulatory state for each asset |
+
+---
+
+# Regulatory Action Composition
+
+`Regulatory_Action_Composition.thy` is a separate Isabelle session that
+imports the published `Regulatory_Instance` theory. It is mapped here because
+the model is intended to constrain product behavior, but the table remains a
+planned correspondence: no concrete source revision or model-to-code
+refinement has yet been discharged.
+
+## Outcome and Pair Semantics
+
+| Formal Model | Planned Implementation Target | Open Boundary |
+|---|---|---|
+| `command_outcome = Applied | Rejected | Operational_Failure` | Typed result of the regulatory command evaluator | Concrete error ABI, storage effect, and revert/return behavior are not pinned |
+| `legal_outcome` / `state_effect` | Pure reference transition evaluator shared by contract and service tests | Must preserve legal rejection separately from missing asset, lock, or external failure |
+| `action_state_idempotent` | Repeated-command state-effect property test | Does not imply replay safety; repeated commands still have distinct trace events |
+| `commuting_pairs_complete` / `noncommuting_pairs_complete` | Order-sensitivity registry and pairwise reference tests | The 12/9 classification is for the five-state, seven-label machine only |
+| `noncommuting_witnesses_sound` / `noncommuting_witnesses_complete` | Concrete regression vectors for every noncommuting pair | A deployment must bind each public command to the corresponding label before using these vectors |
+
+## Legal Effects and Transfer Gates
+
+| Formal Model | Planned Implementation Target | Open Boundary |
+|---|---|---|
+| `legal_action_kind` / `legal_descriptor` | Typed regulatory-action schema and policy metadata | Descriptor consistency is proved; factual legal authority is not |
+| `recover_and_liquidate_are_not_state_transitions` | Separate enforcement-transfer command path | No force-transfer authorization or settlement implementation is verified |
+| `ordinary_transfer_allowed` | Ordinary transfer precondition | Requires both the regulatory-state gate and the supplied current-policy condition |
+| `transfer_allowed` / `enforcement_transfer_action` | Dispatcher separating ordinary and enforcement paths | Caller identity, signature, jurisdiction, and policy-oracle correctness are external |
+| `restricted_transfer_uses_current_condition` | Restricted-state policy adapter | The policy condition is an abstract Boolean input, not a mechanized legal rule |
+
+## Trace, Frame, Atomic Queue, and Normal Forms
+
+| Formal Model | Planned Implementation Target | Open Boundary |
+|---|---|---|
+| `execute_command` / `run_command_queue` | Ordered regulatory command processor | Queue persistence, retries, replay protection, and concurrency are not modeled |
+| `command_trace_preserves_input` / `command_trace_records_execution_outcome` | Event-schema and audit-log conformance tests | Trace integrity and signature authenticity remain external |
+| `execute_on_store` / `other_asset_unchanged` | Asset-keyed storage update and frame test | Requires a concrete storage/refinement boundary |
+| `execute_sync_command` / `run_sync_queue` | Completed-step synchronization orchestrator | Atomic step model excludes partial propagation, timeout, rollback, and interleaving |
+| `completed_states_are_valid` / `completed_prefixes_are_consistent` | Prefix invariant tests over completed command batches | Does not prove distributed atomicity |
+| `normal_forms_cardinality` / `every_word_has_normal_form` | Finite reference oracle and generated conformance-vector corpus | The 60 vectors classify state effects, not traces, identities, or implementation states |
+
+### Mapping Completion Gate
+
+RAC is now present in the repository-level formal map, but program mapping is
+not complete. Completion requires immutable implementation targets for the
+command result type, transition evaluator, transfer dispatcher, event schema,
+asset storage update, and queue boundary, plus bidirectional coverage of all
+modeled labels/outcomes and an explicit disposition for every open boundary
+above. A green Isabelle build or a generated test corpus does not discharge
+model-to-code refinement.
 
 ---
 
@@ -369,6 +421,19 @@ Until formal refinement proofs (model → code) are available, the following pla
 | `eventual_completion` | Model/reference test: under the same assumptions, a closed aggregate pending-count trace reaches zero | Planned |
 | `conditional_safety_preservation` | End-to-end refinement target: from a valid state with an enabled transition, verify sync succeeds and the result is valid | Planned |
 
+### Regulatory-Action-Composition Theorems
+
+| Theorem | Test Strategy | Status |
+|---|---|---|
+| `action_state_idempotent` | Exhaustive test over all five states and seven labels; separately assert that trace identity is not collapsed | Planned |
+| `noncommuting_witnesses_complete` | Replay every checked witness in both orders and compare final states | Planned |
+| `legal_action_descriptor_inventory` | Schema inventory test for all six legal-effect descriptors | Planned |
+| `ordinary_transfer_uses_both_gates` | Truth-table test proving neither the state gate nor current-policy input is bypassed | Planned |
+| `command_trace_records_execution_outcome` | Event test covering applied, rejected, and operational-failure outcomes without conflation | Planned |
+| `other_asset_unchanged` | Asset-keyed frame property test over two or more store entries | Planned |
+| `completed_prefixes_are_consistent` | Batch test checking the invariant after every completed atomic step | Planned |
+| `normal_forms_cardinality` / `every_word_has_normal_form` | Generate the 60 state-effect vectors and reduce arbitrary action words to the reference set | Planned |
+
 ### Functor / Convergence and Hierarchy Theorems
 
 | Theorem | Test Strategy | Status |
@@ -399,6 +464,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.6.0 | 2026-07-31 | Added the standalone `Regulatory_Action_Composition` session to repository-level mapping: outcome separation, complete 12/9 pair classification, legal-effect and transfer-gate boundaries, trace/frame and completed atomic-queue targets, 60 normal forms, proposed tests, and an explicit program-mapping completion gate. No implementation refinement is claimed. |
 | 0.5.6 | 2026-07-20 | Editorial: refinement-direction glosses aligned with the formal reading of `state_refines` (a partial view refines the fuller view), matching the theory sources. No change to theorems, assumptions, mappings, or dispositions. |
 | 0.5.5 | 2026-07-20 | Editorial: numbered property labels replaced with the property names throughout the current document (coverage list, section headings, assumption and test tables); historical change-log rows retained verbatim. No change to theorems, assumptions, mappings, or dispositions. |
 | 0.5.4 | 2026-07-19 | Scope and contract correction: retained the timestamp and source-node bounds of `priority_key_injectivity`; separated the formal coupling-breadth hierarchy from the product's S0--S3 operational meanings and left that refinement open; described the external domain-independence instance as a TCP-inspired toy endpoint/abstract tracker rather than an RFC 793 or concrete conntrack model; classified regulatory actions, genesis enforcement, tests, and external cryptography as open implementation or refinement obligations; consolidated the gap and assumption-scope description. |

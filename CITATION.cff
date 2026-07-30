@@ -1,13 +1,13 @@
 cff-version: 1.2.0
-message: "Please cite the paper and the exact repository commit used for the mechanized artifact."
-title: "Cross-Domain State Preservation Functor"
+message: "Please name the Isabelle session, cite the exact repository commit, and cite the related paper when applicable."
+title: "Oraclizer Formal Verification Artifacts"
 type: software
 authors:
   - family-names: "Kim"
     given-names: "Jinwook"
     alias: "Jay"
 repository-code: "https://github.com/Oraclizer/formal-verification"
-url: "https://arxiv.org/abs/2604.03844"
+url: "https://github.com/Oraclizer/formal-verification"
 license: BSD-3-Clause
 keywords:
   - Isabelle/HOL
@@ -15,11 +15,14 @@ keywords:
   - state preservation
   - functor
   - cross-domain synchronization
+  - regulatory action composition
 abstract: >-
-  A ten-theory Isabelle/HOL candidate formalizing compositional cross-domain
-  state preservation, deterministic selection and conditional aggregate
-  progress, authenticated views, guarded model-level convergence, and a
-  degree-indexed hierarchy with explicit assurance boundaries.
+  Two composable Isabelle/HOL sessions formalizing cross-domain state
+  preservation and regulatory action composition. The repository covers
+  deterministic selection and conditional aggregate progress, authenticated
+  views, guarded model-level convergence, a degree-indexed hierarchy, complete
+  action-pair classification, typed outcomes, trace and frame properties, and
+  finite transformation normal forms with explicit assurance boundaries.
 preferred-citation:
   type: article
   title: "The Cross-Domain State Preservation Functor: A Mechanized Theory of Regulatory State Synchronization in Isabelle/HOL"

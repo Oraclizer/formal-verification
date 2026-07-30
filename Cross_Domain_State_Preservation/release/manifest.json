@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "generated_on": "2026-07-31",
+  "session": "Cross_Domain_State_Preservation",
+  "isabelle_version": "Isabelle2025-2",
+  "document_engine": "LuaTeX 1.24.0 (TeX Live 2026)",
+  "source": {
+    "file_count": 13,
+    "tree_sha256": "810C8AFA0C32A97034A00E67FE5FA9CAF388148695F8299EBA2F8BB5395551F6",
+    "tree_hash_algorithm": "SHA-256 of UTF-8 lines '<file-sha256>  <session-relative-path>\\n', sorted ordinally; files are ROOT, document/root.tex, document/root.bib, and all top-level .thy sources"
+  },
+  "external_dependencies": [
+    {
+      "session": "ADS_Functor",
+      "compatibility": "Isabelle2025-2 AFP release",
+      "source_file_count": 7,
+      "source_tree_sha256": "7148E695494A95ED7E07416133FA7285671BC6F51B581E921358BAB87FA05ACC"
+    }
+  ],
+  "pdf": {
+    "path": "Cross_Domain_State_Preservation.pdf",
+    "pages": 167,
+    "sha256": "7A417D5576DDE3F9FE1ABDDDA88B3C38D49408C72E4AAF6A398EF27F27026434"
+  },
+  "build_contract": {
+    "proof_check": "isabelle build -c -d <ADS_Functor> -d <repository> Cross_Domain_State_Preservation Regulatory_Action_Composition",
+    "document": "isabelle build -d <ADS_Functor> -d <repository> -o document=pdf -o document_output=<output> Cross_Domain_State_Preservation",
+    "result": "Finished Cross_Domain_State_Preservation"
+  }
+}

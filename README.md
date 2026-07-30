@@ -1,74 +1,83 @@
 <div align="center">
-  <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification: The Cross-Domain State Preservation Functor in Isabelle/HOL" width="860">
+  <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
 
-  <p><strong>Machine-checked model-level foundations for cross-domain state preservation.</strong></p>
+  <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition.</strong></p>
 
-  [![Artifact](https://img.shields.io/badge/artifact-ten--theory%20candidate-6f42c1.svg)](Cross_Domain_State_Preservation/ROOT)
+  [![Artifacts](https://img.shields.io/badge/artifacts-two%20sessions-6f42c1.svg)](#artifact-index)
   [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-167c3a.svg)](https://isabelle.in.tum.de/)
   [![Proof status](https://img.shields.io/badge/proofs-sorry%2Foops--free-167c3a.svg)](CONTRIBUTING.md#building-and-checking-the-proofs)
-  [![arXiv](https://img.shields.io/badge/arXiv-2604.03844-b31b1b.svg)](https://arxiv.org/abs/2604.03844)
   [![License](https://img.shields.io/badge/license-BSD--3--Clause-0b5cad.svg)](LICENSE)
 
   [Proof scope](#verified-model-level-results) |
   [Architecture](#theory-architecture) |
   [Build](#reproduce-the-proofs) |
   [Mapping](FORMAL_MODEL_MAPPING.md) |
-  [Paper](docs/document.pdf)
+  [CDSP PDF](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) |
+  [RAC PDF](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf)
 </div>
 
-> **Mechanized assurance.** This ten-theory Isabelle/HOL artifact is
-> `sorry`/`oops`-free and reproducibly checks under Isabelle2025-2. It
-> establishes the model-level results summarized below, with theorem assumptions
-> and implementation correspondences tracked explicitly in
-> [Verified model-level results](#verified-model-level-results) and
+> **Mechanized assurance.** The repository contains two composable
+> Isabelle/HOL sessions. Their tracked theories are `sorry`/`oops`-free and
+> reproducibly check under Isabelle2025-2 with the declared AFP dependency.
+> Claims are model-level and bounded by the assumptions recorded here and in
 > [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md).
 
-## What this artifact is
+## Artifact index
 
-The `Cross_Domain_State_Preservation` session contains ten Isabelle theories
-for compositional cross-domain state synchronization. It develops reusable
-state-preservation morphisms, regulatory and non-regulatory instances,
-deterministic priority selection, conditional aggregate progress, authenticated
-views, functor laws, guarded model-level convergence, and a degree-indexed
-synchronization hierarchy.
+| Session | Scope | Authoritative source | Reading copy |
+| --- | --- | --- | --- |
+| `Cross_Domain_State_Preservation` | Ten-theory foundation for preservation morphisms, priority and conditional progress, authenticated views, guarded convergence, and synchronization-degree hierarchy | [`Cross_Domain_State_Preservation/ROOT`](Cross_Domain_State_Preservation/ROOT) | [`Cross_Domain_State_Preservation.pdf`](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) |
+| `Regulatory_Action_Composition` | Standalone theory over the published regulatory instance: outcomes, pair commutativity, provenance, transfer gates, traces, atomic queues, and finite normal forms | [`Regulatory_Action_Composition/ROOT`](Regulatory_Action_Composition/ROOT) | [`Regulatory_Action_Composition.pdf`](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) |
 
-The current tree is a full ten-theory AFP resubmission candidate. An earlier
-version was submitted to the Archive of Formal Proofs on 2026-03-25; this
-expanded candidate has not yet been uploaded or accepted as an AFP entry.
-Repository publication, AFP submission, review, and acceptance are separate
-states.
+The sessions share a repository because RAC reuses the concrete regulatory
+machine from CDSP. They remain separate release and review units. RAC does not
+import or extend `ADS_Functor`; its only formal dependency on CDSP is
+`Regulatory_Instance`.
+
+An earlier version of CDSP was submitted to the Archive of Formal Proofs on
+2026-03-25 but was not accepted as an AFP entry. Neither session in this
+repository is an AFP entry. Repository publication, preprint publication,
+submission, review, and acceptance are separate states.
 
 ## Verified model-level results
 
-| Layer | Representative results | Essential boundary |
+| Session | Representative results | Essential boundary |
 | --- | --- | --- |
-| State preservation | `regulatory_homomorphism`, `valid_state_preservation`, `sequential_preservation` | Atomic finite-domain model |
-| Regulatory instance | terminal confiscation, universal confiscation reachability, isolation, no self-loops | Five states, seven actions, declared transition relation |
-| Priority and progress | unique maximum selection, `starvation_bound`, closed-count completion | Injective priorities and deterministic in-roster fairness assumptions |
-| Composition and convergence | guarded safety and existential bounded run to validity | Recovery uses Hilbert choice and is not executable |
-| Authenticated functor | identity/composition/associativity, merge and blinding soundness, Canton tree instance | Model-level authenticated views, not protocol traces |
-| Degree hierarchy | natural transformations, capability-sensitive reconciliation, under-provisioning counterexample | Degree means coupling breadth, not the product's operational S0-S3 semantics |
-| Domain independence | TCP-inspired endpoint/tracker instance | Abstract example, not RFC 793 or OS conntrack conformance |
+| CDSP — state preservation | `regulatory_homomorphism`, `valid_state_preservation`, `sequential_preservation` | Atomic finite-domain model |
+| CDSP — priority and progress | unique maximum selection, `starvation_bound`, closed-count completion | Injective priorities and deterministic in-roster fairness assumptions |
+| CDSP — composition and convergence | guarded safety and existential bounded run to validity | Recovery uses Hilbert choice and is not executable |
+| CDSP — authenticated functor | identity/composition/associativity, merge and blinding soundness, Canton tree instance | Model-level authenticated views, not protocol traces |
+| CDSP — degree hierarchy | natural transformations, capability-sensitive reconciliation, under-provisioning counterexample | Degree means coupling breadth, not operational S0-S3 semantics |
+| RAC — action algebra | all 21 distinct-label pairs classified as 12 commuting and 9 noncommuting, with witnesses | Concrete five-state, seven-label machine |
+| RAC — outcomes and traces | applied/rejected/operational-failure separation, trace and unrelated-asset frame properties | No authorization, replay, or concurrency model |
+| RAC — atomic queues and normal forms | completed-step validity and consistency; exactly 60 reachable transformation vectors | Atomic completed steps, not partial propagation or rollback |
 
-Every row above is shorthand. The authoritative theorem-to-target map,
-assumptions, open obligations, and proposed test correspondences are in
+Every row is shorthand. The authoritative theorem-to-target map, assumptions,
+open obligations, and proposed implementation correspondences are in
 [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md).
 
 ## Theory architecture
 
 ```mermaid
 flowchart TB
-    SP["State_Preservation<br/>generic state-machine and preservation locales"]
-    RI["Regulatory_Instance<br/>regulatory model and synchronization"]
-    PR["Priority_Resolution<br/>selection and aggregate progress locales"]
-    DQ["DQuencer_Instance<br/>priority and scheduling instance"]
-    CO["Composition<br/>guarded safety plus convergence composition"]
-    PA["Proof_Automation<br/>reusable Eisbach discharge"]
-    FL["Functor_Laws<br/>category laws, authenticated lift, safe recovery"]
-    HI["Hierarchy<br/>degree-indexed functors and natural transformations"]
-    EX["External_Instance<br/>domain-independence witness"]
-    CA["Canton_Bridge<br/>recursive authenticated transaction-tree instance"]
-    ADS["AFP ADS_Functor<br/>external formal dependency"]
+    subgraph CDSP["Cross_Domain_State_Preservation session"]
+      SP["State_Preservation"]
+      RI["Regulatory_Instance"]
+      PR["Priority_Resolution"]
+      DQ["DQuencer_Instance"]
+      CO["Composition"]
+      PA["Proof_Automation"]
+      FL["Functor_Laws"]
+      HI["Hierarchy"]
+      EX["External_Instance"]
+      CA["Canton_Bridge"]
+    end
+
+    subgraph RAC["Regulatory_Action_Composition session"]
+      RA["Regulatory_Action_Composition"]
+    end
+
+    ADS["AFP ADS_Functor external dependency"]
 
     SP --> RI
     SP --> CO
@@ -85,22 +94,23 @@ flowchart TB
     FL --> CA
     RI --> FL
     RI --> CA
+    RI --> RA
 ```
 
-The session dependencies declared in
-[`Cross_Domain_State_Preservation/ROOT`](Cross_Domain_State_Preservation/ROOT)
-are `HOL-Library`, `HOL-Eisbach`, and the AFP session `ADS_Functor`.
+The CDSP session depends on `HOL-Library`, `HOL-Eisbach`, and the AFP session
+`ADS_Functor`. RAC extends the built CDSP session and imports its regulatory
+instance explicitly.
 
 ## Assurance boundary
 
-### Established within the model
+### Established within the models
 
-- all ten tracked theories build under the declared Isabelle session;
-- the source is `sorry`/`oops`-free;
-- named results follow from the locales, definitions, and assumptions stated
+- both declared sessions and all eleven tracked theories build;
+- the theory sources contain no `sorry` or `oops`;
+- named results follow from the definitions, locales, and assumptions stated
   in the theories;
-- the regulatory, authenticated, hierarchy, Canton-tree, and external
-  instances discharge their declared Isabelle obligations.
+- RAC's pair inventory, witnesses, and 60 normal forms are checked in the
+  Isabelle kernel rather than asserted from an external enumeration.
 
 ### Not established
 
@@ -108,11 +118,12 @@ are `HOL-Library`, `HOL-Eisbach`, and the AFP session `ADS_Functor`.
   refinement;
 - distributed lock, timeout, rollback, finality, or concurrent interleaving
   correctness;
-- probabilistic VRF behavior, adversarial BFT protocol execution, or network
-  liveness;
-- per-request fairness or open-system progress under continuous arrivals;
-- cryptographic implementation correctness;
-- a live deployment, operational security, audit, or legal result.
+- authorization, identity, replay protection, or correctness of a concrete
+  transfer-policy oracle;
+- probabilistic VRF behavior, adversarial BFT execution, network liveness, or
+  partial propagation;
+- cryptographic implementation correctness, legal truth, live deployment,
+  operational security, or audit status.
 
 These are open or external obligations, not implied consequences of a green
 proof build.
@@ -131,32 +142,38 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Or pass both directories for each build:
+Check both sessions from the repository root:
 
 ```bash
 isabelle build \
   -d . \
   -d /path/to/afp/thys \
-  Cross_Domain_State_Preservation
+  Cross_Domain_State_Preservation Regulatory_Action_Composition
 ```
 
 Expected completion includes:
 
 ```text
 Finished Cross_Domain_State_Preservation
+Finished Regulatory_Action_Composition
 ```
 
-Generate the theory document:
+Generate a session document in a chosen output directory:
 
 ```bash
 isabelle build \
   -d . \
   -d /path/to/afp/thys \
   -o document=pdf \
-  Cross_Domain_State_Preservation
+  -o document_output=/path/to/output \
+  Regulatory_Action_Composition
 ```
 
-The tracked [candidate document](docs/document.pdf) is provided for reading.
+Isabelle's build output may be named `document.pdf`. That is a transient build
+artifact. A tracked public reading copy is accepted only under
+`<Session>/release/<Session>.pdf`, with the exact case-sensitive session name.
+Generic `document.pdf` files are not public release artifacts.
+
 An independent assurance claim should identify the exact commit, Isabelle and
 AFP revisions, command, and resulting session log.
 
@@ -164,24 +181,27 @@ AFP revisions, command, and resulting session log.
 
 | Path | Purpose |
 | --- | --- |
-| `Cross_Domain_State_Preservation/*.thy` | Ten authoritative Isabelle theory sources |
-| `Cross_Domain_State_Preservation/ROOT` | Session graph, dependencies, and document inputs |
-| `Cross_Domain_State_Preservation/document/` | Isabelle/LaTeX document source |
-| `docs/document.pdf` | Rendered candidate paper |
+| `ROOTS` | Registers both repository sessions |
+| `Cross_Domain_State_Preservation/*.thy` | Ten authoritative CDSP theories |
+| `Cross_Domain_State_Preservation/document/` | CDSP Isabelle/LaTeX document source |
+| `Cross_Domain_State_Preservation/release/` | CDSP session-named PDF and release manifest |
+| `Regulatory_Action_Composition/*.thy` | Authoritative RAC theory |
+| `Regulatory_Action_Composition/document/` | RAC Isabelle/LaTeX document source |
+| `Regulatory_Action_Composition/release/` | RAC session-named PDF and release manifest |
 | `FORMAL_MODEL_MAPPING.md` | Theorem-to-target mapping, assumptions, gaps, and proposed tests |
 | `CONTRIBUTING.md` | Review channels, proof reproduction, and contribution policy |
 | `SECURITY.md` | Sensitive-report routing and assurance boundary |
-| `CITATION.cff` | Machine-readable citation metadata |
+| `CITATION.cff` | Repository-level citation metadata |
 
-Generated Isabelle heaps, local output, editor state, and machine-specific
-paths are excluded from the public tree.
+Generated Isabelle heaps, transient `document.pdf` files, local output, editor
+state, and machine-specific paths are excluded from the public tree.
 
 ## Independent review and contributions
 
 The highest-value contributions are counterexamples, overly strong assumption
 reports, model-scope challenges, reproduction results, and clarity fixes.
-Theory changes are issue-first because this mirror must remain aligned with
-the scholarly and AFP candidate.
+Theory changes are issue-first so that each session remains a coherent,
+auditable artifact.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a Pull Request. Use the
 issue forms for public proof or documentation questions. Report sensitive
@@ -202,8 +222,8 @@ Support and project decision boundaries are in [SUPPORT.md](SUPPORT.md) and
   Functors in Isabelle/HOL*,
   [AFP: ADS_Functor](https://www.isa-afp.org/entries/ADS_Functor.html).
 
-Use [CITATION.cff](CITATION.cff) and cite the exact commit when referring to
-the mechanized artifact.
+Use [CITATION.cff](CITATION.cff), name the session used, and cite the exact
+commit when referring to a mechanized artifact.
 
 ## License and disclaimer
 
@@ -213,4 +233,3 @@ limitations. [DISCLAIMER.md](DISCLAIMER.md) summarizes the model, academic,
 implementation, and deployment boundaries without replacing the license.
 
 Maintainer: Jinwook Kim (Jay), `jay@oraclizer.io`.
-

@@ -8,7 +8,7 @@ wallet, key-management system, or deployed service.
 
 | Scope | Status |
 | --- | --- |
-| Exact tracked ten-theory candidate | Proof and model reports accepted |
+| Exact tracked CDSP and RAC sessions | Proof and model reports accepted |
 | Earlier commits and forks | Best effort only |
 | Implementations and deployments | Not covered |
 
@@ -43,7 +43,7 @@ result.
 
 ## Handling
 
-The maintainer will assess whether a report affects the tracked candidate and
+The maintainer will assess whether a report affects a tracked session and
 may request more information. No response, remediation, disclosure, release,
 or publication deadline is guaranteed. There is no bug bounty or financial
 reward program.

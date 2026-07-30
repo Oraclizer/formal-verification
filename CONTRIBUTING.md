@@ -1,10 +1,10 @@
 # Contributing
 
-This repository is the public mirror of an academic verification artifact: a set of
-Isabelle/HOL theories prepared as a ten-theory resubmission candidate for the
-[Archive of Formal Proofs](https://www.isa-afp.org/). An earlier submission exists, but the
-current candidate has not yet been uploaded. It is maintained as a single-author scholarly entry rather
-than as a conventional open-source project that merges external pull requests. Please keep this
+This repository is the public home of two composable academic verification
+artifacts: the ten-theory `Cross_Domain_State_Preservation` session and the
+standalone `Regulatory_Action_Composition` child session. They are maintained
+as single-author scholarly artifacts rather than as a conventional open-source
+project that routinely merges external theory contributions. Please keep this
 context in mind when engaging with the repository.
 
 Read the [Code of Conduct](CODE_OF_CONDUCT.md), [Security
@@ -34,12 +34,12 @@ or the framing of the formalization are exactly the kind of engagement this entr
 
 ## On code contributions
 
-Because the theories form an AFP resubmission candidate, changes to the `.thy` sources are
-handled through the AFP process and the entry's authorship, not through ad-hoc merges here.
-We do not generally accept pull requests that add new locales, instances, or theorems. If you
-believe a proof change is warranted (a fix for an unsound step, a meaningful simplification, or
-a generalization), please open an issue first to discuss it before preparing any patch. This
-keeps the public mirror consistent with the audited candidate.
+Changes to `.thy` sources are issue-first and handled at the affected session's
+artifact boundary, not through ad-hoc merges. We do not generally accept pull
+requests that add new locales, instances, or theorems. If you believe a proof
+change is warranted (a fix for an unsound step, a meaningful simplification,
+or a generalization), please open an issue before preparing a patch. This
+keeps each public session coherent and auditable.
 
 ## Reporting issues
 
@@ -53,22 +53,29 @@ Please open an issue with:
 
 ## Building and checking the proofs
 
-Anyone can independently check the proofs. The entry depends on the AFP entry `ADS_Functor`,
+Anyone can independently check the proofs. The CDSP session depends on the AFP
+entry `ADS_Functor`, and RAC inherits that session environment through CDSP,
 so the AFP must be available to Isabelle: register it once with `isabelle components -u
 /path/to/afp/thys`, or pass it via `-d` as shown below. See https://www.isa-afp.org/help/ for
 obtaining and using the AFP.
 
 ```bash
 # Check all proofs (point -d at both this repo and the AFP)
-# expects: Finished Cross_Domain_State_Preservation, no errors
-isabelle build -d . -d /path/to/afp/thys Cross_Domain_State_Preservation
+# expects both sessions to finish with no errors
+isabelle build -d . -d /path/to/afp/thys \
+  Cross_Domain_State_Preservation Regulatory_Action_Composition
 
-# Generate the document PDF
-isabelle build -d . -d /path/to/afp/thys -o document=pdf Cross_Domain_State_Preservation
+# Generate one session document into a chosen output directory
+isabelle build -d . -d /path/to/afp/thys \
+  -o document=pdf -o document_output=/path/to/output \
+  Regulatory_Action_Composition
 ```
 
 - **Isabelle version:** exactly 2025-2 for the audited build.
 - All theories build without `sorry` or `oops`; independent confirmation of this is welcome.
+- Isabelle may emit `document.pdf` in the build-output directory. A tracked
+  reading copy must instead be named
+  `<Session>/release/<Session>.pdf`.
 
 Before submitting documentation or repository changes, also run:
 
@@ -85,7 +92,7 @@ A Pull Request should:
 
 - address one reviewable issue;
 - explain the affected theorem, assumption, public claim, or document;
-- preserve Isabelle `2025-2` and the declared AFP dependency unless the change
+- preserve Isabelle `2025-2`, the session graph, and declared dependencies unless the change
   is an intentional migration;
 - include the exact proof build result when theories or document sources
   change;
@@ -95,7 +102,7 @@ A Pull Request should:
   machine-local paths, or unrelated artifacts;
 - distinguish model-level evidence from implementation or deployment claims.
 
-Maintainers may request a smaller patch, further mechanization, or AFP review.
+Maintainers may request a smaller patch or further mechanization and review.
 A passing check does not guarantee acceptance or merge.
 
 ## Code style (for reference)

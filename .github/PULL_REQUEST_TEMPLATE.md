@@ -8,14 +8,15 @@ Describe the smallest reviewable change and link the issue.
 - [ ] Theory or proof changed; exact Isabelle build result is included
 - [ ] `FORMAL_MODEL_MAPPING.md` updated where required
 - [ ] Paper or citation metadata updated where required
+- [ ] Tracked PDFs use `<Session>/release/<Session>.pdf`
 - [ ] Model-level and implementation-level claims remain distinct
 
 Explain the affected formal items and public claims:
 
 ## Verification
 
-- [ ] Isabelle `2025-2` session build, or an explicit documentation-only N/A
-- [ ] AFP revision recorded for proof-affecting changes
+- [ ] Isabelle `2025-2` build for every affected session, or an explicit documentation-only N/A
+- [ ] External dependency revision recorded for proof-affecting changes
 - [ ] `node scripts/verify-repository-health.mjs`
 - [ ] No `sorry`, `oops`, credentials, local paths, or generated Isabelle output
 
