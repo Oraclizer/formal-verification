@@ -18,8 +18,14 @@ const required = [
   "CITATION.cff",
   "CHANGELOG.md",
   "FORMAL_MODEL_MAPPING.md",
+  "ROOTS",
   "Cross_Domain_State_Preservation/ROOT",
-  "docs/document.pdf",
+  "Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf",
+  "Cross_Domain_State_Preservation/release/manifest.json",
+  "Regulatory_Action_Composition/ROOT",
+  "Regulatory_Action_Composition/Regulatory_Action_Composition.thy",
+  "Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf",
+  "Regulatory_Action_Composition/release/manifest.json",
   "docs/assets/formal-verification-banner.svg",
   ".github/PULL_REQUEST_TEMPLATE.md",
   ".github/dependabot.yml",
@@ -31,6 +37,7 @@ const excluded = new Set([".git", ".isabelle", "output"]);
 const textExtensions = new Set([
   ".bib",
   ".cff",
+  ".json",
   ".md",
   ".mjs",
   ".svg",
@@ -58,6 +65,14 @@ for (const path of required) {
 }
 
 const files = walk(root);
+for (const absolute of files.filter((path) => extname(path).toLowerCase() === ".pdf")) {
+  const path = relative(root, absolute).replaceAll("\\", "/");
+  const match = /^([^/]+)\/release\/([^/]+)\.pdf$/.exec(path);
+  if (!match || match[1] !== match[2]) {
+    failures.push(`PDF release must be <Session>/release/<Session>.pdf: ${path}`);
+  }
+}
+
 for (const absolute of files) {
   const path = relative(root, absolute).replaceAll("\\", "/");
   if (!textExtensions.has(extname(path).toLowerCase())) continue;
@@ -83,7 +98,8 @@ for (const absolute of files.filter((path) => extname(path).toLowerCase() === ".
 }
 
 const rootSession = readFileSync(resolve(root, "Cross_Domain_State_Preservation/ROOT"), "utf8");
-const theories = [
+const racSession = readFileSync(resolve(root, "Regulatory_Action_Composition/ROOT"), "utf8");
+const cdspTheories = [
   "State_Preservation",
   "Regulatory_Instance",
   "Priority_Resolution",
@@ -95,12 +111,27 @@ const theories = [
   "External_Instance",
   "Canton_Bridge",
 ];
-for (const theory of theories) {
+for (const theory of cdspTheories) {
   if (!rootSession.includes(theory)) failures.push(`ROOT missing theory: ${theory}`);
   try {
     statSync(resolve(root, "Cross_Domain_State_Preservation", `${theory}.thy`));
   } catch {
     failures.push(`missing theory source: ${theory}.thy`);
+  }
+}
+if (!racSession.includes("session Regulatory_Action_Composition = Cross_Domain_State_Preservation +")) {
+  failures.push("RAC ROOT must extend Cross_Domain_State_Preservation");
+}
+if (!racSession.includes("Regulatory_Action_Composition")) {
+  failures.push("RAC ROOT missing Regulatory_Action_Composition theory");
+}
+const repositoryRoots = readFileSync(resolve(root, "ROOTS"), "utf8");
+for (const sessionRoot of [
+  "Cross_Domain_State_Preservation",
+  "Regulatory_Action_Composition",
+]) {
+  if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
+    failures.push(`ROOTS missing session directory: ${sessionRoot}`);
   }
 }
 
@@ -152,6 +183,8 @@ for (const source of markdown) {
 
 const readme = readFileSync(resolve(root, "README.md"), "utf8");
 for (const marker of [
+  "## Repository maintenance status",
+  "production-maintained public research repository",
   "## Verified model-level results",
   "## Theory architecture",
   "## Assurance boundary",
@@ -160,6 +193,15 @@ for (const marker of [
   "## License and disclaimer",
 ]) {
   if (!readme.includes(marker)) failures.push(`README missing required marker: ${marker}`);
+}
+
+for (const [path, marker] of [
+  ["CONTRIBUTING.md", "production-maintained as a public research surface"],
+  ["GOVERNANCE.md", "## Repository maintenance standard"],
+  ["SECURITY.md", "Production-maintained refers to repository review"],
+]) {
+  const text = readFileSync(resolve(root, path), "utf8");
+  if (!text.includes(marker)) failures.push(`${path} missing maintenance marker: ${marker}`);
 }
 
 const workflow = readFileSync(resolve(root, ".github/workflows/repository-health.yml"), "utf8");
@@ -176,4 +218,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${theories.length} theories`);
+console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1} theories, 2 sessions`);

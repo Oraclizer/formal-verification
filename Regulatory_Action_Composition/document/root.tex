@@ -1,0 +1,98 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{isabelle,isabellesym}
+\usepackage{amsmath,amssymb}
+\usepackage{pdfsetup}
+
+\urlstyle{rm}
+\isabellestyle{it}
+
+\begin{document}
+\emergencystretch=3em
+
+\title{Regulatory Action Composition}
+\author{Jinwook Kim (Jay)}
+\maketitle
+
+\begin{abstract}
+We mechanize sequential regulatory-action composition over a concrete
+five-state, seven-label reference machine in Isabelle/HOL.  The theory
+separates applied transitions, legal rejection, and operational failure;
+classifies all 21 unordered pairs of distinct transition labels into 12
+commuting and 9 noncommuting pairs with checked witnesses; proves terminal
+absorption and restrictive-state provenance; specifies typed legal effects
+and state-sensitive transfer gates; records trace and frame properties for
+commands and completed atomic synchronization steps; and enumerates exactly
+60 distinct reachable state-transformation vectors.  These are model-level
+results for the declared finite machine.  They do not establish legal truth,
+authorization correctness, concurrent execution, distributed rollback,
+network liveness, or model-to-code refinement.
+\end{abstract}
+
+\clearpage
+\tableofcontents
+\clearpage
+
+\section{Overview}
+
+Regulatory commands do not in general commute.  Applying two otherwise valid
+labels in opposite orders may produce different final states because the
+first transition changes whether the second transition is defined.  This
+artifact makes that order sensitivity explicit and executable at the model
+level, while preserving a distinction between an undefined legal transition
+and an operational failure outside the state machine.
+
+The session is a standalone artifact built on the published
+\texttt{Cross\_Domain\_State\_Preservation} session.  It imports only the
+concrete regulatory instance from that session; it does not import or extend
+the authenticated-data-structure functor layer.  The shared base supplies the
+five states, seven transition labels, transition function, and atomic global
+state abstraction~\cite{cdsp}.  The regulatory interpretation is motivated by
+the protocol model described in the related RCP paper~\cite{rcp}.
+
+\subsection{Checked result groups}
+
+\begin{description}
+\item[Outcome semantics.] Applied, rejected, and operational-failure outcomes
+  remain distinct, with rejected and failed commands leaving the modeled
+  state unchanged.
+\item[Pair classification.] The complete set of 21 unordered pairs of
+  distinct labels is partitioned into 12 commuting and 9 noncommuting pairs;
+  every noncommuting pair has a concrete state witness.
+\item[Terminality and provenance.] Confiscation is absorbing for arbitrary
+  action words, while the reachable restrictive states carry checked
+  provenance constraints.
+\item[Legal-effect and transfer layer.] Six typed legal-effect descriptors
+  cover state transitions and the separate enforcement-transfer path.
+  Ordinary transfers use both the regulatory-state gate and a current-policy
+  condition.
+\item[Trace and synchronization.] Command queues preserve order and input
+  identity, record execution outcome, leave unrelated assets unchanged, and
+  preserve validity after each completed atomic synchronization step.
+\item[Finite normal forms.] Exactly 60 distinct state-transformation vectors
+  are reachable; every action word evaluates to one of them and the set is
+  closed under every transition label.
+\end{description}
+
+\subsection{Assurance boundary}
+
+The artifact is a finite reference semantics, not a legal opinion or an
+implementation proof.  In particular, the current-policy input for restricted
+transfers is abstract.  Asset lookup, authorization, replay protection,
+concurrent interleavings, partial propagation, timeout, rollback, bytecode
+behavior, and deployment security remain external or refinement obligations.
+The atomic queue theorems speak only about completed model steps.
+
+\input{session}
+
+\section{Conclusion}
+
+The checked algebra shows where regulatory actions are order-insensitive and
+where order is semantically load-bearing.  It also supplies a bounded,
+auditable normal-form universe for regression tests and later implementation
+mapping, without extending the claims beyond the concrete reference machine.
+
+\bibliographystyle{plain}
+\bibliography{root}
+
+\end{document}

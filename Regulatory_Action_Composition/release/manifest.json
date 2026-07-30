@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "generated_on": "2026-07-31",
+  "session": "Regulatory_Action_Composition",
+  "isabelle_version": "Isabelle2025-2",
+  "document_engine": "LuaTeX 1.24.0 (TeX Live 2026)",
+  "source": {
+    "file_count": 4,
+    "tree_sha256": "8B401C2F0190BC95C7D82FBB69A854D6A07A02F4A2F1BD5D4F6C451D11465B0C",
+    "tree_hash_algorithm": "SHA-256 of UTF-8 lines '<file-sha256>  <session-relative-path>\\n', sorted ordinally; files are ROOT, document/root.tex, document/root.bib, and all top-level .thy sources"
+  },
+  "dependencies": [
+    {
+      "session": "Cross_Domain_State_Preservation",
+      "import": "Cross_Domain_State_Preservation.Regulatory_Instance",
+      "source_tree_sha256": "810C8AFA0C32A97034A00E67FE5FA9CAF388148695F8299EBA2F8BB5395551F6"
+    },
+    {
+      "session": "ADS_Functor",
+      "relationship": "transitive through Cross_Domain_State_Preservation; not imported by the RAC theory",
+      "source_tree_sha256": "7148E695494A95ED7E07416133FA7285671BC6F51B581E921358BAB87FA05ACC"
+    }
+  ],
+  "pdf": {
+    "path": "Regulatory_Action_Composition.pdf",
+    "pages": 27,
+    "sha256": "E3FA37E1CCDE95A8BC30F97552EFE4A270B01C2BD6EC8D97B4712E9E79FE0A2C"
+  },
+  "build_contract": {
+    "proof_check": "isabelle build -c -d <ADS_Functor> -d <repository> Cross_Domain_State_Preservation Regulatory_Action_Composition",
+    "document": "isabelle build -d <ADS_Functor> -d <repository> -o document=pdf -o document_output=<output> Regulatory_Action_Composition",
+    "result": "Finished Regulatory_Action_Composition"
+  }
+}

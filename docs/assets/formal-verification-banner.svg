@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="title desc">
   <title id="title">Oraclizer Formal Verification</title>
-  <desc id="desc">The Cross-Domain State Preservation Functor, mechanized in Isabelle/HOL, represented by a calibrated commutative proof diagram.</desc>
+  <desc id="desc">Independent formal verification artifacts mechanized in Isabelle/HOL, represented by a calibrated commutative proof diagram.</desc>
   <defs>
     <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#070b18"/>
@@ -119,7 +119,7 @@
     <text x="348" y="64" fill="#9d91ee" font-size="13" font-weight="700" letter-spacing="2.35">ISABELLE/HOL  •  MECHANIZED ARTIFACT</text>
     <text x="344" y="130" fill="#f4f6ff" font-size="60" font-weight="750" letter-spacing="1.2">FORMAL VERIFICATION</text>
     <rect x="348" y="150" width="54" height="4" rx="2" fill="#9b83f7"/>
-    <text x="348" y="190" fill="#c6d7f2" font-size="23" font-weight="650" letter-spacing=".82">CROSS-DOMAIN STATE PRESERVATION FUNCTOR</text>
-    <text x="348" y="230" fill="#9daec6" font-size="17" letter-spacing=".16">Ten-theory candidate  •  compositional proofs  •  explicit assurance boundaries</text>
+    <text x="348" y="190" fill="#c6d7f2" font-size="23" font-weight="650" letter-spacing=".82">COMPOSABLE, SESSION-SCOPED PROOF ARTIFACTS</text>
+    <text x="348" y="230" fill="#9daec6" font-size="17" letter-spacing=".16">Machine-checked models  •  reproducible releases  •  explicit assurance boundaries</text>
   </g>
 </svg>
