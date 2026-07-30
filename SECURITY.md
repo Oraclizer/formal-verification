@@ -8,9 +8,14 @@ wallet, key-management system, or deployed service.
 
 | Scope | Status |
 | --- | --- |
+| Repository operations and public release surface | Production-maintained |
 | Exact tracked CDSP and RAC sessions | Proof and model reports accepted |
 | Earlier commits and forks | Best effort only |
 | Implementations and deployments | Not covered |
+
+Production-maintained refers to repository review, reproducibility, release
+identity, public-surface checks, and coordinated reporting. It is not a
+production-readiness claim for any implementation or deployment.
 
 This policy creates no warranty, support agreement, audit representation, or
 service-level commitment.

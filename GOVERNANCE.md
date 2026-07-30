@@ -33,6 +33,19 @@ A green check does not compel a merge. Material theory changes remain
 issue-first so that the affected session can be reviewed as one coherent
 artifact.
 
+## Repository maintenance standard
+
+The public repository is production-maintained at the repository-operations
+level. A merge must leave authoritative session sources, reproducible build
+instructions, session-named reading copies, integrity manifests, model
+boundaries, security reporting, and automated repository-health checks
+mutually consistent. A documentation-only change must not silently alter a
+formal claim or release identity.
+
+This standard governs the research repository surface. It is not a statement
+that a bridge, contract, service, deployment, or model-to-code refinement is
+production-ready.
+
 ## Publications and releases
 
 A repository branch, badge, PDF, tag, preprint, AFP submission, AFP acceptance,

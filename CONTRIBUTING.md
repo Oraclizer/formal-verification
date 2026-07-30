@@ -7,6 +7,11 @@ as single-author scholarly artifacts rather than as a conventional open-source
 project that routinely merges external theory contributions. Please keep this
 context in mind when engaging with the repository.
 
+The repository is production-maintained as a public research surface. That
+means every accepted change must preserve reproducibility, release identity,
+public-claim consistency, and reviewability. It does not mean that this
+repository contains or certifies a production implementation.
+
 Read the [Code of Conduct](CODE_OF_CONDUCT.md), [Security
 policy](SECURITY.md), and [Governance](GOVERNANCE.md) before contributing.
 
@@ -98,6 +103,8 @@ A Pull Request should:
   change;
 - update `FORMAL_MODEL_MAPPING.md` when an assumption, result, or
   implementation target changes;
+- preserve the production-maintenance contract across the README, governance,
+  security, release manifest, and automated repository-health surfaces;
 - contain no generated Isabelle output, credentials, private correspondence,
   machine-local paths, or unrelated artifacts;
 - distinguish model-level evidence from implementation or deployment claims.

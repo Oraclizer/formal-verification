@@ -183,6 +183,8 @@ for (const source of markdown) {
 
 const readme = readFileSync(resolve(root, "README.md"), "utf8");
 for (const marker of [
+  "## Repository maintenance status",
+  "production-maintained public research repository",
   "## Verified model-level results",
   "## Theory architecture",
   "## Assurance boundary",
@@ -191,6 +193,15 @@ for (const marker of [
   "## License and disclaimer",
 ]) {
   if (!readme.includes(marker)) failures.push(`README missing required marker: ${marker}`);
+}
+
+for (const [path, marker] of [
+  ["CONTRIBUTING.md", "production-maintained as a public research surface"],
+  ["GOVERNANCE.md", "## Repository maintenance standard"],
+  ["SECURITY.md", "Production-maintained refers to repository review"],
+]) {
+  const text = readFileSync(resolve(root, path), "utf8");
+  if (!text.includes(marker)) failures.push(`${path} missing maintenance marker: ${marker}`);
 }
 
 const workflow = readFileSync(resolve(root, ".github/workflows/repository-health.yml"), "utf8");

@@ -10,6 +10,7 @@ Describe the smallest reviewable change and link the issue.
 - [ ] Paper or citation metadata updated where required
 - [ ] Tracked PDFs use `<Session>/release/<Session>.pdf`
 - [ ] Model-level and implementation-level claims remain distinct
+- [ ] Production-maintenance claims remain repository-scoped and consistent
 
 Explain the affected formal items and public claims:
 

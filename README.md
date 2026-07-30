@@ -6,6 +6,7 @@
   [![Artifacts](https://img.shields.io/badge/artifacts-two%20sessions-6f42c1.svg)](#artifact-index)
   [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-167c3a.svg)](https://isabelle.in.tum.de/)
   [![Proof status](https://img.shields.io/badge/proofs-sorry%2Foops--free-167c3a.svg)](CONTRIBUTING.md#building-and-checking-the-proofs)
+  [![Maintenance](https://img.shields.io/badge/repository-production--maintained-0b5cad.svg)](#repository-maintenance-status)
   [![License](https://img.shields.io/badge/license-BSD--3--Clause-0b5cad.svg)](LICENSE)
 
   [Proof scope](#verified-model-level-results) |
@@ -21,6 +22,15 @@
 > reproducibly check under Isabelle2025-2 with the declared AFP dependency.
 > Claims are model-level and bounded by the assumptions recorded here and in
 > [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md).
+
+## Repository maintenance status
+
+This is a **production-maintained public research repository**. The
+designation covers repository operations: reviewable changes, reproducible
+proof and document builds, session-scoped releases, integrity manifests,
+automated public-surface checks, security reporting, and change governance.
+It does not designate either artifact as a production implementation,
+deployment, audit, legal opinion, or model-to-code refinement.
 
 ## Artifact index
 

@@ -5,6 +5,11 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Defined the repository as a production-maintained public research surface
+  while keeping implementation, deployment, audit, legal, and refinement
+  readiness explicitly outside that designation.
+- Gave the RAC title/abstract, table of contents, and body separate page
+  boundaries in the tracked session document.
 - Added `Regulatory_Action_Composition` as a standalone child session of
   `Cross_Domain_State_Preservation`, importing only the concrete regulatory
   instance.

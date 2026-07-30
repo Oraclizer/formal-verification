@@ -6,7 +6,7 @@
   "document_engine": "LuaTeX 1.24.0 (TeX Live 2026)",
   "source": {
     "file_count": 4,
-    "tree_sha256": "E9FA15377B5D40CCE4026A3D202AE518054D6C246A606ED4D311BE0363D706C9",
+    "tree_sha256": "8B401C2F0190BC95C7D82FBB69A854D6A07A02F4A2F1BD5D4F6C451D11465B0C",
     "tree_hash_algorithm": "SHA-256 of UTF-8 lines '<file-sha256>  <session-relative-path>\\n', sorted ordinally; files are ROOT, document/root.tex, document/root.bib, and all top-level .thy sources"
   },
   "dependencies": [
@@ -23,8 +23,8 @@
   ],
   "pdf": {
     "path": "Regulatory_Action_Composition.pdf",
-    "pages": 26,
-    "sha256": "F1C63FA146FE4102DE2F6C1386DE5154BE80939D0DB6B421CA68990F789CE428"
+    "pages": 27,
+    "sha256": "E3FA37E1CCDE95A8BC30F97552EFE4A270B01C2BD6EC8D97B4712E9E79FE0A2C"
   },
   "build_contract": {
     "proof_check": "isabelle build -c -d <ADS_Functor> -d <repository> Cross_Domain_State_Preservation Regulatory_Action_Composition",
