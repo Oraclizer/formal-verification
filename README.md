@@ -3,18 +3,17 @@
 
   <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition.</strong></p>
 
-  [![Artifacts](https://img.shields.io/badge/artifacts-two%20sessions-6f42c1.svg)](#artifact-index)
+  [![Artifacts](https://img.shields.io/badge/artifacts-two%20sessions-6f42c1.svg)](#formal-artifact-catalog)
   [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-167c3a.svg)](https://isabelle.in.tum.de/)
   [![Proof status](https://img.shields.io/badge/proofs-sorry%2Foops--free-167c3a.svg)](CONTRIBUTING.md#building-and-checking-the-proofs)
   [![Maintenance](https://img.shields.io/badge/repository-production--maintained-0b5cad.svg)](#repository-maintenance-status)
   [![License](https://img.shields.io/badge/license-BSD--3--Clause-0b5cad.svg)](LICENSE)
 
   [Proof scope](#verified-model-level-results) |
+  [Artifacts](#formal-artifact-catalog) |
   [Architecture](#theory-architecture) |
   [Build](#reproduce-the-proofs) |
-  [Mapping](FORMAL_MODEL_MAPPING.md) |
-  [CDSP PDF](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) |
-  [RAC PDF](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf)
+  [Mapping](FORMAL_MODEL_MAPPING.md)
 </div>
 
 > **Mechanized assurance.** The repository contains two composable
@@ -32,26 +31,31 @@ automated public-surface checks, security reporting, and change governance.
 It does not designate either artifact as a production implementation,
 deployment, audit, legal opinion, or model-to-code refinement.
 
-## Artifact index
+## Formal artifact catalog
 
-| Session | Source | PDF |
-| --- | --- | --- |
-| CDSP | [Session ROOT](Cross_Domain_State_Preservation/ROOT) | [Reading copy](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) |
-| RAC | [Session ROOT](Regulatory_Action_Composition/ROOT) | [Reading copy](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) |
+This catalog lists the formal-verification artifacts released from this
+repository. Each row is an independently buildable Isabelle session and a
+separate review and release unit. **Source** opens the authoritative session
+`ROOT`; **PDF** is the session-named reading copy; and **Manifest** records the
+source and PDF hashes together with the document-build identity.
 
-**Scope**
+| Artifact | Role | Verification focus | Entry points |
+| --- | --- | --- | --- |
+| **CDSP** | Foundation | Preservation morphisms, priority and conditional progress, authenticated views, guarded convergence, and the synchronization-degree hierarchy | [Source](Cross_Domain_State_Preservation/ROOT) · [PDF](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) · [Manifest](Cross_Domain_State_Preservation/release/manifest.json) |
+| **RAC** | Extension | Regulatory outcomes, pair commutativity, provenance, transfer gates, traces, atomic queues, and finite normal forms | [Source](Regulatory_Action_Composition/ROOT) · [PDF](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) · [Manifest](Regulatory_Action_Composition/release/manifest.json) |
 
-- **CDSP:** Ten-theory foundation for preservation morphisms, priority and
-  conditional progress, authenticated views, guarded convergence, and the
-  synchronization-degree hierarchy.
-- **RAC:** Standalone theory over the published regulatory instance, covering
-  outcomes, pair commutativity, provenance, transfer gates, traces, atomic
-  queues, and finite normal forms.
+**Role taxonomy**
 
-The sessions share a repository because RAC reuses the concrete regulatory
-machine from CDSP. They remain separate release and review units. RAC does not
-import or extend `ADS_Functor`; its only formal dependency on CDSP is
-`Regulatory_Instance`.
+- **Foundation:** introduces reusable formal definitions and base laws.
+- **Extension:** imports a repository session to establish an additional
+  checked result set.
+- **Bridge:** proves a correspondence with an external model or formalization.
+- **Application:** instantiates a formal model for a bounded domain case.
+
+The role classifies an artifact's primary formal relationship, not its
+maturity, publication venue, or acceptance state. CDSP is the reusable
+foundation; RAC is an extension because it imports CDSP's
+`Regulatory_Instance`. RAC does not import or extend `ADS_Functor`.
 
 An earlier version of CDSP was submitted to the Archive of Formal Proofs on
 2026-03-25 but was not accepted as an AFP entry. Neither session in this
