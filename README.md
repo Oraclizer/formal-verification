@@ -78,8 +78,14 @@ open obligations, and proposed implementation correspondences are in
 ## Theory architecture
 
 ```mermaid
+---
+config:
+  flowchart:
+    nodeSpacing: 28
+    rankSpacing: 90
+---
 flowchart TB
-    subgraph CDSP["Cross_Domain_State_Preservation session"]
+    subgraph CDSP["CDSP session"]
       SP["State_Preservation"]
       RI["Regulatory_Instance"]
       PR["Priority_Resolution"]
@@ -92,11 +98,11 @@ flowchart TB
       CA["Canton_Bridge"]
     end
 
-    subgraph RAC["Regulatory_Action_Composition session"]
+    subgraph RAC["RAC session"]
       RA["Regulatory_Action_Composition"]
     end
 
-    ADS["AFP ADS_Functor external dependency"]
+    ADS["AFP ADS_Functor<br/>external dependency"]
 
     SP --> RI
     SP --> CO
