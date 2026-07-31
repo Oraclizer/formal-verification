@@ -27,6 +27,7 @@ const required = [
   "Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf",
   "Regulatory_Action_Composition/release/manifest.json",
   "docs/assets/formal-verification-banner.svg",
+  "docs/assets/theory-architecture.svg",
   ".github/PULL_REQUEST_TEMPLATE.md",
   ".github/dependabot.yml",
   ".github/ISSUE_TEMPLATE/config.yml",

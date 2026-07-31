@@ -81,50 +81,9 @@ open obligations, and proposed implementation correspondences are in
 
 ## Theory architecture
 
-```mermaid
----
-config:
-  flowchart:
-    nodeSpacing: 28
-    rankSpacing: 90
----
-flowchart TB
-    subgraph CDSP["CDSP session"]
-      SP["State_Preservation"]
-      RI["Regulatory_Instance"]
-      PR["Priority_Resolution"]
-      DQ["DQuencer_Instance"]
-      CO["Composition"]
-      PA["Proof_Automation"]
-      FL["Functor_Laws"]
-      HI["Hierarchy"]
-      EX["External_Instance"]
-      CA["Canton_Bridge"]
-    end
-
-    subgraph RAC["RAC session"]
-      RA["Regulatory_Action_Composition"]
-    end
-
-    ADS["AFP ADS_Functor<br/>external dependency"]
-
-    SP --> RI
-    SP --> CO
-    SP --> PA
-    SP --> FL
-    SP --> HI
-    SP --> EX
-    PR --> DQ
-    DQ --> CO
-    CO --> FL
-    ADS --> FL
-    ADS --> CA
-    FL --> HI
-    FL --> CA
-    RI --> FL
-    RI --> CA
-    RI --> RA
-```
+<div align="center">
+  <img src="docs/assets/theory-architecture.svg" alt="Import graph of the CDSP and RAC sessions. State_Preservation feeds Regulatory_Instance, Composition, Proof_Automation, Functor_Laws, Hierarchy and External_Instance. Priority_Resolution feeds DQuencer_Instance, which feeds Composition. Composition and Regulatory_Instance feed Functor_Laws, which feeds Hierarchy and Canton_Bridge. The external AFP session ADS_Functor feeds Functor_Laws and Canton_Bridge. Regulatory_Action_Composition in the RAC session imports Regulatory_Instance." width="900">
+</div>
 
 The CDSP session depends on `HOL-Library`, `HOL-Eisbach`, and the AFP session
 `ADS_Functor`. RAC extends the built CDSP session and imports its regulatory
@@ -217,6 +176,7 @@ AFP revisions, command, and resulting session log.
 | `Regulatory_Action_Composition/*.thy` | Authoritative RAC theory |
 | `Regulatory_Action_Composition/document/` | RAC Isabelle/LaTeX document source |
 | `Regulatory_Action_Composition/release/` | RAC session-named PDF and release manifest |
+| `docs/assets/` | README banner and the theory-architecture diagram, with the diagram's Mermaid source |
 | `FORMAL_MODEL_MAPPING.md` | Theorem-to-target mapping, assumptions, gaps, and proposed tests |
 | `CONTRIBUTING.md` | Review channels, proof reproduction, and contribution policy |
 | `SECURITY.md` | Sensitive-report routing and assurance boundary |

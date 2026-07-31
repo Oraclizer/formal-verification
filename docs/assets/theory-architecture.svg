@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="720" viewBox="0 0 1180 720" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="ta-title ta-desc">
+  <title id="ta-title">Theory architecture</title>
+  <desc id="ta-desc">Import graph of the two Isabelle sessions in this repository. The CDSP session contains ten theories: State_Preservation feeds Regulatory_Instance, Composition, Proof_Automation, Functor_Laws, Hierarchy and External_Instance; Priority_Resolution feeds DQuencer_Instance, which feeds Composition; Composition and Regulatory_Instance feed Functor_Laws; Functor_Laws feeds Hierarchy and Canton_Bridge; Regulatory_Instance also feeds Canton_Bridge. The external AFP session ADS_Functor feeds Functor_Laws and Canton_Bridge. The RAC session contains Regulatory_Action_Composition, which imports Regulatory_Instance from CDSP.</desc>
+
+  <defs>
+    <linearGradient id="ta-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b18"/>
+      <stop offset=".58" stop-color="#10182d"/>
+      <stop offset="1" stop-color="#13273b"/>
+    </linearGradient>
+    <pattern id="ta-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0v32" fill="none" stroke="#bdd6ee" stroke-width="1" opacity=".035"/>
+      <circle cx="0" cy="0" r="1.1" fill="#9fc4df" opacity=".08"/>
+    </pattern>
+    <marker id="ta-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 1.4 9 5 0 8.6Z" fill="#7f9ac6"/>
+    </marker>
+    <marker id="ta-arrow-ext" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 1.4 9 5 0 8.6Z" fill="#9a83f8"/>
+    </marker>
+  </defs>
+
+  <rect width="1180" height="720" rx="20" fill="url(#ta-bg)"/>
+  <rect width="1180" height="720" rx="20" fill="url(#ta-grid)"/>
+
+  <!-- session containers -->
+  <g>
+    <rect x="24" y="88" width="856" height="572" rx="16" fill="#0b142a" fill-opacity=".55" stroke="#33507c" stroke-width="1.5"/>
+    <text x="46" y="116" fill="#8fa6c9" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1.6">CDSP SESSION</text>
+
+    <rect x="910" y="558" width="250" height="102" rx="16" fill="#0b1f2e" fill-opacity=".55" stroke="#3f7f96" stroke-width="1.5"/>
+    <text x="932" y="586" fill="#8fbccb" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1.6">RAC SESSION</text>
+
+    <text x="910" y="106" fill="#a294ee" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1.6">EXTERNAL</text>
+  </g>
+
+  <!-- edges: session-internal -->
+  <g fill="none" stroke="#5f7aa8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ta-arrow)">
+    <path d="M350 173 V239"/>
+    <path d="M310 173 V208 H145 V239"/>
+    <path d="M390 173 V208 H555 V239"/>
+    <path d="M290 173 V196 H42 V598 H61"/>
+    <path d="M330 173 V205 H247 V486 H266"/>
+    <path d="M410 173 V196 H862 V374 H844"/>
+    <path d="M760 173 V239"/>
+    <path d="M760 285 V351"/>
+    <path d="M740 397 V422 H374 V463"/>
+    <path d="M350 285 V463"/>
+    <path d="M390 285 V320 H657 V598 H639"/>
+    <path d="M420 285 V410 H900 V614 H920"/>
+    <path d="M310 509 V545 H145 V575"/>
+    <path d="M390 509 V545 H555 V575"/>
+  </g>
+
+  <!-- edges: external AFP dependency -->
+  <g fill="none" stroke="#8b76e8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#ta-arrow-ext)">
+    <path d="M985 181 V445 H410 V463"/>
+    <path d="M1035 181 V530 H600 V575"/>
+  </g>
+
+  <!-- nodes -->
+  <g font-family="SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace" font-size="13" text-anchor="middle">
+    <g fill="#101d36" stroke="#42639b" stroke-width="1.4">
+      <rect x="266" y="127" width="168" height="46" rx="9"/>
+      <rect x="676" y="127" width="168" height="46" rx="9"/>
+      <rect x="61" y="239" width="168" height="46" rx="9"/>
+      <rect x="266" y="239" width="168" height="46" rx="9"/>
+      <rect x="471" y="239" width="168" height="46" rx="9"/>
+      <rect x="676" y="239" width="168" height="46" rx="9"/>
+      <rect x="676" y="351" width="168" height="46" rx="9"/>
+      <rect x="266" y="463" width="168" height="46" rx="9"/>
+      <rect x="61" y="575" width="168" height="46" rx="9"/>
+      <rect x="471" y="575" width="168" height="46" rx="9"/>
+    </g>
+    <g fill="#dce8f8">
+      <text x="350" y="155">State_Preservation</text>
+      <text x="760" y="155">Priority_Resolution</text>
+      <text x="145" y="267">Proof_Automation</text>
+      <text x="350" y="267">Regulatory_Instance</text>
+      <text x="555" y="267">External_Instance</text>
+      <text x="760" y="267">DQuencer_Instance</text>
+      <text x="760" y="379">Composition</text>
+      <text x="350" y="491">Functor_Laws</text>
+      <text x="145" y="603">Hierarchy</text>
+      <text x="555" y="603">Canton_Bridge</text>
+    </g>
+
+    <rect x="920" y="591" width="230" height="46" rx="9" fill="#0e2333" stroke="#4c9fd2" stroke-width="1.4"/>
+    <text x="1035" y="619" fill="#dbeef8">Regulatory_Action_Composition</text>
+
+    <rect x="910" y="119" width="200" height="62" rx="9" fill="#161232" stroke="#8b76e8" stroke-width="1.4" stroke-dasharray="6 4"/>
+    <text x="1010" y="144" fill="#e4dcff">AFP ADS_Functor</text>
+    <text x="1010" y="164" fill="#a99bea" font-size="11">external dependency</text>
+  </g>
+
+  <!-- legend -->
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" fill="#8397b5">
+    <path d="M42 686 H86" fill="none" stroke="#5f7aa8" stroke-width="1.7" marker-end="url(#ta-arrow)"/>
+    <text x="96" y="690">imports within this repository</text>
+    <path d="M330 686 H374" fill="none" stroke="#8b76e8" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#ta-arrow-ext)"/>
+    <text x="384" y="690">imports the external AFP session</text>
+  </g>
+</svg>
