@@ -5,6 +5,12 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Replaced the README Mermaid block with a tracked SVG of the theory
+  architecture. GitHub renders a Mermaid block inside an iframe whose `src`
+  carries a URL fragment, so browsers scrolled that iframe into view on load and
+  opened the landing page in the middle of the README instead of at the top. The
+  Mermaid definition is kept next to the SVG as the diagram source, and the SVG
+  is now a required public-surface file.
 - Improved the RAC reading copy by making its exact parent-session identifier
   safely breakable and replacing narrow description-list blocks with
   full-width result-group paragraphs.

@@ -1,0 +1,44 @@
+%% Source definition for docs/assets/theory-architecture.svg
+%%
+%% The rendered diagram is committed as a static SVG rather than embedded as a
+%% GitHub Mermaid block. GitHub renders a Mermaid block inside an iframe whose
+%% src carries a URL fragment, and the browser scrolls that iframe into view on
+%% load, which drags the whole README to the middle of the page. Keep this file
+%% and the SVG in step when the theory imports change.
+
+flowchart TB
+    subgraph CDSP["CDSP session"]
+      SP["State_Preservation"]
+      RI["Regulatory_Instance"]
+      PR["Priority_Resolution"]
+      DQ["DQuencer_Instance"]
+      CO["Composition"]
+      PA["Proof_Automation"]
+      FL["Functor_Laws"]
+      HI["Hierarchy"]
+      EX["External_Instance"]
+      CA["Canton_Bridge"]
+    end
+
+    subgraph RAC["RAC session"]
+      RA["Regulatory_Action_Composition"]
+    end
+
+    ADS["AFP ADS_Functor<br/>external dependency"]
+
+    SP --> RI
+    SP --> CO
+    SP --> PA
+    SP --> FL
+    SP --> HI
+    SP --> EX
+    PR --> DQ
+    DQ --> CO
+    CO --> FL
+    ADS --> FL
+    ADS --> CA
+    FL --> HI
+    FL --> CA
+    RI --> FL
+    RI --> CA
+    RI --> RA
