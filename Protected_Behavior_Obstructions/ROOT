@@ -1,0 +1,6 @@
+session Protected_Behavior_Obstructions = HOL +
+  options [document = false]
+  theories
+    Protected_Behavior_Profile
+    Protected_Stochastic_Morphism
+    Protected_Obstruction_Examples

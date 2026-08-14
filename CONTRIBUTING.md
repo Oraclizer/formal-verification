@@ -1,11 +1,13 @@
 # Contributing
 
-This repository is the public home of two composable academic verification
-artifacts: the ten-theory `Cross_Domain_State_Preservation` session and the
-standalone `Regulatory_Action_Composition` child session. They are maintained
-as single-author scholarly artifacts rather than as a conventional open-source
-project that routinely merges external theory contributions. Please keep this
-context in mind when engaging with the repository.
+This repository is the public home of two composable product-model sessions:
+the ten-theory `Cross_Domain_State_Preservation` session and the standalone
+`Regulatory_Action_Composition` child session. It also contains the independent
+`PARTIAL / NO SAME` `Protected_Behavior_Obstructions` research companion, which
+has no Oraclizer implementation or product-refinement target. The artifacts are
+maintained as single-author scholarly works rather than as a conventional
+open-source project that routinely merges external theory contributions.
+Please keep this context in mind when engaging with the repository.
 
 The repository is production-maintained as a public research surface. That
 means every accepted change must preserve reproducibility, release identity,
@@ -65,16 +67,23 @@ so the AFP must be available to Isabelle: register it once with `isabelle compon
 obtaining and using the AFP.
 
 ```bash
-# Check all proofs (point -d at both this repo and the AFP)
-# expects both sessions to finish with no errors
+# Check the two product-model sessions (point -d at both this repo and the AFP)
 isabelle build -d . -d /path/to/afp/thys \
   Cross_Domain_State_Preservation Regulatory_Action_Composition
+
+# Check the independent PARTIAL / NO SAME companion (AFP is not required)
+isabelle build -c -D Protected_Behavior_Obstructions \
+  Protected_Behavior_Obstructions
 
 # Generate one session document into a chosen output directory
 isabelle build -d . -d /path/to/afp/thys \
   -o document=pdf -o document_output=/path/to/output \
   Regulatory_Action_Composition
 ```
+
+Before changing the companion, read its folder-local
+[`CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md).
+It is not an Oraclizer product-refinement mapping.
 
 - **Isabelle version:** exactly 2025-2 for the audited build.
 - All theories build without `sorry` or `oops`; independent confirmation of this is welcome.
@@ -101,8 +110,10 @@ A Pull Request should:
   is an intentional migration;
 - include the exact proof build result when theories or document sources
   change;
-- update `FORMAL_MODEL_MAPPING.md` when an assumption, result, or
-  implementation target changes;
+- update `FORMAL_MODEL_MAPPING.md` when an Oraclizer product-model assumption,
+  result, or implementation target changes, and update the folder-local
+  `Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md` when the companion
+  correspondence changes;
 - preserve the production-maintenance contract across the README, governance,
   security, release manifest, and automated repository-health surfaces;
 - contain no generated Isabelle output, credentials, private correspondence,

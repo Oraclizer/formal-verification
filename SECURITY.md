@@ -10,6 +10,7 @@ wallet, key-management system, or deployed service.
 | --- | --- |
 | Repository operations and public release surface | Production-maintained |
 | Exact tracked CDSP and RAC sessions | Proof and model reports accepted |
+| `Protected_Behavior_Obstructions` | Independent `PARTIAL / NO SAME` research companion; no product-refinement target |
 | Earlier commits and forks | Best effort only |
 | Implementations and deployments | Not covered |
 

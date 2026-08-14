@@ -28,5 +28,31 @@ jobs:
       - name: Verify public surface and local links
         run: node scripts/verify-repository-health.mjs
 
-  # The lightweight repository check does not replace the declared
-  # Isabelle 2025-2 plus AFP session build.
+  protected-behavior-obstructions:
+    name: Isabelle2025-2 / Protected Behavior Obstructions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      ISABELLE_SHA256: a20a507bc7c1270d8be96a9f3fbec06345387789d2dc2c4d3df6260d47bfb33c
+      ISABELLE_URL: https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install pinned Isabelle2025-2
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/Isabelle2025-2_linux.tar.gz"
+          isabelle_home="$RUNNER_TEMP/Isabelle2025-2"
+          curl --fail --location --retry 3 --output "$archive" "$ISABELLE_URL"
+          echo "$ISABELLE_SHA256  $archive" | sha256sum --check --strict
+          tar -xzf "$archive" -C "$RUNNER_TEMP"
+          test "$("$isabelle_home/bin/isabelle" version)" = "Isabelle2025-2"
+      - name: Build Protected_Behavior_Obstructions named session
+        shell: bash
+        run: >-
+          "$RUNNER_TEMP/Isabelle2025-2/bin/isabelle" build
+          -D Protected_Behavior_Obstructions
+          Protected_Behavior_Obstructions
