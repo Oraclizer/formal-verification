@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.6.0
-**Last updated:** 2026-07-31
+**Version:** 0.6.1
+**Last updated:** 2026-08-13
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -26,6 +26,15 @@ This mapping covers:
 - **Proof Automation**: reusable Eisbach discharge methods for the generic locale obligations
 
 All theory files mapped below are mechanically checked by Isabelle/HOL 2025-2 with no `sorry` or `oops` occurrences.
+
+### Independent research companion outside this mapping
+
+`Protected_Behavior_Obstructions` is an independent research companion. It has
+no Oraclizer implementation target and no Oraclizer product-refinement target.
+Its cross-prover status is `PARTIAL / NO SAME`; the detailed Lean-Isabelle
+correspondence is owned by the folder-local
+[`CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md).
+This pointer is not a product-coverage or implementation-mapping entry.
 
 ## What Verification Establishes and What It Does Not
 
@@ -464,6 +473,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.6.1 | 2026-08-13 | Added only an out-of-scope pointer to an independent research companion. This does not expand Oraclizer product coverage or add an implementation/refinement mapping. |
 | 0.6.0 | 2026-07-31 | Added the standalone `Regulatory_Action_Composition` session to repository-level mapping: outcome separation, complete 12/9 pair classification, legal-effect and transfer-gate boundaries, trace/frame and completed atomic-queue targets, 60 normal forms, proposed tests, and an explicit program-mapping completion gate. No implementation refinement is claimed. |
 | 0.5.6 | 2026-07-20 | Editorial: refinement-direction glosses aligned with the formal reading of `state_refines` (a partial view refines the fuller view), matching the theory sources. No change to theorems, assumptions, mappings, or dispositions. |
 | 0.5.5 | 2026-07-20 | Editorial: numbered property labels replaced with the property names throughout the current document (coverage list, section headings, assumption and test tables); historical change-log rows retained verbatim. No change to theorems, assumptions, mappings, or dispositions. |

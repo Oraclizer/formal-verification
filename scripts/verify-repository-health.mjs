@@ -26,6 +26,12 @@ const required = [
   "Regulatory_Action_Composition/Regulatory_Action_Composition.thy",
   "Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf",
   "Regulatory_Action_Composition/release/manifest.json",
+  "Protected_Behavior_Obstructions/ROOT",
+  "Protected_Behavior_Obstructions/README.md",
+  "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md",
+  "Protected_Behavior_Obstructions/Protected_Behavior_Profile.thy",
+  "Protected_Behavior_Obstructions/Protected_Stochastic_Morphism.thy",
+  "Protected_Behavior_Obstructions/Protected_Obstruction_Examples.thy",
   "docs/assets/formal-verification-banner.svg",
   "docs/assets/theory-architecture.svg",
   ".github/PULL_REQUEST_TEMPLATE.md",
@@ -100,6 +106,7 @@ for (const absolute of files.filter((path) => extname(path).toLowerCase() === ".
 
 const rootSession = readFileSync(resolve(root, "Cross_Domain_State_Preservation/ROOT"), "utf8");
 const racSession = readFileSync(resolve(root, "Regulatory_Action_Composition/ROOT"), "utf8");
+const protectedSession = readFileSync(resolve(root, "Protected_Behavior_Obstructions/ROOT"), "utf8");
 const cdspTheories = [
   "State_Preservation",
   "Regulatory_Instance",
@@ -126,14 +133,53 @@ if (!racSession.includes("session Regulatory_Action_Composition = Cross_Domain_S
 if (!racSession.includes("Regulatory_Action_Composition")) {
   failures.push("RAC ROOT missing Regulatory_Action_Composition theory");
 }
+const protectedTheories = [
+  "Protected_Behavior_Profile",
+  "Protected_Stochastic_Morphism",
+  "Protected_Obstruction_Examples",
+];
+if (!protectedSession.includes("session Protected_Behavior_Obstructions = HOL +")) {
+  failures.push("Protected Behavior ROOT must extend HOL");
+}
+for (const theory of protectedTheories) {
+  if (!protectedSession.includes(theory)) failures.push(`Protected Behavior ROOT missing theory: ${theory}`);
+  try {
+    statSync(resolve(root, "Protected_Behavior_Obstructions", `${theory}.thy`));
+  } catch {
+    failures.push(`missing Protected Behavior theory source: ${theory}.thy`);
+  }
+}
 const repositoryRoots = readFileSync(resolve(root, "ROOTS"), "utf8");
 for (const sessionRoot of [
   "Cross_Domain_State_Preservation",
+  "Protected_Behavior_Obstructions",
   "Regulatory_Action_Composition",
 ]) {
   if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
     failures.push(`ROOTS missing session directory: ${sessionRoot}`);
   }
+}
+
+const productMapping = readFileSync(resolve(root, "FORMAL_MODEL_MAPPING.md"), "utf8");
+for (const marker of [
+  "independent research companion",
+  "no Oraclizer implementation target",
+  "no Oraclizer product-refinement target",
+  "PARTIAL / NO SAME",
+  "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md",
+]) {
+  if (!productMapping.includes(marker)) failures.push(`root mapping missing out-of-scope marker: ${marker}`);
+}
+if (/^\|\s*T[0-8]\b/m.test(productMapping)) {
+  failures.push("root product mapping must not own the detailed T0-T8 cross-prover table");
+}
+
+const crossProverMapping = readFileSync(
+  resolve(root, "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md"),
+  "utf8",
+);
+for (const marker of ["T0 profile algebra", "T8 product preorder", "PARTIAL / NO SAME"]) {
+  if (!crossProverMapping.includes(marker)) failures.push(`folder mapping missing marker: ${marker}`);
 }
 
 function anchorsFor(path) {
@@ -205,6 +251,17 @@ for (const [path, marker] of [
   if (!text.includes(marker)) failures.push(`${path} missing maintenance marker: ${marker}`);
 }
 
+for (const [path, marker] of [
+  ["CONTRIBUTING.md", "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md"],
+  [".github/PULL_REQUEST_TEMPLATE.md", "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md"],
+  ["SECURITY.md", "Independent `PARTIAL / NO SAME` research companion"],
+  ["CITATION.cff", "PARTIAL / NO SAME research companion"],
+  ["CHANGELOG.md", "no Oraclizer implementation or product-refinement target"],
+]) {
+  const text = readFileSync(resolve(root, path), "utf8");
+  if (!text.includes(marker)) failures.push(`${path} missing companion marker: ${marker}`);
+}
+
 const workflow = readFileSync(resolve(root, ".github/workflows/repository-health.yml"), "utf8");
 if (!/^permissions:\s*$/m.test(workflow)) failures.push("workflow missing top-level permissions");
 if (!/timeout-minutes:\s*\d+/m.test(workflow)) failures.push("workflow missing job timeout");
@@ -219,4 +276,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1} theories, 2 sessions`);
+console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length} theories, 3 sessions`);

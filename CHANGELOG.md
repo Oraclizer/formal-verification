@@ -5,6 +5,10 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added the independent `Protected_Behavior_Obstructions` named session, its
+  `PARTIAL / NO SAME` scope, folder-local cross-prover mapping, bounded
+  controls, and a pinned Isabelle2025-2 Continuous Integration build. The
+  companion has no Oraclizer implementation or product-refinement target.
 - Replaced the README Mermaid block with a tracked SVG of the theory
   architecture. GitHub renders a Mermaid block inside an iframe whose `src`
   carries a URL fragment, so browsers scrolled that iframe into view on load and

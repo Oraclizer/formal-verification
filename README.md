@@ -1,9 +1,9 @@
 <div align="center">
   <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
 
-  <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition.</strong></p>
+  <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition, plus an independent protected-behavior obstruction companion.</strong></p>
 
-  [![Artifacts](https://img.shields.io/badge/artifacts-two%20sessions-6f42c1.svg)](#formal-artifact-catalog)
+  [![Artifacts](https://img.shields.io/badge/artifacts-three%20sessions-6f42c1.svg)](#formal-artifact-catalog)
   [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-167c3a.svg)](https://isabelle.in.tum.de/)
   [![Proof status](https://img.shields.io/badge/proofs-sorry%2Foops--free-167c3a.svg)](CONTRIBUTING.md#building-and-checking-the-proofs)
   [![Maintenance](https://img.shields.io/badge/repository-production--maintained-0b5cad.svg)](#repository-maintenance-status)
@@ -16,11 +16,15 @@
   [Mapping](FORMAL_MODEL_MAPPING.md)
 </div>
 
-> **Mechanized assurance.** The repository contains two composable
-> Isabelle/HOL sessions. Their tracked theories are `sorry`/`oops`-free and
+> **Mechanized assurance.** The repository contains three Isabelle/HOL
+> sessions. CDSP and RAC compose; `Protected_Behavior_Obstructions` is an
+> independent `PARTIAL` HOL companion and receives no Lean/Isabelle `SAME`
+> credit. The tracked theories are `sorry`/`oops`-free and
 > reproducibly check under Isabelle2025-2 with the declared AFP dependency.
-> Claims are model-level and bounded by the assumptions recorded here and in
-> [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md).
+> Claims are model-level and bounded by the assumptions recorded here. The
+> Oraclizer product mapping remains in
+> [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md); the independent
+> companion's exact boundary is folder-local.
 
 ## Repository maintenance status
 
@@ -28,7 +32,7 @@ This is a **production-maintained public research repository**. The
 designation covers repository operations: reviewable changes, reproducible
 proof and document builds, session-scoped releases, integrity manifests,
 automated public-surface checks, security reporting, and change governance.
-It does not designate either artifact as a production implementation,
+It does not designate any artifact as a production implementation,
 deployment, audit, legal opinion, or model-to-code refinement.
 
 ## Formal artifact catalog
@@ -43,6 +47,7 @@ source and PDF hashes together with the document-build identity.
 | --- | --- | --- | --- |
 | **CDSP** | Foundation | Preservation morphisms, priority and conditional progress, authenticated views, guarded convergence, and the synchronization-degree hierarchy | [Source](Cross_Domain_State_Preservation/ROOT) · [PDF](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) · [Manifest](Cross_Domain_State_Preservation/release/manifest.json) |
 | **RAC** | Extension | Regulatory outcomes, pair commutativity, provenance, transfer gates, traces, atomic queues, and finite normal forms | [Source](Regulatory_Action_Composition/ROOT) · [PDF](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) · [Manifest](Regulatory_Action_Composition/release/manifest.json) |
+| **Protected Behavior Obstructions** | Partial companion | Set/profile consequences, explicit stochastic assumptions, set-level morphism laws, preorder facts, and bounded controls | [Source](Protected_Behavior_Obstructions/ROOT) · [Scope](Protected_Behavior_Obstructions/README.md) · [Cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md) · PDF/manifest not produced (`document = false`) |
 
 **Role taxonomy**
 
@@ -58,8 +63,8 @@ foundation; RAC is an extension because it imports CDSP's
 `Regulatory_Instance`. RAC does not import or extend `ADS_Functor`.
 
 An earlier version of CDSP was submitted to the Archive of Formal Proofs on
-2026-03-25 but was not accepted as an AFP entry. Neither session in this
-repository is an AFP entry. Repository publication, preprint publication,
+2026-03-25 but was not accepted as an AFP entry. None of these sessions is an
+AFP entry. Repository publication, preprint publication,
 submission, review, and acceptance are separate states.
 
 ## Verified model-level results
@@ -74,10 +79,14 @@ submission, review, and acceptance are separate states.
 | RAC — action algebra | all 21 distinct-label pairs classified as 12 commuting and 9 noncommuting, with witnesses | Concrete five-state, seven-label machine |
 | RAC — outcomes and traces | applied/rejected/operational-failure separation, trace and unrelated-asset frame properties | No authorization, replay, or concurrency model |
 | RAC — atomic queues and normal forms | completed-step validity and consistency; exactly 60 reachable transformation vectors | Atomic completed steps, not partial propagation or rollback |
+| Protected behavior obstructions | nested profile algebra, assumption-transparent T2/T3/T4/T5 consequences, set-level morphism laws, preorder facts, and direct finite witnesses | `PARTIAL`; no kernel-derived first-hit law, scheduler correspondence, quantitative pushforward, or `SAME` credit |
 
-Every row is shorthand. The authoritative theorem-to-target map, assumptions,
-open obligations, and proposed implementation correspondences are in
-[`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md).
+Every row is shorthand. The Oraclizer theorem-to-target map, assumptions, open
+obligations, and proposed implementation correspondences are in
+[`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md). The independent
+protected-obstruction companion has no product target; its detailed
+correspondence is in
+[`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md).
 
 ## Theory architecture
 
@@ -87,13 +96,14 @@ open obligations, and proposed implementation correspondences are in
 
 The CDSP session depends on `HOL-Library`, `HOL-Eisbach`, and the AFP session
 `ADS_Functor`. RAC extends the built CDSP session and imports its regulatory
-instance explicitly.
+instance explicitly. `Protected_Behavior_Obstructions` extends `HOL`
+independently and imports neither CDSP nor RAC.
 
 ## Assurance boundary
 
 ### Established within the models
 
-- both declared sessions and all eleven tracked theories build;
+- all three declared sessions and all fourteen tracked theories build;
 - the theory sources contain no `sorry` or `oops`;
 - named results follow from the definitions, locales, and assumptions stated
   in the theories;
@@ -118,6 +128,17 @@ proof build.
 
 ## Reproduce the proofs
 
+For the independent protected-obstruction companion only, Isabelle2025-2 is
+enough; it extends `HOL` and does not require AFP:
+
+```bash
+isabelle build -c -D Protected_Behavior_Obstructions Protected_Behavior_Obstructions
+```
+
+Read its [scope](Protected_Behavior_Obstructions/README.md) and
+[cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)
+before comparing it with the canonical Lean development.
+
 ### Prerequisites
 
 - Isabelle `2025-2`
@@ -130,13 +151,14 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Check both sessions from the repository root:
+Check all three sessions from the repository root:
 
 ```bash
 isabelle build \
   -d . \
   -d /path/to/afp/thys \
-  Cross_Domain_State_Preservation Regulatory_Action_Composition
+  Cross_Domain_State_Preservation Regulatory_Action_Composition \
+  Protected_Behavior_Obstructions
 ```
 
 Expected completion includes:
@@ -144,6 +166,7 @@ Expected completion includes:
 ```text
 Finished Cross_Domain_State_Preservation
 Finished Regulatory_Action_Composition
+Finished Protected_Behavior_Obstructions
 ```
 
 Generate a session document in a chosen output directory:
@@ -169,15 +192,18 @@ AFP revisions, command, and resulting session log.
 
 | Path | Purpose |
 | --- | --- |
-| `ROOTS` | Registers both repository sessions |
+| `ROOTS` | Registers all three repository sessions |
 | `Cross_Domain_State_Preservation/*.thy` | Ten authoritative CDSP theories |
 | `Cross_Domain_State_Preservation/document/` | CDSP Isabelle/LaTeX document source |
 | `Cross_Domain_State_Preservation/release/` | CDSP session-named PDF and release manifest |
 | `Regulatory_Action_Composition/*.thy` | Authoritative RAC theory |
 | `Regulatory_Action_Composition/document/` | RAC Isabelle/LaTeX document source |
 | `Regulatory_Action_Composition/release/` | RAC session-named PDF and release manifest |
+| `Protected_Behavior_Obstructions/*.thy` | Three authoritative partial-companion theories |
+| `Protected_Behavior_Obstructions/README.md` and `ROOT` | Session scope and named-session registration; no PDF target |
+| `Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md` | Detailed `PARTIAL / NO SAME` Lean-Isabelle correspondence and stochastic nonclaims |
 | `docs/assets/` | README banner and the theory-architecture diagram, with the diagram's Mermaid source |
-| `FORMAL_MODEL_MAPPING.md` | Theorem-to-target mapping, assumptions, gaps, and proposed tests |
+| `FORMAL_MODEL_MAPPING.md` | Oraclizer theorem-to-target mapping, assumptions, gaps, proposed tests, and a short out-of-scope pointer to the independent companion |
 | `CONTRIBUTING.md` | Review channels, proof reproduction, and contribution policy |
 | `SECURITY.md` | Sensitive-report routing and assurance boundary |
 | `CITATION.cff` | Repository-level citation metadata |

@@ -6,7 +6,8 @@ Describe the smallest reviewable change and link the issue.
 
 - [ ] No theory, theorem, locale, or assumption changes
 - [ ] Theory or proof changed; exact Isabelle build result is included
-- [ ] `FORMAL_MODEL_MAPPING.md` updated where required
+- [ ] `FORMAL_MODEL_MAPPING.md` updated only for Oraclizer product/refinement changes
+- [ ] `Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md` updated for companion correspondence changes
 - [ ] Paper or citation metadata updated where required
 - [ ] Tracked PDFs use `<Session>/release/<Session>.pdf`
 - [ ] Model-level and implementation-level claims remain distinct
