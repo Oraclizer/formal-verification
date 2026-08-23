@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - "codex/**"
   workflow_dispatch:
 
 concurrency:
@@ -40,13 +39,24 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+      - name: Restore cached Isabelle archive
+        id: isabelle-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/Isabelle2025-2_linux.tar.gz
+          key: isabelle-${{ env.ISABELLE_SHA256 }}
       - name: Install pinned Isabelle2025-2
         shell: bash
         run: |
           set -euo pipefail
           archive="$RUNNER_TEMP/Isabelle2025-2_linux.tar.gz"
           isabelle_home="$RUNNER_TEMP/Isabelle2025-2"
-          curl --fail --location --retry 3 --output "$archive" "$ISABELLE_URL"
+          if [ ! -f "$archive" ]; then
+            curl --fail --location \
+              --connect-timeout 30 --max-time 1800 \
+              --retry 5 --retry-delay 15 --retry-connrefused --retry-all-errors \
+              --output "$archive" "$ISABELLE_URL"
+          fi
           echo "$ISABELLE_SHA256  $archive" | sha256sum --check --strict
           tar -xzf "$archive" -C "$RUNNER_TEMP"
           test "$("$isabelle_home/bin/isabelle" version)" = "Isabelle2025-2"
