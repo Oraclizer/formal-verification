@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -157,6 +158,95 @@ for (const sessionRoot of [
 ]) {
   if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
     failures.push(`ROOTS missing session directory: ${sessionRoot}`);
+  }
+}
+
+function sessionSourceFiles(session) {
+  const directory = resolve(root, session);
+  const theories = readdirSync(directory)
+    .filter((entry) => extname(entry).toLowerCase() === ".thy")
+    .sort();
+  return ["ROOT", "document/root.tex", "document/root.bib", ...theories].filter((rel) => {
+    try {
+      return statSync(resolve(directory, rel)).isFile();
+    } catch {
+      return false;
+    }
+  });
+}
+
+function sha256Upper(bytes) {
+  return createHash("sha256").update(bytes).digest("hex").toUpperCase();
+}
+
+// The manifest's own definition: SHA-256 of UTF-8 lines
+// '<file-sha256>  <session-relative-path>\n', sorted ordinally.
+function sessionTreeHash(session) {
+  const directory = resolve(root, session);
+  const sources = sessionSourceFiles(session);
+  const lines = sources
+    .map((rel) => `${sha256Upper(readFileSync(resolve(directory, rel)))}  ${rel}\n`)
+    .sort();
+  return { count: sources.length, digest: sha256Upper(Buffer.from(lines.join(""), "utf8")) };
+}
+
+const releaseManifests = new Map();
+for (const session of readdirSync(root, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort()) {
+  const manifestPath = `${session}/release/manifest.json`;
+  try {
+    if (!statSync(resolve(root, manifestPath)).isFile()) continue;
+  } catch {
+    continue;
+  }
+  let manifest;
+  try {
+    manifest = JSON.parse(readFileSync(resolve(root, manifestPath), "utf8"));
+  } catch {
+    failures.push(`unparsable release manifest: ${manifestPath}`);
+    continue;
+  }
+  releaseManifests.set(session, manifest);
+
+  const { count, digest } = sessionTreeHash(session);
+  if (manifest.source?.file_count !== count) {
+    failures.push(
+      `${manifestPath}: source.file_count records ${manifest.source?.file_count}, recomputed ${count}`,
+    );
+  }
+  if (manifest.source?.tree_sha256 !== digest) {
+    failures.push(
+      `${manifestPath}: source.tree_sha256 records ${manifest.source?.tree_sha256}, recomputed ${digest}`,
+    );
+  }
+
+  const pdfPath = `${session}/release/${manifest.pdf?.path ?? ""}`;
+  try {
+    const recorded = manifest.pdf?.sha256;
+    const actual = sha256Upper(readFileSync(resolve(root, pdfPath)));
+    if (recorded !== actual) {
+      failures.push(`${manifestPath}: pdf.sha256 records ${recorded}, recomputed ${actual}`);
+    }
+  } catch {
+    failures.push(`${manifestPath}: pdf.path is not readable: ${pdfPath}`);
+  }
+}
+
+// A dependency entry that names a session released from this repository must
+// carry that session's own recorded hash.
+for (const [session, manifest] of releaseManifests) {
+  const dependencies = [...(manifest.dependencies ?? []), ...(manifest.external_dependencies ?? [])];
+  for (const dependency of dependencies) {
+    const target = releaseManifests.get(dependency.session);
+    if (!target) continue;
+    if (dependency.source_tree_sha256 !== target.source?.tree_sha256) {
+      failures.push(
+        `${session}/release/manifest.json: dependency ${dependency.session} records ` +
+          `${dependency.source_tree_sha256}, but that session records ${target.source?.tree_sha256}`,
+      );
+    }
   }
 }
 
