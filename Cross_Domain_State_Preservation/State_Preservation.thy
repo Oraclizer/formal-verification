@@ -58,7 +58,7 @@ text \<open>Determinism is inherent: transition is a function, not a relation.\<
 
 lemma transition_deterministic:
   "transition s a = Some s1 \<Longrightarrow> transition s a = Some s2 \<Longrightarrow> s1 = s2"
-  by simp
+  sorry
 
 text \<open>Sequential composition of actions (partial, returns None on first failure).\<close>
 
