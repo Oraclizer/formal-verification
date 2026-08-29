@@ -3,7 +3,9 @@
 
   <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition, plus an independent protected-behavior obstruction companion.</strong></p>
 
+  [![Proofs](https://github.com/Oraclizer/formal-verification/actions/workflows/proofs.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/proofs.yml)
   [![Repository health](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml)
+  [![External dependencies](https://github.com/Oraclizer/formal-verification/actions/workflows/external-dependencies.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/external-dependencies.yml)
   [![arXiv](https://img.shields.io/badge/arXiv-2604.03844-b31b1b.svg)](https://arxiv.org/abs/2604.03844)
   [![License](https://img.shields.io/badge/license-BSD--3--Clause-0b5cad.svg)](LICENSE)
 

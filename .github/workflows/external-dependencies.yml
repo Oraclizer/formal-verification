@@ -1,0 +1,69 @@
+name: External dependencies
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/external-dependencies.yml"
+      - ".github/workflows/proofs.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: external-deps-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-archives:
+    # Confirms that the pinned external archives the proof lane depends on are
+    # still reachable and byte-identical to their recorded digests, so an
+    # upstream move is caught by this scheduled check instead of by a failing
+    # proof build.
+    name: Pinned archives reachable and unchanged
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      ISABELLE_SHA256: a20a507bc7c1270d8be96a9f3fbec06345387789d2dc2c4d3df6260d47bfb33c
+      ISABELLE_URL: https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz
+      AFP_ADS_FUNCTOR_SHA256: 10d6fa8671c461022ae5e71859a07610d616681fed79e2f1c81029a124203c85
+      AFP_ADS_FUNCTOR_URL: https://isa-afp.org/release/afp-ADS_Functor-2026-02-06.tar.gz
+    steps:
+      - name: Restore cached Isabelle archive
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/Isabelle2025-2_linux.tar.gz
+          key: isabelle-${{ env.ISABELLE_SHA256 }}
+      - name: Restore cached AFP ADS_Functor archive
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/afp-ADS_Functor.tar.gz
+          key: afp-ads-functor-${{ env.AFP_ADS_FUNCTOR_SHA256 }}
+      - name: Verify the Isabelle distribution archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/Isabelle2025-2_linux.tar.gz"
+          if [ ! -f "$archive" ]; then
+            curl --fail --location \
+              --connect-timeout 30 --max-time 1800 \
+              --retry 5 --retry-delay 15 --retry-connrefused --retry-all-errors \
+              --output "$archive" "$ISABELLE_URL"
+          fi
+          echo "$ISABELLE_SHA256  $archive" | sha256sum --check --strict
+      - name: Verify the AFP entry archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/afp-ADS_Functor.tar.gz"
+          rm -f "$archive.fresh"
+          curl --fail --location \
+            --connect-timeout 30 --max-time 600 \
+            --retry 5 --retry-delay 15 --retry-connrefused --retry-all-errors \
+            --output "$archive.fresh" "$AFP_ADS_FUNCTOR_URL"
+          echo "$AFP_ADS_FUNCTOR_SHA256  $archive.fresh" | sha256sum --check --strict
+          mv "$archive.fresh" "$archive"
