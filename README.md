@@ -135,8 +135,8 @@ isabelle build -c -D Protected_Behavior_Obstructions Protected_Behavior_Obstruct
 
 Read its [scope](Protected_Behavior_Obstructions/README.md) and
 [cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)
-before comparing it with the canonical Lean development, which is external
-and not published in this repository.
+before comparing it with the canonical Lean development, published separately as
+[observer-patch-holography](https://github.com/FloatingPragma/observer-patch-holography).
 
 ### Prerequisites
 
@@ -189,23 +189,16 @@ AFP revisions, command, and resulting session log.
 
 ## Repository map
 
+Every released artifact follows one directory convention, so the map stays
+this short as the catalog grows:
+
 | Path | Purpose |
 | --- | --- |
-| `ROOTS` | Registers all three repository sessions |
-| `Cross_Domain_State_Preservation/*.thy` | Ten authoritative CDSP theories |
-| `Cross_Domain_State_Preservation/document/` | CDSP Isabelle/LaTeX document source |
-| `Cross_Domain_State_Preservation/release/` | CDSP session-named PDF and release manifest |
-| `Regulatory_Action_Composition/*.thy` | Authoritative RAC theory |
-| `Regulatory_Action_Composition/document/` | RAC Isabelle/LaTeX document source |
-| `Regulatory_Action_Composition/release/` | RAC session-named PDF and release manifest |
-| `Protected_Behavior_Obstructions/*.thy` | Three authoritative partial-companion theories |
-| `Protected_Behavior_Obstructions/README.md` and `ROOT` | Session scope and named-session registration; no PDF target |
-| `Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md` | Detailed `PARTIAL / NO SAME` Lean-Isabelle correspondence and stochastic nonclaims |
+| `ROOTS` | Registers every released session |
+| `<Session>/` | One directory per catalog artifact: the authoritative `*.thy` theories and the session `ROOT`. Sessions that produce a reading copy add `document/` (LaTeX source) and `release/` (session-named PDF and manifest); session-scoped docs such as a scope README or a cross-prover mapping live inside the same directory |
 | `docs/assets/` | README banner and the theory-architecture diagram, with the diagram's Mermaid source |
-| `FORMAL_MODEL_MAPPING.md` | Oraclizer theorem-to-target mapping, assumptions, gaps, proposed tests, and a short out-of-scope pointer to the independent companion |
-| `CONTRIBUTING.md` | Review channels, proof reproduction, and contribution policy |
-| `SECURITY.md` | Sensitive-report routing and assurance boundary |
-| `CITATION.cff` | Repository-level citation metadata |
+| `FORMAL_MODEL_MAPPING.md` | Oraclizer theorem-to-target mapping, assumptions, gaps, and proposed tests |
+| `CONTRIBUTING.md`, `SECURITY.md`, `CITATION.cff` | Review channels and proof reproduction, sensitive-report routing, and citation metadata |
 
 Generated Isabelle heaps, transient `document.pdf` files, local output, editor
 state, and machine-specific paths are excluded from the public tree.
