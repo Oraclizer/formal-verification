@@ -1,8 +1,9 @@
 # Protected Behavior Obstructions cross-prover mapping
 
 This folder-local document records the detailed correspondence between the
-canonical Lean protected-obstruction development and this independent
-Isabelle/HOL companion. The Isabelle session is `PARTIAL / NO SAME`: a locale
+canonical Lean protected-obstruction development
+([FloatingPragma/observer-patch-holography](https://github.com/FloatingPragma/observer-patch-holography))
+and this independent Isabelle/HOL companion. The Isabelle session is `PARTIAL / NO SAME`: a locale
 assumption that repeats a Lean conclusion is not an independent derivation of
 that conclusion. This session has no Oraclizer implementation target and no
 Oraclizer product-refinement target.

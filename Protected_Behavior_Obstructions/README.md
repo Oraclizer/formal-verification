@@ -6,9 +6,10 @@ reasoning. It is not a translation of the Lean stochastic foundation, and no
 Lean/Isabelle row receives `SAME` credit.
 
 The detailed T0--T8 and stochastic boundary is in
-[`CROSS_PROVER_MAPPING.md`](CROSS_PROVER_MAPPING.md). The Lean development is
-external and not published in this repository; the mapping exists so this
-companion can be evaluated on its own terms.
+[`CROSS_PROVER_MAPPING.md`](CROSS_PROVER_MAPPING.md). The Lean development is the public
+[observer-patch-holography](https://github.com/FloatingPragma/observer-patch-holography)
+project; the mapping exists so this companion can be evaluated on its own
+terms.
 
 Build from the repository root:
 
