@@ -8,7 +8,7 @@
   [![External dependencies](https://github.com/Oraclizer/formal-verification/actions/workflows/external-dependencies.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/external-dependencies.yml)
   [![arXiv](https://img.shields.io/badge/arXiv-2604.03844-b31b1b.svg)](https://arxiv.org/abs/2604.03844)
   [![Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/Oraclizer/formal-verification/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/Oraclizer/formal-verification)
-  [![License](https://img.shields.io/github/license/Oraclizer/formal-verification)](LICENSE)
+  [![License](https://img.shields.io/github/license/Oraclizer/formal-verification?color=0b5cad)](LICENSE)
 
   [Proof scope](#verified-model-level-results) |
   [Artifacts](#formal-artifact-catalog) |
