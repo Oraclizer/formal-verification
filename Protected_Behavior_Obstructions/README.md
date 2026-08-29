@@ -6,7 +6,9 @@ reasoning. It is not a translation of the Lean stochastic foundation, and no
 Lean/Isabelle row receives `SAME` credit.
 
 The detailed T0--T8 and stochastic boundary is in
-[`CROSS_PROVER_MAPPING.md`](CROSS_PROVER_MAPPING.md).
+[`CROSS_PROVER_MAPPING.md`](CROSS_PROVER_MAPPING.md). The Lean development is
+external and not published in this repository; the mapping exists so this
+companion can be evaluated on its own terms.
 
 Build from the repository root:
 
@@ -32,10 +34,8 @@ The exact boundary is intentional:
 
 The session therefore supports set/profile algebra, assumption-transparent
 T2/T3/T4/T5 consequences, set-level morphism identity/composition, profile
-preorder facts, and bounded mutation witnesses. Lean remains canonical for
-the stochastic foundation, kernel-derived T2/T3, stochastic morphism
-exactness, quantitative transport, scheduler correspondence, and OPH
-behavior-cut recovery.
-
-No model-to-code refinement, rate, expected-time, mixing, infinite-tower, or
-deployment-safety claim is made.
+preorder facts, and bounded mutation witnesses; it claims no model-to-code
+refinement, rate, expected-time, mixing, infinite-tower, or
+deployment-safety result. The Lean development remains canonical for the
+stochastic foundation, kernel-derived T2/T3, stochastic morphism exactness,
+quantitative transport, scheduler correspondence, and behavior-cut recovery.

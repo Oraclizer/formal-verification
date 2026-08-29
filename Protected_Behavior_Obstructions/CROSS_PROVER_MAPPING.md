@@ -16,8 +16,8 @@ Oraclizer product-refinement target.
 | T4 endpoint union | path-defined certificate and exact profile theorem | `protected_profile.T4_endpoint_union` | `PARTIAL`: Isabelle unfolds a certificate over the supplied opaque `first_hit` function |
 | T5 observable collapse | kernel-connected profile collapse | `protected_profile.T5_observable_determination` | `PARTIAL`: Isabelle proves the set/profile consequence under the locale laws |
 | T6 scheduler correspondence | support soundness, rewrite completeness, target normality | None | `LEAN-ONLY` |
-| T7 behavior recovery | OPH `RealizedBehavior` and `BehaviorCut` recovery | None | `LEAN-ONLY` |
-| T8 product preorder | four concrete OPH cut coordinates | `profile_LE`; `profile_LT`; reflexivity and transitivity | `PARTIAL`: `profile_correspondence` assumes exact cut membership instead of deriving it |
+| T7 behavior recovery | the Lean development's `RealizedBehavior` and `BehaviorCut` recovery | None | `LEAN-ONLY` |
+| T8 product preorder | four concrete cut coordinates in the Lean development | `profile_LE`; `profile_LT`; reflexivity and transitivity | `PARTIAL`: `profile_correspondence` assumes exact cut membership instead of deriving it |
 | Qualitative exact morphism | kernel lumping, target and quotient exactness, derived layer exactness | `exact_morphism_id`; `exact_morphism_comp` | `PARTIAL`: Isabelle has set-level protected, initial, target, and silent-relation exactness only |
 | Quantitative transport | full-support pooling and stochastic pushforward | zero-weight boundary theorem only | `LEAN-ONLY` for the positive theorem; the Isabelle theorem is boundary evidence |
 | M2/M3 witnesses | kernel-derived proper-target fixtures | `M2_positive_not_almost_sure`; `M3_two_positive_endpoints` | `PARTIAL`: Isabelle values are defined directly, not derived from kernels |

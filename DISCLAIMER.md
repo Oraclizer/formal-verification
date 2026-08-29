@@ -18,11 +18,9 @@ documented in `FORMAL_MODEL_MAPPING.md`.
 
 ## Risk and use
 
-Machine-checked proofs can coexist with an unsuitable model, missing
-assumption, dependency issue, refinement error, implementation defect,
-operational failure, key compromise, network failure, or incorrect external
-fact. Independent review and implementation-specific evidence remain
-necessary.
+The results are model-level: a machine-checked proof binds its model and
+assumptions, not an implementation or an operating environment. Independent
+review and implementation-specific evidence remain necessary.
 
 Nothing here is legal, regulatory, tax, investment, security, or operational
 advice.
