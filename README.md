@@ -3,10 +3,8 @@
 
   <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition, plus an independent protected-behavior obstruction companion.</strong></p>
 
-  [![Artifacts](https://img.shields.io/badge/artifacts-three%20sessions-6f42c1.svg)](#formal-artifact-catalog)
-  [![Isabelle](https://img.shields.io/badge/Isabelle-2025--2-167c3a.svg)](https://isabelle.in.tum.de/)
-  [![Proof status](https://img.shields.io/badge/proofs-sorry%2Foops--free-167c3a.svg)](CONTRIBUTING.md#building-and-checking-the-proofs)
-  [![Maintenance](https://img.shields.io/badge/repository-production--maintained-0b5cad.svg)](#repository-maintenance-status)
+  [![Repository health](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml)
+  [![arXiv](https://img.shields.io/badge/arXiv-2604.03844-b31b1b.svg)](https://arxiv.org/abs/2604.03844)
   [![License](https://img.shields.io/badge/license-BSD--3--Clause-0b5cad.svg)](LICENSE)
 
   [Proof scope](#verified-model-level-results) |
@@ -17,9 +15,11 @@
 </div>
 
 > **Mechanized assurance.** The repository contains three Isabelle/HOL
-> sessions. CDSP and RAC compose; `Protected_Behavior_Obstructions` is an
-> independent `PARTIAL` HOL companion and receives no Lean/Isabelle `SAME`
-> credit. The tracked theories are `sorry`/`oops`-free and
+> sessions. CDSP and RAC compose. `Protected_Behavior_Obstructions` is an
+> independent HOL companion to an external Lean development: its rows are
+> graded `PARTIAL`, never `SAME` (both grades are defined in
+> [`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)).
+> The tracked theories are `sorry`/`oops`-free and
 > reproducibly check under Isabelle2025-2 with the declared AFP dependency.
 > Claims are model-level and bounded by the assumptions recorded here. The
 > Oraclizer product mapping remains in
@@ -71,14 +71,14 @@ submission, review, and acceptance are separate states.
 
 | Session | Representative results | Essential boundary |
 | --- | --- | --- |
-| CDSP — state preservation | `regulatory_homomorphism`, `valid_state_preservation`, `sequential_preservation` | Atomic finite-domain model |
-| CDSP — priority and progress | unique maximum selection, `starvation_bound`, closed-count completion | Injective priorities and deterministic in-roster fairness assumptions |
-| CDSP — composition and convergence | guarded safety and existential bounded run to validity | Recovery uses Hilbert choice and is not executable |
-| CDSP — authenticated functor | identity/composition/associativity, merge and blinding soundness, Canton tree instance | Model-level authenticated views, not protocol traces |
-| CDSP — degree hierarchy | natural transformations, capability-sensitive reconciliation, under-provisioning counterexample | Degree means coupling breadth, not operational S0-S3 semantics |
-| RAC — action algebra | all 21 distinct-label pairs classified as 12 commuting and 9 noncommuting, with witnesses | Concrete five-state, seven-label machine |
-| RAC — outcomes and traces | applied/rejected/operational-failure separation, trace and unrelated-asset frame properties | No authorization, replay, or concurrency model |
-| RAC — atomic queues and normal forms | completed-step validity and consistency; exactly 60 reachable transformation vectors | Atomic completed steps, not partial propagation or rollback |
+| CDSP: state preservation | `regulatory_homomorphism`, `valid_state_preservation`, `sequential_preservation` | Atomic finite-domain model |
+| CDSP: priority and progress | unique maximum selection, `starvation_bound`, closed-count completion | Injective priorities and deterministic in-roster fairness assumptions |
+| CDSP: composition and convergence | guarded safety and existential bounded run to validity | Recovery uses Hilbert choice and is not executable |
+| CDSP: authenticated functor | identity/composition/associativity, merge and blinding soundness, Canton tree instance | Model-level authenticated views, not protocol traces |
+| CDSP: degree hierarchy | natural transformations, capability-sensitive reconciliation, under-provisioning counterexample | Degree means coupling breadth, not operational S0-S3 semantics |
+| RAC: action algebra | all 21 distinct-label pairs classified as 12 commuting and 9 noncommuting, with witnesses | Concrete five-state, seven-label machine |
+| RAC: outcomes and traces | applied/rejected/operational-failure separation, trace and unrelated-asset frame properties | No authorization, replay, or concurrency model |
+| RAC: atomic queues and normal forms | completed-step validity and consistency; exactly 60 reachable transformation vectors | Atomic completed steps, not partial propagation or rollback |
 | Protected behavior obstructions | nested profile algebra, assumption-transparent T2/T3/T4/T5 consequences, set-level morphism laws, preorder facts, and direct finite witnesses | `PARTIAL`; no kernel-derived first-hit law, scheduler correspondence, quantitative pushforward, or `SAME` credit |
 
 Every row is shorthand. The Oraclizer theorem-to-target map, assumptions, open
@@ -112,16 +112,12 @@ independently and imports neither CDSP nor RAC.
 
 ### Not established
 
-- Isabelle-to-Rust, Isabelle-to-Solidity, Isabelle-to-EVM, or model-to-code
-  refinement;
-- distributed lock, timeout, rollback, finality, or concurrent interleaving
-  correctness;
-- authorization, identity, replay protection, or correctness of a concrete
-  transfer-policy oracle;
-- probabilistic VRF behavior, adversarial BFT execution, network liveness, or
-  partial propagation;
-- cryptographic implementation correctness, legal truth, live deployment,
-  operational security, or audit status.
+- model-to-code refinement (Isabelle to Rust, Solidity, or EVM);
+- distributed-runtime correctness: locks, timeouts, rollback, finality,
+  concurrent interleaving, network liveness, or adversarial BFT execution;
+- external facts and operations: authorization and identity policy, replay
+  protection, cryptographic implementation correctness, legal truth, live
+  deployment, operational security, or audit status.
 
 These are open or external obligations, not implied consequences of a green
 proof build.
@@ -137,7 +133,8 @@ isabelle build -c -D Protected_Behavior_Obstructions Protected_Behavior_Obstruct
 
 Read its [scope](Protected_Behavior_Obstructions/README.md) and
 [cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)
-before comparing it with the canonical Lean development.
+before comparing it with the canonical Lean development, which is external
+and not published in this repository.
 
 ### Prerequisites
 

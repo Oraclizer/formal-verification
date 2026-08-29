@@ -145,3 +145,11 @@ Meaningful contributions may be credited through Git history, acknowledgments,
 release notes, or a security advisory. State a preferred credit name if it
 differs from your GitHub identity. Submission does not create an employment,
 agency, support, acceptance, or publication obligation.
+
+## Downstream consumers
+
+Continuous integration in `Oraclizer/erc-trust` pins an exact commit of this
+repository and fetches it by hash, and the session layout of
+`Regulatory_Action_Composition` participates in that consumer's build. Keep
+the default branch protected, never rewrite published history, and treat
+session-graph changes as coordinated changes with that consumer.

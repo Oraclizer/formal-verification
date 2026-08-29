@@ -1,8 +1,9 @@
 # Support
 
-This repository does not provide production support, integration consulting,
-deployment review, legal advice, incident response, or a response-time
-agreement.
+This repository provides the published Isabelle/HOL artifacts, their
+reproduction instructions, and repository-specific review channels. It does
+not provide production support, integration consulting, deployment review,
+legal advice, incident response, or a response-time agreement.
 
 ## Where to ask
 
@@ -13,8 +14,9 @@ agreement.
 | Sensitive vulnerability | Private path in `SECURITY.md` |
 | Isabelle reproduction question | Issue with exact commit, tool versions, AFP revision, and command |
 
-Search existing issues first. The maintainer may redirect, close, or leave
-unanswered requests outside the scholarly artifact's scope.
+Search existing issues first. Counterexamples, assumption challenges, and
+reproduction reports are especially welcome; requests outside the scholarly
+artifact's scope may be redirected or closed.
 
 ## Out of scope
 
