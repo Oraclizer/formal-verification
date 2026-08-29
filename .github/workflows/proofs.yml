@@ -27,6 +27,14 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Reject untrusted proof source forms
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R -n -E '^\s*(sorry|oops|axiomatization|oracle)\b|\bby\s+eval\b|\bnative_decide\b|\bskip_proof\b|\bsledgehammer\b|\bsmt_oracle\b' \
+            Cross_Domain_State_Preservation Regulatory_Action_Composition Protected_Behavior_Obstructions --include='*.thy'; then
+            exit 1
+          fi
       - name: Restore cached Isabelle archive
         id: isabelle-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -72,6 +80,14 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Reject untrusted proof source forms
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R -n -E '^\s*(sorry|oops|axiomatization|oracle)\b|\bby\s+eval\b|\bnative_decide\b|\bskip_proof\b|\bsledgehammer\b|\bsmt_oracle\b' \
+            Cross_Domain_State_Preservation Regulatory_Action_Composition Protected_Behavior_Obstructions --include='*.thy'; then
+            exit 1
+          fi
       - name: Restore cached Isabelle archive
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
