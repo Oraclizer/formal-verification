@@ -1,5 +1,8 @@
 <div align="center">
-  <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
+  <picture>
+    <source media="(max-width: 900px)" srcset="docs/assets/formal-verification-banner-mobile.svg">
+    <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
+  </picture>
 
   <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition, plus an independent protected-behavior obstruction companion.</strong></p>
 
@@ -94,7 +97,10 @@ correspondence is in
 ## Theory architecture
 
 <div align="center">
-  <img src="docs/assets/theory-architecture.svg" alt="Import graph of the CDSP and RAC sessions. State_Preservation feeds Regulatory_Instance, Composition, Proof_Automation, Functor_Laws, Hierarchy and External_Instance. Priority_Resolution feeds DQuencer_Instance, which feeds Composition. Composition and Regulatory_Instance feed Functor_Laws, which feeds Hierarchy and Canton_Bridge. The external AFP session ADS_Functor feeds Functor_Laws and Canton_Bridge. Regulatory_Action_Composition in the RAC session imports Regulatory_Instance." width="900">
+  <picture>
+    <source media="(max-width: 900px)" srcset="docs/assets/theory-architecture-mobile.svg">
+    <img src="docs/assets/theory-architecture.svg" alt="Import graph of the CDSP and RAC sessions. State_Preservation feeds Regulatory_Instance, Composition, Proof_Automation, Functor_Laws, Hierarchy and External_Instance. Priority_Resolution feeds DQuencer_Instance, which feeds Composition. Composition and Regulatory_Instance feed Functor_Laws, which feeds Hierarchy and Canton_Bridge. The external AFP session ADS_Functor feeds Functor_Laws and Canton_Bridge. Regulatory_Action_Composition in the RAC session imports Regulatory_Instance." width="900">
+  </picture>
 </div>
 
 The CDSP session depends on `HOL-Library`, `HOL-Eisbach`, and the AFP session
