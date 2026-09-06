@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "isabelle": "Isabelle2025-2",
+  "parent_session": "Regulatory_Action_Composition",
+  "parent_repository_revision": "a77e40a0fbc185a006002b5dbe514de6c9a38232",
+  "ads_functor_url": "https://isa-afp.org/release/afp-ADS_Functor-2026-02-06.tar.gz",
+  "ads_functor_sha256": "10d6fa8671c461022ae5e71859a07610d616681fed79e2f1c81029a124203c85",
+  "files": [
+    {
+      "path": "Credit_Once_Kernel.thy",
+      "sha256": "ac025c5e1ba69a749be2d34988ed41bb7e012a601d7295fdea144b9645d99e3f"
+    },
+    {
+      "path": "Message_Boundaries.thy",
+      "sha256": "04fc3c3621ccaf66f8ae68572218ce7018e720e62a74b6966dbbb32fe34f77d9"
+    },
+    {
+      "path": "Message_Consumers.thy",
+      "sha256": "e6afb255ee65a5408fb8de308dcc28f0eb49dc42c312d835cdb1a5f58f803a4a"
+    },
+    {
+      "path": "Message_Examples.thy",
+      "sha256": "a5d86dfbf69f9c229cf5b1c5b2af1e5208ad817ecc6deecb300569a21b84d0b3"
+    },
+    {
+      "path": "Message_Execution.thy",
+      "sha256": "96287cb4724433caa030401fdcf9766b8e2257795ad35661d16f2709d3d88f3c"
+    },
+    {
+      "path": "Message_Mutations.thy",
+      "sha256": "ab409f16289bfc97c2fd11b947df93a9714e7ba504862ecbb5637545c41b7033"
+    },
+    {
+      "path": "Message_Summary.thy",
+      "sha256": "27b2b87c3178adc68ed10199f4159a0446a3122b3ea1390bd462220a5a02ddc3"
+    },
+    {
+      "path": "Message_Transport.thy",
+      "sha256": "045716506b83361c69f2dcb43b4b4305c66835eb57b228ac2b4bfe6d84f71a7f"
+    },
+    {
+      "path": "Message_Types.thy",
+      "sha256": "40cd3c6fee186fe6fef45b618dc93c0662bf89515abc1b4c27cfcbda0ab2a9d0"
+    },
+    {
+      "path": "README.md",
+      "sha256": "bf230fbd1041fdcb5e1a3e2c19bda5c63c5eff0cadcd15ed86905fe2043ab01d"
+    },
+    {
+      "path": "ROOT",
+      "sha256": "dd5de64f968cb18a9925a78cfe1a0e1013ed6c88ab64ed66002723a82796630b"
+    },
+    {
+      "path": "Source_Certificates.thy",
+      "sha256": "4a61af5a342e1b3f62621e16b134a5412c0c8cff2047815b9990388300e1c350"
+    },
+    {
+      "path": "claims.json",
+      "sha256": "9b0bea367b4ef4ffabd8f10943a883d934acd7a2f6ddb0643e9cac02671f139f"
+    },
+    {
+      "path": "document/root.bib",
+      "sha256": "ecf437979fc017971e0e6538db00cddecbf13782dfbe8b44fae768869aa58b7e"
+    },
+    {
+      "path": "document/root.tex",
+      "sha256": "6ffe1ae5662d1556172b60103577f083914ece42673695037b284f8cca3a4ba0"
+    },
+    {
+      "path": "verify-source.mjs",
+      "sha256": "3de105cdd70ca3786423a2abf22799c1fbe13e2b911c7f91ac3d8ccf3546d453"
+    }
+  ]
+}

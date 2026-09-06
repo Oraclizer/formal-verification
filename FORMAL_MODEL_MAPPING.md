@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.6.1
-**Last updated:** 2026-08-13
+**Version:** 0.7.0
+**Last updated:** 2026-09-06
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -16,6 +16,7 @@ This document tracks the correspondence between formally verified model elements
 
 This mapping covers:
 
+- **Cross-Chain Message Integrity**: authenticated source binding, destination-credit uniqueness, route and checked-summary equivalence, credit-marker recovery and actual regulatory consumers
 - **Cross-Domain State Preservation Homomorphism**: safety
 - **Regulatory Action Composition**: applied/rejected/failure outcome semantics, complete action-pair classification, legal-effect descriptors, transfer gates, trace/frame properties, completed atomic queues, and finite transformation normal forms
 - **Deterministic Selection and Aggregate Pending-Count Progress**: finite maximum selection and closed-count progress (deadlock and individual request fairness are not proved)
@@ -49,6 +50,44 @@ The current proofs do **not** establish:
 - An executable recovery, queue, priority, or BFT algorithm for convergence; `oss_realize` uses existential choice and ignores its event when selecting recovery.
 - Network-level properties such as message loss, partial synchrony, or dynamic topology changes; these remain unverified external/refinement obligations.
 - Properties of unverified external components: P2P networking, external cryptographic libraries (BLS), UI, database layer.
+
+---
+
+# Cross-Chain Message Integrity
+
+The [session](Cross_Chain_Message_Integrity/README.md) proves model-level
+properties of a finalized source-fact authentication profile. Its
+[claim ledger](Cross_Chain_Message_Integrity/claims.json) records exact theorem
+roots, assumptions and formal consumers. Every implementation row below is
+**PLANNED / NOT VERIFIED**; a formal consumer is not a compiled product consumer.
+
+| Formal source and result | Intended product consumer | Required correspondence and tests |
+|---|---|---|
+| `Message_Types.transfer_binding`; `accepted_payload_is_bound` | Message decoder, source adapter and destination execution | Canonical signed preimage covers source domain/event, asset, amount, destination, recipient, historical epoch, operation and separator. Run each field-change vector against actual bytes. |
+| `certificate_authenticates_source_fact`; `certificate_authenticates_stable_fact` | Relay verification and trusted epoch configuration | Sound crypto verification, distinct registered signers, trusted threshold, honest source checks and stable source facts. A source reversal is distinct from destination finality. |
+| `family_wide_at_most_once`; `local_markers_give_global_once_iff` | Destination credit and persistent replay state | One stable destination per source key; atomic durable effect-plus-marker step; every real route uses the gate. New envelope IDs and authority rotation must not reset consumption. |
+| `normal_bypass_guarantee_equivalence`; finite continuation theorem | Validated route and bypass router | Preserve raw rejection before deriving payload from the certificate. Supply the same authenticated caller and actual current context. Compare full replies and effects. |
+| `checked_summary_is_exact_information` | Internal checked-message cache or representation | Compute after intrinsic verification; recheck current authority/version/permissions. The summary is not a replacement wire certificate. Its iff ranges over declared model contexts. |
+| `regulatory_permission`; `apply_regulatory_message` | Token/adapter ordinary and enforcement gates, completed regulatory writes | Match the authenticated operation to actual RAC action semantics and preserve CDSP metadata scope. Test source removal and stale-authority FREEZE; metadata validity alone is insufficient. |
+| `recovery_preserves_future_deliveries`; historical-context impossibility | Durable replay-state restoration | Restore markers from complete valid credit records, then supply the actual current context. Unrelated financial effects and later lawful spends require a separate complete journal correspondence. |
+
+The caller in `execution_request` is a model input whose origin must be an
+authenticated execution context. Accepting a caller asserted by an untrusted
+wire message does not discharge this obligation. Likewise, comparing an epoch
+or version to a context field does not prove that the context was read from the
+current authority. Source truth and stable finality are external premises;
+the verifier never queries a target safety bit.
+
+The session proves no source-lock protocol, terminal-decision consensus,
+network liveness, full financial recovery or distributed atomicity. Its global
+credit history records occurrences, while the receiver consults a local
+destination/source-key marker. Regulatory holding support remains metadata;
+it is not token supply. No existing CDSP or RAC definition is changed.
+
+Closure requires actual source, a positive branch, a consumer-removal negative
+and a compiled/runtime consumer for each implementation obligation. Those
+links are not supplied by the model proofs. The product mapping therefore
+remains pre-implementation.
 
 ---
 
@@ -473,6 +512,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.7.0 | 2026-09-06 | Added authenticated message execution results, exact formal consumers and explicitly unverified implementation obligations. Existing CDSP/RAC meanings are unchanged. |
 | 0.6.1 | 2026-08-13 | Added only an out-of-scope pointer to an independent research companion. This does not expand Oraclizer product coverage or add an implementation/refinement mapping. |
 | 0.6.0 | 2026-07-31 | Added the standalone `Regulatory_Action_Composition` session to repository-level mapping: outcome separation, complete 12/9 pair classification, legal-effect and transfer-gate boundaries, trace/frame and completed atomic-queue targets, 60 normal forms, proposed tests, and an explicit program-mapping completion gate. No implementation refinement is claimed. |
 | 0.5.6 | 2026-07-20 | Editorial: refinement-direction glosses aligned with the formal reading of `state_refines` (a partial view refines the fuller view), matching the theory sources. No change to theorems, assumptions, mappings, or dispositions. |

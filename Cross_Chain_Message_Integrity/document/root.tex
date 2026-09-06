@@ -1,0 +1,138 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=22mm]{geometry}
+\usepackage{isabelle,isabellesym}
+\usepackage{amsmath,amssymb}
+\usepackage{microtype}
+\usepackage{pdfsetup}
+\urlstyle{rm}
+\isabellestyle{it}
+
+\begin{document}
+\emergencystretch=3em
+\title{Cross-Chain Message Integrity}
+\author{Jinwook Kim (Jay)}
+\date{September 2026}
+\maketitle
+
+\begin{abstract}
+This Isabelle/HOL development connects authenticated source facts to
+destination-credit execution. Under explicit cryptographic, honest-attestation
+and stable-source assumptions, accepted messages bind the full transfer
+payload and arbitrary delivery traces create at most one new destination
+credit per source event. A separate kernel characterization proves that
+destination-local once markers give global uniqueness exactly when admitted
+requests for the same source key have one destination. Constructive normal
+and bypass decoders preserve rejection, effects and finite continuations.
+A checked internal message summary characterizes the information distinguished
+by the receiver over its declared contexts. Concrete regulatory consumers and
+semantic counterexamples distinguish source authentication, current authority,
+state preservation and recovery information. These are model-level results,
+not proofs of cryptographic implementations, external finality, distributed
+atomicity or deployed software.
+\end{abstract}
+
+\clearpage
+\tableofcontents
+\clearpage
+
+\section{Scope and Use}
+
+A message identifier names an envelope; a source key names the event whose
+effect may be delivered again through another envelope or route. The binding
+records the source key, asset, amount, intended destination, recipient,
+historical source epoch, operation and domain separator. A destination credit
+and its persistent once marker are added in one local model step.
+
+The model counts execution occurrences. Two executions with identical values
+count twice. Source debits, replicated records, repeated replies and later
+lawful transfers are different operations and are not counted as new
+destination credits. The global history is a proof observation; the receiver
+checks the marker for its declared destination and source key.
+
+\subsection{Assumptions and implementation obligations}
+
+\begin{itemize}
+\item Cryptographic verification is assumed to identify the actual signers of
+the complete source statement. No BLS, hash or serialization implementation is
+verified here.
+\item The trusted epoch configuration supplies a finite roster, a Byzantine
+fault bound and a threshold strictly above that bound. Honest roster members
+attest true source facts. Stable source outcomes are uniquely associated with
+their source keys. These are external source assumptions.
+\item The execution context supplies the actual current authority, policy
+permissions and state version. The caller input must be obtained from an
+authenticated execution context, not accepted as a self-asserted wire identity.
+Establishing these inputs for an implementation remains an obligation.
+\item The local credit effect and its marker are recorded atomically and
+durably. Reconstructing markers from a complete valid credit history is proved;
+storage correctness and recovery of unrelated financial effects are not.
+\item All modeled entry routes use the receiver. Exhaustive correspondence to
+real contract, administrative, adapter and runtime entrypoints is not established.
+\end{itemize}
+
+There is no network liveness theorem, source-lock protocol, independent
+terminal-decision protocol, full financial-journal recovery or implementation
+refinement in this session. A source reversal certificate is distinguishable
+from source finality authorizing a destination credit.
+
+\section{Checked Results}
+
+\paragraph{Authentication and global uniqueness.}
+Threshold authentication obtains an honest signer from the roster and then
+uses the separately stated source assumptions. The execution proof uses that
+authenticated binding to connect destination-local markers with a global
+source-event bound. A general kernel theorem supplies both directions of the
+destination-functionality criterion; a two-message execution witnesses failure
+when the condition is removed.
+
+\paragraph{Representations and information.}
+The normal-to-bypass encoding checks raw payload consistency before discarding
+the redundant payload copy. Its decoder preserves complete replies and effects,
+including rejection. The checked summary is computed after intrinsic
+verification. Equality of summaries is equivalent to equality of the current
+receiver's results over every context and state in the model. This is a semantic
+information quotient, not an optimal byte encoding, a replacement wire
+certificate or a characterization of every product-reachable policy.
+
+\paragraph{Regulatory consumers.}
+The transfer-permission consumer uses Regulatory Action Composition to keep
+ordinary transfers and authorized enforcement distinct. A separate completed
+state-update consumer uses Cross-Domain State Preservation for atomic
+regulatory metadata updates. It preserves a source-key application marker.
+Neither consumer identifies token supply with regulatory holding support.
+The imported models remain within their existing scope~\cite{cdsp}.
+
+\paragraph{Counterexamples and boundary witnesses.}
+The session includes field-removal witnesses for the authenticated binding,
+equal-value and dual-destination replay, marker loss across authority rotation,
+untrusted threshold and repeated signer identifiers, raw-input laundering,
+stale authority and version checks, source-reversal separation, and current
+permission recovery. In particular, a stale FREEZE can preserve the CDSP state
+invariant while violating the required authorization check.
+
+\section{Relationship to Existing Results}
+
+Durable completion records and consistent retry rendezvous are established
+principles~\cite{rifl}. Atomic commit protocols separately specify stable,
+non-conflicting decisions~\cite{graylamport}; Byzantine quorum intersection is
+also established theory~\cite{malkhireiter}. The general factorization criterion
+used here is standard. This development supplies checked statements and
+counterexamples for the displayed receiver and source-fact profile. It does
+not claim a new general atomic-commit protocol or a general theory of
+distributed recovery.
+
+\section{Reproduction}
+
+Use Isabelle2025-2 with the pinned ADS\_Functor dependency recorded by the
+repository. Build the named Cross\_Chain\_Message\_Integrity session with the
+repository registered as a session directory. The repository README and
+session README give the complete commands. The following theories are the
+authoritative definitions, proofs and concrete witnesses.
+
+\clearpage
+\input{session}
+\clearpage
+\bibliographystyle{abbrv}
+\bibliography{root}
+\end{document}
