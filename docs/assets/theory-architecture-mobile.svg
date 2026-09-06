@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1640" viewBox="0 0 600 1640" role="img" aria-labelledby="title desc" preserveAspectRatio="xMidYMid meet">
+  <title id="title">Theory architecture for narrow screens</title>
+  <desc id="desc">A mobile import map for the CDSP and RAC Isabelle sessions. State Preservation feeds six CDSP theories; Priority Resolution feeds DQuencer Instance and Composition; Composition and Regulatory Instance feed Functor Laws; Functor Laws feeds Hierarchy and Canton Bridge; Regulatory Instance also feeds Canton Bridge. External ADS Functor feeds Functor Laws and Canton Bridge. RAC Regulatory Action Composition imports Regulatory Instance.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#070b18"/><stop offset=".58" stop-color="#10182d"/><stop offset="1" stop-color="#13273b"/></linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0v32" fill="none" stroke="#bdd6ee" stroke-width="1" opacity=".04"/></pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#7f9ac6"/></marker>
+    <style>.stage{fill:#0b142a;fill-opacity:.72;stroke:#33507c;stroke-width:2}.box{fill:#101b34;stroke:#496b9b;stroke-width:2}.ext{fill:#161232;stroke:#8b76e8;stroke-width:2;stroke-dasharray:8 6}.rac{fill:#0e2333;stroke:#4c9fd2;stroke-width:2}.title{font:750 27px Inter,Segoe UI,Arial,sans-serif;fill:#f4f6ff}.label{font:700 22px Inter,Segoe UI,Arial,sans-serif;fill:#dbe6f5}.text{font:18px Inter,Segoe UI,Arial,sans-serif;fill:#dbe6f5}.small{font:15px Inter,Segoe UI,Arial,sans-serif;fill:#9eb1c8}.eyebrow{font:700 14px Inter,Segoe UI,Arial,sans-serif;letter-spacing:1.7px;fill:#9d91ee}.flow{fill:none;stroke:#7f9ac6;stroke-width:3;marker-end:url(#arrow)}.link{fill:none;stroke:#7f9ac6;stroke-width:3}</style>
+  </defs>
+  <rect width="600" height="1640" rx="24" fill="url(#bg)"/>
+  <rect width="600" height="1640" rx="24" fill="url(#grid)"/>
+  <text class="title" x="30" y="50">Theory architecture</text>
+  <text class="small" x="30" y="80">Isabelle session imports and external dependencies</text>
+
+  <rect class="stage" x="24" y="110" width="552" height="1020" rx="22"/>
+  <text class="eyebrow" x="48" y="150">CDSP SESSION</text>
+  <rect class="box" x="84" y="174" width="432" height="66" rx="14"/><text class="text" x="300" y="214" text-anchor="middle">State_Preservation</text>
+
+  <path class="link" d="M84 207H38v376"/>
+  <path class="flow" d="M38 306h42"/><path class="flow" d="M38 416h42"/><path class="flow" d="M38 526h42"/>
+  <rect class="box" x="84" y="274" width="210" height="66" rx="14"/><text class="text" x="189" y="314" text-anchor="middle">Proof_Automation</text>
+  <rect class="box" x="84" y="384" width="210" height="66" rx="14"/><text class="text" x="189" y="424" text-anchor="middle">Regulatory_Instance</text>
+  <rect class="box" x="84" y="494" width="210" height="66" rx="14"/><text class="text" x="189" y="534" text-anchor="middle">External_Instance</text>
+
+  <rect class="box" x="318" y="274" width="210" height="66" rx="14"/><text class="text" x="423" y="314" text-anchor="middle">Priority_Resolution</text>
+  <path class="flow" d="M423 340v40"/>
+  <rect class="box" x="318" y="384" width="210" height="66" rx="14"/><text class="text" x="423" y="424" text-anchor="middle">DQuencer_Instance</text>
+  <path class="flow" d="M423 450v40"/>
+  <rect class="box" x="318" y="494" width="210" height="66" rx="14"/><text class="text" x="423" y="534" text-anchor="middle">Composition</text>
+
+  <path class="link" d="M189 450v142h111M423 560v32H300"/><path class="flow" d="M300 592v36"/>
+  <rect class="box" x="84" y="632" width="432" height="70" rx="14"/><text class="text" x="300" y="675" text-anchor="middle">Functor_Laws</text>
+  <path class="link" d="M300 702v42H189M300 744H411"/>
+  <path class="flow" d="M189 744v36"/><path class="flow" d="M411 744v36"/>
+  <rect class="box" x="84" y="784" width="210" height="66" rx="14"/><text class="text" x="189" y="824" text-anchor="middle">Hierarchy</text>
+  <rect class="box" x="318" y="784" width="210" height="66" rx="14"/><text class="text" x="423" y="824" text-anchor="middle">Canton_Bridge</text>
+
+  <rect x="48" y="892" width="504" height="190" rx="16" fill="#0c1830" stroke="#496b9b" stroke-width="2"/>
+  <text class="eyebrow" x="72" y="928">DIRECT IMPORTS FROM STATE_PRESERVATION</text>
+  <text class="small" x="72" y="965">Proof_Automation · Regulatory_Instance</text>
+  <text class="small" x="72" y="995">External_Instance · Composition · Functor_Laws</text>
+  <text class="small" x="72" y="1025">Hierarchy</text>
+  <text class="small" x="72" y="1055">Canton_Bridge also imports Regulatory_Instance.</text>
+
+  <rect class="ext" x="24" y="1174" width="552" height="166" rx="22"/>
+  <text class="eyebrow" x="48" y="1214">EXTERNAL AFP SESSION</text>
+  <rect class="ext" x="72" y="1236" width="456" height="66" rx="14"/><text class="text" x="300" y="1265" text-anchor="middle">ADS_Functor</text><text class="small" x="300" y="1288" text-anchor="middle">imports into Functor_Laws + Canton_Bridge</text>
+
+  <rect class="stage" x="24" y="1384" width="552" height="166" rx="22"/>
+  <text class="eyebrow" x="48" y="1424" fill="#8fbccb">RAC SESSION</text>
+  <rect class="rac" x="72" y="1446" width="456" height="66" rx="14"/><text class="text" x="300" y="1475" text-anchor="middle">Regulatory_Action_Composition</text><text class="small" x="300" y="1498" text-anchor="middle">imports Regulatory_Instance from CDSP</text>
+  <text class="small" x="30" y="1588">Solid arrows show imports within this repository.</text>
+  <text class="small" x="30" y="1614">Dashed violet marks the external AFP dependency.</text>
+</svg>
