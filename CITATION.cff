@@ -16,18 +16,22 @@ keywords:
   - functor
   - cross-domain synchronization
   - regulatory action composition
+  - cross-chain message integrity
   - protected behavior obstructions
   - cross-prover mapping
 abstract: >-
-  Two composable Isabelle/HOL sessions formalize cross-domain state
-  preservation and regulatory action composition, while an independent
+  Three dependent Isabelle/HOL sessions formalize cross-domain state
+  preservation, regulatory action composition and authenticated message
+  execution, while an independent
   PARTIAL / NO SAME research companion checks protected-behavior profile
   consequences without an Oraclizer implementation or product-refinement
   target. The repository covers
   deterministic selection and conditional aggregate progress, authenticated
   views, guarded model-level convergence, a degree-indexed hierarchy, complete
   action-pair classification, typed outcomes, trace and frame properties, and
-  finite transformation normal forms with explicit scope boundaries.
+  finite transformation normal forms, source-event credit uniqueness,
+  representation equivalence and checked message summaries with explicit
+  external assumptions and scope boundaries.
 preferred-citation:
   type: article
   title: "The Cross-Domain State Preservation Functor: A Mechanized Theory of Regulatory State Synchronization in Isabelle/HOL"

@@ -1,0 +1,18 @@
+chapter Oraclizer
+
+session Cross_Chain_Message_Integrity = Regulatory_Action_Composition +
+  options [timeout = 600, document_build = "pdflatex"]
+  theories
+    Message_Types
+    Credit_Once_Kernel
+    Source_Certificates
+    Message_Execution
+    Message_Transport
+    Message_Summary
+    Message_Examples
+    Message_Consumers
+    Message_Mutations
+    Message_Boundaries
+  document_files
+    "root.tex"
+    "root.bib"

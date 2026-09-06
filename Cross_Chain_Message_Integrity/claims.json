@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "session": "Cross_Chain_Message_Integrity",
+  "result_level": "formal_model",
+  "implementation_refinement": "NOT_ESTABLISHED",
+  "assumptions": [
+    {
+      "id": "signature-soundness",
+      "meaning": "Verification identifies actual signers of the complete source statement.",
+      "source": "Source_Certificates.thy",
+      "anchor": "signature_sound",
+      "implementation_status": "Cryptographic implementation and serialization unverified."
+    },
+    {
+      "id": "trusted-configuration",
+      "meaning": "Finite epoch roster, registered fault set and threshold above the fault bound.",
+      "source": "Source_Certificates.thy",
+      "anchor": "finite_roster",
+      "implementation_status": "Runtime membership, threshold provisioning and epoch agreement unverified."
+    },
+    {
+      "id": "honest-source-attestation",
+      "meaning": "An honest registered signer attests only true source statements.",
+      "source": "Source_Certificates.thy",
+      "anchor": "honest_attests_truth",
+      "implementation_status": "External source fact validation obligation."
+    },
+    {
+      "id": "stable-source",
+      "meaning": "Every non-provisional true source outcome is the unique stable outcome at its source key.",
+      "source": "Source_Certificates.thy",
+      "anchor": "stable_fact_unique",
+      "implementation_status": "External finality assumption; does not prove an independent decision protocol."
+    },
+    {
+      "id": "current-context",
+      "meaning": "Caller identity, authority epoch, state version and permissions describe the actual execution context.",
+      "source": "Message_Types.thy",
+      "anchor": "current_use_allowed",
+      "implementation_status": "Authenticated caller extraction and current policy reads remain implementation obligations."
+    },
+    {
+      "id": "durable-local-step",
+      "meaning": "Credit execution and persistent destination/source-key marker insertion form one atomic durable step.",
+      "source": "Message_Types.thy",
+      "anchor": "record_credit",
+      "implementation_status": "Database/contract transaction and complete journal correspondence unverified."
+    },
+    {
+      "id": "entrypoint-coverage",
+      "meaning": "Each modeled route calls the displayed receiver.",
+      "source": "Message_Execution.thy",
+      "anchor": "receive_credit",
+      "implementation_status": "Exhaustive real contract, adapter, administrative and runtime route coverage unverified."
+    }
+  ],
+  "claims": [
+    {
+      "id": "binding",
+      "theorem": "Source_Certificates.source_attestation.accepted_payload_is_bound",
+      "source": "Source_Certificates.thy",
+      "line": 129,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.authenticated_request ?roster ?threshold ?verifies ?c ?r\\<rbrakk> \\<Longrightarrow> statement_binding (certificate_statement (request_certificate ?r)) = request_binding ?r \\<and> request_authority_epoch ?r = context_authority_epoch ?c \\<and> request_version ?r = context_version ?c \\<and> (request_caller ?r, request_binding ?r) \\<in> context_permissions ?c",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "source-fact",
+      "theorem": "Source_Certificates.source_attestation.certificate_authenticates_source_fact",
+      "source": "Source_Certificates.thy",
+      "line": 68,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.certificate_ok ?roster ?threshold ?verifies ?cert\\<rbrakk> \\<Longrightarrow> ?source_truth (certificate_statement ?cert)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "stable-source",
+      "theorem": "Source_Certificates.source_attestation.certificate_authenticates_stable_fact",
+      "source": "Source_Certificates.thy",
+      "line": 83,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.certificate_ok ?roster ?threshold ?verifies ?cert; statement_status (certificate_statement ?cert) \\<noteq> Observed\\<rbrakk> \\<Longrightarrow> ?stable_source (binding_key (statement_binding (certificate_statement ?cert))) = Some (certificate_statement ?cert)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "source-non-equivocation",
+      "theorem": "Source_Certificates.source_attestation.stable_certificates_cannot_equivocate",
+      "source": "Source_Certificates.thy",
+      "line": 90,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.certificate_ok ?roster ?threshold ?verifies ?a; source_attestation.certificate_ok ?roster ?threshold ?verifies ?b; statement_status (certificate_statement ?a) \\<noteq> Observed; statement_status (certificate_statement ?b) \\<noteq> Observed; binding_key (statement_binding (certificate_statement ?a)) = binding_key (statement_binding (certificate_statement ?b))\\<rbrakk> \\<Longrightarrow> certificate_statement ?a = certificate_statement ?b",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "global-once",
+      "theorem": "Message_Execution.source_attestation.family_wide_at_most_once",
+      "source": "Message_Execution.thy",
+      "line": 140,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> count_list (map binding_key (credit_history (source_attestation.run_messages ?roster ?threshold ?verifies ?trace empty_message_state))) ?key \\<le> 1",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "once-iff",
+      "theorem": "Credit_Once_Kernel.local_markers_give_global_once_iff",
+      "source": "Credit_Once_Kernel.thy",
+      "line": 123,
+      "statement": "(\\<forall>xs key. count_list (map binding_key (credit_history (run_once ?admission xs empty_message_state))) key \\<le> 1) = destination_functional ?admission",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "executed-source",
+      "theorem": "Message_Execution.source_attestation.every_executed_credit_has_authenticated_source",
+      "source": "Message_Execution.thy",
+      "line": 149,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; ?b \\<in> set (credit_history (source_attestation.run_messages ?roster ?threshold ?verifies ?trace empty_message_state))\\<rbrakk> \\<Longrightarrow> ?stable_source (binding_key ?b) = Some \\<lparr>statement_binding = ?b, statement_status = Finalized\\<rparr>",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "current-authority",
+      "theorem": "Message_Execution.source_attestation.new_credit_has_current_permission",
+      "source": "Message_Execution.thy",
+      "line": 156,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; snd (source_attestation.receive_credit ?roster ?threshold ?verifies ?route ?c ?r ?s) = New_Credit ?b\\<rbrakk> \\<Longrightarrow> ?b = request_binding ?r \\<and> current_use_allowed ?c ?r \\<and> statement_binding (certificate_statement (request_certificate ?r)) = ?b \\<and> context_endpoint ?c = binding_destination ?b",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "route-equivalence",
+      "theorem": "Message_Transport.source_attestation.normal_bypass_guarantee_equivalence",
+      "source": "Message_Transport.thy",
+      "line": 79,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> source_attestation.receive_bypass ?roster ?threshold ?verifies ?c (encode_bypass ?m) ?s = source_attestation.receive_normal ?roster ?threshold ?verifies ?c ?m ?s",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "route-continuation",
+      "theorem": "Message_Transport.source_attestation.normal_bypass_finite_continuation_equivalence",
+      "source": "Message_Transport.thy",
+      "line": 108,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> source_attestation.bypass_trace ?roster ?threshold ?verifies (map (\\<lambda>(c, m). (c, encode_bypass m)) ?xs) ?s = source_attestation.normal_trace ?roster ?threshold ?verifies ?xs ?s",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "route-information",
+      "theorem": "Message_Transport.source_attestation.route_information_sufficiency_iff",
+      "source": "Message_Transport.thy",
+      "line": 149,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (\\<exists>receiver. \\<forall>m. receiver (?encoding m) = source_attestation.normal_semantics ?roster ?threshold ?verifies m) = (\\<forall>m n. ?encoding m = ?encoding n \\<longrightarrow> (\\<forall>c s. source_attestation.receive_normal ?roster ?threshold ?verifies c m s = source_attestation.receive_normal ?roster ?threshold ?verifies c n s))",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "summary-exact",
+      "theorem": "Message_Summary.source_attestation.checked_summary_is_exact_information",
+      "source": "Message_Summary.thy",
+      "line": 125,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (source_attestation.checked_summary ?roster ?threshold ?verifies ?m = source_attestation.checked_summary ?roster ?threshold ?verifies ?n) = (\\<forall>c s. source_attestation.receive_normal ?roster ?threshold ?verifies c ?m s = source_attestation.receive_normal ?roster ?threshold ?verifies c ?n s)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "summary-continuation",
+      "theorem": "Message_Summary.source_attestation.checked_summary_preserves_finite_continuations",
+      "source": "Message_Summary.thy",
+      "line": 163,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> example.summary_trace (map (\\<lambda>(c, m). (c, source_attestation.checked_summary ?roster ?threshold ?verifies m)) ?xs) ?s = source_attestation.normal_trace ?roster ?threshold ?verifies ?xs ?s",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "summary-update",
+      "theorem": "Message_Summary.source_attestation.checked_summary_commutes_with_refresh",
+      "source": "Message_Summary.thy",
+      "line": 149,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> source_attestation.checked_summary ?roster ?threshold ?verifies (refresh_envelope ?epoch ?version ?m) = map_option (refresh_descriptor ?epoch ?version) (source_attestation.checked_summary ?roster ?threshold ?verifies ?m)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "credit-recovery",
+      "theorem": "Message_Execution.source_attestation.recovery_preserves_future_deliveries",
+      "source": "Message_Execution.thy",
+      "line": 175,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.message_invariant ?stable_source ?s\\<rbrakk> \\<Longrightarrow> source_attestation.run_messages ?roster ?threshold ?verifies ?continuation (restore_message_state (credit_history ?s)) = source_attestation.run_messages ?roster ?threshold ?verifies ?continuation ?s",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "regulatory-permission",
+      "theorem": "Message_Consumers.source_attestation.regulatory_permission_has_source_and_current_authority",
+      "source": "Message_Consumers.thy",
+      "line": 39,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.regulatory_permission ?roster ?threshold ?verifies ?c ?r ?restriction ?state\\<rbrakk> \\<Longrightarrow> current_use_allowed ?c ?r \\<and> ?stable_source (binding_key (request_binding ?r)) = Some \\<lparr>statement_binding = request_binding ?r, statement_status = Finalized\\<rparr>",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "regulatory-source",
+      "theorem": "Message_Consumers.source_attestation.accepted_regulatory_message_is_source_bound",
+      "source": "Message_Consumers.thy",
+      "line": 121,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.apply_regulatory_message ?roster ?threshold ?verifies ?c ?r ?s = Some ?t\\<rbrakk> \\<Longrightarrow> ?stable_source (binding_key (request_binding ?r)) = Some \\<lparr>statement_binding = request_binding ?r, statement_status = Finalized\\<rparr>",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "regulatory-state",
+      "theorem": "Message_Consumers.source_attestation.completed_regulatory_message_preserves_cdsp",
+      "source": "Message_Consumers.thy",
+      "line": 128,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; valid_state (receiver_snapshot ?s); source_attestation.apply_regulatory_message ?roster ?threshold ?verifies ?c ?r ?s = Some ?t\\<rbrakk> \\<Longrightarrow> valid_state (receiver_snapshot ?t)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "regulatory-replay",
+      "theorem": "Message_Consumers.source_attestation.repeated_regulatory_source_is_rejected",
+      "source": "Message_Consumers.thy",
+      "line": 148,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.apply_regulatory_message ?roster ?threshold ?verifies ?c ?r ?s = Some ?t\\<rbrakk> \\<Longrightarrow> source_attestation.apply_regulatory_message ?roster ?threshold ?verifies ?c' ?r ?t = None",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "binding-mutants",
+      "theorem": "Message_Mutations.all_binding_removals_execute",
+      "source": "Message_Mutations.thy",
+      "line": 83,
+      "statement": "example.weakened_binding_receive ?field (changed_context ?field) (changed_request ?field) empty_message_state = (record_credit (changed_binding ?field) empty_message_state, New_Credit (changed_binding ?field))",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "binding-violations",
+      "theorem": "Message_Mutations.all_binding_removals_violate_source",
+      "source": "Message_Mutations.thy",
+      "line": 95,
+      "statement": "example_source (binding_key (changed_binding ?field)) \\<noteq> Some \\<lparr>statement_binding = changed_binding ?field, statement_status = Finalized\\<rparr>",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "destination-negative",
+      "theorem": "Message_Boundaries.actual_destination_mutation_breaks_kernel_once",
+      "source": "Message_Boundaries.thy",
+      "line": 24,
+      "statement": "count_list (map binding_key (credit_history (run_once weak_destination_gate [(Validated_Route, example_context, example_request 17), (Bypass_Route, changed_context Destination_Field, changed_request Destination_Field)] empty_message_state))) (0, 17) = 2",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "summary-positive",
+      "theorem": "Message_Boundaries.different_certificates_same_receiver_observations",
+      "source": "Message_Boundaries.thy",
+      "line": 62,
+      "statement": "\\<forall>c s. example.receive_normal c (example_envelope 100 17) s = example.receive_normal c alternative_envelope s",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "current-record-no-go",
+      "theorem": "Message_Boundaries.history_only_current_permission_decoder_impossible",
+      "source": "Message_Boundaries.thy",
+      "line": 155,
+      "statement": "\\<nexists>decoder. \\<forall>c. decoder [] (example_request 17) = snd (example.receive_credit Validated_Route c (example_request 17) empty_message_state)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "stale-freeze-negative",
+      "theorem": "Message_Boundaries.removed_epoch_check_executes_stale_freeze",
+      "source": "Message_Boundaries.thy",
+      "line": 124,
+      "statement": "example.regulatory_apply_without_current_epoch example_context (example_request 20\\<lparr>request_authority_epoch := 7\\<rparr>) \\<lparr>receiver_snapshot = example_snapshot ACTIVE, receiver_applied = {}\\<rparr> = Some \\<lparr>receiver_snapshot = example_snapshot FROZEN, receiver_applied = {(0, 20)}\\<rparr>",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "consumer-removal",
+      "theorem": "Message_Consumers.current_authority_consumer_removal",
+      "source": "Message_Consumers.thy",
+      "line": 82,
+      "statement": "\\<not> example.regulatory_permission example_context (example_request 19\\<lparr>request_authority_epoch := 7\\<rparr>) True FROZEN \\<and> unchecked_regulatory_permission (example_request 19\\<lparr>request_authority_epoch := 7\\<rparr>) True FROZEN",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "concrete-activation",
+      "theorem": "Message_Examples.example_new_credit",
+      "source": "Message_Examples.thy",
+      "line": 125,
+      "statement": "example.receive_credit Validated_Route example_context (example_request 17) empty_message_state = (record_credit (example_binding 17) empty_message_state, New_Credit (example_binding 17))",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "concrete-regulatory-activation",
+      "theorem": "Message_Consumers.example_completed_freeze",
+      "source": "Message_Consumers.thy",
+      "line": 166,
+      "statement": "example.apply_regulatory_message example_context (example_request 20) \\<lparr>receiver_snapshot = example_snapshot ACTIVE, receiver_applied = {}\\<rparr> = Some \\<lparr>receiver_snapshot = example_snapshot FROZEN, receiver_applied = {(0, 20)}\\<rparr>",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "reversal-separation",
+      "theorem": "Message_Examples.example_reversal_is_not_destination_finality",
+      "source": "Message_Examples.thy",
+      "line": 169,
+      "statement": "example.certificate_ok (example_certificate 22) \\<and> \\<not> example.authenticated_request example_context (example_request 22)",
+      "oracle_dependencies": 0,
+      "result_level": "formal_model"
+    }
+  ],
+  "formal_consumers": [
+    {
+      "provider": "source_attestation.authenticated_request",
+      "consumer": "source_attestation.regulatory_permission",
+      "source": "Message_Consumers.thy",
+      "positive": "regulatory_consumer_positive_and_negative",
+      "removal": "current_authority_consumer_removal"
+    },
+    {
+      "provider": "source_attestation.authenticated_request",
+      "consumer": "source_attestation.apply_regulatory_message",
+      "source": "Message_Consumers.thy",
+      "positive": "example_completed_freeze",
+      "removal": "removed_epoch_check_executes_stale_freeze"
+    },
+    {
+      "provider": "source_attestation.credit_admissible",
+      "consumer": "once_receive / run_once",
+      "source": "Message_Execution.thy",
+      "positive": "family_wide_at_most_once",
+      "removal": "actual_destination_mutation_breaks_kernel_once"
+    }
+  ],
+  "nonclaims": [
+    "cryptographic implementation",
+    "external source finality implementation",
+    "independent terminal consensus",
+    "source locks",
+    "full financial journal recovery",
+    "distributed atomicity",
+    "liveness",
+    "compiled or runtime product refinement"
+  ]
+}

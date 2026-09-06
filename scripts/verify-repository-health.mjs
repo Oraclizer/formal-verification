@@ -27,6 +27,11 @@ const required = [
   "Regulatory_Action_Composition/Regulatory_Action_Composition.thy",
   "Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf",
   "Regulatory_Action_Composition/release/manifest.json",
+  "Cross_Chain_Message_Integrity/ROOT",
+  "Cross_Chain_Message_Integrity/README.md",
+  "Cross_Chain_Message_Integrity/claims.json",
+  "Cross_Chain_Message_Integrity/source-manifest.json",
+  "Cross_Chain_Message_Integrity/verify-source.mjs",
   "Protected_Behavior_Obstructions/ROOT",
   "Protected_Behavior_Obstructions/README.md",
   "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md",
@@ -155,9 +160,28 @@ for (const sessionRoot of [
   "Cross_Domain_State_Preservation",
   "Protected_Behavior_Obstructions",
   "Regulatory_Action_Composition",
+  "Cross_Chain_Message_Integrity",
 ]) {
   if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
     failures.push(`ROOTS missing session directory: ${sessionRoot}`);
+  }
+}
+
+const messageName = "Cross_Chain_Message_Integrity";
+const messageDirectory = resolve(root, messageName);
+const messageRoot = readFileSync(resolve(messageDirectory, "ROOT"), "utf8");
+const messageManifest = JSON.parse(readFileSync(resolve(messageDirectory, "source-manifest.json"), "utf8"));
+const messageTheories = readdirSync(messageDirectory).filter((file) => file.endsWith(".thy")).sort();
+const manifestTheories = messageManifest.files.map((f) => f.path).filter((f) => f.endsWith(".thy")).sort();
+if (JSON.stringify(messageTheories) !== JSON.stringify(manifestTheories)) failures.push("Message theory manifest mismatch");
+if (!messageRoot.includes("session Cross_Chain_Message_Integrity = Regulatory_Action_Composition +")) {
+  failures.push("Message ROOT must extend RAC");
+}
+for (const file of messageManifest.files) {
+  const hash = createHash("sha256").update(readFileSync(resolve(messageDirectory, file.path))).digest("hex");
+  if (hash !== file.sha256) failures.push(`Message source hash mismatch: ${file.path}`);
+  if (file.path.endsWith(".thy") && !messageRoot.includes(file.path.slice(0, -4))) {
+    failures.push(`Message ROOT missing theory: ${file.path}`);
   }
 }
 
@@ -366,4 +390,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length} theories, 3 sessions`);
+console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length} theories, 4 sessions`);

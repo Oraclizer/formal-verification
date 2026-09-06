@@ -5,6 +5,14 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added `Cross_Chain_Message_Integrity`, extending RAC with authenticated
+  source facts, destination-credit uniqueness, constructive route equivalence,
+  an exact local-marker criterion, a checked contextual summary and concrete
+  regulatory consumers. The ten-theory session includes kernel-checked examples and
+  semantic boundary witnesses. Source/crypto/current-context assumptions and
+  unverified runtime correspondence remain explicit. Added source integrity
+  checks, reproducible document sources, mapping and named-session CI.
+
 - Added the independent `Protected_Behavior_Obstructions` named session, its
   `PARTIAL / NO SAME` scope, folder-local cross-prover mapping, bounded
   controls, and a pinned Isabelle2025-2 Continuous Integration build. The

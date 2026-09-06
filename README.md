@@ -4,7 +4,7 @@
     <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
   </picture>
 
-  <p><strong>Machine-checked model-level foundations for cross-domain state preservation and regulatory action composition, plus an independent protected-behavior obstruction companion.</strong></p>
+  <p><strong>Machine-checked model-level foundations for cross-domain state preservation, regulatory action composition and authenticated message execution, plus an independent protected-behavior obstruction companion.</strong></p>
 
   [![Proofs](https://github.com/Oraclizer/formal-verification/actions/workflows/proofs.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/proofs.yml)
   [![Repository health](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml)
@@ -20,8 +20,8 @@
   [Mapping](FORMAL_MODEL_MAPPING.md)
 </div>
 
-> **Mechanized assurance.** The repository contains three Isabelle/HOL
-> sessions. CDSP and RAC compose. `Protected_Behavior_Obstructions` is an
+> **Mechanized assurance.** The repository contains four Isabelle/HOL
+> sessions. CDSP, RAC and Cross-Chain Message Integrity form a dependency chain. `Protected_Behavior_Obstructions` is an
 > independent HOL companion to an external Lean development: its rows are
 > graded `PARTIAL`, never `SAME` (both grades are defined in
 > [`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)).
@@ -53,6 +53,7 @@ source and PDF hashes together with the document-build identity.
 | --- | --- | --- | --- |
 | **CDSP** | Foundation | Preservation morphisms, priority and conditional progress, authenticated views, guarded convergence, and the synchronization-degree hierarchy | [Source](Cross_Domain_State_Preservation/ROOT) · [PDF](Cross_Domain_State_Preservation/release/Cross_Domain_State_Preservation.pdf) · [Manifest](Cross_Domain_State_Preservation/release/manifest.json) |
 | **RAC** | Extension | Regulatory outcomes, pair commutativity, provenance, transfer gates, traces, atomic queues, and finite normal forms | [Source](Regulatory_Action_Composition/ROOT) · [PDF](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) · [Manifest](Regulatory_Action_Composition/release/manifest.json) |
+| **Cross-Chain Message Integrity** | Extension | Authenticated source binding, destination-credit uniqueness, checked representations and regulatory consumers | [Source](Cross_Chain_Message_Integrity/ROOT) · [Scope and build](Cross_Chain_Message_Integrity/README.md) · [Claims](Cross_Chain_Message_Integrity/claims.json) · [Source manifest](Cross_Chain_Message_Integrity/source-manifest.json) |
 | **Protected Behavior Obstructions** | Partial companion | Set/profile consequences, explicit stochastic assumptions, set-level morphism laws, preorder facts, and bounded controls | [Source](Protected_Behavior_Obstructions/ROOT) · [Scope](Protected_Behavior_Obstructions/README.md) · [Cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md) · PDF/manifest not produced (`document = false`) |
 
 **Role taxonomy**
@@ -67,6 +68,9 @@ The role classifies an artifact's primary formal relationship, not its
 maturity, publication venue, or acceptance state. CDSP is the reusable
 foundation; RAC is an extension because it imports CDSP's
 `Regulatory_Instance`. RAC does not import or extend `ADS_Functor`.
+Cross-Chain Message Integrity extends RAC and consumes its transfer gate and
+CDSP completed regulatory synchronization. Its document is reproducible from
+source; no generated PDF is tracked for this session.
 
 An earlier version of CDSP was submitted to the Archive of Formal Proofs on
 2026-03-25 but was not accepted as an AFP entry. None of these sessions is an
@@ -85,6 +89,7 @@ submission, review, and acceptance are separate states.
 | RAC: action algebra | all 21 distinct-label pairs classified as 12 commuting and 9 noncommuting, with witnesses | Concrete five-state, seven-label machine |
 | RAC: outcomes and traces | applied/rejected/operational-failure separation, trace and unrelated-asset frame properties | No authorization, replay, or concurrency model |
 | RAC: atomic queues and normal forms | completed-step validity and consistency; exactly 60 reachable transformation vectors | Atomic completed steps, not partial propagation or rollback |
+| Cross-chain message integrity | Full payload binding, source-key credit bound, exact local-marker criterion, normal/bypass equivalence, contextual summary iff and concrete consumers | External source/crypto/current-context assumptions; no full financial recovery or runtime refinement |
 | Protected behavior obstructions | nested profile algebra, assumption-transparent T2/T3/T4/T5 consequences, set-level morphism laws, preorder facts, and direct finite witnesses | `PARTIAL`; no kernel-derived first-hit law, scheduler correspondence, quantitative pushforward, or `SAME` credit |
 
 Every row is shorthand. The Oraclizer theorem-to-target map, assumptions, open
@@ -106,13 +111,16 @@ correspondence is in
 The CDSP session depends on `HOL-Library`, `HOL-Eisbach`, and the AFP session
 `ADS_Functor`. RAC extends the built CDSP session and imports its regulatory
 instance explicitly. `Protected_Behavior_Obstructions` extends `HOL`
-independently and imports neither CDSP nor RAC.
+independently and imports neither CDSP nor RAC. The diagram displays the
+CDSP/RAC foundation. Cross-Chain Message Integrity adds a child of RAC: typed
+source certificates and a local-once kernel feed execution, transport, checked
+summaries, concrete consumers and semantic boundary tests.
 
 ## Assurance boundary
 
 ### Established within the models
 
-- all three declared sessions and all fourteen tracked theories build;
+- all four declared sessions and all twenty-four tracked theories build;
 - the theory sources contain no `sorry` or `oops`;
 - named results follow from the definitions, locales, and assumptions stated
   in the theories;
@@ -125,7 +133,7 @@ independently and imports neither CDSP nor RAC.
 - distributed-runtime correctness: locks, timeouts, rollback, finality,
   concurrent interleaving, network liveness, or adversarial BFT execution;
 - external facts and operations: authorization and identity policy, replay
-  protection, cryptographic implementation correctness, legal truth, live
+  protection in deployed code, cryptographic implementation correctness, legal truth, live
   deployment, operational security, or audit status.
 
 These are open or external obligations, not implied consequences of a green
@@ -157,14 +165,14 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Check all three sessions from the repository root:
+Check all four sessions from the repository root:
 
 ```bash
 isabelle build \
   -d . \
   -d /path/to/afp/thys \
   Cross_Domain_State_Preservation Regulatory_Action_Composition \
-  Protected_Behavior_Obstructions
+  Cross_Chain_Message_Integrity Protected_Behavior_Obstructions
 ```
 
 Expected completion includes:
@@ -172,6 +180,7 @@ Expected completion includes:
 ```text
 Finished Cross_Domain_State_Preservation
 Finished Regulatory_Action_Composition
+Finished Cross_Chain_Message_Integrity
 Finished Protected_Behavior_Obstructions
 ```
 
@@ -190,6 +199,9 @@ Isabelle's build output may be named `document.pdf`. That is a transient build
 artifact. A tracked public reading copy is accepted only under
 `<Session>/release/<Session>.pdf`, with the exact case-sensitive session name.
 Generic `document.pdf` files are not public release artifacts.
+
+The [message-integrity build instructions](Cross_Chain_Message_Integrity/README.md#reproduction)
+provide the dated AFP archive and digest used in Continuous Integration.
 
 An independent assurance claim should identify the exact commit, Isabelle and
 AFP revisions, command, and resulting session log.
