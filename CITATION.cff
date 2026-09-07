@@ -19,13 +19,16 @@ keywords:
   - cross-chain message integrity
   - reservation correctness
   - evidence atomic binding
+  - evidence binding composition
+  - finite funding allocation
   - protected behavior obstructions
   - cross-prover mapping
 abstract: >-
-  Five dependent Isabelle/HOL sessions formalize cross-domain state
+  Six dependent Isabelle/HOL sessions formalize cross-domain state
   preservation, regulatory action composition, authenticated message
   execution, reservation correctness and evidence-qualified terminal
-  consumers, while an independent
+  consumers, finite funding allocation and preservation of completed decisions
+  through historical projection and recovery, while an independent
   PARTIAL / NO SAME research companion checks protected-behavior profile
   consequences without an Oraclizer implementation or product-refinement
   target. The repository covers
@@ -34,7 +37,10 @@ abstract: >-
   action-pair classification, typed outcomes, trace and frame properties, and
   finite transformation normal forms, source-event credit uniqueness,
   representation equivalence and checked message summaries with explicit
-  external assumptions and scope boundaries.
+  external assumptions and scope boundaries. The composition extension connects
+  the existing source, financial and regulatory consumers to fresh completed
+  calls and recovery of the same recorded executions; physical and compiled
+  implementation correspondence remains outside these model results.
 preferred-citation:
   type: article
   title: "The Cross-Domain State Preservation Functor: A Mechanized Theory of Regulatory State Synchronization in Isabelle/HOL"

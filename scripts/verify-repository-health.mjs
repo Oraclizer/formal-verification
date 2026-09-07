@@ -48,6 +48,20 @@ const required = [
   "Evidence_Atomic_Binding/build-document.mjs",
   "Evidence_Atomic_Binding/document/root.tex",
   "Evidence_Atomic_Binding/document/root.bib",
+  "Evidence_Binding_Composition/ROOT",
+  "Evidence_Binding_Composition/README.md",
+  "Evidence_Binding_Composition/MODEL_BOUNDARY.md",
+  "Evidence_Binding_Composition/claims.json",
+  "Evidence_Binding_Composition/source-manifest.json",
+  "Evidence_Binding_Composition/verify-source.mjs",
+  "Evidence_Binding_Composition/verify-proof-output.mjs",
+  "Evidence_Binding_Composition/build-document.mjs",
+  "Evidence_Binding_Composition/document/root.tex",
+  "Evidence_Binding_Composition/document/root.bib",
+  "Evidence_Binding_Composition/Audit/ROOT",
+  "Evidence_Binding_Composition/Audit/Composition_Audit_Base.thy",
+  "Evidence_Binding_Composition/Audit/Composition_Proof_Audit.thy",
+  "Evidence_Binding_Composition/Audit/README.md",
   "Protected_Behavior_Obstructions/ROOT",
   "Protected_Behavior_Obstructions/README.md",
   "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md",
@@ -179,6 +193,7 @@ for (const sessionRoot of [
   "Cross_Chain_Message_Integrity",
   "Preemptive_Lock_Correctness",
   "Evidence_Atomic_Binding",
+  "Evidence_Binding_Composition",
 ]) {
   if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
     failures.push(`ROOTS missing session directory: ${sessionRoot}`);
@@ -236,6 +251,24 @@ for (const file of bindingManifest.files) {
   if (hash !== file.sha256) failures.push(`Binding source hash mismatch: ${file.path}`);
   if (file.path.endsWith(".thy") && !bindingRoot.includes(file.path.slice(0, -4))) {
     failures.push(`Binding ROOT missing theory: ${file.path}`);
+  }
+}
+
+const compositionName = "Evidence_Binding_Composition";
+const compositionDirectory = resolve(root, compositionName);
+const compositionRoot = readFileSync(resolve(compositionDirectory, "ROOT"), "utf8");
+const compositionManifest = JSON.parse(readFileSync(resolve(compositionDirectory, "source-manifest.json"), "utf8"));
+const compositionTheories = readdirSync(compositionDirectory).filter((file) => file.endsWith(".thy")).sort();
+const compositionManifestTheories = compositionManifest.files.map((f) => f.path).filter((f) => f.endsWith(".thy") && !f.includes("/")).sort();
+if (JSON.stringify(compositionTheories) !== JSON.stringify(compositionManifestTheories)) failures.push("Composition theory manifest mismatch");
+if (!compositionRoot.includes("session Evidence_Binding_Composition = Evidence_Atomic_Binding +")) {
+  failures.push("Composition ROOT must extend evidence binding");
+}
+for (const file of compositionManifest.files) {
+  const hash = createHash("sha256").update(readFileSync(resolve(compositionDirectory, file.path))).digest("hex");
+  if (hash !== file.sha256) failures.push(`Composition source hash mismatch: ${file.path}`);
+  if (file.path.endsWith(".thy") && !file.path.includes("/") && !compositionRoot.includes(file.path.slice(0, -4))) {
+    failures.push(`Composition ROOT missing theory: ${file.path}`);
   }
 }
 
@@ -444,4 +477,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length + reservationTheories.length + bindingTheories.length} theories, 6 sessions`);
+console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length + reservationTheories.length + bindingTheories.length + compositionTheories.length} theories, 7 sessions`);

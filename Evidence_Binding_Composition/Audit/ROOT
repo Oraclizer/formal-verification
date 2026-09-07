@@ -1,0 +1,5 @@
+session Composition_Proof_Audit = Evidence_Binding_Composition +
+  options [document = false, timeout = 600]
+  theories
+    Composition_Audit_Base
+    Composition_Proof_Audit

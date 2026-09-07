@@ -2,7 +2,8 @@
 
 This repository is the public home of a composable product-model chain:
 `Cross_Domain_State_Preservation`, `Regulatory_Action_Composition`,
-`Cross_Chain_Message_Integrity`, `Preemptive_Lock_Correctness` and `Evidence_Atomic_Binding`. It also contains the independent
+`Cross_Chain_Message_Integrity`, `Preemptive_Lock_Correctness`,
+`Evidence_Atomic_Binding` and `Evidence_Binding_Composition`. It also contains the independent
 `PARTIAL / NO SAME` `Protected_Behavior_Obstructions` research companion, which
 has no Oraclizer implementation or product-refinement target. The artifacts are
 maintained as single-author scholarly works rather than as a conventional
@@ -70,7 +71,8 @@ obtaining and using the AFP.
 # Check the product-model sessions (point -d at both this repo and the AFP)
 isabelle build -d . -d /path/to/afp/thys \
   Cross_Domain_State_Preservation Regulatory_Action_Composition \
-  Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Evidence_Atomic_Binding
+  Cross_Chain_Message_Integrity Preemptive_Lock_Correctness \
+  Evidence_Atomic_Binding Evidence_Binding_Composition
 
 # Check the independent PARTIAL / NO SAME companion (AFP is not required)
 isabelle build -c -D Protected_Behavior_Obstructions \
@@ -86,7 +88,7 @@ Before changing the companion, read its folder-local
 [`CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md).
 It is not an Oraclizer product-refinement mapping.
 
-- **Isabelle version:** exactly 2025-2 for the audited build.
+- **Isabelle version:** exactly 2025-2 for these sessions.
 - All theories build without `sorry` or `oops`; independent confirmation of this is welcome.
 - Isabelle may emit `document.pdf` in the build-output directory. A tracked
   reading copy must instead be named
@@ -163,3 +165,22 @@ Its [session guide](Evidence_Atomic_Binding/README.md#reproduce-the-proofs-and-t
 provides the proof and document commands. Update its source manifest after a
 reviewed source or document change; implementation status must retain the
 evidence level actually established.
+
+For changes to Evidence Binding Composition, read its
+[source guide](Evidence_Binding_Composition/README.md#source-guide) and
+[model boundary](Evidence_Binding_Composition/MODEL_BOUNDARY.md), then run:
+
+```bash
+node Evidence_Binding_Composition/verify-source.mjs
+isabelle build -b -j 1 -o threads=1 -o parallel_proofs=0 \
+  -d /path/to/ADS_Functor -d . Evidence_Binding_Composition
+node Evidence_Binding_Composition/build-document.mjs output/Evidence_Binding_Composition
+```
+
+The AFP path must contain its `ROOT`; the standalone document builder needs
+`pdflatex` and `bibtex`. Keep the source manifest aligned with reviewed inputs.
+This child preserves the parent session files and uses their existing guards.
+Report whether a proposed change affects allocation assumptions, current
+permissions, a declared reader, call identifiers or full recovery comparisons.
+Equal final funding is not sufficient evidence for removing a raw history or
+changing the order of observable effects.

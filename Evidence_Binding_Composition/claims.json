@@ -1,0 +1,838 @@
+{
+  "schema_version": 1,
+  "session": "Evidence_Binding_Composition",
+  "result_level": "formal_model",
+  "implementation_refinement": "NOT_ESTABLISHED",
+  "runtime_status": "NOT_VERIFIED",
+  "inherited_contract": "../Evidence_Atomic_Binding/claims.json",
+  "assumptions": [
+    {
+      "id": "inherited-source-contract",
+      "anchor": "../Evidence_Atomic_Binding/model-contract.md",
+      "meaning": "The original source-attestation, stable-source, logical terminal authority, current-use and durable-call assumptions are retained."
+    },
+    {
+      "id": "finite-allocation-language",
+      "anchor": "Funding_Characterization.thy",
+      "meaning": "The equivalence covers finite distinct credited roots and holders, supported positive canonical ordinary effects, and the supplied current contexts. It is not realization under every fixed policy."
+    },
+    {
+      "id": "declared-observations",
+      "anchor": "Historical_Decision_Projection.thy; MODEL_BOUNDARY.md",
+      "meaning": "The historical projection covers the declared observed and sourced request and environment alphabets, preserving the full current state and raw histories."
+    },
+    {
+      "id": "recovery-source",
+      "anchor": "Integration_Transport.thy",
+      "meaning": "The original exact current-source and replica checks execute before projection. Block inputs contain structured HOL entries, not a byte encoding of arbitrary function-valued state."
+    },
+    {
+      "id": "implementation-obligations",
+      "anchor": "MODEL_BOUNDARY.md",
+      "meaning": "Authentic current policy, physical source control, distributed agreement, atomic durable effect/results, complete current recovery inputs and compiled consumers require separate implementation evidence."
+    }
+  ],
+  "claims": [
+    {
+      "id": "finite-realization",
+      "file": "Funding_Realization.thy",
+      "theorem": "Funding_Realization.source_attestation.finite_funding_realization",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 7,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m; \\<forall>root\\<in>set ?roots. root \\<in> set (credit_history (received_messages (machine_state ?m))); distinct (map binding_key ?roots); distinct ?holders; \\<forall>root\\<in>set ?roots. sum_list (map (?target root) ?holders) = sum_list (map (realization_units ?m root) ?holders); \\<forall>account. realization_account_total ?roots ?holders ?target account = realization_account_total ?roots ?holders (realization_units ?m) account\\<rbrakk> \\<Longrightarrow> realization_succeeds ?certificates (realization_plan ?roots ?holders ?m ?target) ?m \\<and> (\\<forall>root\\<in>set ?roots. \\<forall>h\\<in>set ?holders. realization_units (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m) root h = ?target root h) \\<and> (\\<forall>key account. (key, account) \\<notin> realization_cells ?roots ?holders \\<longrightarrow> funded_units (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m)) (key, account) = funded_units (machine_state ?m) (key, account)) \\<and> destination_units (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m)) = destination_units (machine_state ?m) \\<and> erase_lineage_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m) = erase_lineage_state ?m \\<and> realization_static_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m) = realization_static_state ?m \\<and> machine_journal (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m) = machine_journal ?m @ map Descendant_Event (realization_plan ?roots ?holders ?m ?target) \\<and> lawful_descendants (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m)) = lawful_descendants (machine_state ?m) @ realization_plan ?roots ?holders ?m ?target \\<and> (\\<forall>e\\<in>set (realization_plan ?roots ?holders ?m ?target). lineage_root e \\<in> set ?roots \\<and> lineage_from e \\<in> set ?holders \\<and> lineage_to e \\<in> set ?holders \\<and> 0 < lineage_amount e \\<and> canonical_realization_effect e) \\<and> source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders ?m ?target)) ?m)"
+    },
+    {
+      "id": "finite-characterization",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.source_attestation.finite_funding_admissibility_iff_realization",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 5,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m; \\<forall>root\\<in>set ?roots. root \\<in> set (credit_history (received_messages (machine_state ?m))); distinct (map binding_key ?roots); distinct ?holders\\<rbrakk> \\<Longrightarrow> funding_table_admissible ?roots ?holders ?m ?target = (\\<exists>effects. funding_execution_image ?roots ?holders ?certificates ?m ?target effects)"
+    },
+    {
+      "id": "execution-forces-margins",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.actual_successful_image_forces_admissibility",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>financial_history_agreement ?balances ?m; distinct (map binding_key ?roots); distinct ?holders; funding_execution_image ?roots ?holders ?certificates ?m ?target ?effects\\<rbrakk> \\<Longrightarrow> funding_table_admissible ?roots ?holders ?m ?target"
+    },
+    {
+      "id": "realization-source-frame",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.source_attestation.characterized_image_has_actual_parent_execution_and_source_frame",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m; funding_execution_image ?roots ?holders ?certificates ?m ?target ?effects\\<rbrakk> \\<Longrightarrow> run_realization ?certificates ?effects ?m = source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates ?effects) ?m \\<and> machine_journal (run_realization ?certificates ?effects ?m) = machine_journal ?m @ map Descendant_Event ?effects \\<and> source_units (machine_state (run_realization ?certificates ?effects ?m)) = source_units (machine_state ?m) \\<and> source_effects (machine_state (run_realization ?certificates ?effects ?m)) = source_effects (machine_state ?m) \\<and> received_messages (machine_state (run_realization ?certificates ?effects ?m)) = received_messages (machine_state ?m) \\<and> source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (run_realization ?certificates ?effects ?m)"
+    },
+    {
+      "id": "actual-source-step",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.source_attestation.source_realization_one_step_is_the_actual_parent_result",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; record_reference (coupled_core ?s) ?index (lineage_root ?effect) Confirmed_Decision \\<noteq> None; binding_key (lineage_root ?effect) \\<in> core_published (coupled_core ?s); get_reg_state (receiver_snapshot (core_regulatory (coupled_core ?s))) (binding_destination (lineage_root ?effect)) (binding_asset (lineage_root ?effect)) = Some ACTIVE\\<rbrakk> \\<Longrightarrow> snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client True (Client_Protocol (binding_destination (lineage_root ?effect)) ?index (source_realization_intent ?certificate ?effect))) (source_attestation.source_realization_installed ?roster ?threshold ?verifies ?effect ?s)) = Coupling_Client_Reply (Protocol_Response (snd (execute_descendant (source_realization_context ?effect) (source_realization_request ?certificate ?effect) (lineage_root ?effect) (lineage_from ?effect) (lineage_to ?effect) (lineage_amount ?effect) (core_parent (coupled_core ?s))))) \\<and> core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s)) = fst (execute_descendant (source_realization_context ?effect) (source_realization_request ?certificate ?effect) (lineage_root ?effect) (lineage_from ?effect) (lineage_to ?effect) (lineage_amount ?effect) (core_parent (coupled_core ?s))) \\<and> coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s) = coupled_source ?s \\<and> coupled_receipts (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s) = coupled_receipts ?s \\<and> coupled_sent (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s) = coupled_sent ?s \\<and> coupled_blocked (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s) = coupled_blocked ?s \\<and> core_records (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s)) = core_records (coupled_core ?s) \\<and> core_published (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s)) = core_published (coupled_core ?s) \\<and> core_regulatory (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s)) = core_regulatory (coupled_core ?s) \\<and> core_epoch (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_word ?certificate ?index ?effect) ?s)) = Suc (Suc (core_epoch (coupled_core ?s)))"
+    },
+    {
+      "id": "actual-source-plan",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.source_attestation.source_realization_constructive_plan_uses_the_actual_dispatcher",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 9,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; financial_history_agreement ?balances (core_parent (coupled_core ?s)); \\<forall>root\\<in>set ?roots. root \\<in> set (credit_history (received_messages (machine_state (core_parent (coupled_core ?s))))); distinct (map binding_key ?roots); distinct ?holders; \\<forall>root\\<in>set ?roots. sum_list (map (?target root) ?holders) = sum_list (map (realization_units (core_parent (coupled_core ?s)) root) ?holders); \\<forall>root\\<in>set ?roots. record_reference (coupled_core ?s) (?indices root) root Confirmed_Decision \\<noteq> None; \\<forall>root\\<in>set ?roots. binding_key root \\<in> core_published (coupled_core ?s); \\<forall>root\\<in>set ?roots. get_reg_state (receiver_snapshot (core_regulatory (coupled_core ?s))) (binding_destination root) (binding_asset root) = Some ACTIVE\\<rbrakk> \\<Longrightarrow> (\\<forall>root\\<in>set ?roots. \\<forall>holder\\<in>set ?holders. realization_units (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s))) root holder = ?target root holder) \\<and> coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s) = coupled_source ?s \\<and> (\\<forall>i<length (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target). source_attestation.source_realization_reply ?roster ?threshold ?verifies ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target ! i) (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (take i (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target))) ?s) = Coupling_Client_Reply (Protocol_Response Descendant_Executed))"
+    },
+    {
+      "id": "actual-source-word",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.source_attestation.source_realization_finite_word_projection",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; \\<forall>effect\\<in>set ?effects. record_reference (coupled_core ?s) (?indices (lineage_root effect)) (lineage_root effect) Confirmed_Decision \\<noteq> None; \\<forall>effect\\<in>set ?effects. binding_key (lineage_root effect) \\<in> core_published (coupled_core ?s); \\<forall>effect\\<in>set ?effects. get_reg_state (receiver_snapshot (core_regulatory (coupled_core ?s))) (binding_destination (lineage_root effect)) (binding_asset (lineage_root effect)) = Some ACTIVE\\<rbrakk> \\<Longrightarrow> core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices ?effects) ?s)) = run_realization ?certificates ?effects (core_parent (coupled_core ?s)) \\<and> coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices ?effects) ?s) = coupled_source ?s \\<and> core_records (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices ?effects) ?s)) = core_records (coupled_core ?s) \\<and> core_published (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices ?effects) ?s)) = core_published (coupled_core ?s) \\<and> core_regulatory (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices ?effects) ?s)) = core_regulatory (coupled_core ?s)"
+    },
+    {
+      "id": "actual-two-source-roots",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.realization_two_roots_are_an_actual_joint_prefix",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "realization_source_second = realized.run_source_coupling (realization_credit_word 17 @ realization_credit_word 23) (initial_source_coupling sample_balances (sample_metadata ACTIVE) conservation_contexts) \\<and> realized.source_coupling_invariant sample_balances realization_source_second"
+    },
+    {
+      "id": "actual-two-root-consumers",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.realization_two_roots_supply_the_actual_consumers",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "core_parent (coupled_core realization_source_second) = realization_parent_second \\<and> record_reference (coupled_core realization_source_second) 0 (sample_binding 17) Confirmed_Decision = Some (linked_certificate 17) \\<and> record_reference (coupled_core realization_source_second) 0 (sample_binding 23) Confirmed_Decision = Some (linked_certificate 23) \\<and> core_published (coupled_core realization_source_second) = {(0, 17), (0, 23)} \\<and> receiver_snapshot (core_regulatory (coupled_core realization_source_second)) = sample_metadata ACTIVE \\<and> credit_history (received_messages (machine_state realization_parent_second)) = [sample_binding 17, sample_binding 23] \\<and> funded_units (machine_state realization_parent_second) ((0, 17), 2, 17, 3) = 5 \\<and> funded_units (machine_state realization_parent_second) ((0, 23), 2, 17, 3) = 5 \\<and> boundary_effects (controlled_endpoint (coupled_source realization_source_second)) = [sample_binding 17, sample_binding 23] \\<and> controlled_returns (coupled_source realization_source_second) = [] \\<and> boundary_units (controlled_endpoint (coupled_source realization_source_second)) (0, 17) = 0"
+    },
+    {
+      "id": "actual-two-root-dispatch",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.actual_two_root_plan_activates_every_source_dispatch",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(\\<forall>root\\<in>set [sample_binding 17, sample_binding 23]. \\<forall>holder\\<in>set [3, 4]. realization_units (core_parent (coupled_core realization_exchange_finished)) root holder = realization_exchange_target root holder) \\<and> coupled_source realization_exchange_finished = coupled_source realization_lineage_seed \\<and> (\\<forall>i<length realization_exchange_effects. realized.source_realization_reply realization_certificates (\\<lambda>_. 0) (realization_exchange_effects ! i) (realized.run_source_coupling (source_realization_words realization_certificates (\\<lambda>_. 0) (take i realization_exchange_effects)) realization_lineage_seed) = Coupling_Client_Reply (Protocol_Response Descendant_Executed))"
+    },
+    {
+      "id": "actual-source-erasure",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.actual_source_realization_preserves_erased_state_and_source_pool",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "erase_lineage_state (core_parent (coupled_core realization_exchange_finished)) = erase_lineage_state even_boundary_seed \\<and> coupled_source realization_exchange_finished = coupled_source realization_source_second \\<and> boundary_effects (controlled_endpoint (coupled_source realization_exchange_finished)) = [sample_binding 17, sample_binding 23] \\<and> controlled_returns (coupled_source realization_exchange_finished) = [] \\<and> boundary_units (controlled_endpoint (coupled_source realization_exchange_finished)) (0, 17) = 0 \\<and> destination_units (machine_state (core_parent (coupled_core realization_exchange_finished))) = destination_units (machine_state even_boundary_seed)"
+    },
+    {
+      "id": "actual-source-event-frame",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.actual_realization_has_no_new_source_credit_or_return",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_units (machine_state (core_parent (coupled_core realization_exchange_finished))) = source_units (machine_state even_boundary_seed) \\<and> source_effects (machine_state (core_parent (coupled_core realization_exchange_finished))) = source_effects (machine_state even_boundary_seed) \\<and> received_messages (machine_state (core_parent (coupled_core realization_exchange_finished))) = received_messages (machine_state even_boundary_seed) \\<and> reservation_at (machine_state (core_parent (coupled_core realization_exchange_finished))) = reservation_at (machine_state even_boundary_seed)"
+    },
+    {
+      "id": "observed-callback",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.observed_callback_history_projection",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> normalize_result normalize_observed_history (source_attestation.execute_observed ?roster ?threshold ?verifies ?command (normalize_observed_history ?state)) = normalize_result normalize_observed_history (source_attestation.execute_observed ?roster ?threshold ?verifies ?command ?state)"
+    },
+    {
+      "id": "sourced-callback",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.sourced_callback_history_projection",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> normalize_result normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies ?request (normalize_sourced_history ?state)) = normalize_result normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies ?request ?state)"
+    },
+    {
+      "id": "observed-finite-word",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.every_observed_call_word_has_the_same_decisions",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> durable_call_protocol.run_calls (operational_call_projection.reduced_execute normalize_observed_history (source_attestation.execute_observed ?roster ?threshold ?verifies)) (operational_call_projection.reduced_environment_execute normalize_observed_history (source_attestation.execute_observed_environment ?roster ?threshold ?verifies)) ?actions (realized.observed_history_projection.normalize_call_machine ?machine) = realized.observed_history_projection.normalize_call_machine (durable_call_protocol.run_calls (source_attestation.execute_observed ?roster ?threshold ?verifies) (source_attestation.execute_observed_environment ?roster ?threshold ?verifies) ?actions ?machine)"
+    },
+    {
+      "id": "sourced-finite-word",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.every_sourced_call_word_has_the_same_decisions",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> durable_call_protocol.run_calls (operational_call_projection.reduced_execute normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies)) (operational_call_projection.reduced_environment_execute normalize_sourced_history (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies)) ?actions (realized.sourced_history_projection.normalize_call_machine ?machine) = realized.sourced_history_projection.normalize_call_machine (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions ?machine)"
+    },
+    {
+      "id": "sourced-completions-1",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.sourced_finite_completions_and_history(1)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> call_completions (durable_call_protocol.run_calls (operational_call_projection.reduced_execute normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies)) (operational_call_projection.reduced_environment_execute normalize_sourced_history (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies)) ?actions (realized.sourced_history_projection.normalize_call_machine ?machine)) = call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions ?machine)"
+    },
+    {
+      "id": "sourced-completions-2",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.sourced_finite_completions_and_history(2)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> call_history (durable_call_protocol.run_calls (operational_call_projection.reduced_execute normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies)) (operational_call_projection.reduced_environment_execute normalize_sourced_history (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies)) ?actions (realized.sourced_history_projection.normalize_call_machine ?machine)) = call_history (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions ?machine)"
+    },
+    {
+      "id": "sourced-completions-3",
+      "file": "Historical_Decision_Projection.thy",
+      "theorem": "Historical_Decision_Projection.source_attestation.sourced_finite_completions_and_history(3)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> call_authority_results (durable_call_protocol.run_calls (operational_call_projection.reduced_execute normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies)) (operational_call_projection.reduced_environment_execute normalize_sourced_history (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies)) ?actions (realized.sourced_history_projection.normalize_call_machine ?machine)) = call_authority_results (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions ?machine)"
+    },
+    {
+      "id": "current-information-iff",
+      "file": "Integration_Boundaries.thy",
+      "theorem": "Integration_Boundaries.source_attestation.current_snapshot_equality_iff_all_actual_cache_probes",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (capture_snapshot (observed_core ?first) = capture_snapshot (observed_core ?second)) = (\\<forall>snapshot. snd (source_attestation.execute_observed ?roster ?threshold ?verifies (current_snapshot_probe ?endpoint) (source_attestation.install_snapshot_probe ?roster ?threshold ?verifies ?endpoint snapshot ?first)) = snd (source_attestation.execute_observed ?roster ?threshold ?verifies (current_snapshot_probe ?endpoint) (source_attestation.install_snapshot_probe ?roster ?threshold ?verifies ?endpoint snapshot ?second)))"
+    },
+    {
+      "id": "raw-journal-iff",
+      "file": "Integration_Boundaries.thy",
+      "theorem": "Integration_Boundaries.source_attestation.actual_raw_journal_equality_iff",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (snd (source_attestation.execute_observed ?roster ?threshold ?verifies Read_Raw_Journal ?first) = snd (source_attestation.execute_observed ?roster ?threshold ?verifies Read_Raw_Journal ?second)) = (machine_journal (core_parent (observed_core ?first)) = machine_journal (core_parent (observed_core ?second)))"
+    },
+    {
+      "id": "raw-source-iff",
+      "file": "Integration_Boundaries.thy",
+      "theorem": "Integration_Boundaries.source_attestation.actual_source_effect_probe_equality_iff",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (source_attestation.source_effect_probe ?roster ?threshold ?verifies ?first = source_attestation.source_effect_probe ?roster ?threshold ?verifies ?second) = (boundary_effects (controlled_endpoint (coupled_source (observation_source ?first))) = boundary_effects (controlled_endpoint (coupled_source (observation_source ?second))))"
+    },
+    {
+      "id": "recovery-information-iff",
+      "file": "Integration_Boundaries.thy",
+      "theorem": "Integration_Boundaries.durable_call_protocol.current_replay_evidence_equality_iff_all_candidate_admissions",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>durable_call_protocol.authority_replay_contract ?execute ?environment_execute ?first_source; durable_call_protocol.authority_replay_contract ?execute ?environment_execute ?second_source\\<rbrakk> \\<Longrightarrow> (call_genesis ?first_source = call_genesis ?second_source \\<and> call_authority_log ?first_source = call_authority_log ?second_source) = (\\<forall>candidate. (durable_call_protocol.checked_current_replay ?execute ?environment_execute ?first_source candidate \\<noteq> None) = (durable_call_protocol.checked_current_replay ?execute ?environment_execute ?second_source candidate \\<noteq> None))"
+    },
+    {
+      "id": "recovered-dispatch-iff",
+      "file": "Integration_Boundaries.thy",
+      "theorem": "Integration_Boundaries.durable_call_protocol.actual_recovered_dispatch_admission_is_exact",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(recovery_source (durable_call_protocol.dispatch_from_recovered_replica ?execute ?call_id ?command ?runtime) \\<noteq> recovery_source ?runtime) = (recovery_connected ?runtime \\<and> recovery_replica ?runtime = Some (call_authority_state (recovery_source ?runtime)))"
+    },
+    {
+      "id": "block-decoder",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.recovery_block_encoding_has_an_actual_decoder",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "recovery_from_blocks (fst (encode_recovery_blocks ?candidate)) (snd (encode_recovery_blocks ?candidate)) = ?candidate"
+    },
+    {
+      "id": "block-recovery",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.durable_call_protocol.a_complete_ordered_partition_recovers_the_actual_source",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>durable_call_protocol.authority_replay_contract ?execute ?environment_execute ?source; concat ?blocks = call_authority_log ?source\\<rbrakk> \\<Longrightarrow> durable_call_protocol.checked_current_replay ?execute ?environment_execute ?source (recovery_from_blocks (call_genesis ?source) ?blocks) = Some (call_authority_state ?source)"
+    },
+    {
+      "id": "block-order-negative",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.durable_call_protocol.changed_block_order_is_rejected_by_the_actual_recovery_check",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "concat ?changed_blocks \\<noteq> call_authority_log ?source \\<Longrightarrow> durable_call_protocol.checked_current_replay ?execute ?environment_execute ?source (recovery_from_blocks ?genesis ?changed_blocks) = None"
+    },
+    {
+      "id": "recovery-word-transport",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.operational_call_projection.restored_runtime_transports_every_future_call_word",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>operational_call_projection ?projection_map ?execute ?environment_execute; durable_call_protocol.authority_replay_contract ?execute ?environment_execute (recovery_source ?runtime); recovery_connected ?runtime; durable_call_protocol.checked_current_replay ?execute ?environment_execute (recovery_source ?runtime) ?candidate = Some ?restored\\<rbrakk> \\<Longrightarrow> durable_call_protocol.run_calls (operational_call_projection.reduced_execute ?projection_map ?execute) (operational_call_projection.reduced_environment_execute ?projection_map ?environment_execute) ?actions (operational_call_projection.normalize_call_machine ?projection_map (recovery_source (durable_call_protocol.dispatch_from_recovered_replica ?execute ?call_id ?command (durable_call_protocol.restore_current_replica ?execute ?environment_execute ?candidate ?runtime)))) = operational_call_projection.normalize_call_machine ?projection_map (durable_call_protocol.run_calls ?execute ?environment_execute ?actions (durable_call_protocol.dispatch_client_call ?execute ?call_id ?command (recovery_source ?runtime)))"
+    },
+    {
+      "id": "recovery-completions-1",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.operational_call_projection.restored_runtime_preserves_all_future_completed_replies(1)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>operational_call_projection ?projection_map ?execute ?environment_execute; durable_call_protocol.authority_replay_contract ?execute ?environment_execute (recovery_source ?runtime); recovery_connected ?runtime; durable_call_protocol.checked_current_replay ?execute ?environment_execute (recovery_source ?runtime) ?candidate = Some ?restored\\<rbrakk> \\<Longrightarrow> call_completions (durable_call_protocol.run_calls (operational_call_projection.reduced_execute ?projection_map ?execute) (operational_call_projection.reduced_environment_execute ?projection_map ?environment_execute) ?actions (operational_call_projection.normalize_call_machine ?projection_map (recovery_source (durable_call_protocol.dispatch_from_recovered_replica ?execute ?call_id ?command (durable_call_protocol.restore_current_replica ?execute ?environment_execute ?candidate ?runtime))))) = call_completions (durable_call_protocol.run_calls ?execute ?environment_execute ?actions (durable_call_protocol.dispatch_client_call ?execute ?call_id ?command (recovery_source ?runtime)))"
+    },
+    {
+      "id": "recovery-completions-2",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.operational_call_projection.restored_runtime_preserves_all_future_completed_replies(2)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>operational_call_projection ?projection_map ?execute ?environment_execute; durable_call_protocol.authority_replay_contract ?execute ?environment_execute (recovery_source ?runtime); recovery_connected ?runtime; durable_call_protocol.checked_current_replay ?execute ?environment_execute (recovery_source ?runtime) ?candidate = Some ?restored\\<rbrakk> \\<Longrightarrow> call_history (durable_call_protocol.run_calls (operational_call_projection.reduced_execute ?projection_map ?execute) (operational_call_projection.reduced_environment_execute ?projection_map ?environment_execute) ?actions (operational_call_projection.normalize_call_machine ?projection_map (recovery_source (durable_call_protocol.dispatch_from_recovered_replica ?execute ?call_id ?command (durable_call_protocol.restore_current_replica ?execute ?environment_execute ?candidate ?runtime))))) = call_history (durable_call_protocol.run_calls ?execute ?environment_execute ?actions (durable_call_protocol.dispatch_client_call ?execute ?call_id ?command (recovery_source ?runtime)))"
+    },
+    {
+      "id": "ordered-composition",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.operational_call_projection.ordered_call_composition_commutes_with_projection",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "operational_call_projection ?projection_map ?execute ?environment_execute \\<Longrightarrow> durable_call_protocol.run_calls (operational_call_projection.reduced_execute ?projection_map ?execute) (operational_call_projection.reduced_environment_execute ?projection_map ?environment_execute) ?second (durable_call_protocol.run_calls (operational_call_projection.reduced_execute ?projection_map ?execute) (operational_call_projection.reduced_environment_execute ?projection_map ?environment_execute) ?first (operational_call_projection.normalize_call_machine ?projection_map ?machine)) = operational_call_projection.normalize_call_machine ?projection_map (durable_call_protocol.run_calls ?execute ?environment_execute (?first @ ?second) ?machine)"
+    },
+    {
+      "id": "ordered-recovery-completions",
+      "file": "Integration_Transport.thy",
+      "theorem": "Integration_Transport.operational_call_projection.recovered_ordered_blocks_transport_finite_completed_calls",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>operational_call_projection ?projection_map ?execute ?environment_execute; durable_call_protocol.authority_replay_contract ?execute ?environment_execute (recovery_source ?runtime); recovery_connected ?runtime; concat ?blocks = call_authority_log (recovery_source ?runtime)\\<rbrakk> \\<Longrightarrow> durable_call_protocol.checked_current_replay ?execute ?environment_execute (recovery_source ?runtime) (recovery_from_blocks (call_genesis (recovery_source ?runtime)) ?blocks) = Some (call_authority_state (recovery_source ?runtime)) \\<and> call_completions (durable_call_protocol.run_calls (operational_call_projection.reduced_execute ?projection_map ?execute) (operational_call_projection.reduced_environment_execute ?projection_map ?environment_execute) (?first @ ?second) (operational_call_projection.normalize_call_machine ?projection_map (recovery_source (durable_call_protocol.dispatch_from_recovered_replica ?execute ?call_id ?command (durable_call_protocol.restore_current_replica ?execute ?environment_execute (recovery_from_blocks (call_genesis (recovery_source ?runtime)) ?blocks) ?runtime))))) = call_completions (durable_call_protocol.run_calls ?execute ?environment_execute ?second (durable_call_protocol.run_calls ?execute ?environment_execute ?first (durable_call_protocol.dispatch_client_call ?execute ?call_id ?command (recovery_source ?runtime))))"
+    },
+    {
+      "id": "nonidentity-history",
+      "file": "Integration_Examples.thy",
+      "theorem": "Integration_Examples.actual_history_projection_changes_a_generated_payload",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "normalize_observed_history (history_example_tick 1) \\<noteq> history_example_tick 1"
+    },
+    {
+      "id": "current-distinction",
+      "file": "Integration_Examples.thy",
+      "theorem": "Integration_Examples.the_actual_current_probe_keeps_the_clock_distinction",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (sample.execute_observed (current_snapshot_probe 0) (sample.install_snapshot_probe 0 (capture_snapshot (observed_core (history_example_tick 1))) (history_example_tick 1))) = Effect_Reply Internal_Completed \\<and> snd (sample.execute_observed (current_snapshot_probe 0) (sample.install_snapshot_probe 0 (capture_snapshot (observed_core (history_example_tick 1))) (history_example_tick 2))) = Observation_Busy"
+    },
+    {
+      "id": "current-guard-removal",
+      "file": "Integration_Examples.thy",
+      "theorem": "Integration_Examples.removing_the_current_cache_guard_changes_the_actual_probe_reply",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (execute_current_without_cache_guard 0 (Client_Protocol 0 0 (Time_Intent 0)) (sample.install_snapshot_probe 0 (capture_snapshot (observed_core (history_example_tick 1))) (history_example_tick 2))) = Effect_Reply Internal_Completed \\<and> snd (sample.execute_observed (current_snapshot_probe 0) (sample.install_snapshot_probe 0 (capture_snapshot (observed_core (history_example_tick 1))) (history_example_tick 2))) = Observation_Busy"
+    },
+    {
+      "id": "original-reachability-invariant",
+      "file": "Historical_Reachability_Boundary.thy",
+      "theorem": "Historical_Reachability_Boundary.source_attestation.every_generated_call_authority_keeps_current_capture",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> current_history_is_capture (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_observed ?roster ?threshold ?verifies) (source_attestation.execute_observed_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_observed_finality ?core))))"
+    },
+    {
+      "id": "projection-not-original-reachable",
+      "file": "Historical_Reachability_Boundary.thy",
+      "theorem": "Historical_Reachability_Boundary.projected_actual_history_is_not_any_original_call_authority",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "normalize_observed_history (history_example_tick 1) \\<noteq> call_authority_state (sample.observed_calls.run_calls ?actions (initial_call_machine (initial_observed_finality ?core)))"
+    },
+    {
+      "id": "reachability-reply-separation",
+      "file": "Historical_Reachability_Boundary.thy",
+      "theorem": "Historical_Reachability_Boundary.original_reachability_and_reply_preservation_are_distinct",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (sample.execute_observed ?command (normalize_observed_history (history_example_tick 1))) = snd (sample.execute_observed ?command (history_example_tick 1)) \\<and> normalize_observed_history (history_example_tick 1) \\<noteq> call_authority_state (sample.observed_calls.run_calls ?actions (initial_call_machine (initial_observed_finality ?core)))"
+    },
+    {
+      "id": "spend-guard-removal",
+      "file": "Funding_Guard_Controls.thy",
+      "theorem": "Funding_Guard_Controls.exact_spend_removal_changes_a_source_generated_execution",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (execute_descendant (funding_control_context\\<lparr>lock_spend_permissions := {}\\<rparr>) funding_control_request (sample_binding 17) 3 4 5 realization_parent_second) = Request_Rejected \\<and> snd (execute_without_exact_spend_guard (funding_control_context\\<lparr>lock_spend_permissions := {}\\<rparr>) funding_control_request (sample_binding 17) 3 4 5 realization_parent_second) = Descendant_Executed \\<and> funded_units (machine_state (fst (execute_without_exact_spend_guard (funding_control_context\\<lparr>lock_spend_permissions := {}\\<rparr>) funding_control_request (sample_binding 17) 3 4 5 realization_parent_second))) ((0, 17), 2, 17, 4) = 5 \\<and> funded_units (machine_state (fst (execute_descendant (funding_control_context\\<lparr>lock_spend_permissions := {}\\<rparr>) funding_control_request (sample_binding 17) 3 4 5 realization_parent_second))) ((0, 17), 2, 17, 4) = 0"
+    },
+    {
+      "id": "actual-source-call-translation",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.source_attestation.translated_finite_word_has_the_exact_joint_source",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_call_ready ?namespace ?next ?machine\\<rbrakk> \\<Longrightarrow> source_call_ready ?namespace (?next + 2 * length ?actions) (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) ?machine) \\<and> observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) ?machine)) = source_attestation.run_source_coupling ?roster ?threshold ?verifies ?actions (observation_source (call_authority_state ?machine))"
+    },
+    {
+      "id": "actual-completed-source-cut",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.source_attestation.every_translated_client_cut_has_its_actual_completed_reply",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_call_ready ?namespace ?next ?machine\\<rbrakk> \\<Longrightarrow> call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next (?prefix @ Coupling_Client ?available ?command # ?suffix)) ?machine) (?namespace, Suc (?next + 2 * length ?prefix)) = Some (coupling_client_observation (snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client ?available ?command) (source_attestation.run_source_coupling ?roster ?threshold ?verifies ?prefix (observation_source (call_authority_state ?machine))))))"
+    },
+    {
+      "id": "generated-source-recovery",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.source_attestation.generated_translation_has_exact_current_recovery",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> durable_call_protocol.checked_current_replay (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))) (current_source_candidate (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts)))) = Some (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))"
+    },
+    {
+      "id": "generated-source-recovery-transport",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.source_attestation.generated_translation_transports_recovery_and_future_replies(1)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> call_completions (durable_call_protocol.run_calls (operational_call_projection.reduced_execute normalize_sourced_history (source_attestation.execute_sourced_request ?roster ?threshold ?verifies)) (operational_call_projection.reduced_environment_execute normalize_sourced_history (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies)) ?future (realized.sourced_history_projection.normalize_call_machine (recovery_source (durable_call_protocol.dispatch_from_recovered_replica (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) ?call_id ?request (durable_call_protocol.restore_current_replica (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (current_source_candidate (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts)))) \\<lparr>recovery_source = durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts)), recovery_replica = None, recovery_connected = True\\<rparr>))))) = call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?future (durable_call_protocol.dispatch_client_call (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) ?call_id ?request (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (coupling_call_word ?namespace ?next ?actions) (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts)))))"
+    },
+    {
+      "id": "actual-durable-funding",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.actual_durable_calls_have_the_constructed_funding",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<forall>root\\<in>set [sample_binding 17, sample_binding 23]. \\<forall>holder\\<in>set [3, 4]. realization_units (core_parent (coupled_core (observation_source (call_authority_state realization_durable_calls)))) root holder = realization_exchange_target root holder"
+    },
+    {
+      "id": "actual-source-to-completion",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.actual_two_root_source_to_completed_descendant_reply",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions realization_durable_calls realization_last_call_id = Some (Sourced_Observation (Effect_Reply (Protocol_Response Descendant_Executed)))"
+    },
+    {
+      "id": "actual-source-completion-after-recovery",
+      "file": "Source_Call_Realization.thy",
+      "theorem": "Source_Call_Realization.recovered_value_flow_retains_its_completed_descendant",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions (realized.sourced_history_projection.reduced.run_calls ?future (realized.sourced_history_projection.normalize_call_machine (recovery_source (realized.sourced_calls.dispatch_from_recovered_replica realization_last_call_id (Endpoint_Request (Execute_Current 0 realization_last_command)) (realized.sourced_calls.restore_current_replica (current_source_candidate realization_durable_calls) realization_call_recovery))))) realization_last_call_id = Some (Sourced_Observation (Effect_Reply (Protocol_Response Descendant_Executed)))"
+    },
+    {
+      "id": "equal-pool-completed-distinction",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.pooled_balances_do_not_determine_the_actual_fresh_completed_probe",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<nexists>decide. \\<forall>prefix\\<in>{realization_call_prefix, realization_call_actions}. decide (destination_units (machine_state (core_parent (coupled_core (observation_source (call_authority_state (funding_comparison_calls prefix))))))) = call_completions (funding_probe_calls prefix) (funding_probe_call_id prefix)"
+    },
+    {
+      "id": "recovered-funding-success",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.recovery_and_projection_preserve_the_actual_funding_separation(1)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions (recovered_funding_probe_calls realization_call_prefix ?future) (funding_probe_call_id realization_call_prefix) = Some (Sourced_Observation (Effect_Reply (Protocol_Response Descendant_Executed)))"
+    },
+    {
+      "id": "recovered-funding-refusal",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.recovery_and_projection_preserve_the_actual_funding_separation(2)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions (recovered_funding_probe_calls realization_call_actions ?future) (funding_probe_call_id realization_call_actions) = Some (Sourced_Observation (Effect_Reply (Protocol_Response Request_Rejected)))"
+    },
+    {
+      "id": "regulatory-policy-distinction",
+      "file": "Regulatory_Composition_Example.thy",
+      "theorem": "Regulatory_Composition_Example.equal_funding_does_not_supply_the_current_active_policy",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funded_units (machine_state (core_parent regulation_published)) = funded_units (machine_state (core_parent regulation_root_ready)) \\<and> destination_units (machine_state (core_parent regulation_published)) = destination_units (machine_state (core_parent regulation_root_ready)) \\<and> snd (regulation_case.invoke_protocol 2 7 0 regulation_ordinary_intent regulation_root_ready) = Protocol_Response Descendant_Executed \\<and> snd (regulation_case.invoke_protocol 2 10 0 regulation_ordinary_intent regulation_published) = Protocol_Response Request_Rejected"
+    },
+    {
+      "id": "actual-regulatory-call-prefix",
+      "file": "Regulatory_Composition_Example.thy",
+      "theorem": "Regulatory_Composition_Example.actual_observed_calls_generate_the_previously_required_cut",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_call_ready 92 22 regulatory_denied_calls \\<and> observed_core (call_authority_state regulatory_denied_calls) = regulation_denied \\<and> call_completions regulatory_denied_calls (92, 21) = Some (Effect_Reply (Protocol_Response Request_Rejected))"
+    },
+    {
+      "id": "actual-regulatory-enforcement",
+      "file": "Regulatory_Composition_Example.thy",
+      "theorem": "Regulatory_Composition_Example.the_same_call_machine_completes_actual_enforcement",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "observed_core (call_authority_state regulatory_enforced_calls) = regulation_enforced \\<and> call_completions regulatory_enforced_calls (92, 23) = Some (Effect_Reply (Protocol_Response Descendant_Executed)) \\<and> historical_snapshots (call_authority_state regulatory_enforced_calls) 12 = Some (capture_snapshot regulation_enforced)"
+    },
+    {
+      "id": "regulatory-projection-nonidentity",
+      "file": "Regulatory_Composition_Example.thy",
+      "theorem": "Regulatory_Composition_Example.actual_generated_regulatory_history_is_changed_by_projection",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "normalize_observed_history (call_authority_state regulatory_enforced_calls) \\<noteq> call_authority_state regulatory_enforced_calls"
+    },
+    {
+      "id": "recovered-regulatory-refusal",
+      "file": "Regulatory_Composition_Example.thy",
+      "theorem": "Regulatory_Composition_Example.both_regulatory_decisions_survive_recovery_projection_and_future_calls(1)",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions (regulatory_recovered_future ?actions) (92, 21) = Some (Effect_Reply (Protocol_Response Request_Rejected))"
+    },
+    {
+      "id": "recovered-regulatory-enforcement",
+      "file": "Regulatory_Composition_Example.thy",
+      "theorem": "Regulatory_Composition_Example.both_regulatory_decisions_survive_recovery_projection_and_future_calls(2)",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions (regulatory_recovered_future ?actions) (92, 23) = Some (Effect_Reply (Protocol_Response Descendant_Executed))"
+    },
+    {
+      "id": "ordered-word-reflection",
+      "file": "Funding_Order_Boundary.thy",
+      "theorem": "Funding_Order_Boundary.successful_canonical_journals_reflect_the_whole_word",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>realization_succeeds ?certificates ?first ?initial; realization_succeeds ?certificates ?second ?initial; \\<forall>e\\<in>set ?first. canonical_realization_effect e; \\<forall>e\\<in>set ?second. canonical_realization_effect e\\<rbrakk> \\<Longrightarrow> (machine_journal (run_realization ?certificates ?first ?initial) = machine_journal (run_realization ?certificates ?second ?initial)) = (?first = ?second)"
+    },
+    {
+      "id": "reverse-actual-word",
+      "file": "Funding_Order_Boundary.thy",
+      "theorem": "Funding_Order_Boundary.reverse_exchange_activates_every_actual_source_consumer",
+      "role": "application",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(\\<forall>root\\<in>set [sample_binding 23, sample_binding 17]. \\<forall>holder\\<in>set [3, 4]. realization_units (core_parent (coupled_core reverse_exchange_source)) root holder = realization_exchange_target root holder) \\<and> coupled_source reverse_exchange_source = coupled_source realization_lineage_seed \\<and> (\\<forall>i<length reverse_exchange_effects. realized.source_realization_reply realization_certificates (\\<lambda>_. 0) (reverse_exchange_effects ! i) (realized.run_source_coupling (source_realization_words realization_certificates (\\<lambda>_. 0) (take i reverse_exchange_effects)) realization_lineage_seed) = Coupling_Client_Reply (Protocol_Response Descendant_Executed))"
+    },
+    {
+      "id": "equal-selected-funding",
+      "file": "Funding_Order_Boundary.thy",
+      "theorem": "Funding_Order_Boundary.the_two_orders_have_the_same_selected_funding",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<forall>root\\<in>set [sample_binding 17, sample_binding 23]. \\<forall>holder\\<in>set [3, 4]. realization_units (core_parent (coupled_core realization_exchange_finished)) root holder = realization_units (core_parent (coupled_core reverse_exchange_source)) root holder"
+    },
+    {
+      "id": "actual-raw-order-distinction",
+      "file": "Funding_Order_Boundary.thy",
+      "theorem": "Funding_Order_Boundary.the_two_successful_orders_have_different_actual_raw_replies",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>core_parent (observed_core ?forward) = core_parent (coupled_core realization_exchange_finished); core_parent (observed_core ?reverse) = core_parent (coupled_core reverse_exchange_source)\\<rbrakk> \\<Longrightarrow> snd (realized.execute_observed Read_Raw_Journal ?forward) \\<noteq> snd (realized.execute_observed Read_Raw_Journal ?reverse)"
+    },
+    {
+      "id": "actual-even-step-invariant",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.actual_even_policy_preserves_every_funding_cell_parity",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "even_amount_spend_policy ?context \\<Longrightarrow> even (funded_units (machine_state (fst (execute_descendant ?context ?request ?root ?sender ?recipient ?amount ?machine))) (?key, ?account)) = even (funded_units (machine_state ?machine) (?key, ?account))"
+    },
+    {
+      "id": "actual-even-word-invariant",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.source_attestation.finite_fixed_even_policy_preserves_funding_parity",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; even_amount_spend_policy ?context; \\<forall>action\\<in>set ?actions. fixed_descendant_context ?context action\\<rbrakk> \\<Longrightarrow> even (funded_units (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions ?machine)) (?key, ?account)) = even (funded_units (machine_state ?machine) (?key, ?account))"
+    },
+    {
+      "id": "nonempty-even-policy",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_even_policy_is_nonempty_and_bidirectional_for_both_roots(1)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(0, (0, 17), 3, 4, 2, Ordinary_Transfer_Effect) \\<in> lock_spend_permissions even_boundary_context"
+    },
+    {
+      "id": "even-policy-actual-success",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.one_unit_is_rejected_but_two_units_really_execute(2)",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (execute_descendant even_boundary_context (even_boundary_request 2) (sample_binding 17) 4 3 2 even_boundary_seed) = Descendant_Executed"
+    },
+    {
+      "id": "fixed-even-policy-no-go",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.no_actual_finite_word_with_the_fixed_even_policy_realizes_the_target",
+      "role": "boundary-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "\\<forall>action\\<in>set ?actions. fixed_descendant_context even_boundary_context action \\<Longrightarrow> \\<not> (\\<forall>root\\<in>set [sample_binding 17, sample_binding 23]. \\<forall>holder\\<in>set [3, 4]. realization_units (realized.run_reservations sample_balances ?actions even_boundary_seed) root holder = even_boundary_target root holder)"
+    },
+    {
+      "id": "even-policy-guard-removal",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_same_guard_removal_changes_the_actual_cell_parity",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funded_units (machine_state (fst (execute_without_exact_spend_guard even_boundary_context (even_boundary_request 1) (sample_binding 17) 4 3 1 even_boundary_seed))) ((0, 17), 2, 17, 3) = 1"
+    },
+    {
+      "id": "two-forbidden-moves-complete",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.both_forbidden_unit_moves_execute_under_the_same_single_guard_removal(2)",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd even_boundary_second_mutant = Descendant_Executed"
+    },
+    {
+      "id": "full-policy-counter-target",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_two_actual_mutant_moves_realize_the_parity_obstructed_table",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<forall>root\\<in>set [sample_binding 17, sample_binding 23]. \\<forall>holder\\<in>set [3, 4]. realization_units (fst even_boundary_second_mutant) root holder = even_boundary_target root holder"
+    },
+    {
+      "id": "full-policy-counter-pooled-frame",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_two_actual_mutant_moves_restore_pooled_balances",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "destination_units (machine_state (fst even_boundary_second_mutant)) = destination_units (machine_state even_boundary_seed)"
+    },
+    {
+      "id": "even-target-rows",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_parity_obstructed_target_has_the_same_rows_and_actual_columns(1)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<forall>root\\<in>set [sample_binding 17, sample_binding 23]. sum_list (map (even_boundary_target root) [3, 4]) = sum_list (map (realization_units even_boundary_seed root) [3, 4])"
+    },
+    {
+      "id": "even-target-actual-columns",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_parity_obstructed_target_has_the_same_rows_and_actual_columns(2)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<forall>account. realization_account_total [sample_binding 17, sample_binding 23] [3, 4] even_boundary_target account = realization_account_total [sample_binding 17, sample_binding 23] [3, 4] (realization_units even_boundary_seed) account"
+    },
+    {
+      "id": "even-second-original-refusal",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_original_policy_rejects_the_second_unit_move_too",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (execute_descendant even_boundary_context even_boundary_second_request (sample_binding 23) 3 4 1 (fst even_boundary_first_mutant)) = Request_Rejected"
+    },
+    {
+      "id": "even-mutant-source-units-frame",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_two_actual_mutant_moves_do_not_create_source_effects_or_credits(1)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_units (machine_state (fst even_boundary_second_mutant)) = source_units (machine_state even_boundary_seed)"
+    },
+    {
+      "id": "even-mutant-source-effects-frame",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_two_actual_mutant_moves_do_not_create_source_effects_or_credits(2)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_effects (machine_state (fst even_boundary_second_mutant)) = source_effects (machine_state even_boundary_seed)"
+    },
+    {
+      "id": "even-mutant-credit-frame",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_two_actual_mutant_moves_do_not_create_source_effects_or_credits(3)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "received_messages (machine_state (fst even_boundary_second_mutant)) = received_messages (machine_state even_boundary_seed)"
+    },
+    {
+      "id": "even-bidirectional-policy-2",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_even_policy_is_nonempty_and_bidirectional_for_both_roots(2)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(0, (0, 17), 4, 3, 2, Ordinary_Transfer_Effect) \\<in> lock_spend_permissions even_boundary_context"
+    },
+    {
+      "id": "even-bidirectional-policy-3",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_even_policy_is_nonempty_and_bidirectional_for_both_roots(3)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(0, (0, 23), 3, 4, 2, Ordinary_Transfer_Effect) \\<in> lock_spend_permissions even_boundary_context"
+    },
+    {
+      "id": "even-bidirectional-policy-4",
+      "file": "Even_Amount_Policy_Boundary.thy",
+      "theorem": "Even_Amount_Policy_Boundary.the_even_policy_is_nonempty_and_bidirectional_for_both_roots(4)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(0, (0, 23), 4, 3, 2, Ordinary_Transfer_Effect) \\<in> lock_spend_permissions even_boundary_context"
+    },
+    {
+      "id": "same-revision-distinct-inputs",
+      "file": "Integration_Examples.thy",
+      "theorem": "Integration_Examples.distinct_clock_inputs_have_the_same_revision",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "core_epoch (observed_core (history_example_tick 1)) = core_epoch (observed_core (history_example_tick 2))"
+    },
+    {
+      "id": "empty-roots-arithmetic",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.empty_roots_are_admissible",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funding_table_admissible [] ?holders ?m ?target"
+    },
+    {
+      "id": "empty-holders-arithmetic",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.empty_holders_are_admissible",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funding_table_admissible ?roots [] ?m ?target"
+    },
+    {
+      "id": "empty-roots-execution",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.empty_roots_have_the_empty_actual_image",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funding_execution_image [] ?holders ?certificates ?m ?target []"
+    },
+    {
+      "id": "empty-holders-execution",
+      "file": "Funding_Characterization.thy",
+      "theorem": "Funding_Characterization.empty_holders_have_the_empty_actual_image",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funding_execution_image ?roots [] ?certificates ?m ?target []"
+    },
+    {
+      "id": "seed-probe-fresh",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.the_two_probe_identifiers_are_fresh_at_their_own_cuts(1)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_call_ready 91 (2 * length (realization_call_prefix @ [funding_separation_environment])) (funding_comparison_calls (realization_call_prefix @ [funding_separation_environment]))"
+    },
+    {
+      "id": "exchange-probe-fresh",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.the_two_probe_identifiers_are_fresh_at_their_own_cuts(2)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_call_ready 91 (2 * length (realization_call_actions @ [funding_separation_environment])) (funding_comparison_calls (realization_call_actions @ [funding_separation_environment]))"
+    },
+    {
+      "id": "probe-identifier-prefix-length",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.probe_identifier_difference_records_only_the_extra_prefix",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funding_probe_call_id realization_call_actions = (91, snd (funding_probe_call_id realization_call_prefix) + 8)"
+    },
+    {
+      "id": "each-probe-exact-recovery",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.each_generated_probe_has_exact_current_recovery",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "realized.sourced_calls.checked_current_replay (funding_probe_calls ?prefix) (current_source_candidate (funding_probe_calls ?prefix)) = Some (call_authority_state (funding_probe_calls ?prefix))"
+    },
+    {
+      "id": "each-recovery-same-machine",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.each_recovery_keeps_the_original_generated_machine(1)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "recovery_source (realized.sourced_calls.restore_current_replica (current_source_candidate (funding_probe_calls ?prefix)) (funding_probe_runtime ?prefix)) = funding_probe_calls ?prefix"
+    },
+    {
+      "id": "each-recovery-actual-replica",
+      "file": "Funding_Completion_Separation.thy",
+      "theorem": "Funding_Completion_Separation.each_recovery_keeps_the_original_generated_machine(2)",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "recovery_replica (realized.sourced_calls.restore_current_replica (current_source_candidate (funding_probe_calls ?prefix)) (funding_probe_runtime ?prefix)) = Some (call_authority_state (funding_probe_calls ?prefix))"
+    },
+    {
+      "id": "finite-source-financial-frame",
+      "file": "Source_Realization_Link.thy",
+      "theorem": "Source_Realization_Link.source_attestation.finite_source_realization_preserves_the_exact_financial_projection",
+      "role": "supporting-endpoint",
+      "oracle_dependencies": 0,
+      "premise_count": 10,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (core_parent (coupled_core ?s)); \\<forall>root\\<in>set ?roots. root \\<in> set (credit_history (received_messages (machine_state (core_parent (coupled_core ?s))))); distinct (map binding_key ?roots); distinct ?holders; \\<forall>root\\<in>set ?roots. sum_list (map (?target root) ?holders) = sum_list (map (realization_units (core_parent (coupled_core ?s)) root) ?holders); \\<forall>account. realization_account_total ?roots ?holders ?target account = realization_account_total ?roots ?holders (realization_units (core_parent (coupled_core ?s))) account; \\<forall>root\\<in>set ?roots. record_reference (coupled_core ?s) (?indices root) root Confirmed_Decision \\<noteq> None; \\<forall>root\\<in>set ?roots. binding_key root \\<in> core_published (coupled_core ?s); \\<forall>root\\<in>set ?roots. get_reg_state (receiver_snapshot (core_regulatory (coupled_core ?s))) (binding_destination root) (binding_asset root) = Some ACTIVE\\<rbrakk> \\<Longrightarrow> core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s)) = source_attestation.run_reservations ?roster ?threshold ?verifies ?balances (realization_actions ?certificates (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) (core_parent (coupled_core ?s)) \\<and> erase_lineage_state (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s))) = erase_lineage_state (core_parent (coupled_core ?s)) \\<and> destination_units (machine_state (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s)))) = destination_units (machine_state (core_parent (coupled_core ?s))) \\<and> machine_journal (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s))) = machine_journal (core_parent (coupled_core ?s)) @ map Descendant_Event (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target) \\<and> coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s) = coupled_source ?s \\<and> source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (source_realization_words ?certificates ?indices (realization_plan ?roots ?holders (core_parent (coupled_core ?s)) ?target)) ?s)))"
+    }
+  ]
+}
