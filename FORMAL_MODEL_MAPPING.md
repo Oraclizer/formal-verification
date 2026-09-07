@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
 **Version:** 0.9.0
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-08
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -16,6 +16,7 @@ This document tracks the correspondence between formally verified model elements
 
 This mapping covers:
 
+- **Evidence Binding Composition**: finite funding-margin characterization through actual permitted operations, source-to-call execution, historical reply projection, exact recovery continuation, and financial/regulatory applications with policy and observation boundaries
 - **Evidence Atomic Binding**: source-qualified terminal records and actual financial/regulatory consumers, source allocation, completed current/history/raw responses, guarded recovery and explicit progress conditions
 
 - **Preemptive Lock Correctness**: complete-footprint reservations, worker leases, source/destination/return uniqueness, evidence-based settlement, rooted funding, timeout information boundaries and complete-journal recovery
@@ -53,6 +54,50 @@ The current proofs do **not** establish:
 - An executable recovery, queue, priority, or BFT algorithm for convergence; `oss_realize` uses existential choice and ignores its event when selecting recovery.
 - Network-level properties such as message loss, partial synchrony, or dynamic topology changes; these remain unverified external/refinement obligations.
 - Properties of unverified external components: P2P networking, external cryptographic libraries (BLS), UI, database layer.
+
+---
+
+# Evidence Binding Composition
+
+The [session](Evidence_Binding_Composition/README.md) extends Evidence Atomic
+Binding through its existing operations. Its
+[source guide](Evidence_Binding_Composition/README.md#source-guide) identifies
+the fourteen theories, and its [model boundary](Evidence_Binding_Composition/MODEL_BOUNDARY.md)
+states the assumptions and excluded interpretations. The
+[claim ledger](Evidence_Binding_Composition/claims.json) records the exact
+theorem statements. This is a model-level connection, with no implementation
+refinement credit added to the parent obligations.
+
+The allocation iff assumes the parent reservation contract, already credited
+roots with distinct immutable keys, and finite distinct holders. It compares
+selected root totals and complete destination-account totals. The construction
+supplies current permissions for its chosen positive ordinary transfers;
+authentic current policy supply remains an implementation obligation.
+
+| Formal result | Actual formal consumer | Remaining product correspondence |
+|---|---|---|
+| Arithmetic funding margins iff a supported successful finite allocation image exists | `realization_plan`, `execute_descendant` and the actual parent reservation execution; [Funding_Characterization](Evidence_Binding_Composition/Funding_Characterization.thy) | Physical holdings-to-root mapping, current permission supply and the intended supported transfer language; no optimal-plan or arbitrary fixed-policy guarantee |
+| Source-qualified realization reaches fresh completed client replies | Actual context installation, confirmed terminal reference, primary marker, sourced cache refresh and durable call program; [Source_Call_Realization](Evidence_Binding_Composition/Source_Call_Realization.thy) | Authentic context/source inputs, physical cache check-to-use behavior, invocation identity and durable effect/result storage |
+| Historical normalization preserves replies and normalized updates for every finite modeled call word | Actual observed/sourced callbacks and their durable invocation, result, completion and history records; [Historical_Decision_Projection](Evidence_Binding_Composition/Historical_Decision_Projection.thy) | Correspondence to each deployed API, raw getter and event; the reduced state is not automatically an original reachable state or a full recovery replica |
+| Exact current recovery followed by projected continuation preserves completed decisions | Original genesis/full-entry validation, full-replica comparison and dispatch on the existing machine; [Integration_Transport](Evidence_Binding_Composition/Integration_Transport.thy) | Authenticity, completeness, currentness and persistence of recovery inputs; structured HOL blocks do not establish byte encoding of function-valued maps |
+| Equal pooled balances give different actual fresh funding decisions; freeze rejects ordinary use while permitting authorized enforcement | Source-generated monetary probes and a separate generated observed regulatory call sequence; [financial application](Evidence_Binding_Composition/Funding_Completion_Separation.thy) and [regulatory application](Evidence_Binding_Composition/Regulatory_Composition_Example.thy) | Actual token/adapter admission, regulatory fact production and durable retention of successful and failed responses |
+| Current snapshots, raw order and fixed amount-sensitive policy impose observable limits | Full-cache probes, raw journal/source-effect readers, an even-amount parity invariant and exact-spend-guard removal controls | No unordered whole-API merge, globally minimal representation or unrestricted fixed-policy reachability follows; controls concern formal functions, not compiled mutations |
+
+The financial application begins at the actual sourced genesis, produces two
+credited roots, realizes a new allocation and completes a later probe. The
+regulatory application independently generates monetary credit, freeze,
+ordinary rejection and enforcement on one observed call machine. Both retain
+their existing completion records through the original recovery checks and
+finite projected continuations. A prior completed reply and a fresh request
+under current policy remain different operations.
+
+Message authentication, reservation accounting, terminal consumers, the
+durable-call kernel and the credited-root funding threshold are inherited
+results. The new connection does not replace the parent's source, policy,
+persistence or [compiled-consumer obligations](Evidence_Atomic_Binding/product-obligations.json).
+Raw observations and source classes remain available. Distributed terminal
+agreement, physical domain application and implementation refinement remain
+outside the established model result.
 
 ---
 
@@ -583,6 +628,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| Unreleased | 2026-09-08 | Added Evidence Binding Composition: finite allocation characterization, actual source/fresh-call/recovery connections, historical reply projection and financial/regulatory applications. Existing parent statements and implementation boundaries are preserved. |
 | 0.9.0 | 2026-09-07 | Added evidence-qualified terminal consumers, joint source accounting, completed observation/recovery contracts and explicit implementation obligations. Existing parent meanings are unchanged. |
 | 0.7.0 | 2026-09-06 | Added authenticated message execution results, exact formal consumers and explicitly unverified implementation obligations. Existing CDSP/RAC meanings are unchanged. |
 | 0.6.1 | 2026-08-13 | Added only an out-of-scope pointer to an independent research companion. This does not expand Oraclizer product coverage or add an implementation/refinement mapping. |

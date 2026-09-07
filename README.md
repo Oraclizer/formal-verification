@@ -20,8 +20,10 @@
   [Mapping](FORMAL_MODEL_MAPPING.md)
 </div>
 
-> **Mechanized assurance.** The repository contains six Isabelle/HOL
-> sessions. CDSP, RAC, Cross-Chain Message Integrity, Preemptive Lock Correctness and Evidence Atomic Binding form a dependency chain. `Protected_Behavior_Obstructions` is an
+> **Mechanized assurance.** The repository contains seven Isabelle/HOL
+> sessions. CDSP, RAC, Cross-Chain Message Integrity, Preemptive Lock Correctness,
+> Evidence Atomic Binding and Evidence Binding Composition form a dependency chain.
+> `Protected_Behavior_Obstructions` is an
 > independent HOL companion to an external Lean development: its rows are
 > graded `PARTIAL`, never `SAME` (both grades are defined in
 > [`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)).
@@ -43,11 +45,12 @@ deployment, audit, legal opinion, or model-to-code refinement.
 
 ## Formal artifact catalog
 
-This catalog lists the formal-verification artifacts released from this
+This catalog lists the formal-verification artifacts in this
 repository. Each row is an independently buildable Isabelle session and a
 separate review and release unit. **Source** opens the authoritative session
 `ROOT`; **PDF** is the session-named reading copy; and **Manifest** records the
-source and PDF hashes together with the document-build identity.
+source and PDF hashes together with the document-build identity. A **Source
+manifest** instead records the tracked proof and documentation inputs.
 
 | Artifact | Role | Verification focus | Entry points |
 | --- | --- | --- | --- |
@@ -56,6 +59,7 @@ source and PDF hashes together with the document-build identity.
 | **Cross-Chain Message Integrity** | Extension | Authenticated source binding, destination-credit uniqueness, checked representations and regulatory consumers | [Source](Cross_Chain_Message_Integrity/ROOT) · [Scope and build](Cross_Chain_Message_Integrity/README.md) · [Claims](Cross_Chain_Message_Integrity/claims.json) · [Source manifest](Cross_Chain_Message_Integrity/source-manifest.json) |
 | **Preemptive Lock Correctness** | Extension | Asset reservations, source/destination once, evidence-based release, rooted funding, timeout boundaries and journal recovery | [Source](Preemptive_Lock_Correctness/ROOT) · [Scope and build](Preemptive_Lock_Correctness/README.md) · [Claims](Preemptive_Lock_Correctness/claims.json) · [Source manifest](Preemptive_Lock_Correctness/source-manifest.json) |
 | **Evidence Atomic Binding** | Extension | Source-qualified terminal records, guarded financial/regulatory effects, completed observations and checked recovery | [Source](Evidence_Atomic_Binding/ROOT) · [Scope and build](Evidence_Atomic_Binding/README.md) · [Claims](Evidence_Atomic_Binding/claims.json) · [Source manifest](Evidence_Atomic_Binding/source-manifest.json) |
+| **Evidence Binding Composition** | Extension | Finite allocation characterization, actual source-to-call execution, historical projection and recovery of completed decisions | [Source](Evidence_Binding_Composition/ROOT) · [Scope and build](Evidence_Binding_Composition/README.md) · [Claims](Evidence_Binding_Composition/claims.json) · [Source manifest](Evidence_Binding_Composition/source-manifest.json) |
 | **Protected Behavior Obstructions** | Partial companion | Set/profile consequences, explicit stochastic assumptions, set-level morphism laws, preorder facts, and bounded controls | [Source](Protected_Behavior_Obstructions/ROOT) · [Scope](Protected_Behavior_Obstructions/README.md) · [Cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md) · PDF/manifest not produced (`document = false`) |
 
 **Role taxonomy**
@@ -78,7 +82,10 @@ Its technical companion is likewise reproducible from source. Evidence Atomic
 Binding extends reservation correctness with separate source and terminal
 authority, actual source/parent accounting, completed current and historical
 responses, and guarded recovery. Its technical guide is built from the
-session document sources; no generated PDF is tracked.
+session document sources; no generated PDF is tracked. Evidence Binding
+Composition extends that session with finite allocation through its actual
+consumers and preservation of modeled replies through historical projection
+and recovery. Its technical proof document also builds from source.
 
 An earlier version of CDSP was submitted to the Archive of Formal Proofs on
 2026-03-25 but was not accepted as an AFP entry. None of these sessions is an
@@ -100,6 +107,7 @@ submission, review, and acceptance are separate states.
 | Cross-chain message integrity | Full payload binding, source-key credit bound, exact local-marker criterion, normal/bypass equivalence, contextual summary iff and concrete consumers | External source/crypto/current-context assumptions; no full financial recovery or runtime refinement |
 | Preemptive lock correctness | Complete-footprint ownership, stale-version protection, source/credit/return uniqueness, exclusive settlement, source-pool conservation and rooted continuation/recovery | Atomic local commits, stable-source/current-context assumptions; conditional cleanup bounds, no runtime refinement or distributed observational atomicity |
 | Evidence atomic binding | Immutable terminal cores, source/credit/return exclusion and allocation, actual callback response provenance, fresh-call revision order, product words and current-source recovery | Conditional source, authority and durability contracts; no whole-runtime refinement, all-API linearizability or unconditional termination |
+| Evidence binding composition | Finite allocation iff with supplied current contexts; actual source and fresh completed calls; historical projection over finite call words; recovery and financial/regulatory applications | Credited distinct roots and finite holders; current policy and durable-source obligations; no arbitrary fixed-policy realization, global minimal representation or implementation refinement |
 | Protected behavior obstructions | nested profile algebra, assumption-transparent T2/T3/T4/T5 consequences, set-level morphism laws, preorder facts, and direct finite witnesses | `PARTIAL`; no kernel-derived first-hit law, scheduler correspondence, quantitative pushforward, or `SAME` credit |
 
 Every row is shorthand. The Oraclizer theorem-to-target map, assumptions, open
@@ -108,6 +116,14 @@ obligations, and proposed implementation correspondences are in
 protected-obstruction companion has no product target; its detailed
 correspondence is in
 [`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md).
+
+The composition [source guide](Evidence_Binding_Composition/README.md#source-guide)
+links the allocation, call and recovery theorems to their controls. Equal pooled
+balances can produce different fresh completed funding replies; a nonempty
+even-amount policy can block an arithmetically admissible target; and successful
+reorderings can remain distinguishable through raw journals. Its
+[model boundary](Evidence_Binding_Composition/MODEL_BOUNDARY.md) states the
+consumer classes and separates those results from deployed behavior.
 
 ## Theory architecture
 
@@ -129,14 +145,16 @@ Correctness adds a further child: reservations and worker leases feed source
 control, evidence-based settlement, rooted funding and complete-journal recovery.
 Evidence Atomic Binding adds controlled source outcomes, terminal records and
 guarded consumers, then connects actual callback executions to completed
-responses and independent financial/regulatory observations. The diagram
+responses and independent financial/regulatory observations. Evidence Binding
+Composition adds finite allocation, historical-state projection and actual
+call/recovery applications without changing those parent operations. The diagram
 continues to show the CDSP/RAC foundation only.
 
 ## Assurance boundary
 
 ### Established within the models
 
-- all six declared sessions and their registered theories build;
+- all seven declared sessions and their registered theories build;
 - the theory sources contain no `sorry` or `oops`;
 - named results follow from the definitions, locales, and assumptions stated
   in the theories;
@@ -181,7 +199,7 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Check all six sessions from the repository root:
+Check all seven sessions from the repository root:
 
 ```bash
 isabelle build \
@@ -189,7 +207,8 @@ isabelle build \
   -d /path/to/afp/thys \
   Cross_Domain_State_Preservation Regulatory_Action_Composition \
   Cross_Chain_Message_Integrity Preemptive_Lock_Correctness \
-  Evidence_Atomic_Binding Protected_Behavior_Obstructions
+  Evidence_Atomic_Binding Evidence_Binding_Composition \
+  Protected_Behavior_Obstructions
 ```
 
 Expected completion includes:
@@ -200,6 +219,7 @@ Finished Regulatory_Action_Composition
 Finished Cross_Chain_Message_Integrity
 Finished Preemptive_Lock_Correctness
 Finished Evidence_Atomic_Binding
+Finished Evidence_Binding_Composition
 Finished Protected_Behavior_Obstructions
 ```
 
@@ -222,17 +242,33 @@ Generic `document.pdf` files are not public release artifacts.
 The [message-integrity build instructions](Cross_Chain_Message_Integrity/README.md#reproduction)
 provide the dated AFP archive and digest used in Continuous Integration.
 
+To check the composition session and its source inputs directly:
+
+```bash
+node Evidence_Binding_Composition/verify-source.mjs
+isabelle build -b -j 1 -o threads=1 -o parallel_proofs=0 \
+  -d /path/to/ADS_Functor -d . Evidence_Binding_Composition
+```
+
+Here `/path/to/ADS_Functor` is the extracted entry directory containing `ROOT`.
+The composition session sets `document = false`; its separate technical
+document uses `pdflatex` and `bibtex`:
+
+```bash
+node Evidence_Binding_Composition/build-document.mjs output/Evidence_Binding_Composition
+```
+
 An independent assurance claim should identify the exact commit, Isabelle and
 AFP revisions, command, and resulting session log.
 
 ## Repository map
 
-Every released artifact follows one directory convention, so the map stays
+Every session follows one directory convention, so the map stays
 this short as the catalog grows:
 
 | Path | Purpose |
 | --- | --- |
-| `ROOTS` | Registers every released session |
+| `ROOTS` | Registers every session |
 | `<Session>/` | One directory per catalog artifact: the authoritative `*.thy` theories and the session `ROOT`. Sessions that produce a reading copy add `document/` (LaTeX source) and `release/` (session-named PDF and manifest); session-scoped docs such as a scope README or a cross-prover mapping live inside the same directory |
 | `docs/assets/` | README banner and the theory-architecture diagram, with the diagram's Mermaid source |
 | `FORMAL_MODEL_MAPPING.md` | Oraclizer theorem-to-target mapping, assumptions, gaps, and proposed tests |

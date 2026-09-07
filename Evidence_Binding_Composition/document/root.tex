@@ -1,0 +1,510 @@
+% SPDX-License-Identifier: BSD-3-Clause
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm,headheight=14pt]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,array,tabularx,longtable}
+\usepackage{microtype,enumitem,fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\urlstyle{tt}
+\newcommand{\code}[1]{\nolinkurl{#1}}
+\newcommand{\source}[1]{\code{#1.thy}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\cat}{\mathbin{+\!+}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=2pt,topsep=3pt,parsep=0pt}
+\renewcommand{\arraystretch}{1.13}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Evidence Binding Composition}
+\fancyhead[R]{\small Technical proof document}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\raggedbottom
+\title{Evidence Binding Composition\\[2mm]\large Finite Allocations, Observable Decisions, and Recovery}
+\author{Oraclizer}
+\date{8 September 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+\begin{abstract}
+This technical note describes the Isabelle/HOL session
+\code{Evidence_Binding_Composition}. Finite funding tables are connected to
+permitted source-aware operations, fresh completed calls, and recovery of the
+same recorded executions. A projection of historical snapshots preserves the
+declared call languages, while concrete observers delimit information that
+cannot be erased. Financial and regulatory applications consume these
+connections. The results concern a conditional mathematical model; physical
+source control, current policy supply, durable storage, distributed agreement
+and compiled consumers remain implementation obligations.
+\end{abstract}
+
+\section{Scope and inherited operations}
+The session extends \code{Evidence_Atomic_Binding}, which in turn uses the
+existing reservation, message and regulatory models. Throughout this note,
+an \emph{actual operation} is an existing HOL transition or reader invoked
+by a constructed execution. The word does not assert a physical deployment.
+The source statements supply the exact types and assumptions; the propositions
+below present their mathematical content in compact notation.
+
+The parent provides immutable source bindings, source-attestation premises,
+credited-root funding, current-use checks, confirmed terminal references,
+primary publication, and the durable-call and recovery functions. In
+particular, it already relates a credited root's holder funding to the replies
+of its descendant consumer over common current contexts and requests. It also
+already checks candidate recovery data against the complete current source.
+
+The child supplies a finite allocation characterization and connects the
+resulting operations to complete call executions. It constructs a historical
+projection, proves its primitive update laws, and carries those laws through
+the original recovery checks. Two actual applications and several separating
+executions show where the connections apply and where they stop.
+
+\paragraph{Notation.}
+For a reservation machine $m$, write $J(m)$ for its journal and $P_m(a)$ for
+the pooled destination balance of account $a$. A root $r$ has immutable key
+$k(r)$ and holder account $a(r,h)$, which includes destination, asset and holder.
+Write $F_m(r,h)$ for funding attributed to $k(r)$ at $a(r,h)$. List
+concatenation is $u\cat v$; all execution words in this note are finite.
+
+Fixed-margin integer tables and their moves are established mathematical
+objects~\cite{diaconisSturmfels1998}. Explicit state mappings and local proof
+obligations for behavioral correspondence are also standard~\cite{abadiLamport1991}.
+The contribution here concerns their consumption by these specified protocol
+operations, not a new general transportation or refinement-mapping theory.
+
+\clearpage
+\section{Finite funding margins and constructive realization}
+Fix finite lists $R$ of roots and $H$ of holders. Root keys in $R$ are distinct,
+holders in $H$ are distinct, every selected root is already credited, and $m$
+satisfies the parent reservation contract. A target $T:R\times H\to\Nat$
+specifies the selected funding cells. For any complete account $a$, define
+\[
+ C_T(a)=\sum_{r\in R}\ \sum_{\substack{h\in H\\a(r,h)=a}} T(r,h).
+\]
+This compares actual accounts. Identical holder numbers on different assets
+or destinations do not form one column. Define arithmetic admissibility by
+\begin{align}
+ \sum_{h\in H}T(r,h)&=\sum_{h\in H}F_m(r,h) &&(r\in R),\label{eq:rows}\\
+ C_T(a)&=C_{F_m}(a) &&(\text{every account }a).\label{eq:accounts}
+\end{align}
+Neither condition calls the execution function or asks whether the target is
+safe. Successful execution appears on the other side of the characterization.
+
+\begin{theorem}[Finite allocation characterization]
+Under the assumptions above, equations~\eqref{eq:rows}--\eqref{eq:accounts}
+hold if and only if a finite supported word of positive canonical ordinary
+descendant effects succeeds, reaches $T$ on the selected cells, and preserves
+the final pooled balances and the non-lineage reservation state.
+\end{theorem}
+
+The exact statement in \source{Funding_Characterization} is:
+\par\code{finite_funding_admissibility_iff_realization}.\par
+``Supported'' restricts every effect's
+root, sender and recipient to $R$ and $H$. Canonical effects use the constructor
+in \source{Funding_Realization}; the theorem does not characterize arbitrary
+operation grammars or arbitrary fixed permission policies.
+
+\paragraph{Forward proof.}
+For each nonempty holder list, choose its first holder as an anchor. Move each
+other holder's existing root funding to the anchor, omitting zero quantities.
+Then distribute each non-anchor target amount. Equation~\eqref{eq:rows}
+ensures that the remaining anchor amount is its target. At every positive move,
+the construction supplies the existing current authorization, exact spend
+permission and ACTIVE metadata. The amount is bounded by current root funding;
+the parent accounting contract supplies the pooled-balance bound as well.
+
+Distinct root keys preserve the rows already processed, even when roots share
+destination accounts. Funding outside the selected cells remains unchanged.
+The account-total condition, together with the invariant pooled residual,
+therefore restores every final pooled balance. Empty root or holder selections
+use the empty word.
+
+\paragraph{Reverse proof.}
+An accepted effect subtracts and adds the same quantity within one selected
+root, so its row sum is unchanged. The supported word preserves outside
+funding and the residual $P_m(a)-C_{F_m}(a)$. Equality of final pooled balances
+then forces~\eqref{eq:accounts}. The target equality forces~\eqref{eq:rows}.
+
+\paragraph{What is retained.}
+The non-lineage comparison is \code{erase_lineage_state}: it clears the funding
+map and descendant-history field from reservation state. It does not remove
+the real history. For the constructed effect list $w$,
+\[
+ J(m')=J(m)\cat\operatorname{map}(\mathrm{DescendantEvent},w).
+\]
+No new source debit, credit or return is introduced. Intermediate pooled
+balances may change. No minimal number of transfers or optimal cost is claimed.
+
+\clearpage
+\section{An explicit historical projection and its update law}
+A historical snapshot stores more than its query functions read. The map
+$q$ changes only six fields inside historical snapshots' financial records:
+
+\begin{center}
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+Field & Normalized value\\
+\midrule
+\code{reservation_at} & No reservation at any key\\
+\code{asset_version} & Zero at every asset\\
+\code{issued_certificates} & Empty list\\
+\code{received_messages} & Empty message state\\
+\code{lawful_descendants} & Empty list\\
+\code{reservation_clock} & Zero\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The current core and endpoint caches are untouched. Historical balances,
+application values, owner information, source-effect lists, regulatory state,
+terminal records, publication markers and snapshot revisions are retained.
+Actual source state and raw journals are retained too. Thus the projection is
+not an instruction to delete a production record.
+
+For a callback $e$, let $e(x,s)=(s',r)$, with input $x$ and reply $r$.
+\source{Historical_Decision_Projection} proves idempotence and the equations
+\begin{align}
+ q(q(s))&=q(s),\label{eq:idem}\\
+ \operatorname{snd}(e(x,q(s)))&=\operatorname{snd}(e(x,s)),\label{eq:reply}\\
+ q(\operatorname{fst}(e(x,q(s))))&=q(\operatorname{fst}(e(x,s))).\label{eq:update}
+\end{align}
+The reduced callback runs the original function and normalizes its result:
+\[
+\widehat e(x,s)=(q(\operatorname{fst}(e(x,s))),\operatorname{snd}(e(x,s))).
+\]
+Its data does not contain a table of future answers or a precomputed safety
+decision.
+
+\paragraph{Primitive proof obligations.}
+The stored query reader uses balances, application values, regulatory state and
+terminal records. Readiness additionally uses source effects, publication and
+owner information. None reads the six normalized fields. Case analysis gives
+their value and readiness equalities. Current-cache validation and current
+authorization read the unchanged current state. Storing a new core result
+commutes with normalizing the historical map after that insertion.
+
+These facts cover every observed command and environment constructor. The
+sourced callbacks additionally check source availability, source debit/return
+gaps and source-coupling guards; these inputs are unchanged. Their update and
+reply equations follow from the same primitive checks and actual callbacks.
+
+\begin{theorem}[Finite call projection]
+Lift $q$ to the authority state and genesis of the call machine, leaving its
+call records intact; denote that lift by $Q$. For every finite client and
+environment word $u$,
+\[
+ \widehat{\operatorname{run}}(u,Q(M))
+   =Q(\operatorname{run}(u,M)).
+\]
+The invocation table, execution results, completions, local response records
+and complete call history agree.
+\end{theorem}
+
+The proof supplies equations~\eqref{eq:reply}--\eqref{eq:update} to the two
+actual durable-call protocols, checks all call-action constructors, and
+inducts over $u$. Completed rejection, Busy and Unavailable are included.
+This explicit mapping uses standard local-to-behavior reasoning; it does not
+appeal to a general existence theorem for a suitable mapping~\cite{abadiLamport1991}.
+
+\clearpage
+\section{Source operations, fresh calls and recovery of existing results}
+The allocation construction must pass the child dispatcher as well as the
+parent financial operation. For each move, \source{Source_Realization_Link}
+installs the specified endpoint context through an environment input. It then
+consumes the confirmed terminal record and evidence index, primary-publication
+marker, and the current regulatory receiver state. The resulting parent state
+and reply equal the actual descendant operation's result, including rejection.
+Authenticity of the context input remains an implementation obligation.
+
+\source{Source_Call_Realization} translates every coupling input into the
+sourced durable-call language. Source attempts, receipt arrivals and context
+changes become authority inputs. A client command first sets the explicit
+availability input, completes an actual full-cache refresh, then completes
+the unchanged command through \code{Execute_Current}. The refresh installs
+the current snapshot; it does not manufacture a successful client result.
+
+\paragraph{Freshness and completion.}
+The translator reserves two identifiers per coupling input in a fixed
+namespace. A lower bound on unused identifiers advances with the word.
+Existing invocation, result and completion entries are preserved. For each
+fresh command it reuses the parent's begin, dispatch, collect and complete
+program. The generated sourced state projects exactly to the original coupling
+execution, and each client position completes that execution's actual reply.
+
+This is an uninterrupted finite construction. Arbitrary future words may
+contain crashes, disconnections, lost responses and policy inputs; the
+projection theorem preserves their behavior without promising successful
+delivery. Durable result reuse itself is established systems practice, as
+exemplified by RIFL~\cite{leeEtAl2015}. The additional question here is how the
+recorded result is tied to the particular source and financial consumer.
+
+\paragraph{The recovery comparison is preserved.}
+For a source machine $M$, the original checker compares a candidate's genesis
+and ordered entries with those of $M$ and validates its recorded callback
+history. Internal replayability alone is insufficient. Successful recovery
+returns the actual authority state. Restored dispatch requires a connected
+source and full replica equality before using the existing call dispatcher.
+
+\begin{theorem}[Recovery followed by projected continuation]
+Suppose the original source satisfies its generated replay contract, its
+current candidate is accepted, and the recovery connection is available.
+Restore and dispatch using that original
+runtime. For every finite suffix, projected execution has the same completed
+reply table and call history as the corresponding original dispatch and suffix.
+\end{theorem}
+
+\paragraph{Proof sketch.}
+The parent recovery theorem identifies the restored state with the current
+authority state. Its guarded-dispatch theorem identifies the resulting source
+machine with the original dispatcher result. Applying the finite call
+projection to that machine proves the suffix equalities. Earlier invocation
+identifiers and completed replies are retained: a fresh machine is never
+substituted after the recovery boundary.
+
+\source{Integration_Transport} also decodes ordered lists of entry blocks by
+concatenation. Encoding entries as singleton blocks decodes to the original
+candidate. A complete partition can therefore feed the unchanged current-source
+check. This is a theorem about structured HOL entries, not serialization of
+arbitrary function-valued state into finite bytes.
+
+\clearpage
+\section{Two applications through the actual completion boundary}
+\subsection{Same pooled balances, different financial decisions}
+The monetary example begins at the actual sourced genesis. Its prefix applies
+two source effects, produces their receipts, records terminal decisions,
+credits the destination, publishes primary state and reconciles the reservations.
+A lawful transfer establishes the initial lineage table. The constructed
+exchange then changes the attribution while restoring pooled balances:
+\[
+ \begin{array}{c@{\qquad}c}
+ \text{lineage seed}&\text{after exchange}\\[1mm]
+ \begin{pmatrix}0&5\\5&0\end{pmatrix}&
+ \begin{pmatrix}5&0\\0&5\end{pmatrix}
+ \end{array}
+\]
+Rows are roots 17 and 23; columns are holders 3 and 4 of the same destination
+asset. Both pre-probe states have pooled balances $(5,5)$.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{@{}lccY@{}}
+\toprule
+Pre-probe state & Root 17 at holder 4 & Amount & Fresh completed reply\\
+\midrule
+Lineage seed & 5 & 1 & \code{Descendant_Executed}\\
+After exchange & 0 & 1 & \code{Request_Rejected}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Both probes request root 17, holder $4\to3$, one ordinary unit, and the same
+current permission. The inherited funding threshold supplies the two actual
+parent replies. Terminal and current-context facts connect those replies to
+the source dispatcher; the fresh-call translation completes them. The longer
+prefix uses a later unused identifier, not a fabricated cached result.
+
+\source{Funding_Completion_Separation} then restores each original generated
+machine. Retransmission uses its real recorded reply, and every finite
+projected continuation retains it. This provides an actual completed-call
+distinction from equal pooled balances. Pooled equality is a property of the
+states \emph{before} the probes; the successful extra transfer changes balances.
+
+\subsection{Regulatory state is an independent input to consumption}
+The regulatory application reuses the parent's monetary credit and separate
+regulatory-attestation profile. It generates fresh observed calls from the
+original regulatory genesis, reaches a published freeze, rejects ordinary use,
+and then executes authorized enforcement on that same call machine.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{@{}lYl@{}}
+\toprule
+Call identifier & Actual request after the freeze & Completed result\\
+\midrule
+$(92,21)$ & Ordinary descendant transfer & Rejected\\
+$(92,23)$ & Authorized enforcement transfer & Executed\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The ordinary denial does not consume the funding or remove the freeze.
+The later enforcement creates a historical snapshot at revision 12 whose
+normalization is nontrivial, while preserving query values and readiness.
+Both completion entries coexist on the enforced machine. The original
+current candidate restores it; redispatch and every projected finite suffix
+retain both results. The exact source theorem is
+\code{both_regulatory_decisions_survive_recovery_projection_and_future_calls}
+in \source{Regulatory_Composition_Example}.
+
+The regulatory certificate remains a supplied attestation input. This
+application does not construct its physical producer. Its purpose is to show
+that the call and recovery connection also consumes actual regulatory state,
+rather than treating available funding as sufficient authorization.
+
+\clearpage
+\section{Separating executions and controls}
+\subsection{Current snapshots, raw order and original reachability}
+A current-cache input can distinguish complete current snapshots. Inject a
+candidate cache and invoke the existing zero-time client. Its response is
+an \code{Internal_Completed} effect reply exactly when the cache equals the current snapshot;
+otherwise it is Busy. Hence equality of every such probe response is
+equivalent to equality of the current snapshots. A revision number alone
+cannot replace that comparison. The clock example supplies equal revisions
+with different full snapshots and demonstrates the changed response after
+removing only the current-cache guard.
+
+Raw observers impose different requirements. The journal reader returns the
+entire event list, and the available source-effect reader returns its full
+effect list. For successful canonical words $u,v$ from the same start,
+\[
+ J(\operatorname{run}(u,m))=J(\operatorname{run}(v,m))\quad\Longleftrightarrow\quad u=v.
+\]
+Cancel the common journal prefix and use injectivity of the descendant-event
+constructor. Two successful orders of the example exchange reach the same
+selected funding and give different raw journal replies. Thus ordered
+concatenation is available, while arbitrary permutation is not justified.
+
+Reply preservation also differs from original-state reachability. Every
+original generated observed authority stores its current full capture in the
+current historical slot. After one clock tick, $q$ changes the historical
+clock to zero while keeping the current clock at one. The projected state
+violates that original invariant and is not any original generated authority
+state, although its callbacks retain their replies. It belongs to the reduced
+representation, not to the original full-state recovery interface.
+
+\subsection{A nonempty fixed policy obstructs an admissible table}
+Hold a current context fixed whose spend permissions admit positive even
+amounts in both directions for both roots. The actual two-unit request
+succeeds, so the policy is not an empty denial policy. Every successful move
+changes two funding cells by an even amount; every rejected request leaves
+funding unchanged. Induction gives a parity invariant for every finite
+descendant-only word under that context.
+
+The target below satisfies the same root and account margins but changes
+cell parity, making it unreachable under the fixed policy:
+\[
+ \begin{pmatrix}0&5\\5&0\end{pmatrix}
+ \ \longrightarrow\ 
+ \begin{pmatrix}1&4\\4&1\end{pmatrix}.
+\]
+This does not contradict the allocation constructor, which supplies permitted
+current contexts for its chosen moves. No unrestricted fixed-policy
+reachability theorem is inferred from the arithmetic margins.
+
+\paragraph{The two-leg control.}
+Remove only exact spend-tuple membership from the existing descendant
+function. Under the same fixed context, first move one unit of root 17 from
+holder 4 to holder 3, then one unit of root 23 from holder 3 to holder 4.
+Both modified calls actually return Executed and reach the whole target table,
+with final pooled balances restored and no new source effects or credits.
+The original consumer rejects the first unit call and also the second at that
+intermediate state. The proof derives the two actual replies before calculating
+the final table. These are controls on formal functions, not compiled-product
+mutation tests. See \source{Even_Amount_Policy_Boundary}.
+
+\clearpage
+\section{Implementation boundary and reproduction}
+The formal constructions preserve the parent's external obligations. They do
+not obtain authenticity by changing a client-supplied Boolean, or infer that an
+unknown source effect is absent. The following implementation work remains
+separate from the statements summarized here.
+
+\begin{description}[leftmargin=0pt,style=nextline,font=\normalfont\bfseries]
+\item[Source and terminal evidence.]
+Physical adapters must provide immutable effect identity, deduplication,
+persistent no-effect fences and authenticated current outcomes. Signature,
+roster and stable-source assumptions must be related to their actual producers.
+A timeout or lost acknowledgment does not authorize a refund. A later
+compensating action has a new identity; it does not replace a stable same-key
+finalized fact with a reversed fact.
+\item[Current policy and persistence.]
+Context installation is an explicit environment input. Its authenticity and
+currentness are not established by that constructor. The model also requires
+an atomic durable execution/result record and a complete current recovery
+source. Their implementation across failures and restart requires evidence.
+\item[Observation and settlement.]
+Public getters, raw storage, events and timestamp/revision encodings need their
+own correspondence. Primary publication does not establish simultaneous
+application at every physical domain. Secondary-progress telemetry does not
+perform settlement. A token's replay rejection is not automatically the
+formal call kernel's retransmission of an earlier reply.
+\item[Compiled and distributed behavior.]
+The parent API inventory is a source-declaration inventory, not a
+compiler-derived ABI certificate. Encoding, compiler output, deployed consumers,
+distributed terminal agreement and linearizability of the complete deployed
+API are outside this result. Raw observations are not hidden to imply atomicity.
+\end{description}
+
+\subsection*{Reproduction commands}
+Use Isabelle2025-2 and the dated AFP ADS\_Functor archive
+\url{https://isa-afp.org/release/afp-ADS_Functor-2026-02-06.tar.gz}.
+Its SHA-256 is:
+\par{\small\code{10d6fa8671c461022ae5e71859a07610d616681fed79e2f1c81029a124203c85}}\par
+From the repository root, the dependency path must directly contain its
+\code{ROOT}. Source checking and native proof checking are separate commands:
+
+{\small
+\begin{verbatim}
+node Evidence_Binding_Composition/verify-source.mjs
+isabelle build -b -j 1 -o threads=1 -o parallel_proofs=0 \
+  -d /path/to/ADS_Functor -d . Evidence_Binding_Composition
+\end{verbatim}
+}
+
+The session sets \code{document = false}. With \code{pdflatex} and
+\code{bibtex} on the path, the standalone document builder uses a separate
+output directory:
+{\small
+\begin{verbatim}
+node Evidence_Binding_Composition/build-document.mjs \
+  output/Evidence_Binding_Composition
+\end{verbatim}
+}
+The public source manifest records the relevant input files; a reproduction
+should identify the repository commit, tool versions and command used.
+This note does not assign a publication revision, deployment status or
+external assurance designation. The source guide names files within the
+session directory in the repository.
+
+\clearpage
+\appendix
+\section{Source guide}
+The table gives the relevant theory files, not a substitute for their typed
+statements. Parent results are reused under their original assumptions.
+
+{\small
+\begin{longtable}{@{}p{0.43\textwidth}p{0.53\textwidth}@{}}
+\toprule
+Theory & Role in the connection\\
+\midrule
+\endhead
+\source{Funding_Realization} & Constructive gather/distribute word; successful guards, outside-cell and financial frames.\\
+\source{Funding_Characterization} & Arithmetic margins if and only if an actual supported successful allocation image exists.\\
+\source{Source_Realization_Link} & Current context and terminal/publication premises; actual source-generated two-root prefix.\\
+\source{Source_Call_Realization} & Fresh identifiers, refresh and command completion; source-word correspondence and recovery continuation.\\
+\source{Historical_Decision_Projection} & Six-field historical normalization, primitive equations and finite call projection.\\
+\source{Integration_Transport} & Lossless ordered entry blocks; original restore/dispatch followed by projected continuation.\\
+\source{Integration_Boundaries} & Exact current-cache and raw-reader distinctions; original recovery admission.\\
+\source{Integration_Examples} & Actual clock and cache examples; nontrivial normalization and cache-guard control.\\
+\source{Historical_Reachability_Boundary} & A reply-preserving projected history outside original generated states.\\
+\source{Funding_Completion_Separation} & Equal pooled balances with different fresh completed funding decisions, retained after recovery.\\
+\source{Regulatory_Composition_Example} & Actual observed monetary/freeze/rejection/enforcement calls and retained completions.\\
+\source{Funding_Order_Boundary} & Successful exchange orders with equal funding and different raw journal replies.\\
+\source{Funding_Guard_Controls} & Single exact-spend-guard removal on a source-generated financial state.\\
+\source{Even_Amount_Policy_Boundary} & Fixed-policy parity obstruction and both actual forbidden unit moves under the same guard removal.\\
+\bottomrule
+\end{longtable}
+}
+
+\begingroup
+\small
+\bibliographystyle{plain}
+\bibliography{root}
+\endgroup
+\end{document}

@@ -1,0 +1,19 @@
+chapter Oraclizer
+
+session Evidence_Binding_Composition = Evidence_Atomic_Binding +
+  options [document = false, timeout = 600]
+  theories
+    Funding_Realization
+    Funding_Characterization
+    Source_Realization_Link
+    Funding_Guard_Controls
+    Historical_Decision_Projection
+    Integration_Boundaries
+    Integration_Transport
+    Integration_Examples
+    Historical_Reachability_Boundary
+    Source_Call_Realization
+    Regulatory_Composition_Example
+    Funding_Order_Boundary
+    Funding_Completion_Separation
+    Even_Amount_Policy_Boundary

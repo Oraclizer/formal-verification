@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "session": "Evidence_Binding_Composition",
+  "isabelle": "Isabelle2025-2",
+  "parent_session": "Evidence_Atomic_Binding",
+  "parent_repository_revision": "9b5e48dc696f8a021ee1a75db3dc0d327546182b",
+  "parent_source_manifest_sha256": "e33389e1f555ba9c9380a7dd03f689857eaceb7a69c56d2e13f6a470afb1d153",
+  "ads_functor_url": "https://isa-afp.org/release/afp-ADS_Functor-2026-02-06.tar.gz",
+  "ads_functor_sha256": "10d6fa8671c461022ae5e71859a07610d616681fed79e2f1c81029a124203c85",
+  "files": [
+    {
+      "path": "Audit/Composition_Audit_Base.thy",
+      "sha256": "ddb87aef3a4aba3bae5b0381883308e6b061e6e7718f1233273b0a927149027e"
+    },
+    {
+      "path": "Audit/Composition_Proof_Audit.thy",
+      "sha256": "9ea6405e5c64ebede63b33f8e50eb311b49bb98cf5ef7245208e008337b666e1"
+    },
+    {
+      "path": "Audit/README.md",
+      "sha256": "86d630f487aed45660f36058719f450da775a4ed49cbc1276bd64712b10f4cc3"
+    },
+    {
+      "path": "Audit/ROOT",
+      "sha256": "7e7f57f87ced18c35299f9a1d50d0aac0967d1cd393bd28a2d57137a8726088b"
+    },
+    {
+      "path": "build-document.mjs",
+      "sha256": "7bc0721f1b6174a8b98fd2d9c94120e033a16ba0e13d48c52cc97fe3553b2b60"
+    },
+    {
+      "path": "claims.json",
+      "sha256": "9353d5f46804451c6c975a769eaafbe60587f7f5227e5a98d9dfa67cecf97f13"
+    },
+    {
+      "path": "document/root.bib",
+      "sha256": "ffe6f24eee452b37b23004f048c77b227855b16835fe775be02746a407f9d2b8"
+    },
+    {
+      "path": "document/root.tex",
+      "sha256": "5db44fed89a53f630ec0892fd898e54f70a339bb96d18f17c17589faa467ab63"
+    },
+    {
+      "path": "Even_Amount_Policy_Boundary.thy",
+      "sha256": "44e6b59e21ecd07b9cb44342bdf0c09f10a22a580068efd11525170ee2057c6b"
+    },
+    {
+      "path": "Funding_Characterization.thy",
+      "sha256": "e861f6ccbfc6402e9c4b711a5744b14788951ea3048e3c458434e0bdbc0a7996"
+    },
+    {
+      "path": "Funding_Completion_Separation.thy",
+      "sha256": "d8a77cf26a96cc9183fc2fa5f32efc57ae2402d10cba7c97ab7efe6c269e8e48"
+    },
+    {
+      "path": "Funding_Guard_Controls.thy",
+      "sha256": "6831ed40728f318a9881ac8dcd2cc4c0c01e4ca3748c958c2f77d341303b9eb1"
+    },
+    {
+      "path": "Funding_Order_Boundary.thy",
+      "sha256": "3b5a9c444e2f91d4d2309407403effb4400b721ff424ac4f6fd5d2154484099a"
+    },
+    {
+      "path": "Funding_Realization.thy",
+      "sha256": "2f37bdc408d4dc9623c603f38ff03e225ef696c1e4a10eb0f8c520bf4597af5b"
+    },
+    {
+      "path": "Historical_Decision_Projection.thy",
+      "sha256": "0816a28a538ed4e3b017be6fd89e5a5ea83729ebf5cbd792783d3b748dad9804"
+    },
+    {
+      "path": "Historical_Reachability_Boundary.thy",
+      "sha256": "8b85a01da25b4d24ec27d47e7d839b0e3ff82c83a1773c3c003a72cfc27251d8"
+    },
+    {
+      "path": "Integration_Boundaries.thy",
+      "sha256": "1ea87c4b276bc5254e9fd8735dcc204a1d5d6d31bf544612e37146bc9be5be79"
+    },
+    {
+      "path": "Integration_Examples.thy",
+      "sha256": "3d72fba00f87a5c38fd87858f72674a5519e9b60fee17bfd054ce9788c46a5ef"
+    },
+    {
+      "path": "Integration_Transport.thy",
+      "sha256": "599c245450c351d35727f085ce7acda74badcf9d1e450c3589ba2440e4363329"
+    },
+    {
+      "path": "MODEL_BOUNDARY.md",
+      "sha256": "ebeeba6be8454be78566414149aac5e8b73d609e869705f1cb42ddfa0b4b2581"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ca80c5041fe73ec7feb034fd15777b992dea6820a08d16d381944b28c864876f"
+    },
+    {
+      "path": "Regulatory_Composition_Example.thy",
+      "sha256": "191c527fcb50e79b916a71ac5d50bd6b92ceb6ed0ea0a7c40a259f8e1790f410"
+    },
+    {
+      "path": "ROOT",
+      "sha256": "f5d34afd7b8f094a49456b12d37ac4d9eece00f089336b54253d8523fcf7169c"
+    },
+    {
+      "path": "Source_Call_Realization.thy",
+      "sha256": "499d246edde910b2b36fabe67d823e165960cb65937d5cbab843b47381a1b5da"
+    },
+    {
+      "path": "Source_Realization_Link.thy",
+      "sha256": "3c859e2ae7cee910fd08ca58a88edc95f06cf65c270b746c4057b818d20506d4"
+    },
+    {
+      "path": "verify-proof-output.mjs",
+      "sha256": "27e6eef1b69efb65b33bbe5fd216e651f9428b1c7f80a395d06c374a0f4eacae"
+    },
+    {
+      "path": "verify-source.mjs",
+      "sha256": "d7fbde79aa30c309841c386d41923e63a214f42c4cadd02b7f5b5faddd44e9fa"
+    }
+  ]
+}

@@ -5,6 +5,17 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added `Evidence_Binding_Composition` as a child of Evidence Atomic Binding.
+  It characterizes finite funding allocations under supplied current contexts
+  and connects actual source operations to fresh completed calls, historical
+  projection and recovery of the existing call machine. Financial and
+  regulatory applications retain their completed decisions. Current-cache,
+  raw-order, original-reachability and fixed even-amount-policy controls delimit
+  the result, including both forbidden unit moves under one guard removal.
+  Added the session's source guide, model boundary and proof/document reproduction
+  commands. Existing parent operations and external implementation obligations
+  remain unchanged; implementation refinement remains unestablished.
+
 - Added `Evidence_Atomic_Binding` as a child of reservation correctness. It
   connects controlled source outcomes and immutable terminal records to actual
   credit, return, regulatory, primary and recovery consumers. Joint allocation
