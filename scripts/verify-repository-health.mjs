@@ -38,6 +38,16 @@ const required = [
   "Preemptive_Lock_Correctness/source-manifest.json",
   "Preemptive_Lock_Correctness/refinement-obligations.json",
   "Preemptive_Lock_Correctness/verify-source.mjs",
+  "Evidence_Atomic_Binding/ROOT",
+  "Evidence_Atomic_Binding/README.md",
+  "Evidence_Atomic_Binding/claims.json",
+  "Evidence_Atomic_Binding/source-manifest.json",
+  "Evidence_Atomic_Binding/product-obligations.json",
+  "Evidence_Atomic_Binding/product-api-inventory.json",
+  "Evidence_Atomic_Binding/verify-source.mjs",
+  "Evidence_Atomic_Binding/build-document.mjs",
+  "Evidence_Atomic_Binding/document/root.tex",
+  "Evidence_Atomic_Binding/document/root.bib",
   "Protected_Behavior_Obstructions/ROOT",
   "Protected_Behavior_Obstructions/README.md",
   "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md",
@@ -168,6 +178,7 @@ for (const sessionRoot of [
   "Regulatory_Action_Composition",
   "Cross_Chain_Message_Integrity",
   "Preemptive_Lock_Correctness",
+  "Evidence_Atomic_Binding",
 ]) {
   if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
     failures.push(`ROOTS missing session directory: ${sessionRoot}`);
@@ -207,6 +218,24 @@ for (const file of reservationManifest.files) {
   if (hash !== file.sha256) failures.push(`Reservation source hash mismatch: ${file.path}`);
   if (file.path.endsWith(".thy") && !reservationRoot.includes(file.path.slice(0, -4))) {
     failures.push(`Reservation ROOT missing theory: ${file.path}`);
+  }
+}
+
+const bindingName = "Evidence_Atomic_Binding";
+const bindingDirectory = resolve(root, bindingName);
+const bindingRoot = readFileSync(resolve(bindingDirectory, "ROOT"), "utf8");
+const bindingManifest = JSON.parse(readFileSync(resolve(bindingDirectory, "source-manifest.json"), "utf8"));
+const bindingTheories = readdirSync(bindingDirectory).filter((file) => file.endsWith(".thy")).sort();
+const bindingManifestTheories = bindingManifest.files.map((f) => f.path).filter((f) => f.endsWith(".thy")).sort();
+if (JSON.stringify(bindingTheories) !== JSON.stringify(bindingManifestTheories)) failures.push("Binding theory manifest mismatch");
+if (!bindingRoot.includes("session Evidence_Atomic_Binding = Preemptive_Lock_Correctness +")) {
+  failures.push("Binding ROOT must extend reservation correctness");
+}
+for (const file of bindingManifest.files) {
+  const hash = createHash("sha256").update(readFileSync(resolve(bindingDirectory, file.path))).digest("hex");
+  if (hash !== file.sha256) failures.push(`Binding source hash mismatch: ${file.path}`);
+  if (file.path.endsWith(".thy") && !bindingRoot.includes(file.path.slice(0, -4))) {
+    failures.push(`Binding ROOT missing theory: ${file.path}`);
   }
 }
 
@@ -415,4 +444,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length + reservationTheories.length} theories, 5 sessions`);
+console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length + reservationTheories.length + bindingTheories.length} theories, 6 sessions`);

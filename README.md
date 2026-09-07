@@ -4,7 +4,7 @@
     <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
   </picture>
 
-  <p><strong>Machine-checked model-level foundations for cross-domain state preservation, regulatory action composition, authenticated message execution and reservation settlement, plus an independent protected-behavior obstruction companion.</strong></p>
+  <p><strong>Machine-checked model-level foundations for cross-domain state preservation, regulatory action composition, authenticated message execution and evidence-qualified settlement, plus an independent protected-behavior obstruction companion.</strong></p>
 
   [![Proofs](https://github.com/Oraclizer/formal-verification/actions/workflows/proofs.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/proofs.yml)
   [![Repository health](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml/badge.svg)](https://github.com/Oraclizer/formal-verification/actions/workflows/repository-health.yml)
@@ -20,8 +20,8 @@
   [Mapping](FORMAL_MODEL_MAPPING.md)
 </div>
 
-> **Mechanized assurance.** The repository contains five Isabelle/HOL
-> sessions. CDSP, RAC, Cross-Chain Message Integrity and Preemptive Lock Correctness form a dependency chain. `Protected_Behavior_Obstructions` is an
+> **Mechanized assurance.** The repository contains six Isabelle/HOL
+> sessions. CDSP, RAC, Cross-Chain Message Integrity, Preemptive Lock Correctness and Evidence Atomic Binding form a dependency chain. `Protected_Behavior_Obstructions` is an
 > independent HOL companion to an external Lean development: its rows are
 > graded `PARTIAL`, never `SAME` (both grades are defined in
 > [`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)).
@@ -55,6 +55,7 @@ source and PDF hashes together with the document-build identity.
 | **RAC** | Extension | Regulatory outcomes, pair commutativity, provenance, transfer gates, traces, atomic queues, and finite normal forms | [Source](Regulatory_Action_Composition/ROOT) · [PDF](Regulatory_Action_Composition/release/Regulatory_Action_Composition.pdf) · [Manifest](Regulatory_Action_Composition/release/manifest.json) |
 | **Cross-Chain Message Integrity** | Extension | Authenticated source binding, destination-credit uniqueness, checked representations and regulatory consumers | [Source](Cross_Chain_Message_Integrity/ROOT) · [Scope and build](Cross_Chain_Message_Integrity/README.md) · [Claims](Cross_Chain_Message_Integrity/claims.json) · [Source manifest](Cross_Chain_Message_Integrity/source-manifest.json) |
 | **Preemptive Lock Correctness** | Extension | Asset reservations, source/destination once, evidence-based release, rooted funding, timeout boundaries and journal recovery | [Source](Preemptive_Lock_Correctness/ROOT) · [Scope and build](Preemptive_Lock_Correctness/README.md) · [Claims](Preemptive_Lock_Correctness/claims.json) · [Source manifest](Preemptive_Lock_Correctness/source-manifest.json) |
+| **Evidence Atomic Binding** | Extension | Source-qualified terminal records, guarded financial/regulatory effects, completed observations and checked recovery | [Source](Evidence_Atomic_Binding/ROOT) · [Scope and build](Evidence_Atomic_Binding/README.md) · [Claims](Evidence_Atomic_Binding/claims.json) · [Source manifest](Evidence_Atomic_Binding/source-manifest.json) |
 | **Protected Behavior Obstructions** | Partial companion | Set/profile consequences, explicit stochastic assumptions, set-level morphism laws, preorder facts, and bounded controls | [Source](Protected_Behavior_Obstructions/ROOT) · [Scope](Protected_Behavior_Obstructions/README.md) · [Cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md) · PDF/manifest not produced (`document = false`) |
 
 **Role taxonomy**
@@ -73,7 +74,11 @@ Cross-Chain Message Integrity extends RAC and consumes its transfer gate and
 CDSP completed regulatory synchronization. Its document is reproducible from
 source; no generated PDF is tracked for this session. Preemptive Lock Correctness
 extends that session with source control, reservations and financial settlement.
-Its technical companion is likewise reproducible from source.
+Its technical companion is likewise reproducible from source. Evidence Atomic
+Binding extends reservation correctness with separate source and terminal
+authority, actual source/parent accounting, completed current and historical
+responses, and guarded recovery. Its technical guide is built from the
+session document sources; no generated PDF is tracked.
 
 An earlier version of CDSP was submitted to the Archive of Formal Proofs on
 2026-03-25 but was not accepted as an AFP entry. None of these sessions is an
@@ -94,6 +99,7 @@ submission, review, and acceptance are separate states.
 | RAC: atomic queues and normal forms | completed-step validity and consistency; exactly 60 reachable transformation vectors | Atomic completed steps, not partial propagation or rollback |
 | Cross-chain message integrity | Full payload binding, source-key credit bound, exact local-marker criterion, normal/bypass equivalence, contextual summary iff and concrete consumers | External source/crypto/current-context assumptions; no full financial recovery or runtime refinement |
 | Preemptive lock correctness | Complete-footprint ownership, stale-version protection, source/credit/return uniqueness, exclusive settlement, source-pool conservation and rooted continuation/recovery | Atomic local commits, stable-source/current-context assumptions; conditional cleanup bounds, no runtime refinement or distributed observational atomicity |
+| Evidence atomic binding | Immutable terminal cores, source/credit/return exclusion and allocation, actual callback response provenance, fresh-call revision order, product words and current-source recovery | Conditional source, authority and durability contracts; no whole-runtime refinement, all-API linearizability or unconditional termination |
 | Protected behavior obstructions | nested profile algebra, assumption-transparent T2/T3/T4/T5 consequences, set-level morphism laws, preorder facts, and direct finite witnesses | `PARTIAL`; no kernel-derived first-hit law, scheduler correspondence, quantitative pushforward, or `SAME` credit |
 
 Every row is shorthand. The Oraclizer theorem-to-target map, assumptions, open
@@ -121,12 +127,16 @@ source certificates and a local-once kernel feed execution, transport, checked
 summaries, concrete consumers and semantic boundary tests. Preemptive Lock
 Correctness adds a further child: reservations and worker leases feed source
 control, evidence-based settlement, rooted funding and complete-journal recovery.
+Evidence Atomic Binding adds controlled source outcomes, terminal records and
+guarded consumers, then connects actual callback executions to completed
+responses and independent financial/regulatory observations. The diagram
+continues to show the CDSP/RAC foundation only.
 
 ## Assurance boundary
 
 ### Established within the models
 
-- all five declared sessions and their registered theories build;
+- all six declared sessions and their registered theories build;
 - the theory sources contain no `sorry` or `oops`;
 - named results follow from the definitions, locales, and assumptions stated
   in the theories;
@@ -171,7 +181,7 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Check all five sessions from the repository root:
+Check all six sessions from the repository root:
 
 ```bash
 isabelle build \
@@ -179,7 +189,7 @@ isabelle build \
   -d /path/to/afp/thys \
   Cross_Domain_State_Preservation Regulatory_Action_Composition \
   Cross_Chain_Message_Integrity Preemptive_Lock_Correctness \
-  Protected_Behavior_Obstructions
+  Evidence_Atomic_Binding Protected_Behavior_Obstructions
 ```
 
 Expected completion includes:
@@ -189,6 +199,7 @@ Finished Cross_Domain_State_Preservation
 Finished Regulatory_Action_Composition
 Finished Cross_Chain_Message_Integrity
 Finished Preemptive_Lock_Correctness
+Finished Evidence_Atomic_Binding
 Finished Protected_Behavior_Obstructions
 ```
 

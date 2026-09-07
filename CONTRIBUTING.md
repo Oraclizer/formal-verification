@@ -2,7 +2,7 @@
 
 This repository is the public home of a composable product-model chain:
 `Cross_Domain_State_Preservation`, `Regulatory_Action_Composition`,
-`Cross_Chain_Message_Integrity` and `Preemptive_Lock_Correctness`. It also contains the independent
+`Cross_Chain_Message_Integrity`, `Preemptive_Lock_Correctness` and `Evidence_Atomic_Binding`. It also contains the independent
 `PARTIAL / NO SAME` `Protected_Behavior_Obstructions` research companion, which
 has no Oraclizer implementation or product-refinement target. The artifacts are
 maintained as single-author scholarly works rather than as a conventional
@@ -70,7 +70,7 @@ obtaining and using the AFP.
 # Check the product-model sessions (point -d at both this repo and the AFP)
 isabelle build -d . -d /path/to/afp/thys \
   Cross_Domain_State_Preservation Regulatory_Action_Composition \
-  Cross_Chain_Message_Integrity Preemptive_Lock_Correctness
+  Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Evidence_Atomic_Binding
 
 # Check the independent PARTIAL / NO SAME companion (AFP is not required)
 isabelle build -c -D Protected_Behavior_Obstructions \
@@ -154,3 +154,12 @@ repository and fetches it by hash, and the session layout of
 `Regulatory_Action_Composition` participates in that consumer's build. Keep
 the default branch protected, never rewrite published history, and treat
 session-graph changes as coordinated changes with that consumer.
+
+
+For changes to Evidence Atomic Binding, also run
+`node Evidence_Atomic_Binding/verify-source.mjs` and build the
+`Evidence_Atomic_Binding` named session with the pinned AFP dependency.
+Its [session guide](Evidence_Atomic_Binding/README.md#reproduce-the-proofs-and-technical-guide)
+provides the proof and document commands. Update its source manifest after a
+reviewed source or document change; implementation status must retain the
+evidence level actually established.

@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/Oraclizer/erc-trust",
+  "revision": "dfbd779ef5a49d5907ead2e8d3322859378519ec",
+  "scope": "Source declaration inventory for the inspected TrustToken and its stated storage/interface bases. This is not a compiler-derived ABI or complete runtime refinement certificate.",
+  "source_files": [
+    {
+      "path": "implementation/src/TrustToken.sol",
+      "sha256": "deeedf231b461035ac4496b36438d6ea28298ed2935b920bf9c01cb31f94ef1b"
+    },
+    {
+      "path": "implementation/src/TrustStorage.sol",
+      "sha256": "610170dbd24ba2791d459db9a24e2c05e7d699594c035074379a5700dbdb7931"
+    },
+    {
+      "path": "implementation/src/interfaces/IERC20.sol",
+      "sha256": "414510c4de8ff90b066ea33f3d75ce7c4891f4ee43de55c52e333740d6fd8131"
+    },
+    {
+      "path": "implementation/src/interfaces/IERC7943.sol",
+      "sha256": "1b968ee48cd0c9adadf22d33f1f245486b14ed1141df23f7d01385abfbb159f7"
+    },
+    {
+      "path": "implementation/src/generated/IERCTrustKernel.sol",
+      "sha256": "8f179a21b04fa1f172bdddef2f8878a01524d3429570c0abf9aa60cfc8738f7d"
+    }
+  ],
+  "declared_public_external_functions": [
+    {
+      "name": "supportsInterface",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 106,
+      "mutability": "pure",
+      "declaration": "function supportsInterface(bytes4 interfaceId) external pure returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "balanceOf",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 114,
+      "mutability": "view",
+      "declaration": "function balanceOf(address account) external view returns (uint256)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "totalSupply",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 118,
+      "mutability": "view",
+      "declaration": "function totalSupply() external view returns (uint256)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "allowance",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 122,
+      "mutability": "view",
+      "declaration": "function allowance(address owner, address spender) external view returns (uint256)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "approve",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 126,
+      "mutability": "state_changing",
+      "declaration": "function approve(address spender, uint256 value) external returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "transfer",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 133,
+      "mutability": "state_changing",
+      "declaration": "function transfer(address to, uint256 value) external nonReentrant returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "transferFrom",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 138,
+      "mutability": "state_changing",
+      "declaration": "function transferFrom(address from, address to, uint256 value) external nonReentrant returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "canSend",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 149,
+      "mutability": "view",
+      "declaration": "function canSend(address account) public view returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "canReceive",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 153,
+      "mutability": "view",
+      "declaration": "function canReceive(address account) public view returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "getFrozenTokens",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 159,
+      "mutability": "view",
+      "declaration": "function getFrozenTokens(address account) external view returns (uint256)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "canTransfer",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 165,
+      "mutability": "view",
+      "declaration": "function canTransfer(address from, address to, uint256 amount) public view returns (bool)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "deriveActionId",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 174,
+      "mutability": "view",
+      "declaration": "function deriveActionId(TrustKernelTypes.ActionRequest calldata request) external view returns (bytes32)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "deriveReversalId",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 178,
+      "mutability": "view",
+      "declaration": "function deriveReversalId(TrustKernelTypes.ReversalRequest calldata request) external view returns (bytes32)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "actionRecord",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 182,
+      "mutability": "view",
+      "declaration": "function actionRecord(bytes32 actionId) external view returns (TrustKernelTypes.ActionRecord memory)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "receipt",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 186,
+      "mutability": "view",
+      "declaration": "function receipt(bytes32 commandId) external view returns (TrustKernelTypes.Receipt memory)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "caseRecord",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 190,
+      "mutability": "view",
+      "declaration": "function caseRecord(bytes32 caseId) external view returns (TrustKernelTypes.CaseRecord memory)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "dependencyState",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 194,
+      "mutability": "view",
+      "declaration": "function dependencyState() external view returns (bytes32 dependencyRoot, uint64 dependencyEpoch)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "trustProfile",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 199,
+      "mutability": "view",
+      "declaration": "function trustProfile() external view returns (TrustKernelTypes.ProfileDescriptor memory descriptor)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "executeRegulatoryAction",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 224,
+      "mutability": "state_changing",
+      "declaration": "function executeRegulatoryAction(TrustKernelTypes.ActionRequest calldata request) external nonReentrant returns (bytes32 receiptHash)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "executeRegulatoryReversal",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 237,
+      "mutability": "state_changing",
+      "declaration": "function executeRegulatoryReversal(TrustKernelTypes.ReversalRequest calldata request) external nonReentrant returns (bytes32 receiptHash)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "executeERC7943Action",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 250,
+      "mutability": "state_changing",
+      "declaration": "function executeERC7943Action(TrustKernelTypes.ActionRequest calldata request) external nonReentrant returns (bytes32 receiptHash)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "executeERC7943Reversal",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 285,
+      "mutability": "state_changing",
+      "declaration": "function executeERC7943Reversal(TrustKernelTypes.ReversalRequest calldata request) external nonReentrant returns (bytes32 receiptHash)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "setFrozenTokens",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 312,
+      "mutability": "state_changing",
+      "declaration": "function setFrozenTokens(address account, uint256 amount) external returns (bool result)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "forcedTransfer",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 339,
+      "mutability": "state_changing",
+      "declaration": "function forcedTransfer(address from, address to, uint256 amount) external returns (bool result)",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "configureAuthority",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 358,
+      "mutability": "state_changing",
+      "declaration": "function configureAuthority( bytes32 authorityRef, address account, bool active, bytes32 governanceAuthorizationId, uint256 governanceNonce ) external onlyGovernor",
+      "model_to_abi_status": "UNVERIFIED"
+    },
+    {
+      "name": "rebindDependency",
+      "path": "implementation/src/TrustToken.sol",
+      "line": 376,
+      "mutability": "state_changing",
+      "declaration": "function rebindDependency( TrustKernelTypes.BindingKind kind, address dependency, bytes32 schema, bytes32 governanceAuthorizationId, uint256 governanceNonce ) external onlyGovernor",
+      "model_to_abi_status": "UNVERIFIED"
+    }
+  ],
+  "generated_public_storage_getters": [
+    {
+      "name": "name",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 8,
+      "declaration": "string public name;"
+    },
+    {
+      "name": "symbol",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 9,
+      "declaration": "string public symbol;"
+    },
+    {
+      "name": "decimals",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 10,
+      "declaration": "uint8 public immutable decimals;"
+    },
+    {
+      "name": "governor",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 12,
+      "declaration": "address public immutable governor;"
+    }
+  ],
+  "raw_storage_fields": [
+    {
+      "name": "_totalSupply",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 11,
+      "declaration": "uint256 internal _totalSupply;"
+    },
+    {
+      "name": "_balances",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 14,
+      "declaration": "mapping(address => uint256) internal _balances;"
+    },
+    {
+      "name": "_allowances",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 15,
+      "declaration": "mapping(address => mapping(address => uint256)) internal _allowances;"
+    },
+    {
+      "name": "_frozen",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 16,
+      "declaration": "mapping(address => uint256) internal _frozen;"
+    },
+    {
+      "name": "_restricted",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 17,
+      "declaration": "mapping(address => bool) internal _restricted;"
+    },
+    {
+      "name": "_custodyBacking",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 18,
+      "declaration": "mapping(address => uint256) internal _custodyBacking;"
+    },
+    {
+      "name": "_freezeHeads",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 19,
+      "declaration": "mapping(address => TrustNativeTypes.EffectHead) internal _freezeHeads;"
+    },
+    {
+      "name": "_restrictionHeads",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 20,
+      "declaration": "mapping(address => TrustNativeTypes.EffectHead) internal _restrictionHeads;"
+    },
+    {
+      "name": "_authorities",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 22,
+      "declaration": "mapping(bytes32 => TrustNativeTypes.Authority) internal _authorities;"
+    },
+    {
+      "name": "_usedNonces",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 23,
+      "declaration": "mapping(bytes32 => mapping(uint64 => mapping(uint256 => bool))) internal _usedNonces;"
+    },
+    {
+      "name": "_usedGovernanceIds",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 24,
+      "declaration": "mapping(bytes32 => bool) internal _usedGovernanceIds;"
+    },
+    {
+      "name": "_actions",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 26,
+      "declaration": "mapping(bytes32 => TrustKernelTypes.ActionRecord) internal _actions;"
+    },
+    {
+      "name": "_effects",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 27,
+      "declaration": "mapping(bytes32 => TrustNativeTypes.EffectRecord) internal _effects;"
+    },
+    {
+      "name": "_receipts",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 28,
+      "declaration": "mapping(bytes32 => TrustKernelTypes.Receipt) internal _receipts;"
+    },
+    {
+      "name": "_cases",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 29,
+      "declaration": "mapping(bytes32 => TrustKernelTypes.CaseRecord) internal _cases;"
+    },
+    {
+      "name": "_custody",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 30,
+      "declaration": "mapping(bytes32 => TrustNativeTypes.CustodyRecord) internal _custody;"
+    },
+    {
+      "name": "_consumedEntitlements",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 31,
+      "declaration": "mapping(bytes32 => bool) internal _consumedEntitlements;"
+    },
+    {
+      "name": "_pendingCommitments",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 32,
+      "declaration": "mapping(bytes32 => TrustNativeTypes.PendingCommitments) internal _pendingCommitments;"
+    },
+    {
+      "name": "_pendingReversals",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 33,
+      "declaration": "mapping(bytes32 => TrustNativeTypes.PendingReversal) internal _pendingReversals;"
+    },
+    {
+      "name": "_bindings",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 35,
+      "declaration": "mapping(TrustKernelTypes.BindingKind => TrustNativeTypes.Binding) internal _bindings;"
+    },
+    {
+      "name": "_dependencyRoot",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 36,
+      "declaration": "bytes32 internal _dependencyRoot;"
+    },
+    {
+      "name": "_dependencyEpoch",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 37,
+      "declaration": "uint64 internal _dependencyEpoch;"
+    },
+    {
+      "name": "_routeTicket",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 38,
+      "declaration": "TrustNativeTypes.RouteTicket internal _routeTicket;"
+    },
+    {
+      "name": "_entered",
+      "path": "implementation/src/TrustStorage.sol",
+      "line": 39,
+      "declaration": "uint256 internal _entered;"
+    }
+  ],
+  "declared_events": [
+    {
+      "name": "Transfer",
+      "path": "implementation/src/interfaces/IERC20.sol",
+      "line": 5,
+      "declaration": "event Transfer(address indexed from, address indexed to, uint256 value);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "Approval",
+      "path": "implementation/src/interfaces/IERC20.sol",
+      "line": 6,
+      "declaration": "event Approval(address indexed owner, address indexed spender, uint256 value);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "ForcedTransfer",
+      "path": "implementation/src/interfaces/IERC7943.sol",
+      "line": 8,
+      "declaration": "event ForcedTransfer(address indexed from, address indexed to, uint256 amount);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "Frozen",
+      "path": "implementation/src/interfaces/IERC7943.sol",
+      "line": 9,
+      "declaration": "event Frozen(address indexed account, uint256 amount);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "RegulatoryActionApplied",
+      "path": "implementation/src/generated/IERCTrustKernel.sol",
+      "line": 208,
+      "declaration": "event RegulatoryActionApplied(bytes32 indexed actionId, uint8 indexed action, bytes32 indexed caseId, bytes32 receiptHash);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "RegulatoryReversalApplied",
+      "path": "implementation/src/generated/IERCTrustKernel.sol",
+      "line": 209,
+      "declaration": "event RegulatoryReversalApplied(bytes32 indexed reversalId, uint8 indexed reversal, bytes32 indexed actionId, bytes32 receiptHash);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "TrustDependencyChanged",
+      "path": "implementation/src/generated/IERCTrustKernel.sol",
+      "line": 210,
+      "declaration": "event TrustDependencyChanged(uint8 indexed kind, bytes32 indexed previousBinding, bytes32 indexed currentBinding, bytes32 dependencyRoot, uint64 dependencyEpoch);",
+      "model_to_event_status": "UNVERIFIED"
+    },
+    {
+      "name": "TrustAuthorityChanged",
+      "path": "implementation/src/generated/IERCTrustKernel.sol",
+      "line": 211,
+      "declaration": "event TrustAuthorityChanged(bytes32 indexed authorityRef, address indexed account, uint64 epoch, bool active);",
+      "model_to_event_status": "UNVERIFIED"
+    }
+  ],
+  "consumer_obligation": "product-obligations.json",
+  "omission_policy": "No observed API, event or raw storage surface is removed by the formal-model release. A surface without an established correspondence remains an explicit implementation obligation."
+}

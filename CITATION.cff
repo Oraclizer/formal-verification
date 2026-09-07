@@ -17,12 +17,15 @@ keywords:
   - cross-domain synchronization
   - regulatory action composition
   - cross-chain message integrity
+  - reservation correctness
+  - evidence atomic binding
   - protected behavior obstructions
   - cross-prover mapping
 abstract: >-
-  Three dependent Isabelle/HOL sessions formalize cross-domain state
-  preservation, regulatory action composition and authenticated message
-  execution, while an independent
+  Five dependent Isabelle/HOL sessions formalize cross-domain state
+  preservation, regulatory action composition, authenticated message
+  execution, reservation correctness and evidence-qualified terminal
+  consumers, while an independent
   PARTIAL / NO SAME research companion checks protected-behavior profile
   consequences without an Oraclizer implementation or product-refinement
   target. The repository covers

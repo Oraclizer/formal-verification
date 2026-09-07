@@ -5,6 +5,16 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added `Evidence_Atomic_Binding` as a child of reservation correctness. It
+  connects controlled source outcomes and immutable terminal records to actual
+  credit, return, regulatory, primary and recovery consumers. Joint allocation
+  and credit/return exclusion accompany completed current/history/raw response
+  relations, fresh-call revision order, root continuation and funding/decision
+  results. Concrete controls distinguish weakened guards and unknown effects.
+  Source, authority, durability and runtime correspondence boundaries remain
+  explicit. Added source verification, technical-guide reproduction, product
+  mapping and the named proof build.
+
 - Added `Preemptive_Lock_Correctness`, extending the existing message session
   with complete-footprint reservations, replaceable worker leases, source
   non-reuse, evidence-based release, exclusive financial settlement, rooted
