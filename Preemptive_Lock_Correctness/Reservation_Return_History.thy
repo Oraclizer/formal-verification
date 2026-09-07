@@ -379,7 +379,7 @@ text \<open>The return list is extracted from the actual journal of accepted
   protocol actions. Its key uniqueness follows from the pending-phase check
   and the permanent returned record. These results connect the signed account
   identity to the source-outcome partition without introducing a terminal
-  oracle or equating regulatory support with quantities.\<close>
+  decision oracle or equating regulatory support with quantities.\<close>
 
 end
 
