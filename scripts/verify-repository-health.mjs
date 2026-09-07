@@ -32,6 +32,12 @@ const required = [
   "Cross_Chain_Message_Integrity/claims.json",
   "Cross_Chain_Message_Integrity/source-manifest.json",
   "Cross_Chain_Message_Integrity/verify-source.mjs",
+  "Preemptive_Lock_Correctness/ROOT",
+  "Preemptive_Lock_Correctness/README.md",
+  "Preemptive_Lock_Correctness/claims.json",
+  "Preemptive_Lock_Correctness/source-manifest.json",
+  "Preemptive_Lock_Correctness/refinement-obligations.json",
+  "Preemptive_Lock_Correctness/verify-source.mjs",
   "Protected_Behavior_Obstructions/ROOT",
   "Protected_Behavior_Obstructions/README.md",
   "Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md",
@@ -161,6 +167,7 @@ for (const sessionRoot of [
   "Protected_Behavior_Obstructions",
   "Regulatory_Action_Composition",
   "Cross_Chain_Message_Integrity",
+  "Preemptive_Lock_Correctness",
 ]) {
   if (!repositoryRoots.split(/\r?\n/).includes(sessionRoot)) {
     failures.push(`ROOTS missing session directory: ${sessionRoot}`);
@@ -182,6 +189,24 @@ for (const file of messageManifest.files) {
   if (hash !== file.sha256) failures.push(`Message source hash mismatch: ${file.path}`);
   if (file.path.endsWith(".thy") && !messageRoot.includes(file.path.slice(0, -4))) {
     failures.push(`Message ROOT missing theory: ${file.path}`);
+  }
+}
+
+const reservationName = "Preemptive_Lock_Correctness";
+const reservationDirectory = resolve(root, reservationName);
+const reservationRoot = readFileSync(resolve(reservationDirectory, "ROOT"), "utf8");
+const reservationManifest = JSON.parse(readFileSync(resolve(reservationDirectory, "source-manifest.json"), "utf8"));
+const reservationTheories = readdirSync(reservationDirectory).filter((file) => file.endsWith(".thy")).sort();
+const reservationManifestTheories = reservationManifest.files.map((f) => f.path).filter((f) => f.endsWith(".thy")).sort();
+if (JSON.stringify(reservationTheories) !== JSON.stringify(reservationManifestTheories)) failures.push("Reservation theory manifest mismatch");
+if (!reservationRoot.includes("session Preemptive_Lock_Correctness = Cross_Chain_Message_Integrity +")) {
+  failures.push("Reservation ROOT must extend message integrity");
+}
+for (const file of reservationManifest.files) {
+  const hash = createHash("sha256").update(readFileSync(resolve(reservationDirectory, file.path))).digest("hex");
+  if (hash !== file.sha256) failures.push(`Reservation source hash mismatch: ${file.path}`);
+  if (file.path.endsWith(".thy") && !reservationRoot.includes(file.path.slice(0, -4))) {
+    failures.push(`Reservation ROOT missing theory: ${file.path}`);
   }
 }
 
@@ -390,4 +415,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length} theories, 4 sessions`);
+console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length + reservationTheories.length} theories, 5 sessions`);

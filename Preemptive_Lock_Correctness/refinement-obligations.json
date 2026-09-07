@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "session": "Preemptive_Lock_Correctness",
+  "runtime_refinement": "PLANNED",
+  "full_refinement_established": false,
+  "scope": "Formal model and explicit implementation obligations; no implemented LockManager consumer established.",
+  "search_limit": "Relevant local development directories and the pinned public TRUST source/related tests were inspected. No whole-disk, all-remote-repositories or deployment absence claim is made.",
+  "related_public_repository": {
+    "url": "https://github.com/Oraclizer/erc-trust",
+    "revision": "2545efa64289ad82fe3ad8a99e5dfad01ff92c10"
+  },
+  "formal_to_runtime": [
+    {
+      "id": "reservation-identity",
+      "abstract_condition": "Immutable source key and complete binding",
+      "formal_consumer": "binding_is_registered / current_use_allowed",
+      "formal_claim": "source_non_reuse_and_destination_once",
+      "formal_positive_control": "source_repeat_control",
+      "formal_negative_control_or_mutation": "omitted_source_once_repeats_burn",
+      "runtime_obligation": "Define an injective event identity and canonical complete-binding encoding; changing envelope, authority or generation must not reset persistent consumption.",
+      "related_existing_sources": [
+        "native-actions",
+        "adapter-actions"
+      ],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-footprint",
+      "abstract_condition": "Authoritative complete dependency footprint",
+      "formal_consumer": "acquire_reservation",
+      "formal_claim": "generated_reservations_have_consistent_owners",
+      "formal_positive_control": "opposite_order_acquisition_keeps_no_partial_reservation",
+      "formal_negative_control_or_mutation": "wrong_target_write_changes_unrelated_asset",
+      "runtime_obligation": "Compute the complete finite footprint from a coherent current snapshot and atomically compare all owners and versions before acquiring any asset.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-worker",
+      "abstract_condition": "Reservation distinct from worker lease",
+      "formal_consumer": "reassign_worker / owns_recorded_reservation",
+      "formal_claim": "reassignment_establishes_current_recorded_lease",
+      "formal_positive_control": "expired_held_takeover_control_activates",
+      "formal_negative_control_or_mutation": "replaced_generation_control_rejects",
+      "runtime_obligation": "Keep K and full binding unchanged; increase generation monotonically; authenticate the caller and retain terminal tombstones.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-versions",
+      "abstract_condition": "Current authority, policy and expected versions",
+      "formal_consumer": "write_asset_data / owns_current_reservation",
+      "formal_claim": "stale_version_stays_invalid_after_finite_continuation",
+      "formal_positive_control": "refreshed_expected_version_allows_next_write",
+      "formal_negative_control_or_mutation": "omitted_expected_version_overwrites_committed_value",
+      "runtime_obligation": "Read authentic coherent authority, policy, metadata and versions; perform expected-version comparison and write atomically; check current dependencies for new writes and recorded footprint for cleanup.",
+      "related_existing_sources": [
+        "native-actions",
+        "adapter-actions"
+      ],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-source-debit",
+      "abstract_condition": "Funded source effect at the source endpoint",
+      "formal_consumer": "dispatch_source / execute_source_effect",
+      "formal_claim": "source_non_reuse_and_destination_once",
+      "formal_positive_control": "source_acquire_dispatch_effect_activates",
+      "formal_negative_control_or_mutation": "omitted_source_once_repeats_burn",
+      "runtime_obligation": "Relate the domain/asset allocation pool to actual source holdings; recheck operation, positive amount, balance, current policy and endpoint; commit effect and permanent K debit marker together.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-non-effect",
+      "abstract_condition": "Authoritative permanent no-effect fence",
+      "formal_consumer": "cancel_before_dispatch / fence_unexecuted_source",
+      "formal_claim": "successful_fence_prevents_every_later_credit",
+      "formal_positive_control": "authoritative_fence_activates_and_late_source_is_rejected",
+      "formal_negative_control_or_mutation": "burnt_source_cannot_use_no_effect_fence",
+      "runtime_obligation": "Distinguish never-submitted cancel from authoritative submitted-command fencing; atomically check no persistent debit and close K against every later execution. A missing observation is not evidence of external non-effect.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-publication",
+      "abstract_condition": "Published source-origin evidence and packet identity",
+      "formal_consumer": "publish_source_certificate / published_receive",
+      "formal_claim": "accepted_credit_uses_prior_source",
+      "formal_positive_control": "full_credit_consumer_activates",
+      "formal_negative_control_or_mutation": "removing_publication_origin_creates_unfunded_credit",
+      "runtime_obligation": "Bind actual issuance to the accounted source effect, full stable statement and trusted verifier profile; preserve the exact publication information consumed by admission.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-destination",
+      "abstract_condition": "All destination paths use the once receiver",
+      "formal_consumer": "deliver_reserved_credit",
+      "formal_claim": "actual_parent_message_projection",
+      "formal_positive_control": "full_credit_consumer_activates",
+      "formal_negative_control_or_mutation": "omitted_destination_once_repeats_credit",
+      "runtime_obligation": "Cover normal, bypass, administrative and adapter entrypoints; couple effect, once marker and journal durably. Do not impose a source worker lease or local pending-notification prerequisite.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-return",
+      "abstract_condition": "Reversal evidence and permanent return record",
+      "formal_consumer": "release_to_source / reconcile_recorded_credit",
+      "formal_claim": "every_source_key_is_returned_at_most_once",
+      "formal_positive_control": "actual_reversal_release_activates",
+      "formal_negative_control_or_mutation": "omitting_the_closure_mechanism_returns_twice",
+      "runtime_obligation": "Supply authentic stable reversal evidence with the exact binding and epoch, or an independently proved terminal producer; preserve current ownership/version guards and terminal closure. The current stable-source profile excludes later Finalized/Reversed changes at one key.",
+      "related_existing_sources": [
+        "native-actions",
+        "adapter-actions"
+      ],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-lineage",
+      "abstract_condition": "Rooted funding and current lawful onward use",
+      "formal_consumer": "execute_descendant",
+      "formal_claim": "credited_root_preserves_its_exact_funding",
+      "formal_positive_control": "same_current_continuation_distinguishes_lineage",
+      "formal_negative_control_or_mutation": "omitted_policy_admission_spends_while_frozen",
+      "runtime_obligation": "Check actual caller, root, sender, recipient, amount and operation grants; check the same asset current regulatory state and both account/root balances; retain arbitrary onward effects.",
+      "related_existing_sources": [
+        "ordinary-transfer",
+        "native-actions",
+        "adapter-actions"
+      ],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-reads",
+      "abstract_condition": "Reservation-aware application data and completed responses",
+      "formal_consumer": "read_source_data",
+      "formal_claim": "busy_read_retains_state_and_completes_observation",
+      "formal_positive_control": "current_read_activates_without_reservation",
+      "formal_negative_control_or_mutation": "stale_read_version_is_rejected",
+      "runtime_obligation": "Select the actual read/use API and raw-observer scope; do not change public balanceOf semantics by treating it as this Busy application-data API. Authenticate reader and coherent current version.",
+      "related_existing_sources": [
+        "raw-balance-read"
+      ],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-recovery",
+      "abstract_condition": "Complete authentic journal with atomic durable effects",
+      "formal_consumer": "commit_reservation_event / restart_reservation_machine",
+      "formal_claim": "complete_journal_preserves_actual_continuations_after_cache_loss",
+      "formal_positive_control": "actual_recovery_keeps_lawful_onward_spending",
+      "formal_negative_control_or_mutation": "losing_recovered_once_state_reissues_root_funding",
+      "runtime_obligation": "Preserve genesis, source once, ownership, generation, closure, credits and root funding; retain the required observations separately. Prove crash/storage behavior and use fresh context for new requests.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    },
+    {
+      "id": "reservation-numeric-clock",
+      "abstract_condition": "Unbounded mathematical counters and monotone time",
+      "formal_consumer": "advance_reservation_time / reassign_worker / write_asset_data",
+      "formal_claim": "timeout_has_no_terminal_or_financial_authority",
+      "formal_positive_control": "expired_held_takeover_control_activates",
+      "formal_negative_control_or_mutation": "timeout_only_refund_and_late_credit_duplicate_money",
+      "runtime_obligation": "Specify machine integer bounds, checked arithmetic and rejection on overflow; ensure source IDs, generation and versions never wrap into reuse. Obtain a monotone authoritative clock without granting refund authority.",
+      "related_existing_sources": [],
+      "actual_reservation_source": null,
+      "runtime_guard_and_state_update": null,
+      "runtime_positive_test": null,
+      "runtime_negative_mutation": null,
+      "compiled_downstream_consumer": null,
+      "runtime_status": "PLANNED",
+      "compiled_status": "UNVERIFIED",
+      "formal_publication_requires_runtime_completion": false,
+      "full_refinement_requires_completion": true,
+      "validation_plan": "For an actual Rust implementation, attach Creusot pre/postconditions and Kani harnesses to the real functions, then bind the checked compiled artifact to the live dispatch/storage consumers. Solidity counterparts require appropriate Solidity tooling, not a claimed Kani/Creusot proof."
+    }
+  ],
+  "runtime_to_formal": [
+    {
+      "id": "native-actions",
+      "path": "implementation/src/TrustToken.sol",
+      "sha256": "deeedf231b461035ac4496b36438d6ea28298ed2935b920bf9c01cb31f94ef1b",
+      "functions": [
+        "executeRegulatoryAction",
+        "executeRegulatoryReversal"
+      ],
+      "url": "https://github.com/Oraclizer/erc-trust/blob/2545efa64289ad82fe3ad8a99e5dfad01ff92c10/implementation/src/TrustToken.sol#L224",
+      "scope": "Existing regulatory authorization and evidence endpoints; no reservation or rooted-funding correspondence established.",
+      "obligation_ids": [
+        "reservation-identity",
+        "reservation-versions",
+        "reservation-return",
+        "reservation-lineage"
+      ],
+      "implementation_conformance_verified": false
+    },
+    {
+      "id": "ordinary-transfer",
+      "path": "implementation/src/TrustToken.sol",
+      "sha256": "deeedf231b461035ac4496b36438d6ea28298ed2935b920bf9c01cb31f94ef1b",
+      "functions": [
+        "_ordinaryTransfer",
+        "_ordinaryAvailable"
+      ],
+      "url": "https://github.com/Oraclizer/erc-trust/blob/2545efa64289ad82fe3ad8a99e5dfad01ff92c10/implementation/src/TrustToken.sol#L904",
+      "scope": "Existing balance, restriction, freeze and custody checks; not a source-key funding implementation.",
+      "obligation_ids": [
+        "reservation-lineage"
+      ],
+      "implementation_conformance_verified": false
+    },
+    {
+      "id": "raw-balance-read",
+      "path": "implementation/src/TrustToken.sol",
+      "sha256": "deeedf231b461035ac4496b36438d6ea28298ed2935b920bf9c01cb31f94ef1b",
+      "functions": [
+        "balanceOf"
+      ],
+      "url": "https://github.com/Oraclizer/erc-trust/blob/2545efa64289ad82fe3ad8a99e5dfad01ff92c10/implementation/src/TrustToken.sol#L114",
+      "scope": "Returns the raw balance; not the model application-data read with Busy semantics.",
+      "obligation_ids": [
+        "reservation-reads"
+      ],
+      "implementation_conformance_verified": false
+    },
+    {
+      "id": "adapter-actions",
+      "path": "implementation/src/profiles/ERC3643TrustAdapter.sol",
+      "sha256": "f2806571c8c39984ee6c50f5e8dd0aa94aac5e273564012afcb4ebb55e43320f",
+      "functions": [
+        "executeRegulatoryAction",
+        "executeRegulatoryReversal"
+      ],
+      "url": "https://github.com/Oraclizer/erc-trust/blob/2545efa64289ad82fe3ad8a99e5dfad01ff92c10/implementation/src/profiles/ERC3643TrustAdapter.sol#L258",
+      "scope": "Existing topology, authorization and upstream-state checks; reservation/lease correspondence unverified.",
+      "obligation_ids": [
+        "reservation-identity",
+        "reservation-versions",
+        "reservation-return",
+        "reservation-lineage"
+      ],
+      "implementation_conformance_verified": false
+    }
+  ],
+  "product_decisions_remaining": [
+    "Actual reservation-aware read/use APIs and raw observer scope",
+    "Coherent endpoint version and fencing after primary finality",
+    "Source-fact attestation versus independent terminal decision profile",
+    "Authority/control/evidence for external irreversible effects"
+  ]
+}

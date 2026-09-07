@@ -32,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           if grep -R -n -E '^\s*(sorry|oops|axiomatization|oracle)\b|\bby\s+eval\b|\bnative_decide\b|\bskip_proof\b|\bsledgehammer\b|\bsmt_oracle\b' \
-            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Protected_Behavior_Obstructions --include='*.thy'; then
+            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Protected_Behavior_Obstructions --include='*.thy'; then
             exit 1
           fi
       - name: Restore cached Isabelle archive
@@ -66,8 +66,8 @@ jobs:
   cross-domain-state-preservation:
     # Cross_Domain_State_Preservation depends on the AFP entry ADS_Functor, and
     # Regulatory_Action_Composition extends Cross_Domain_State_Preservation, so
-    # Cross_Chain_Message_Integrity extends RAC. All three named sessions are
-    # built here against the same pinned dependency.
+    # Cross_Chain_Message_Integrity extends RAC, and Preemptive_Lock_Correctness
+    # extends message integrity. All four named sessions share the pinned dependency.
     name: Isabelle2025-2 / Cross-Domain State Preservation
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -86,7 +86,7 @@ jobs:
         run: |
           set -euo pipefail
           if grep -R -n -E '^\s*(sorry|oops|axiomatization|oracle)\b|\bby\s+eval\b|\bnative_decide\b|\bskip_proof\b|\bsledgehammer\b|\bsmt_oracle\b' \
-            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Protected_Behavior_Obstructions --include='*.thy'; then
+            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Protected_Behavior_Obstructions --include='*.thy'; then
             exit 1
           fi
       - name: Restore cached Isabelle archive
@@ -132,17 +132,23 @@ jobs:
           mkdir -p "$RUNNER_TEMP/afp"
           tar -xzf "$archive" -C "$RUNNER_TEMP/afp"
           test -f "$RUNNER_TEMP/afp/ADS_Functor/ROOT"
-      - name: Build CDSP, RAC and Cross_Chain_Message_Integrity
+      - name: Verify model source manifests
+        run: |
+          node Cross_Chain_Message_Integrity/verify-source.mjs
+          node Preemptive_Lock_Correctness/verify-source.mjs
+      - name: Build CDSP, RAC, message integrity and reservation correctness
         shell: bash
         # `isabelle build -d DIR` requires ROOT or ROOTS directly inside DIR, so the
         # entry directory itself is passed, not the extraction parent.
         run: >-
           "$RUNNER_TEMP/Isabelle2025-2/bin/isabelle" build
+          -j 1 -o threads=1 -o parallel_proofs=0
           -d "$RUNNER_TEMP/afp/ADS_Functor"
           -d .
           Cross_Domain_State_Preservation
           Regulatory_Action_Composition
           Cross_Chain_Message_Integrity
+          Preemptive_Lock_Correctness
 
   Proofs:
     # Single aggregate check for the proof lane. Branch protection requires this

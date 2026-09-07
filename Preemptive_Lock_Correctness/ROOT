@@ -1,0 +1,34 @@
+chapter Oraclizer
+
+session Preemptive_Lock_Correctness = Cross_Chain_Message_Integrity +
+  options [timeout = 600, document_build = "pdflatex"]
+  theories [document = false]
+    Reservation_Types
+    Reservation_Protocol
+    Reservation_Execution
+    Source_Non_Reuse
+    Reservation_Message_Link
+    Reservation_Ownership
+    Reservation_Examples
+    Reservation_Mutations
+    Reservation_Lifecycle
+    Reservation_Evidence
+    Reservation_Accounting
+    Reservation_Scenarios
+    Reservation_Frame
+    Reservation_Progress
+    Reservation_Settlement
+    Reservation_Boundaries
+    Reservation_Lineage
+    Reservation_Information
+    Reservation_Recovery
+    Reservation_Access
+    Reservation_Return_History
+    Reservation_Conservation
+    Reservation_Provider
+    Reservation_Policy_Cases
+  theories
+    Reservation_Document
+  document_files
+    "root.tex"
+    "root.bib"

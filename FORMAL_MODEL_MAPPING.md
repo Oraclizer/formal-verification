@@ -1,7 +1,7 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.7.0
-**Last updated:** 2026-09-06
+**Version:** 0.8.0
+**Last updated:** 2026-09-07
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
 ## Purpose
@@ -16,6 +16,7 @@ This document tracks the correspondence between formally verified model elements
 
 This mapping covers:
 
+- **Preemptive Lock Correctness**: complete-footprint reservations, worker leases, source/destination/return uniqueness, evidence-based settlement, rooted funding, timeout information boundaries and complete-journal recovery
 - **Cross-Chain Message Integrity**: authenticated source binding, destination-credit uniqueness, route and checked-summary equivalence, credit-marker recovery and actual regulatory consumers
 - **Cross-Domain State Preservation Homomorphism**: safety
 - **Regulatory Action Composition**: applied/rejected/failure outcome semantics, complete action-pair classification, legal-effect descriptors, transfer gates, trace/frame properties, completed atomic queues, and finite transformation normal forms
@@ -46,10 +47,40 @@ The current proofs do **not** establish:
 - Correspondence between the Isabelle/HOL model and the Rust implementation (refinement proof; addressed during refinement-proof work using Creusot/Kani).
 - Probabilistic properties of VRF-based leader election (abstracted as the deterministic `fair_leader` assumption; see Assumption Gap Analysis below).
 - Individual request starvation freedom or request-identity service order; the liveness theorems use only an aggregate pending count.
-- Concurrent lock contention, permanent-lock recovery, or deadlock freedom; locking is atomic and Boolean in the model.
+- Distributed runtime lock correctness or arbitrary worker-workflow deadlock freedom. The reservation extension separately proves abstract complete-footprint exclusion, snapshot conflict acyclicity and conditional cleanup paths; CDSP locking remains its original atomic Boolean metadata model.
 - An executable recovery, queue, priority, or BFT algorithm for convergence; `oss_realize` uses existential choice and ignores its event when selecting recovery.
 - Network-level properties such as message loss, partial synchrony, or dynamic topology changes; these remain unverified external/refinement obligations.
 - Properties of unverified external components: P2P networking, external cryptographic libraries (BLS), UI, database layer.
+
+---
+
+# Preemptive Lock Correctness
+
+The [session](Preemptive_Lock_Correctness/README.md) connects asset reservations,
+worker leases and source obligations to the actual message receiver, lawful
+rooted funding and journal recovery. Its [claim ledger](Preemptive_Lock_Correctness/claims.json)
+contains exact theorem statements. The [bidirectional obligation ledger](Preemptive_Lock_Correctness/refinement-obligations.json)
+maps 13 load-bearing conditions to required runtime guards, state updates,
+positive tests, mutations and compiled consumers. Every implementation row
+remains **PLANNED / NOT VERIFIED**. Existing token/adapter functions are related
+sources, not a proved LockManager implementation.
+
+| Formal result | Intended consumer | Required boundary |
+|---|---|---|
+| Complete-footprint acquisition and ownership; stale-version continuation rejection | Lock manager and application writes | Authentic complete dependencies, atomic compare/reserve/write, monotone versions/generations and current authority |
+| Source non-reuse and actual parent receiver projection | Source endpoint, relay and destination execution | Immutable K/full binding, accounted source origin, all real routes, durable effect/marker/journal insertion |
+| Reversal/fence success and no later conflicting credit | Source cleanup and next protocol layer | Authoritative no-effect control or true stable reversal evidence; the inherited profile excludes Finalized-to-Reversed changes at one key |
+| Return journal once, exclusive settlement and source-pool conservation | Accounting and recovery | Actual return records, unlost source consumption, rooted holder funding and the same genesis allocation |
+| Current-policy descendant use and pooled-information no-go | Ordinary/enforcement transfers and financial records | Fresh caller/from/to/amount/operation grants and actual regulatory state; total balances and credit records alone omit consumed lineage information |
+| Complete-journal recovery and actual finite continuations | Durable storage and restart | Complete authentic journal, separately retained observations and freshly supplied context; external effect/journal crash window unproved |
+| Snapshot conflict acyclicity and two-call cleanup paths | Scheduler/recovery orchestration | Completed Busy creates no partial holding. This is not external-worker-workflow deadlock freedom or a wall-clock evidence bound |
+
+The public token `balanceOf` remains a raw balance read. It is not the model's
+reservation-aware application-data read. The actual read/use API, coherent
+endpoint fencing, independent terminal profile and external-effect control
+remain product/producer decisions. No full runtime or observational atomicity
+claim follows from these abstract proofs. The source contract supplies actual
+operations and proved invariants, not a Boolean release-safety oracle.
 
 ---
 

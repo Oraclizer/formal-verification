@@ -5,6 +5,14 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added `Preemptive_Lock_Correctness`, extending the existing message session
+  with complete-footprint reservations, replaceable worker leases, source
+  non-reuse, evidence-based release, exclusive financial settlement, rooted
+  funding and complete-journal recovery. The 25-theory session includes
+  actual-consumer controls and semantic mutations. Runtime refinement and
+  independent terminal consensus remain unestablished. Registered the named
+  CI build, source integrity checks and explicit implementation obligations.
+
 - Added `Cross_Chain_Message_Integrity`, extending RAC with authenticated
   source facts, destination-credit uniqueness, constructive route equivalence,
   an exact local-marker criterion, a checked contextual summary and concrete

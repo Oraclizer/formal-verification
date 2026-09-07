@@ -1,8 +1,8 @@
 # Contributing
 
-This repository is the public home of two composable product-model sessions:
-the ten-theory `Cross_Domain_State_Preservation` session and the standalone
-`Regulatory_Action_Composition` child session. It also contains the independent
+This repository is the public home of a composable product-model chain:
+`Cross_Domain_State_Preservation`, `Regulatory_Action_Composition`,
+`Cross_Chain_Message_Integrity` and `Preemptive_Lock_Correctness`. It also contains the independent
 `PARTIAL / NO SAME` `Protected_Behavior_Obstructions` research companion, which
 has no Oraclizer implementation or product-refinement target. The artifacts are
 maintained as single-author scholarly works rather than as a conventional
@@ -67,9 +67,10 @@ so the AFP must be available to Isabelle: register it once with `isabelle compon
 obtaining and using the AFP.
 
 ```bash
-# Check the two product-model sessions (point -d at both this repo and the AFP)
+# Check the product-model sessions (point -d at both this repo and the AFP)
 isabelle build -d . -d /path/to/afp/thys \
-  Cross_Domain_State_Preservation Regulatory_Action_Composition
+  Cross_Domain_State_Preservation Regulatory_Action_Composition \
+  Cross_Chain_Message_Integrity Preemptive_Lock_Correctness
 
 # Check the independent PARTIAL / NO SAME companion (AFP is not required)
 isabelle build -c -D Protected_Behavior_Obstructions \
