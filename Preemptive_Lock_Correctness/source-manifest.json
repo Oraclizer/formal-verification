@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "isabelle": "Isabelle2025-2",
+  "parent_session": "Cross_Chain_Message_Integrity",
+  "parent_repository_revision": "0de6d7961ff0884e392bc573c0dec602b7bda6c6",
+  "ads_functor_url": "https://isa-afp.org/release/afp-ADS_Functor-2026-02-06.tar.gz",
+  "ads_functor_sha256": "10d6fa8671c461022ae5e71859a07610d616681fed79e2f1c81029a124203c85",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "2326aabcdde453e4c425634bd9dd03f73c3a53362fde688b4425b5e0023d114d"
+    },
+    {
+      "path": "ROOT",
+      "sha256": "ed114bc3a6c8d4ef3a154b1ed7eb5720ccd71520e1665c61ab5504b18b81c01c"
+    },
+    {
+      "path": "Reservation_Access.thy",
+      "sha256": "ab22351bf7d4d6c1de9cb0f4af1e143052cee85f36fa0d11d2d101108e14f4e9"
+    },
+    {
+      "path": "Reservation_Accounting.thy",
+      "sha256": "959389a9297919ed13da22de642bbe707515328094fe1e5e30a941ce0ab12591"
+    },
+    {
+      "path": "Reservation_Boundaries.thy",
+      "sha256": "357b238a9487ae19874189fc6a49bc7eb98229258c2409df7e9b2af911d9b247"
+    },
+    {
+      "path": "Reservation_Conservation.thy",
+      "sha256": "3cbbde41f5130406577544aeb798a201004ae90db054ae80e67cb840ff5ea7f3"
+    },
+    {
+      "path": "Reservation_Document.thy",
+      "sha256": "b1bc2d078b4a86dc04d1f1223d8802a5e9ed58cf9c8916e4925c46ad0b604707"
+    },
+    {
+      "path": "Reservation_Evidence.thy",
+      "sha256": "19ba49b5e8e81eae7ece03adb88b85ba3b3943b77bccfe0c7f42bf6f6e821396"
+    },
+    {
+      "path": "Reservation_Examples.thy",
+      "sha256": "1e0bb03167d164d01473298eafe4f3e35308e5b41dd32d3c75a67ccbda8fd588"
+    },
+    {
+      "path": "Reservation_Execution.thy",
+      "sha256": "9f776da88325280a257b4472d31f4175823aa3aa699b6096fb2ba3224656723a"
+    },
+    {
+      "path": "Reservation_Frame.thy",
+      "sha256": "27e278c4c872438949b7e1bbd9ed2d940e5e80392194ee621bb4e96163fc674b"
+    },
+    {
+      "path": "Reservation_Information.thy",
+      "sha256": "530cc026f3515b68b2910bad8ff96a7dc31a52129aebabb3ddf22b3fe44e15b0"
+    },
+    {
+      "path": "Reservation_Lifecycle.thy",
+      "sha256": "e40a1d63bc18d42dd987ad7545718519d9aa77e8f3de201e7b5e920e5b018680"
+    },
+    {
+      "path": "Reservation_Lineage.thy",
+      "sha256": "d8da0beda60197cbb735d038a041d38dc6af7d96e494de97621ebc3f57a1f672"
+    },
+    {
+      "path": "Reservation_Message_Link.thy",
+      "sha256": "0d721a0925617236912fc257d114966720b1ef9a3d9f825440b284ef8d11e5ca"
+    },
+    {
+      "path": "Reservation_Mutations.thy",
+      "sha256": "f203ac1e92688d4e36ca933f5539cf87945440041d573cc3cff92effb0a164c0"
+    },
+    {
+      "path": "Reservation_Ownership.thy",
+      "sha256": "104211d9b290ca4e26c3c9646c5c2a561db4f415724cf8279e4267453a3a9ed6"
+    },
+    {
+      "path": "Reservation_Policy_Cases.thy",
+      "sha256": "441e178ef0a4af137755de53a081ca375b979ffd97c1e0e2ceb20de46117b03c"
+    },
+    {
+      "path": "Reservation_Progress.thy",
+      "sha256": "08e1a98aea8ae1f55d438fc2cdaee9f57689998dc16f4d1c124116f5b9249cea"
+    },
+    {
+      "path": "Reservation_Protocol.thy",
+      "sha256": "bd6240dcbe91a2ccacd164c43b214f90314241389a74159fbd531fae4f800196"
+    },
+    {
+      "path": "Reservation_Provider.thy",
+      "sha256": "1e246b524ae589c85aa9345247c590304318d50d456e3a7f06fedb497736d550"
+    },
+    {
+      "path": "Reservation_Recovery.thy",
+      "sha256": "2f728cefd3970dd06e5121660ca5273ea92937567d8c5e2eaceea831f86776fa"
+    },
+    {
+      "path": "Reservation_Return_History.thy",
+      "sha256": "007c029f5ae5ea459df5cecb28e84dd6d194be5ff65c0001ce310b4f9f46ede4"
+    },
+    {
+      "path": "Reservation_Scenarios.thy",
+      "sha256": "d6035ee2e4418a46f1928518ec52648b10d77e307f51a7c94ea38e4b6a1af55d"
+    },
+    {
+      "path": "Reservation_Settlement.thy",
+      "sha256": "ec3dfc18914828210293cb81fee720049772f38b6f2653f7181fab4dd0a6b60e"
+    },
+    {
+      "path": "Reservation_Types.thy",
+      "sha256": "04acb43ee6792a6be50bb764ddde16f370e6d82ac474f6dc447bc6d52cfcc1c0"
+    },
+    {
+      "path": "Source_Non_Reuse.thy",
+      "sha256": "93f7355fee3b98135aadc0f558fe8dc1fc8e30818898791eb609fc1c042f1266"
+    },
+    {
+      "path": "claims.json",
+      "sha256": "c26c7a68941938c7c4ecbfb3600a4cf82522fd018b517ee752f65867ef9b2b37"
+    },
+    {
+      "path": "document/root.bib",
+      "sha256": "e6fdb77fb7d0da8e3d5337316930cbca16694429742be867f66a4a7a2a859703"
+    },
+    {
+      "path": "document/root.tex",
+      "sha256": "81d8e53c7bd25521a2ff3eedc318a3c4eae6c064289ff43e19ddfbb21cf415b1"
+    },
+    {
+      "path": "refinement-obligations.json",
+      "sha256": "ccb94849af7cdc37143a09d049feeb7591d9739b67a5de2e854fbe5db30040ea"
+    },
+    {
+      "path": "verify-source.mjs",
+      "sha256": "fddb6342ca5e6c0432b227515722d1b4388c3fe14d2e54fa715860d45847e15b"
+    }
+  ]
+}

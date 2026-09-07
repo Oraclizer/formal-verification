@@ -1,0 +1,168 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=23mm]{geometry}
+\usepackage{isabelle,isabellesym}
+\usepackage{amsmath,amssymb,booktabs,tabularx}
+\usepackage{microtype}
+\usepackage{pdfsetup}
+\urlstyle{rm}
+\isabellestyle{it}
+\hypersetup{pdftitle={Preemptive Lock Correctness},pdfauthor={Jinwook Kim (Jay)},pdfsubject={Isabelle/HOL model and verification scope}}
+
+\begin{document}
+\emergencystretch=3em
+\title{Preemptive Lock Correctness}
+\author{Jinwook Kim (Jay)}
+\date{September 2026}
+\maketitle
+
+\begin{abstract}
+This Isabelle/HOL development connects asset reservations, replaceable worker
+leases and irreversible source obligations to the existing authenticated
+message receiver. Arbitrary finite executions preserve ownership, source and
+destination uniqueness, committed updates, financial lineage and complete
+journal recovery. Executable reversal evidence excludes conflicting credit
+under the explicit stable-source profile. Source allocations are conserved
+across unresolved obligations, destination funding and completed returns.
+Concrete executions distinguish timeout from evidence, pooled balances from
+rooted funding, and old message summaries from publication-sensitive
+decisions. These are abstract model results; external finality, authentic
+current contexts and atomic durable execution remain assumptions.
+\end{abstract}
+
+\section{Execution and identity}
+
+A source key identifies an immutable source event. An envelope identifier, a
+worker generation and an authority epoch do not replace it. A transfer binding
+records that key, the asset, amount, destination, recipient, historical source
+epoch, operation and domain separator. The development reuses those types
+and the actual receiver from Cross-Chain Message Integrity.
+
+Acquisition checks the entire current dependency footprint and expected
+versions before reserving any asset. Contention completes with Busy and
+retains no partial acquisition. A reservation retains its binding and
+footprint while its worker lease can expire and be reassigned. Writes use
+the current dependency footprint; terminal cleanup checks the recorded one.
+Committed application data is not a tentative value of an abortable binding
+transaction.
+
+The source account is an allocation pool indexed by source domain and asset.
+Destination balances are indexed by domain, asset and holder. Additional
+funding records identify the originating source key at each holder. A runtime
+adapter must relate these pools and keys to real holdings and source events.
+Token quantities are not regulatory holding support.
+
+\section{Release and conserved obligations}
+
+The protocol distinguishes acquisition, submission, a recorded source effect,
+confirmed credit, an evidenced return and cancellation. A pre-dispatch cancel
+closes the key. After submission, the modeled authoritative source endpoint
+can fence a key only after checking that no debit was recorded; closure and
+that check are atomic in this model. This does not establish absence of an
+uncontrolled external effect.
+
+A debit remains recorded permanently. A destination delivery checks the
+published certificate and the original receiver's admission and once rules;
+it does not wait for a source worker lease or a local pending notification.
+Reconciliation is a separate source-side operation. Consequently, a pending
+source phase may describe acknowledgement lag after a completed destination
+credit. It is not itself the economic unresolved amount.
+
+For each source allocation pool, the proved identity is
+\[
+  \begin{aligned}
+  &\text{source balance}+\text{unresolved amount}\\
+  &\quad+\text{current destination funding from that pool}
+    =\text{genesis allocation}.
+  \end{aligned}
+\]
+The finite sums range over the roots and accounts appearing in the execution.
+Onward transfers redistribute each root's funding among holders. A returned
+binding cannot also be credited, and its actual return journal entry occurs
+at most once. Return records are connected to the current terminal records;
+the equality is not inferred merely from two independent once counters.
+
+The release checker verifies a published certificate, its full binding and
+relay epoch, current authority, ownership, generation, lease and versions.
+Under the parent's stable-source assumption, accepted Reversed evidence
+excludes both existing and later Finalized credit at the same immutable key.
+This profile does not permit Finalized to change to Reversed over time at one
+key. It does not prove an independent distributed terminal-decision protocol.
+
+\section{Progress, information and recovery}
+
+\paragraph{Progress.}
+The snapshot relation between completed Busy requests and current reservation
+owners has no two-edge path and is acyclic. The state machine has no worker
+scheduler or persistent waiting queue. It does not establish absence of
+deadlock in arbitrary external client workflows. Given current permission,
+fresh versions and the required evidence, an expired worker can be replaced
+and cleanup completed in two specified calls. The calls must actually execute
+while their conditions hold. There is no unconditional wall-clock bound on
+external evidence arrival.
+
+\paragraph{Timeout.}
+Advancing time changes neither reservation ownership nor financial effects.
+Two valid source-outcome instances produce the same key, binding and expired
+pending state, while actual evidence-sensitive continuations differ. A
+timeout-only refund replacement creates source funds alongside a late
+destination credit. The information argument is an application of established
+knowledge-precondition reasoning, not a new general impossibility result
+\cite{moses,leases}.
+
+\paragraph{Information.}
+The old checked message summary omits exact certificate-publication
+membership. Two valid certificates can have that same summary but different
+actual admission results. A publication-sensitive internal summary factors
+the actual receiver and is exact for fixed publications over the modeled
+contexts and message states. Separately, two credited roots can merge into
+the same account and leave equal total balances and credit records while
+allowing different onward spending. Those pooled observations do not
+determine the rooted continuation decision.
+
+\paragraph{Recovery.}
+Replaying the complete authentic journal with the same genesis allocation
+recovers every protocol-owned state field, including arbitrary cache loss,
+rooted funding, terminal records and once markers. Applying the same current
+continuation produces the same state, replies and retained observations.
+Completed observations are retained separately; the financial journal does
+not reconstruct them or all historical policy evidence. Storage authenticity,
+completeness and atomicity of the external effect with its record remain
+implementation obligations \cite{persistence,graylamport}.
+
+\section{Formal interface and implementation boundary}
+
+The next protocol layer receives the actual action datatype, execution
+function, computed evidence checks and a contract proved at initialization
+and preserved by actual steps. The contract also instantiates the existing
+guarded-invariant composition interface without requiring a finite carrier.
+No uninterpreted release-safety or future-confirmation oracle is supplied.
+
+The abstract checks require authoritative caller identity, current authority,
+policy and metadata, coherent versions, dependency footprints and source
+control. A concrete implementation must preserve these checks and state
+updates together, handle integer bounds and monotone clocks, and cover every
+actual endpoint and recovery path. The runtime and compiled reservation
+consumer are not established. Public token balance reads are not identified
+with the model's reservation-aware application-data read.
+
+There is no proof here of cross-domain observational atomicity, realization
+of every proposed normal form, independent terminal consensus, a general
+composition of recovery representations, or crashes between external effects
+and journal writes. The source-fact profile and the next-layer producer
+obligations must remain explicit.
+
+\section{Reproduction and evidence}
+
+Use Isabelle2025-2 and the pinned ADS\_Functor dependency specified by the
+repository. Build the named Preemptive\_Lock\_Correctness session. The session
+README supplies the commands; source-manifest.json records the source hashes
+and claims.json records exact theorem roots and assumptions. The complete
+definitions, proof scripts and concrete controls are the accompanying theory
+files. This document is their technical companion, not a replacement proof
+artifact.
+
+\input{session}
+\bibliographystyle{abbrv}
+\bibliography{root}
+\end{document}

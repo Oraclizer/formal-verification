@@ -1,0 +1,628 @@
+{
+  "schema_version": 1,
+  "session": "Preemptive_Lock_Correctness",
+  "result_level": "formal_model",
+  "implementation_refinement": "NOT_ESTABLISHED",
+  "runtime_status": "PLANNED",
+  "assumptions": [
+    {
+      "id": "cryptographic-source-profile",
+      "meaning": "The inherited source_attestation locale assumes sound verification, a finite trusted roster, bounded Byzantine faults, a sufficient threshold and honest source-fact checks.",
+      "anchor": "Source_Certificates.thy: source_attestation"
+    },
+    {
+      "id": "stable-outcome",
+      "meaning": "Every true non-Observed statement has one immutable stable statement at its source key. A later Finalized-to-Reversed change at that key is excluded; independent terminal consensus is not proved.",
+      "anchor": "Source_Certificates.thy: stable_fact_unique"
+    },
+    {
+      "id": "actual-current-context",
+      "meaning": "Caller identity, authority, permissions, regulatory metadata, versions and dependency footprints must describe the actual coherent current execution context.",
+      "anchor": "Reservation_Protocol.thy: metadata_permission; Reservation_Types.thy: owns_recorded_reservation"
+    },
+    {
+      "id": "source-pool-refinement",
+      "meaning": "Domain/asset allocation pools and immutable event keys must be related to actual source holdings and events. Token quantities are not regulatory holding support.",
+      "anchor": "Reservation_Types.thy: source_account_of"
+    },
+    {
+      "id": "authoritative-source-control",
+      "meaning": "The modeled source endpoint atomically checks persistent debit absence and permanently fences the key; absence of an uncontrolled external observation is insufficient.",
+      "anchor": "Reservation_Protocol.thy: fence_unexecuted_source"
+    },
+    {
+      "id": "atomic-durable-step",
+      "meaning": "Accepted effect, marker and journal insertion are one atomic durable model step. Crashes between an external effect and its journal record are not covered.",
+      "anchor": "Reservation_Types.thy: commit_reservation_event"
+    },
+    {
+      "id": "journal-input",
+      "meaning": "Recovery uses the complete authentic locally produced journal and the same genesis allocation. Completed observations are retained separately, and historical policy evidence is not reconstructed in full.",
+      "anchor": "Reservation_Recovery.thy: complete_journal_recovers_arbitrary_cache_loss"
+    },
+    {
+      "id": "progress-preconditions",
+      "meaning": "The explicit cleanup call bounds require current permission, coherent versions, suitable evidence and calls executed while their lease/other preconditions hold. No unconditional evidence arrival, wall-clock bound or external-worker-workflow deadlock theorem is given.",
+      "anchor": "Reservation_Progress.thy"
+    },
+    {
+      "id": "runtime-ranges-and-coverage",
+      "meaning": "All modeled routes must correspond to real entrypoints. Machine counters must not wrap, clocks must be authoritative and monotone, and the compiled consumer must preserve the actual guards and state updates. Runtime refinement remains planned.",
+      "anchor": "refinement-obligations.json"
+    }
+  ],
+  "claims": [
+    {
+      "id": "ownership",
+      "theorem": "Reservation_Ownership.source_attestation.generated_reservations_have_consistent_owners",
+      "source": "Reservation_Ownership.thy",
+      "line": 172,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> ownership_consistent (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances)))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "footprint-exclusion",
+      "theorem": "Reservation_Ownership.active_footprints_cannot_overlap",
+      "source": "Reservation_Ownership.thy",
+      "line": 183,
+      "statement": "\\<lbrakk>ownership_consistent ?s; reservation_at ?s ?key = Some ?first; reservation_at ?s ?other = Some ?second; active_reservation_phase (reservation_phase ?first); active_reservation_phase (reservation_phase ?second); ?asset \\<in> set (reservation_footprint ?first); ?asset \\<in> set (reservation_footprint ?second)\\<rbrakk> \\<Longrightarrow> ?key = ?other",
+      "oracle_dependencies": 0,
+      "premises": 7,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "completed-conflict-acyclicity",
+      "theorem": "Reservation_Progress.completed_busy_conflicts_are_acyclic",
+      "source": "Reservation_Progress.thy",
+      "line": 69,
+      "statement": "ownership_consistent (machine_state ?m) \\<Longrightarrow> acyclic (completed_busy_conflicts ?c ?requests ?versions ?duration ?m)",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "held-recovery",
+      "theorem": "Reservation_Progress.expired_held_reservation_recovers_in_two_calls",
+      "source": "Reservation_Progress.thy",
+      "line": 143,
+      "statement": "\\<lbrakk>ownership_consistent (machine_state ?m); reservation_at (machine_state ?m) (binding_key (request_binding ?r)) = Some ?res; current_use_allowed (lock_authority ?c) ?r; 0 < ?duration; reservation_binding ?res = request_binding ?r; reservation_phase ?res = Reservation_Held; reservation_deadline ?res \\<le> reservation_clock (machine_state ?m)\\<rbrakk> \\<Longrightarrow> snd (reassign_worker ?c ?r ?duration ?m) = Worker_Reassigned \\<and> snd (cancel_before_dispatch ?c ?r (Suc (reservation_generation ?res)) (asset_version (machine_state ?m)) (fst (reassign_worker ?c ?r ?duration ?m))) = Reservation_Released \\<and> (\\<forall>asset. asset_owner (machine_state (fst (cancel_before_dispatch ?c ?r (Suc (reservation_generation ?res)) (asset_version (machine_state ?m)) (fst (reassign_worker ?c ?r ?duration ?m))))) asset \\<noteq> Some (binding_key (request_binding ?r)))",
+      "oracle_dependencies": 0,
+      "premises": 7,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "credit-recovery",
+      "theorem": "Reservation_Progress.source_attestation.expired_pending_credit_recovers_in_two_calls",
+      "source": "Reservation_Progress.thy",
+      "line": 193,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; ownership_consistent (machine_state ?m); reservation_at (machine_state ?m) (binding_key (request_binding ?r)) = Some ?res; current_use_allowed (lock_authority ?c) ?r; 0 < ?duration; reservation_binding ?res = request_binding ?r; reservation_phase ?res = Source_Pending; reservation_deadline ?res \\<le> reservation_clock (machine_state ?m); request_binding ?r \\<in> set (credit_history (received_messages (machine_state ?m)))\\<rbrakk> \\<Longrightarrow> snd (reassign_worker ?c ?r ?duration ?m) = Worker_Reassigned \\<and> snd (opposite.reconcile_recorded_credit ?c ?r (Suc (reservation_generation ?res)) (asset_version (machine_state ?m)) (fst (reassign_worker ?c ?r ?duration ?m))) = Reservation_Released \\<and> (\\<forall>asset. asset_owner (machine_state (fst (opposite.reconcile_recorded_credit ?c ?r (Suc (reservation_generation ?res)) (asset_version (machine_state ?m)) (fst (reassign_worker ?c ?r ?duration ?m))))) asset \\<noteq> Some (binding_key (request_binding ?r)))",
+      "oracle_dependencies": 0,
+      "premises": 9,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "reversal-recovery",
+      "theorem": "Reservation_Progress.source_attestation.expired_pending_reversal_recovers_in_two_calls",
+      "source": "Reservation_Progress.thy",
+      "line": 224,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; ownership_consistent (machine_state ?m); reservation_at (machine_state ?m) (binding_key (request_binding ?r)) = Some ?res; current_use_allowed (lock_authority ?c) ?r; 0 < ?duration; reservation_binding ?res = request_binding ?r; reservation_phase ?res = Source_Pending; reservation_deadline ?res \\<le> reservation_clock (machine_state ?m); source_attestation.reversed_source_evidence ?roster ?threshold ?verifies (lock_authority ?c) ?r (machine_state ?m)\\<rbrakk> \\<Longrightarrow> snd (reassign_worker ?c ?r ?duration ?m) = Worker_Reassigned \\<and> snd (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r (Suc (reservation_generation ?res)) (asset_version (machine_state ?m)) (fst (reassign_worker ?c ?r ?duration ?m))) = Reservation_Released \\<and> (\\<forall>asset. asset_owner (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r (Suc (reservation_generation ?res)) (asset_version (machine_state ?m)) (fst (reassign_worker ?c ?r ?duration ?m))))) asset \\<noteq> Some (binding_key (request_binding ?r)))",
+      "oracle_dependencies": 0,
+      "premises": 9,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "current-write",
+      "theorem": "Reservation_Frame.successful_write_current_owner_and_version",
+      "source": "Reservation_Frame.thy",
+      "line": 22,
+      "statement": "snd (write_asset_data ?c ?r ?g ?versions ?value ?m) = Data_Updated \\<Longrightarrow> current_use_allowed (lock_authority ?c) ?r \\<and> asset_owner (machine_state ?m) (binding_asset (request_binding ?r)) = Some (binding_key (request_binding ?r)) \\<and> ?versions (binding_asset (request_binding ?r)) = asset_version (machine_state ?m) (binding_asset (request_binding ?r))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "stale-version-continuation",
+      "theorem": "Reservation_Frame.source_attestation.stale_version_stays_invalid_after_finite_continuation",
+      "source": "Reservation_Frame.thy",
+      "line": 204,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; snd (write_asset_data ?c ?r ?g ?versions ?value ?m) = Data_Updated; journal_agreement ?balances ?m; binding_asset (request_binding ?next) = binding_asset (request_binding ?r)\\<rbrakk> \\<Longrightarrow> snd (write_asset_data ?next_context ?next ?next_generation ?versions ?next_value (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?continuation (fst (write_asset_data ?c ?r ?g ?versions ?value ?m)))) = Request_Rejected",
+      "oracle_dependencies": 0,
+      "premises": 4,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "data-frame",
+      "theorem": "Reservation_Frame.write_preserves_other_asset_data",
+      "source": "Reservation_Frame.thy",
+      "line": 58,
+      "statement": "?asset \\<noteq> binding_asset (request_binding ?r) \\<Longrightarrow> asset_value (machine_state (fst (write_asset_data ?c ?r ?g ?versions ?value ?m))) ?asset = asset_value (machine_state ?m) ?asset \\<and> asset_version (machine_state (fst (write_asset_data ?c ?r ?g ?versions ?value ?m))) ?asset = asset_version (machine_state ?m) ?asset",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "foreign-owner-frame",
+      "theorem": "Reservation_Frame.foreign_reservation_cannot_overwrite_owned_asset",
+      "source": "Reservation_Frame.thy",
+      "line": 82,
+      "statement": "\\<lbrakk>asset_owner (machine_state ?m) ?asset = Some ?key; binding_key (request_binding ?r) \\<noteq> ?key\\<rbrakk> \\<Longrightarrow> asset_value (machine_state (fst (write_asset_data ?c ?r ?g ?versions ?value ?m))) ?asset = asset_value (machine_state ?m) ?asset \\<and> asset_version (machine_state (fst (write_asset_data ?c ?r ?g ?versions ?value ?m))) ?asset = asset_version (machine_state ?m) ?asset",
+      "oracle_dependencies": 0,
+      "premises": 2,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "source-destination-once-link",
+      "theorem": "Reservation_Message_Link.source_attestation.source_non_reuse_and_destination_once",
+      "source": "Reservation_Message_Link.thy",
+      "line": 107,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> count_list (map binding_key (source_effects (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))) ?key \\<le> 1 \\<and> count_list (map binding_key (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances)))))) ?key \\<le> 1 \\<and> set (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))) \\<subseteq> set (source_effects (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "actual-message-projection",
+      "theorem": "Reservation_Message_Link.source_attestation.actual_parent_message_projection",
+      "source": "Reservation_Message_Link.thy",
+      "line": 61,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> received_messages (machine_state (fst (source_attestation.deliver_reserved_credit ?roster ?threshold ?verifies ?route ?c ?r ?m))) = fst (source_attestation.published_receive ?roster ?threshold ?verifies ?route ?c ?r (machine_state ?m))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "prior-source-origin",
+      "theorem": "Reservation_Message_Link.source_attestation.accepted_credit_uses_prior_source",
+      "source": "Reservation_Message_Link.thy",
+      "line": 127,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.message_source_invariant ?roster ?threshold ?verifies ?stable_source (machine_state ?m); snd (source_attestation.deliver_reserved_credit ?roster ?threshold ?verifies ?route ?c ?r ?m) = Delivery_Response (New_Credit ?b)\\<rbrakk> \\<Longrightarrow> ?b \\<in> set (source_effects (machine_state ?m))",
+      "oracle_dependencies": 0,
+      "premises": 3,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "timeout-non-authority",
+      "theorem": "Source_Non_Reuse.timeout_has_no_terminal_or_financial_authority",
+      "source": "Source_Non_Reuse.thy",
+      "line": 92,
+      "statement": "reservation_at (machine_state (advance_reservation_time ?elapsed ?m)) = reservation_at (machine_state ?m) \\<and> asset_owner (machine_state (advance_reservation_time ?elapsed ?m)) = asset_owner (machine_state ?m) \\<and> source_units (machine_state (advance_reservation_time ?elapsed ?m)) = source_units (machine_state ?m) \\<and> destination_units (machine_state (advance_reservation_time ?elapsed ?m)) = destination_units (machine_state ?m) \\<and> source_effects (machine_state (advance_reservation_time ?elapsed ?m)) = source_effects (machine_state ?m) \\<and> received_messages (machine_state (advance_reservation_time ?elapsed ?m)) = received_messages (machine_state ?m)",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "timeout-information-boundary",
+      "theorem": "Reservation_Boundaries.no_timeout_only_classifier_can_recover_both_outcome_consumers",
+      "source": "Reservation_Boundaries.thy",
+      "line": 103,
+      "statement": "\\<nexists>classify. classify expired_pending_sample = (snd (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (sample.publish_source_certificate (sample_certificate 17) expired_pending_sample)) = Delivery_Response (New_Credit (sample_binding 17))) \\<and> classify expired_pending_sample = (snd (opposite.deliver_reserved_credit Bypass_Route example_context opposite_request (opposite.publish_source_certificate opposite_certificate expired_pending_sample)) = Delivery_Response (New_Credit (sample_binding 17)))",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "release-exact-guard",
+      "theorem": "Reservation_Evidence.source_attestation.evidence_release_exact_guard",
+      "source": "Reservation_Evidence.thy",
+      "line": 53,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (snd (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m) = Reservation_Released) = (owns_recorded_reservation ?c ?r ?g ?versions (machine_state ?m) \\<and> phase_at (machine_state ?m) (binding_key (request_binding ?r)) = Some Source_Pending \\<and> source_attestation.reversed_source_evidence ?roster ?threshold ?verifies (lock_authority ?c) ?r (machine_state ?m))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "release-no-future-credit",
+      "theorem": "Reservation_Evidence.source_attestation.released_source_has_no_current_or_future_credit",
+      "source": "Reservation_Evidence.thy",
+      "line": 90,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; snd (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m) = Reservation_Released; binding_key (request_binding ?other) = binding_key (request_binding ?r)\\<rbrakk> \\<Longrightarrow> snd (source_attestation.published_receive ?roster ?threshold ?verifies ?route ?current ?other ?future) = Message_Rejected",
+      "oracle_dependencies": 0,
+      "premises": 3,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "release-preserves-completed-effects",
+      "theorem": "Reservation_Evidence.source_attestation.evidence_release_preserves_destination_and_completed_data",
+      "source": "Reservation_Evidence.thy",
+      "line": 60,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> destination_units (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m))) = destination_units (machine_state ?m) \\<and> funded_units (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m))) = funded_units (machine_state ?m) \\<and> received_messages (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m))) = received_messages (machine_state ?m) \\<and> lawful_descendants (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m))) = lawful_descendants (machine_state ?m) \\<and> asset_value (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m))) = asset_value (machine_state ?m) \\<and> asset_version (machine_state (fst (source_attestation.release_to_source ?roster ?threshold ?verifies ?c ?r ?g ?versions ?m))) = asset_version (machine_state ?m)",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "fence-no-later-source",
+      "theorem": "Reservation_Lifecycle.source_attestation.successful_fence_prevents_every_later_source_effect",
+      "source": "Reservation_Lifecycle.thy",
+      "line": 340,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_lifecycle_consistent (machine_state ?m); ownership_consistent (machine_state ?m); journal_agreement ?balances ?m; snd (fence_unexecuted_source ?c ?r ?g ?versions ?m) = Source_Fenced\\<rbrakk> \\<Longrightarrow> \\<not> source_was_debited (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?continuation (fst (fence_unexecuted_source ?c ?r ?g ?versions ?m)))) (binding_key (request_binding ?r))",
+      "oracle_dependencies": 0,
+      "premises": 5,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "fence-no-later-credit",
+      "theorem": "Reservation_Return_History.source_attestation.successful_fence_prevents_every_later_credit",
+      "source": "Reservation_Return_History.thy",
+      "line": 28,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_lifecycle_consistent (machine_state ?m); ownership_consistent (machine_state ?m); source_attestation.message_source_invariant ?roster ?threshold ?verifies ?stable_source (machine_state ?m); journal_agreement ?balances ?m; snd (fence_unexecuted_source ?c ?r ?g ?versions ?m) = Source_Fenced\\<rbrakk> \\<Longrightarrow> binding_key (request_binding ?r) \\<notin> set (map binding_key (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?continuation (fst (fence_unexecuted_source ?c ?r ?g ?versions ?m)))))))",
+      "oracle_dependencies": 0,
+      "premises": 6,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "cancel-no-later-credit",
+      "theorem": "Reservation_Return_History.source_attestation.successful_cancel_prevents_every_later_credit",
+      "source": "Reservation_Return_History.thy",
+      "line": 52,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_lifecycle_consistent (machine_state ?m); ownership_consistent (machine_state ?m); source_attestation.message_source_invariant ?roster ?threshold ?verifies ?stable_source (machine_state ?m); journal_agreement ?balances ?m; snd (cancel_before_dispatch ?c ?r ?g ?versions ?m) = Reservation_Released\\<rbrakk> \\<Longrightarrow> binding_key (request_binding ?r) \\<notin> set (map binding_key (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?continuation (fst (cancel_before_dispatch ?c ?r ?g ?versions ?m)))))))",
+      "oracle_dependencies": 0,
+      "premises": 6,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "closed-record-retention",
+      "theorem": "Reservation_Lifecycle.source_attestation.closed_record_survives_arbitrary_continuation",
+      "source": "Reservation_Lifecycle.thy",
+      "line": 22,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; reservation_at (machine_state ?m) ?key = Some ?res; \\<not> active_reservation_phase (reservation_phase ?res); journal_agreement ?balances ?m\\<rbrakk> \\<Longrightarrow> reservation_at (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions ?m)) ?key = Some ?res",
+      "oracle_dependencies": 0,
+      "premises": 4,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "return-once",
+      "theorem": "Reservation_Return_History.source_attestation.every_source_key_is_returned_at_most_once",
+      "source": "Reservation_Return_History.thy",
+      "line": 327,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> count_list (map binding_key (returned_bindings (machine_journal (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))) ?key \\<le> 1",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "return-journal-state-link",
+      "theorem": "Reservation_Return_History.source_attestation.return_journal_matches_returned_source_bindings",
+      "source": "Reservation_Return_History.thy",
+      "line": 356,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; return_history_agreement ?m; source_lifecycle_consistent (machine_state ?m)\\<rbrakk> \\<Longrightarrow> set (returned_bindings (machine_journal ?m)) = example.returned_source_bindings (machine_state ?m)",
+      "oracle_dependencies": 0,
+      "premises": 3,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "settlement-partition",
+      "theorem": "Reservation_Settlement.source_attestation.reachable_settlement_partition(1)",
+      "source": "Reservation_Settlement.thy",
+      "line": 176,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> set (source_effects (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances)))) = example.unresolved_source_obligations (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) \\<union> set (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))) \\<union> example.returned_source_bindings (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances)))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "unresolved-credit-disjoint",
+      "theorem": "Reservation_Settlement.source_attestation.reachable_settlement_partition(2)",
+      "source": "Reservation_Settlement.thy",
+      "line": 176,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> example.unresolved_source_obligations (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) \\<inter> set (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))) = {}",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "unresolved-return-disjoint",
+      "theorem": "Reservation_Settlement.source_attestation.reachable_settlement_partition(3)",
+      "source": "Reservation_Settlement.thy",
+      "line": 176,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> example.unresolved_source_obligations (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) \\<inter> example.returned_source_bindings (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) = {}",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "credit-return-disjoint",
+      "theorem": "Reservation_Settlement.source_attestation.reachable_settlement_partition(4)",
+      "source": "Reservation_Settlement.thy",
+      "line": 176,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> set (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))))) \\<inter> example.returned_source_bindings (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) = {}",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "financial-history",
+      "theorem": "Reservation_Accounting.source_attestation.generated_balances_follow_financial_history",
+      "source": "Reservation_Accounting.thy",
+      "line": 90,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> financial_history_agreement ?balances (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "root-funding-conservation",
+      "theorem": "Reservation_Conservation.source_attestation.credited_root_preserves_its_exact_funding",
+      "source": "Reservation_Conservation.thy",
+      "line": 39,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; financial_history_agreement ?balances ?m; source_attestation.message_invariant ?stable_source (received_messages (machine_state ?m)); ?b \\<in> set (credit_history (received_messages (machine_state ?m)))\\<rbrakk> \\<Longrightarrow> (\\<Sum>account\\<in>financial_accounts (machine_state ?m). int (funded_units (machine_state ?m) (binding_key ?b, account))) = int (binding_amount ?b)",
+      "oracle_dependencies": 0,
+      "premises": 4,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "source-pool-conservation",
+      "theorem": "Reservation_Conservation.source_attestation.all_finite_executions_conserve_source_allocations",
+      "source": "Reservation_Conservation.thy",
+      "line": 135,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> int (source_units (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) ?account) + example.unresolved_pool_mass (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) ?account + example.destination_pool_funding (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) ?account = int (?balances ?account)",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "cache-loss-recovery",
+      "theorem": "Reservation_Recovery.complete_journal_recovers_arbitrary_cache_loss",
+      "source": "Reservation_Recovery.thy",
+      "line": 8,
+      "statement": "journal_agreement ?balances ?m \\<Longrightarrow> restart_reservation_machine ?balances (?m\\<lparr>machine_state := ?lost_cache\\<rparr>) = ?m",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "actual-continuation-recovery",
+      "theorem": "Reservation_Recovery.source_attestation.complete_journal_preserves_actual_continuations_after_cache_loss",
+      "source": "Reservation_Recovery.thy",
+      "line": 16,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; journal_agreement ?balances ?m\\<rbrakk> \\<Longrightarrow> source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?continuation (restart_reservation_machine ?balances (?m\\<lparr>machine_state := ?lost_cache\\<rparr>)) = source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?continuation ?m",
+      "oracle_dependencies": 0,
+      "premises": 2,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "publication-summary-exact",
+      "theorem": "Reservation_Information.source_attestation.publication_sensitive_summary_is_exact_for_fixed_publications",
+      "source": "Reservation_Information.thy",
+      "line": 38,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> (source_attestation.publication_checked_summary ?roster ?threshold ?verifies ?published ?first = source_attestation.publication_checked_summary ?roster ?threshold ?verifies ?published ?second) = (\\<forall>c messages. source_attestation.receive_with_publications ?roster ?threshold ?verifies ?published c ?first messages = source_attestation.receive_with_publications ?roster ?threshold ?verifies ?published c ?second messages)",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "publication-summary-recovery",
+      "theorem": "Reservation_Information.source_attestation.journal_recovery_preserves_publication_summary",
+      "source": "Reservation_Information.thy",
+      "line": 55,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; journal_agreement ?balances ?m\\<rbrakk> \\<Longrightarrow> source_attestation.publication_checked_summary ?roster ?threshold ?verifies (issued_certificates (machine_state (restart_reservation_machine ?balances ?m))) ?envelope = source_attestation.publication_checked_summary ?roster ?threshold ?verifies (issued_certificates (machine_state ?m)) ?envelope",
+      "oracle_dependencies": 0,
+      "premises": 2,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "pooled-information-no-go",
+      "theorem": "Reservation_Lineage.pooled_balances_and_credit_records_do_not_determine_continuation",
+      "source": "Reservation_Lineage.thy",
+      "line": 76,
+      "statement": "\\<nexists>decide. \\<forall>m\\<in>{lineage_history 17, lineage_history 23}. decide (pooled_observation m) = snd (execute_descendant (sample_context ACTIVE) (spend_request 17 5 1) (sample_binding 17) 4 5 1 m)",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "current-contract",
+      "theorem": "Reservation_Provider.source_attestation.all_finite_executions_supply_the_reservation_contract",
+      "source": "Reservation_Provider.thy",
+      "line": 42,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "composition-interface",
+      "theorem": "Reservation_Provider.source_attestation.reservation_contract_instantiates_guarded_invariance",
+      "source": "Reservation_Provider.thy",
+      "line": 46,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> guarded_invariant UNIV (\\<lambda>m action. Some (source_attestation.reservation_step ?roster ?threshold ?verifies ?balances action m)) UNIV (source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances) (\\<lambda>m action. True)",
+      "oracle_dependencies": 0,
+      "premises": 1,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "concrete-credit",
+      "theorem": "Reservation_Examples.full_credit_consumer_activates",
+      "source": "Reservation_Examples.thy",
+      "line": 112,
+      "statement": "credit_history (received_messages (machine_state sample_credited)) = [sample_binding 17] \\<and> destination_units (machine_state sample_credited) (2, 17, 3) = 5 \\<and> funded_units (machine_state sample_credited) ((0, 17), 2, 17, 3) = 5 \\<and> asset_owner (machine_state sample_credited) 17 = None",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "concrete-release",
+      "theorem": "Reservation_Scenarios.actual_reversal_release_activates",
+      "source": "Reservation_Scenarios.thy",
+      "line": 13,
+      "statement": "snd (sample.release_to_source (sample_source_context ACTIVE) (sample_request 22) 0 (\\<lambda>_. 0) sample_return_ready) = Reservation_Released \\<and> source_units (machine_state (fst (sample.release_to_source (sample_source_context ACTIVE) (sample_request 22) 0 (\\<lambda>_. 0) sample_return_ready))) (0, 22) = 5 \\<and> phase_at (machine_state (fst (sample.release_to_source (sample_source_context ACTIVE) (sample_request 22) 0 (\\<lambda>_. 0) sample_return_ready))) (0, 22) = Some Source_Returned",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "source-once-removal",
+      "theorem": "Reservation_Mutations.omitted_source_once_repeats_burn",
+      "source": "Reservation_Mutations.thy",
+      "line": 31,
+      "statement": "count_list (map binding_key (source_effects (machine_state (fst (source_without_once (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) (sample_burnt 17)))))) (0, 17) = 2",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "destination-once-removal",
+      "theorem": "Reservation_Mutations.omitted_destination_once_repeats_credit",
+      "source": "Reservation_Mutations.thy",
+      "line": 59,
+      "statement": "count_list (map binding_key (credit_history (received_messages (machine_state (fst (sample.destination_without_once example_context (sample_request 17) sample_credited)))))) (0, 17) = 2",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "publication-origin-removal",
+      "theorem": "Reservation_Scenarios.removing_publication_origin_creates_unfunded_credit",
+      "source": "Reservation_Scenarios.thy",
+      "line": 85,
+      "statement": "source_effects (machine_state (fst (sample.deliver_reserved_credit Validated_Route example_context (sample_request 17) (sample.publication_without_source_origin (sample_certificate 17) sample_initial)))) = [] \\<and> credit_history (received_messages (machine_state (fst (sample.deliver_reserved_credit Validated_Route example_context (sample_request 17) (sample.publication_without_source_origin (sample_certificate 17) sample_initial))))) = [sample_binding 17]",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "reversal-evidence-removal",
+      "theorem": "Reservation_Scenarios.removing_reversal_evidence_duplicates_money_despite_both_once_counts",
+      "source": "Reservation_Scenarios.thy",
+      "line": 111,
+      "statement": "source_units (machine_state (fst (opposite.release_without_reversal_evidence (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) sample_credit_before_ack))) (0, 17) = 10 \\<and> destination_units (machine_state (fst (opposite.release_without_reversal_evidence (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) sample_credit_before_ack))) (2, 17, 3) = 5 \\<and> source_effects (machine_state (fst (opposite.release_without_reversal_evidence (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) sample_credit_before_ack))) = [sample_binding 17] \\<and> credit_history (received_messages (machine_state (fst (opposite.release_without_reversal_evidence (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) sample_credit_before_ack)))) = [sample_binding 17]",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "stale-version-removal",
+      "theorem": "Reservation_Frame.omitted_expected_version_overwrites_committed_value",
+      "source": "Reservation_Frame.thy",
+      "line": 264,
+      "statement": "snd (write_without_expected_version_check (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) 12 sample_written_nine) = Data_Updated \\<and> asset_value (machine_state (fst (write_without_expected_version_check (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) 12 sample_written_nine))) 17 = 12 \\<and> asset_version (machine_state (fst (write_without_expected_version_check (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) 12 sample_written_nine))) 17 = 2",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "wrong-asset-mutation",
+      "theorem": "Reservation_Access.wrong_target_write_changes_unrelated_asset",
+      "source": "Reservation_Access.thy",
+      "line": 80,
+      "statement": "snd (write_to_unrelated_asset (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) 9 30 sample_held_for_write) = Data_Updated \\<and> asset_value (machine_state (fst (write_to_unrelated_asset (sample_source_context ACTIVE) (sample_request 17) 0 (\\<lambda>_. 0) 9 30 sample_held_for_write))) 30 = 9",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "timeout-refund-mutation",
+      "theorem": "Reservation_Boundaries.timeout_only_refund_and_late_credit_duplicate_money",
+      "source": "Reservation_Boundaries.thy",
+      "line": 94,
+      "statement": "source_units (machine_state (fst (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (sample.publish_source_certificate (sample_certificate 17) (timeout_only_refund (sample_request 17) expired_pending_sample))))) (0, 17) = 10 \\<and> destination_units (machine_state (fst (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (sample.publish_source_certificate (sample_certificate 17) (timeout_only_refund (sample_request 17) expired_pending_sample))))) (2, 17, 3) = 5 \\<and> credit_history (received_messages (machine_state (fst (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (sample.publish_source_certificate (sample_certificate 17) (timeout_only_refund (sample_request 17) expired_pending_sample)))))) = [sample_binding 17]",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "recovery-once-mutation",
+      "theorem": "Reservation_Recovery.losing_recovered_once_state_reissues_root_funding",
+      "source": "Reservation_Recovery.thy",
+      "line": 64,
+      "statement": "funded_units (machine_state (fst (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (replay_losing_once sample_balances (lineage_history 17))))) ((0, 17), 2, 17, 3) = 5 \\<and> funded_units (machine_state (fst (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (replay_losing_once sample_balances (lineage_history 17))))) ((0, 17), 2, 17, 4) = 5 \\<and> source_effects (machine_state (fst (sample.deliver_reserved_credit Bypass_Route example_context (sample_request 17) (replay_losing_once sample_balances (lineage_history 17))))) = [sample_binding 17, sample_binding 23]",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "current-regulatory-consumer",
+      "theorem": "Reservation_Policy_Cases.current_regulatory_freeze_blocks_old_credit_use",
+      "source": "Reservation_Policy_Cases.thy",
+      "line": 8,
+      "statement": "snd (execute_descendant (sample_context FROZEN) (spend_request 17 4 1) (sample_binding 17) 3 4 1 sample_credited) = Request_Rejected \\<and> snd (execute_descendant (sample_context ACTIVE) (spend_request 17 4 1) (sample_binding 17) 3 4 1 sample_credited) = Descendant_Executed",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "policy-consumer-removal",
+      "theorem": "Reservation_Policy_Cases.omitted_policy_admission_spends_while_frozen",
+      "source": "Reservation_Policy_Cases.thy",
+      "line": 31,
+      "statement": "snd (descendant_without_policy_admission (sample_context FROZEN) (spend_request 17 4 1) (sample_binding 17) 3 4 1 sample_credited) = Descendant_Executed \\<and> funded_units (machine_state (fst (descendant_without_policy_admission (sample_context FROZEN) (spend_request 17 4 1) (sample_binding 17) 3 4 1 sample_credited))) ((0, 17), 2, 17, 4) = 1",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "return-closure-mutation",
+      "theorem": "Reservation_Policy_Cases.omitting_the_closure_mechanism_returns_twice",
+      "source": "Reservation_Policy_Cases.thy",
+      "line": 66,
+      "statement": "source_units (machine_state (fst (sample.release_without_closing_record (sample_source_context ACTIVE) (sample_request 22) 0 (\\<lambda>_. 0) (fst (sample.release_without_closing_record (sample_source_context ACTIVE) (sample_request 22) 0 (\\<lambda>_. 0) sample_return_ready))))) (0, 22) = 10",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    },
+    {
+      "id": "independent-asset-progress",
+      "theorem": "Reservation_Access.unrelated_asset_makes_progress_during_source_pending",
+      "source": "Reservation_Access.thy",
+      "line": 95,
+      "statement": "snd (acquire_reservation independent_asset_context (sample_request 30) (\\<lambda>_. 0) 10 (sample_burnt 17)) = Reservation_Acquired \\<and> snd (write_asset_data independent_asset_context (sample_request 30) 0 (\\<lambda>_. 0) 12 independent_asset_acquired) = Data_Updated \\<and> asset_value (machine_state (fst (write_asset_data independent_asset_context (sample_request 30) 0 (\\<lambda>_. 0) 12 independent_asset_acquired))) 30 = 12 \\<and> asset_owner (machine_state (fst (write_asset_data independent_asset_context (sample_request 30) 0 (\\<lambda>_. 0) 12 independent_asset_acquired))) 17 = Some (0, 17) \\<and> source_effects (machine_state (fst (write_asset_data independent_asset_context (sample_request 30) 0 (\\<lambda>_. 0) 12 independent_asset_acquired))) = [sample_binding 17]",
+      "oracle_dependencies": 0,
+      "premises": 0,
+      "result_level": "formal_model"
+    }
+  ],
+  "formal_consumers": [
+    {
+      "provider": "source_attestation.published_receive",
+      "consumer": "source_attestation.deliver_reserved_credit",
+      "source": "Reservation_Message_Link.thy",
+      "connection": "actual_parent_message_projection",
+      "positive": "full_credit_consumer_activates",
+      "removal": "removing_publication_origin_creates_unfunded_credit"
+    },
+    {
+      "provider": "reversed_source_evidence",
+      "consumer": "release_to_source",
+      "source": "Reservation_Evidence.thy",
+      "connection": "released_source_has_no_current_or_future_credit",
+      "positive": "actual_reversal_release_activates",
+      "removal": "removing_reversal_evidence_duplicates_money_despite_both_once_counts"
+    },
+    {
+      "provider": "return_history_agreement / financial_history_agreement / settlement_records_consistent",
+      "consumer": "source_pool_mass_is_conserved",
+      "source": "Reservation_Conservation.thy",
+      "connection": "all_finite_executions_conserve_source_allocations",
+      "positive": "full_credit_consumer_activates",
+      "removal": "omitting_the_closure_mechanism_returns_twice"
+    },
+    {
+      "provider": "RAC ordinary_transfer_allowed / transfer_allowed",
+      "consumer": "metadata_permission / execute_descendant",
+      "source": "Reservation_Policy_Cases.thy",
+      "positive": "current_regulatory_freeze_blocks_old_credit_use",
+      "removal": "omitted_policy_admission_spends_while_frozen"
+    },
+    {
+      "provider": "actual_step_preserves_reservation_contract",
+      "consumer": "guarded_invariant",
+      "source": "Reservation_Provider.thy",
+      "connection": "reservation_contract_instantiates_guarded_invariance",
+      "status": "proved interface packaging; no novelty or distributed-atomicity credit"
+    }
+  ],
+  "nonclaims": [
+    "cryptographic implementation",
+    "external finality implementation",
+    "independent terminal consensus",
+    "distributed observational atomicity",
+    "realization of every proposed normal form",
+    "general composition of recovery representations",
+    "external effect/journal crash window",
+    "all external worker workflow deadlocks",
+    "unconditional evidence arrival or wall-clock liveness",
+    "compiled/runtime implementation refinement"
+  ]
+}
