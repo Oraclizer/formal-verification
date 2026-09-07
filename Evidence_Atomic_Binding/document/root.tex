@@ -1,0 +1,396 @@
+% SPDX-License-Identifier: BSD-3-Clause
+% Standalone build: pdflatex root; bibtex root; pdflatex root; pdflatex root.
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=20mm,headheight=14pt,headsep=7mm,footskip=10mm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\definecolor{ink}{HTML}{19354A}
+\hypersetup{colorlinks=true,linkcolor=ink,citecolor=ink,urlcolor=ink,
+  pdftitle={Evidence Atomic Binding: Repository Technical Guide},
+  pdfsubject={Conditional formal model, consumers, observations and implementation obligations},
+  pdfauthor={}}
+\urlstyle{tt}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\source}[1]{\href{../#1}{\nolinkurl{#1}}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=1.4em,itemsep=3pt,topsep=3pt,parsep=0pt}
+\renewcommand{\arraystretch}{1.18}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{ink}Evidence Atomic Binding}
+\fancyhead[R]{\small Repository technical guide}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\raggedbottom
+
+\begin{document}
+\thispagestyle{plain}
+{\LARGE\bfseries\color{ink} Evidence Atomic Binding}\par
+{\large Repository technical guide}\par
+\vspace{3mm}
+
+\textbf{Scope.} The \code{Evidence_Atomic_Binding} session specifies
+evidence-qualified terminal decisions, their financial and regulatory
+consumers, and the observations and recovery of those executions. It extends
+\code{Preemptive_Lock_Correctness} without changing the parent's operation
+semantics. An actual consumer here is the defined HOL transition or reader.
+No general code-generation, compiled-runtime or deployment correspondence is
+implied. The exact premises remain in the theory statements; see also
+\source{README.md} and \source{model-contract.md}.
+
+\section*{Identity and terminal authority}
+The immutable source key $K$ belongs to a complete binding $B$: key, asset,
+amount, destination, recipient, source epoch, operation and domain separator.
+A route, worker generation, retry or new invocation identifier does not create
+a new financial root. A source statement and a protocol decision are separate
+values. \code{Observed} supplies no terminal decision; authenticated
+\code{Finalized} and \code{Reversed} statements support the corresponding
+confirmed and reversed record kinds.
+
+\code{record_terminal} checks the certificate and operation-specific origin.
+Monetary origin requires the exact positive source debit. A regulatory origin
+uses the authenticated finalized regulatory statement. The first accepted
+binding and kind remain fixed; reauthentication can add evidence for that same
+core. One source profile cannot reinterpret the same key from finalized to
+reversed. A lawful later action requires its own identity and effect duties.
+
+These are source-attestation and record contracts. Distributed commit needs
+agreement among participants, as treated by Gray and Lamport
+\cite{grayLamport2006}; a local record update or source-fact threshold does not
+provide that distributed implementation. Quorum, round, epoch changes and
+restart remain obligations of the production terminal authority.
+
+\section*{Source facts reach actual consumers}
+The controlled source retains effect identity, available allocation and a
+persistent no-effect fence. Applying the same exact binding is idempotent;
+a successful fence prevents a delayed apply. Command arrival and acknowledgment
+arrival are separate, so an effect can exist despite an unavailable reply.
+Finalization and reversal are immutable alternatives after an effect. Reversal
+restores the allocation once. An unknown outcome does not authorize a refund.
+
+\code{issue_source_receipt} checks the current exact source fact and
+signature-slot consistency. Receipt verification reads the issuance log.
+The source-aware dispatcher consumes current receipts and effect/fence evidence;
+arbitrary inputs are admitted to the dispatcher and rejected when guards fail.
+
+{\small
+\begin{tabularx}{\textwidth}{@{}L{0.25\textwidth}Y@{}}
+\toprule
+Consumer & Required connection \\
+\midrule
+Publication and credit & Exact terminal evidence; actual parent publication,
+  delivery, current-use and once checks, including bypass and retry. \\
+Return and reconciliation & Exact reversed or confirmed evidence; actual parent
+  return or reconciliation. Updating the mirror is not another source refund. \\
+Descendant and regulation & Confirmed published root plus current funding and
+  policy checks; regulatory application consumes the exact confirmed record. \\
+Data read and primary & Current read permission and applicable record reference;
+  primary additionally requires the recorded financial or regulatory effect. \\
+\bottomrule
+\end{tabularx}}
+
+\clearpage
+\section*{One allocation, two accounting views}
+For a fixed source pool, let $E$ be the finite set of controlled source effects,
+$R$ the returned bindings and $C$ the bindings in the child credit history.
+Define $U=E\setminus(R\cup C)$. The function $\operatorname{mass}$ sums binding
+amounts belonging to this pool. Let $S_{\rm phys}$ be the authoritative source's
+available units, $F$ the destination funding attributed to the pool's roots,
+and $G$ its genesis allocation. Under the generated joint accounting contract:
+\begin{align*}
+ R\cap C&=\varnothing, & E&=U\mathbin{\dot\cup}C\mathbin{\dot\cup}R,\\
+ S_{\rm phys}+\operatorname{mass}(U)+F&=G.
+\end{align*}
+Every credited binding retains its current finalized source fact. Returned
+bindings have the incompatible reversed fact, so no binding can be in both
+$C$ and $R$. The controlled source equation and this partition account for
+the allocation without treating a returned amount as fresh funding.
+
+The parent mirror separately satisfies
+\[
+ S_{\rm local}+U_{\rm local}+F=G,
+\]
+where $U_{\rm local}$ is its own unresolved mass. Debit and return gaps record
+delayed mirroring. The physical source and its local mirror represent the same
+allocation: adding their balances would double count. Independently consistent
+fragments need not belong to one joint execution. A reversed source fragment
+mixed with an unrelated credited fragment can count fifteen units against an
+allocation of ten.
+
+\textit{Source connections:}
+\source{Source_Coupling_Conservation.thy} establishes the joint partition and
+allocation equation; \source{Source_Observation_Projection.thy} carries them
+through actual sourced call executions.
+
+\section*{Root funding and actual decisions}
+Destination balance is a finite sum of funding over financial roots. Thus,
+for each key $k$ and destination account $a$,
+\[
+  \operatorname{funded}(k,a)\leq\operatorname{destination}(a).
+\]
+The parent contract also yields
+\begin{align*}
+ 0\leq F&\leq G-S_{\rm local}\leq G,\\
+ F=G-S_{\rm local}&\quad\Longleftrightarrow\quad U_{\rm local}=0,\\
+ F=G&\quad\Longleftrightarrow\quad
+       S_{\rm local}=0\ \land\ U_{\rm local}=0.
+\end{align*}
+Zero unresolved mass need not mean an empty unresolved set. Funding is not
+permission: an accepted descendant amount must be root-funded, but a current
+policy can reject every positive amount despite available funding.
+
+For an already credited root $b$, any finite parent action sequence that
+excludes descendant actions consuming $b$ preserves its account funding and
+filtered descendant history. Other roots can use the same asset and account.
+The actual descendant reply is also preserved for the same context, request,
+sender, recipient and amount. This does not preserve an old permission after
+a policy change or after spending $b$.
+
+For two states with financial history agreement and the same credited root,
+equality of every holder's root funding is equivalent to equality of actual
+descendant replies over \emph{all common} contexts, requests and quantities.
+The reverse direction constructs a currently authorized separating probe.
+A single restrictive policy is insufficient to recover funding.
+
+Erasing only funding and descendant history from the reservation state loses
+this distinction: two roots and two holder accounts can have equal erased
+states but different actual continuation replies. Restricted one-root and
+one-account results delimit this ambiguity. The erasure excludes the machine
+journal; complete-journal reconstruction remains valid. It establishes no
+globally minimal trace or sufficient representation for every operation.
+
+\textit{Source connections:} \source{Root_Funding_Bounds.thy},
+\source{Root_Continuation.thy}, \source{Root_Information.thy} and
+\source{Funding_Decision_Information.thy}.
+
+\clearpage
+\section*{Invocation, execution and completed replies}
+The durable call model separates invocation, authority execution, response
+collection and completion. An identifier has at most one durable execution
+result, tied to an exact command, reply and source index. Reusing that identifier
+with a conflicting command does not execute the new command. Crash and lost
+response do not create a second execution of a recorded command.
+
+\textbf{Old identifier and new attempt are different operations.}
+Retransmission retrieves the existing result even if policy has since changed.
+It does not reauthorize an old effect. A fresh invocation uses the actual current
+dispatcher. Completed \code{Busy} and \code{Unavailable} remain completed with
+those values; a later attempt for a different result requires a new identifier.
+
+Real-time precedence distinguishes overlapping calls from a fresh call begun
+after another has completed \cite{herlihyWing1990}. Here the specific ordering
+result says: after a successful current reply completes, a fresh later invocation
+cannot complete a successful current reply with an older revision. Overlapping
+calls may deliver replies later. Balances need not be monotone. This ordering
+result alone is not a linearizability theorem for every API and physical source.
+
+\section*{Observation families retain different meanings}
+The concrete readers inspect caches, histories and stored state. Independent
+abstract readers retain application data, terminal receipts, publication,
+phase, ownership, journal and revision as well as the financial/regulatory
+product. Observation agreement is a theorem about these definitions, not a
+definition that silently replaces every concrete reader with an abstract one.
+
+{\small
+\begin{tabularx}{\textwidth}{@{}L{0.24\textwidth}Y@{}}
+\toprule
+Reply family & Contract at the actual callback \\
+\midrule
+Current value & Cache equals the current complete logical snapshot and the
+  query is ready. Relevant source effects and terminal records are published;
+  application data also requires no active owner. \\
+Protected value & Current reader permission, authority epoch, request scope
+  and applicable terminal reference hold. Current application data also
+  consumes the actual parent data-read transition. \\
+Historical value & Requested revision identifies a ready snapshot captured
+  by initialization or an actual callback. Protected history requires current
+  permission to access that historical data. \\
+Raw value or journal & Explicit stored fields or journal events, without
+  a coherent-current label or confidentiality guarantee for public storage. \\
+Operational status & Reservation phase and reported secondary progress.
+  Reporting progress is not settlement execution. \\
+Physical inspection & Actual controlled source units or effect history,
+  subject to source availability. \\
+Failure reply & Actual busy, unavailable or rejected branch. Completion
+  preserves that result exactly as it preserves a successful result. \\
+\bottomrule
+\end{tabularx}}
+
+Unprotected current and historical queries cover source and destination
+balances. Root funding, application data, regulatory state and terminal
+receipts use the protected path. The raw path remains exposed.
+
+\code{current_cache_valid} compares the complete snapshot, including
+function-valued state. Equal revision numbers alone do not authenticate values.
+This is a logical current-state contract, not an established code-generation
+or constant-cost network mechanism. Refresh can be invalidated by an intervening
+authority revision.
+
+Current source-balance queries additionally require source availability and
+zero debit and return reconciliation gaps. A lost source acknowledgment can
+therefore yield \code{Busy} despite a refreshed local cache. Secondary lag is
+separate telemetry: a ready endpoint can consume primary state before secondary
+settlement, while a stale endpoint cannot present its cache as current.
+
+\textit{Source connections:} \source{Finality_Observations.thy},
+\source{Sourced_Observations.thy}, \source{Call_Order.thy} and
+\source{Sourced_Call_Order.thy}.
+
+\clearpage
+\section*{Core product words and independent response relations}
+The transfer ledger has independently defined balances, root funding and
+debit, credit, return and descendant histories. Its event arithmetic is compared
+with actual reservation fields, committed events and journal suffixes.
+Regulatory synchronization supplies a separate action word. Token quantity
+and regulatory holding support are not identified.
+
+Actual observation and source-aware callbacks determine a finite word of core
+operations. A query or rejected source admission may stutter. Accepted core
+operations consume the existing financial and regulatory functions. Generated
+parent contracts and a valid regulatory initial state supply the applicable
+premises. An arbitrary arithmetic ledger event is not thereby a legal protocol
+execution.
+
+The richer \code{source_observation_alpha} retains physical source units,
+effects and returns. A source effect with a lost acknowledgment can change
+these fields while leaving the whole local observation state unchanged.
+\textbf{The product-word result describes the core projection, not a full
+transition simulation of this richer target.} The target is not a classifier
+for every API reply either: availability, caches, historical cuts, secondary
+progress and permission inputs remain explicit in response relations.
+
+Every completed sourced reply is tied to the actual indexed callback from
+the authoritative replay prefix. Current values and revisions agree with that
+execution cut. For a completed historical response, actual capture provenance
+supplies indices satisfying
+\[
+  \text{snapshot index}\leq\text{execution index}<\text{journal length}.
+\]
+The independent historical value and revision come from that earlier cut.
+Specific relations retain raw and operational fields, physical availability
+and completed failures. Sourced callbacks are analyzed directly, rather than
+inheriting a theorem about another callback/state/reply type.
+
+\section*{Recovery preserves effects and current consumers}
+\code{checked_current_replay} compares the candidate's genesis and exact
+journal with the current authority, then validates recorded callback history.
+Internal replayability alone does not establish authenticity, completeness or
+freshness. Applicable checks reject shortened, reordered, conflicting,
+duplicated and wrong-genesis candidates.
+
+Accepted replay restores the actual authority state, including terminal
+records and descendant lineage. Sourced recovery also preserves the physical
+source projection and resumes through the source-aware dispatcher. Restoration
+does not create a credit or refund. Old identifiers retrieve their durable
+results; new consumption uses current guards. The authentic complete current
+journal and its persistence remain physical implementation obligations.
+
+\section*{Conditional progress and concrete controls}
+A fresh, uninterrupted call at a connected, available endpoint has a finite
+begin/dispatch/collect/complete program. Its remaining length decreases, and
+it completes the actual callback reply, including a failure. A ready public
+read succeeds after refresh in a quiescent interval. Retry fairness and network
+connectivity alone are insufficient: intervening context updates can invalidate
+every refresh through arbitrarily long retry sequences. The completion theorem
+does not guarantee terminal success. Separate conditional terminal programs
+start in a valid joint state and consume a current controlled terminal fact,
+an admissible exact certificate, an available issuance slot, a positive
+mirrored debit and an empty record slot. Current credit admission
+and an unused marker, or current reservation ownership, pending phase and
+relay epoch, supply the remaining conditions. Five delivered source-aware
+actions issue evidence, record the decision, publish the certificate, execute
+credit or return, and publish primary state, without intervening source or
+context changes. A separate fresh durable call completes the final core
+publication response; it does not turn every action into a completed
+source-aware client call. Eventual evidence and delivery remain external.
+Unknown source effects are never made refundable to force progress.
+
+Normal paths include bypass credit, reversed outcome, exact recovery and a
+monetary primary followed by actual regulatory freeze, ordinary-transfer
+rejection, authorized enforcement and reconciliation. The regulatory scenario
+uses a separate supplied abstract source fact. Removing particular terminal,
+source-finalization, cache, source-gap or current-journal checks exposes bad
+effects or observations. Raw intermediate values can be neither atomic endpoint
+state. These are formal-function controls, not compiled-product mutation tests.
+
+\clearpage
+\section*{Implementation duties and nonclaims}
+The logical authority owns current endpoint context and regulatory state.
+Submitted caller, authority epoch and version remain subject to the parent's
+current-use checks. An implementation must bind those checks to the actual
+effect. A candidate proof, prepare, durable decision, local effect, primary
+publication and secondary settlement are distinct events.
+
+Primary publication requires the relevant recorded effect. It does not assert
+that every physical domain has already applied it. A product contract requiring
+all-domain application before that same publication must reconcile its timing
+with consumption before secondary settlement; the model does not silently
+equate those conditions.
+
+{\small
+\begin{tabularx}{\textwidth}{@{}L{0.23\textwidth}Y@{}}
+\toprule
+Boundary & Evidence required from the implementation \\
+\midrule
+Terminal authority & Production primary-finality record (PFR) producer and
+  verifier binding exact fields to signer identity, uniqueness and threshold,
+  with persistent agreement across round, quorum, epoch change and restart. \\
+Source adapter & Immutable effect identity, atomic deduplication, persistent
+  fences, authenticated current outcomes, lost-acknowledgment recovery and
+  one-time returns in the actual bank, chain or DAML API. \\
+Durable calls and recovery & Atomic effect/result recording, exact invocation
+  identity, retained completed failures and an authentic, complete, current
+  genesis/journal or justified checkpoint source. \\
+Current consumption & Actual authority and dependency ownership plus a
+  barrier, fence or equivalent mechanism coupling the current check to use. \\
+Public observations & Correspondence for declared APIs, raw getters, storage
+  and events, including historical revision/timestamp mapping and actual
+  primary application and secondary settlement. \\
+Compiled consumer & Exact source, ABI, encoding, hash preimage, compiler
+  target and runtime consumer, supported by normal execution and a specific
+  guard-removal control for each required connection. \\
+\bottomrule
+\end{tabularx}}
+
+The inspected token already checks action identity/lifecycle, validity
+interval, current authority, dependencies and nonce; reversal also checks the
+current original effect. Those defenses must be preserved and connected
+field by field. Token replay rejection is not automatically retransmission of
+a completed formal reply. A distinct reversal receipt and changed action or
+case lifecycle are not a same-key change of the model's stable source fact.
+The settlement seam accepts external primary-finality and finalized-receipt
+providers. Its authorization result does not itself execute a CDK application
+or declare secondary settlement complete.
+
+\source{product-obligations.json} records source findings, planned tests and
+unverified compiled consumers. \source{product-api-inventory.json} is a source
+declaration inventory, not a compiler-derived ABI certificate. No public API,
+raw storage surface or event is removed to make the formal statements hold.
+
+\textbf{Nonclaims.} This contract supplies no deployment conformance,
+universal source support, unconditional termination, universal raw-observation
+atomicity, complete runtime refinement, global information characterization
+or realization of arbitrary records. It also makes no general claim that
+function-valued snapshot comparisons are code-generatable. The source guide
+in \source{README.md} locates the theory interfaces; the exact conditions are
+stated in \source{model-contract.md} and the referenced theories.
+
+\begingroup
+\small
+\setlength{\parskip}{2pt}
+\bibliographystyle{plain}
+\bibliography{root}
+\endgroup
+\end{document}

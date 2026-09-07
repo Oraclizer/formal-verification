@@ -1,0 +1,781 @@
+{
+  "schema_version": 1,
+  "session": "Evidence_Atomic_Binding",
+  "result_level": "formal_model",
+  "implementation_refinement": "NOT_ESTABLISHED",
+  "runtime_status": "PLANNED",
+  "assumptions": [
+    {
+      "id": "source-attestation",
+      "anchor": "Source_Certificates.thy: source_attestation",
+      "meaning": "Sound verification, a finite trusted roster, bounded faulty signers, a sufficient threshold and honest source checks remain inherited locale premises."
+    },
+    {
+      "id": "stable-source-profile",
+      "anchor": "Controlled_Source_Outcomes.thy; Source_Finality_Link.thy",
+      "meaning": "One actual source history supplies one immutable non-Observed outcome per key. Alternative finalization and reversal histories do not share a universal stable map. Physical source control and cryptography require refinement."
+    },
+    {
+      "id": "terminal-authority",
+      "anchor": "Finality_Records.thy; Finality_Protocol.thy",
+      "meaning": "The model stores one immutable full-binding terminal core. Distributed agreement, epoch transition and restart realization of this authority are not supplied by a local update or a source-fact threshold."
+    },
+    {
+      "id": "physical-source-control",
+      "anchor": "Source_Coupling.thy; Source_Coupling_Conservation.thy",
+      "meaning": "Actual routing must preserve immutable identity, persistent effect deduplication and no-effect fences, authenticated current outcomes, one-time returns and the relation between physical holdings and modeled allocation."
+    },
+    {
+      "id": "current-use",
+      "anchor": "Finality_Observations.thy; Sourced_Observations.thy",
+      "meaning": "The authority owns actual current context and dependencies. Current reads compare the complete logical snapshot; protected use checks current authorization. This extensional equality is not a constant-cost or code-generated network implementation."
+    },
+    {
+      "id": "durable-call-step",
+      "anchor": "Finality_Calls.thy",
+      "meaning": "One authority callback and its durable result/log insertion form one model step. Invocation identity, retained completed failures and persistence across physical crashes require implementation evidence."
+    },
+    {
+      "id": "current-journal",
+      "anchor": "Finality_Recovery.thy; Source_Observation_Projection.thy",
+      "meaning": "Recovery validates an exact candidate against an authentic complete current authority genesis and journal. Internal replayability alone does not supply authenticity, completeness or freshness."
+    },
+    {
+      "id": "observation-coverage",
+      "anchor": "Sourced_Response_Link.thy; Source_Observation_Projection.thy",
+      "meaning": "Core product words and separately defined response relations have their stated scope. The richer physical projection is not a full transition simulation or a classifier of every API reply. Public raw observers remain separately visible."
+    },
+    {
+      "id": "progress",
+      "anchor": "Finality_Progress.thy",
+      "meaning": "Finite call completion can return a failure. Successful cached reads need readiness and a quiescent refresh-to-use interval. Terminal progress requires the stated evidence, authorization and action-delivery conditions; no unconditional termination is asserted."
+    },
+    {
+      "id": "runtime-correspondence",
+      "anchor": "product-obligations.json; product-api-inventory.json",
+      "meaning": "Machine ranges, ABI, encoding, hash preimages, real routes, compiled consumers and physical primary/secondary settlement require separate evidence. All unimplemented tests and unverified consumers retain that status."
+    }
+  ],
+  "claims": [
+    {
+      "id": "valid-record-has-stable-source-statement",
+      "file": "Finality_Records.thy",
+      "theorem": "Finality_Records.source_attestation.valid_record_has_stable_source_statement",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.valid_terminal_record ?roster ?threshold ?verifies ?record\\<rbrakk> \\<Longrightarrow> ?stable_source (binding_key (terminal_binding ?record)) = Some (terminal_statement ?record)"
+    },
+    {
+      "id": "independently-produced-records-agree",
+      "file": "Finality_Records.thy",
+      "theorem": "Finality_Records.source_attestation.independently_produced_records_agree",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.valid_terminal_record ?roster ?threshold ?verifies ?a; source_attestation.valid_terminal_record ?roster ?threshold ?verifies ?b; binding_key (terminal_binding ?a) = binding_key (terminal_binding ?b)\\<rbrakk> \\<Longrightarrow> terminal_core ?a = terminal_core ?b"
+    },
+    {
+      "id": "generated-finality-records-are-valid",
+      "file": "Finality_Records.thy",
+      "theorem": "Finality_Records.source_attestation.generated_finality_records_are_valid",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> source_attestation.terminal_records_valid ?roster ?threshold ?verifies (source_attestation.run_finality ?roster ?threshold ?verifies ?actions (initial_finality_core ?balances ?regulatory ?contexts))"
+    },
+    {
+      "id": "all-future-operations-keep-the-terminal-core",
+      "file": "Finality_Records.thy",
+      "theorem": "Finality_Records.source_attestation.all_future_operations_keep_the_terminal_core",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; core_records ?s ?key = Some ?old\\<rbrakk> \\<Longrightarrow> \\<exists>next. core_records (source_attestation.run_finality ?roster ?threshold ?verifies ?actions ?s) ?key = Some next \\<and> terminal_core next = terminal_core ?old"
+    },
+    {
+      "id": "actual-credit-response-consumes-confirmation",
+      "file": "Finality_Records.thy",
+      "theorem": "Finality_Records.source_attestation.actual_credit_response_consumes_confirmation",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; snd (source_attestation.invoke_protocol ?roster ?threshold ?verifies ?endpoint ?epoch ?index (Deliver_Intent ?route ?r) ?s) = Protocol_Response (Delivery_Response (New_Credit ?b))\\<rbrakk> \\<Longrightarrow> exact_record_reference ?s ?index (request_binding ?r) Confirmed_Decision (request_certificate ?r) \\<and> ?epoch = core_epoch ?s"
+    },
+    {
+      "id": "actual-return-response-consumes-reversal",
+      "file": "Finality_Records.thy",
+      "theorem": "Finality_Records.source_attestation.actual_return_response_consumes_reversal",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; snd (source_attestation.invoke_protocol ?roster ?threshold ?verifies ?endpoint ?epoch ?index (Return_Intent ?r ?g ?versions) ?s) = Protocol_Response Reservation_Released\\<rbrakk> \\<Longrightarrow> exact_record_reference ?s ?index (request_binding ?r) Reversed_Decision (request_certificate ?r) \\<and> ?epoch = core_epoch ?s"
+    },
+    {
+      "id": "finality-supplies-actual-reservation-contract",
+      "file": "Finality_Protocol.thy",
+      "theorem": "Finality_Protocol.source_attestation.finality_supplies_actual_reservation_contract",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (core_parent (source_attestation.run_finality ?roster ?threshold ?verifies ?actions (initial_finality_core ?balances ?regulatory ?contexts)))"
+    },
+    {
+      "id": "finality-preserves-source-allocation",
+      "file": "Finality_Protocol.thy",
+      "theorem": "Finality_Protocol.source_attestation.finality_preserves_source_allocation",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> int (source_units (machine_state (core_parent (source_attestation.run_finality ?roster ?threshold ?verifies ?actions (initial_finality_core ?balances ?regulatory ?contexts)))) ?pool) + regulation_case.unresolved_pool_mass (machine_state (core_parent (source_attestation.run_finality ?roster ?threshold ?verifies ?actions (initial_finality_core ?balances ?regulatory ?contexts)))) ?pool + regulation_case.destination_pool_funding (machine_state (core_parent (source_attestation.run_finality ?roster ?threshold ?verifies ?actions (initial_finality_core ?balances ?regulatory ?contexts)))) ?pool = int (?balances ?pool)"
+    },
+    {
+      "id": "controlled-all-finite-executions",
+      "file": "Controlled_Source_Outcomes.thy",
+      "theorem": "Controlled_Source_Outcomes.controlled_all_finite_executions",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "controlled_source_invariant ?balances (run_controlled_source ?commands (initial_controlled_source ?balances))"
+    },
+    {
+      "id": "controlled-producer-supplies-stable-fact-unique-premise",
+      "file": "Controlled_Source_Outcomes.thy",
+      "theorem": "Controlled_Source_Outcomes.controlled_producer_supplies_stable_fact_unique_premise",
+      "role": "interface-adapter",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>controlled_produced_fact ?balances ?commands ?statement; statement_status ?statement \\<noteq> Observed\\<rbrakk> \\<Longrightarrow> controlled_stable_source ?balances ?commands (binding_key (statement_binding ?statement)) = Some ?statement"
+    },
+    {
+      "id": "controlled-finalization-rejects-late-reverse",
+      "file": "Controlled_Source_Outcomes.thy",
+      "theorem": "Controlled_Source_Outcomes.controlled_finalization_rejects_late_reverse",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>controlled_outcomes ?s ?key = Some (Controlled_Finalized ?b); binding_key ?other = ?key\\<rbrakk> \\<Longrightarrow> controlled_reverse ?other (run_controlled_source ?commands ?s) = (run_controlled_source ?commands ?s, Controlled_Outcome_Rejected)"
+    },
+    {
+      "id": "controlled-reversal-rejects-late-finalize-and-apply",
+      "file": "Controlled_Source_Outcomes.thy",
+      "theorem": "Controlled_Source_Outcomes.controlled_reversal_rejects_late_finalize_and_apply",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>controlled_outcomes ?s ?key = Some (Controlled_Reversed ?b); binding_key ?other = ?key\\<rbrakk> \\<Longrightarrow> controlled_finalize ?other (run_controlled_source ?commands ?s) = (run_controlled_source ?commands ?s, Controlled_Outcome_Rejected) \\<and> controlled_boundary (Boundary_Apply ?other) (run_controlled_source ?commands ?s) = (run_controlled_source ?commands ?s, Controlled_Outcome_Rejected)"
+    },
+    {
+      "id": "controlled-no-single-stable-map-for-alternative-outcomes",
+      "file": "Controlled_Source_Outcomes.thy",
+      "theorem": "Controlled_Source_Outcomes.controlled_no_single_stable_map_for_alternative_outcomes",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "controlled_pending_effect ?b ?s \\<Longrightarrow> \\<nexists>stable. stable (binding_key ?b) = controlled_source_fact (fst (controlled_finalize ?b ?s)) (binding_key ?b) \\<and> stable (binding_key ?b) = controlled_source_fact (fst (controlled_reverse ?b ?s)) (binding_key ?b)"
+    },
+    {
+      "id": "boundary-finite-execution-contract",
+      "file": "Source_Effect_Boundary.thy",
+      "theorem": "Source_Effect_Boundary.boundary_finite_execution_contract",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "boundary_history_consistent (run_source_boundary ?commands (initial_source_boundary ?balances)) \\<and> boundary_allocation ?balances (run_source_boundary ?commands (initial_source_boundary ?balances))"
+    },
+    {
+      "id": "boundary-no-local-classifier-of-remote-effect",
+      "file": "Source_Effect_Boundary.thy",
+      "theorem": "Source_Effect_Boundary.boundary_no_local_classifier_of_remote_effect",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>boundary_valid_binding ?b; binding_amount ?b \\<le> ?balances (source_account_of ?b)\\<rbrakk> \\<Longrightarrow> \\<nexists>classify. \\<forall>arrived. classify (boundary_local_view (boundary_silent_attempt ?balances ?b arrived)) = boundary_has_effect ?b (boundary_endpoint (boundary_silent_attempt ?balances ?b arrived))"
+    },
+    {
+      "id": "boundary-timeout-refund-cannot-use-only-local-absence",
+      "file": "Source_Effect_Boundary.thy",
+      "theorem": "Source_Effect_Boundary.boundary_timeout_refund_cannot_use_only_local_absence",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>boundary_valid_binding ?b; binding_amount ?b \\<le> ?balances (source_account_of ?b); ?refund (boundary_local_view (boundary_silent_attempt ?balances ?b False))\\<rbrakk> \\<Longrightarrow> ?refund (boundary_local_view (boundary_silent_attempt ?balances ?b True)) \\<and> boundary_has_effect ?b (boundary_endpoint (boundary_silent_attempt ?balances ?b True))"
+    },
+    {
+      "id": "every-generated-receipt-has-a-produced-source-fact",
+      "file": "Source_Finality_Link.thy",
+      "theorem": "Source_Finality_Link.every_generated_receipt_has_a_produced_source_fact",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "receipt_log_sound ?balances ?commands (generated_source_receipts ?balances ?commands ?candidates)"
+    },
+    {
+      "id": "source-receipts-interpret-source-attestation",
+      "file": "Source_Finality_Link.thy",
+      "theorem": "Source_Finality_Link.source_receipts_interpret_source_attestation",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "source_attestation example_roster example_faulty example_bound example_threshold (source_receipt_verifies (generated_source_receipts ?balances ?commands ?candidates)) (source_receipt_signed (generated_source_receipts ?balances ?commands ?candidates)) (controlled_produced_fact ?balances ?commands) (controlled_stable_source ?balances ?commands)"
+    },
+    {
+      "id": "linked-return-is-one-source-restoration-and-one-parent-mirror-update",
+      "file": "Source_Finality_Link.thy",
+      "theorem": "Source_Finality_Link.linked_return_is_one_source_restoration_and_one_parent_mirror_update",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "fst linked_return_result = linked_source_state \\<and> snd (snd linked_return_result) = Protocol_Response Reservation_Released \\<and> boundary_units (controlled_endpoint (fst linked_return_result)) (0, 22) = 5 \\<and> source_units (machine_state (core_parent (fst (snd linked_return_result)))) (0, 22) = 5"
+    },
+    {
+      "id": "source-coupling-step-preserves-invariant",
+      "file": "Source_Coupling.thy",
+      "theorem": "Source_Coupling.source_attestation.source_coupling_step_preserves_invariant",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances ?s\\<rbrakk> \\<Longrightarrow> source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances (fst (source_attestation.source_coupling_step ?roster ?threshold ?verifies ?action ?s))"
+    },
+    {
+      "id": "completed-no-effect-rejects-every-late-transmission",
+      "file": "Source_Coupling.thy",
+      "theorem": "Source_Coupling.source_attestation.completed_no_effect_rejects_every_late_transmission",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 5,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances ?s; snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client ?available ?command) ?s) = Coupling_Client_Reply ?result; coupling_closed_binding ?command ?result = Some ?b; binding_key ?late = binding_key ?b\\<rbrakk> \\<Longrightarrow> coupling_source_result ?arrived ?replied (Controlled_Boundary (Boundary_Apply ?late)) (source_attestation.coupling_after_client ?roster ?threshold ?verifies ?continuation ?available ?command ?s) = (source_attestation.coupling_after_client ?roster ?threshold ?verifies ?continuation ?available ?command ?s, Coupling_Rejected)"
+    },
+    {
+      "id": "remote-return-and-child-credit-are-disjoint",
+      "file": "Source_Coupling_Conservation.thy",
+      "theorem": "Source_Coupling_Conservation.source_attestation.remote_return_and_child_credit_are_disjoint",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.source_coupling_accounting_invariant ?roster ?threshold ?verifies ?stable_source ?balances ?s\\<rbrakk> \\<Longrightarrow> coupling_remote_returns ?s \\<inter> coupling_credits ?s = {}"
+    },
+    {
+      "id": "all-finite-joint-executions-preserve-actual-source-allocation",
+      "file": "Source_Coupling_Conservation.thy",
+      "theorem": "Source_Coupling_Conservation.source_attestation.all_finite_joint_executions_preserve_actual_source_allocation",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> int (boundary_units (controlled_endpoint (coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies ?actions (initial_source_coupling ?balances ?regulatory ?contexts)))) ?pool) + coupling_remote_pending_mass (source_attestation.run_source_coupling ?roster ?threshold ?verifies ?actions (initial_source_coupling ?balances ?regulatory ?contexts)) ?pool + regulation_case.destination_pool_funding (machine_state (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies ?actions (initial_source_coupling ?balances ?regulatory ?contexts))))) ?pool = int (?balances ?pool)"
+    },
+    {
+      "id": "every-completed-sourced-reply-has-its-actual-source",
+      "file": "Sourced_Response_Link.thy",
+      "theorem": "Sourced_Response_Link.source_attestation.every_completed_sourced_reply_has_its_actual_source",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some ?reply\\<rbrakk> \\<Longrightarrow> \\<exists>request index. call_authority_results (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (request, ?reply, index) \\<and> index < length (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial))) \\<and> ?reply = snd (source_attestation.execute_sourced_request ?roster ?threshold ?verifies request (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial))"
+    },
+    {
+      "id": "completed-sourced-current-preserves-value-revision-and-source-guards",
+      "file": "Sourced_Response_Link.thy",
+      "theorem": "Sourced_Response_Link.source_attestation.completed_sourced_current_preserves_value_revision_and_source_guards",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (Sourced_Observation (Current_Value ?revision ?payload))\\<rbrakk> \\<Longrightarrow> \\<exists>command query index. call_authority_results (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (Endpoint_Request command, Sourced_Observation (Current_Value ?revision ?payload), index) \\<and> index < length (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial))) \\<and> command_query command = Some query \\<and> ?payload = abstract_query_value query (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial)) \\<and> ?revision = target_revision (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial)) \\<and> (\\<forall>account. current_source_query command = Some account \\<longrightarrow> observation_source_available (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial) \\<and> source_view_is_reconciled (observation_source (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial)) account)"
+    },
+    {
+      "id": "completed-sourced-historical-has-a-prior-actual-snapshot",
+      "file": "Sourced_Response_Link.thy",
+      "theorem": "Sourced_Response_Link.source_attestation.completed_sourced_historical_has_a_prior_actual_snapshot",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))) ?call_id = Some (Sourced_Observation (Historical_Value ?revision ?payload))\\<rbrakk> \\<Longrightarrow> \\<exists>command query execution_index snapshot_index. call_authority_results (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))) ?call_id = Some (Endpoint_Request command, Sourced_Observation (Historical_Value ?revision ?payload), execution_index) \\<and> execution_index < length (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts)))) \\<and> snapshot_index \\<le> execution_index \\<and> command_query command = Some query \\<and> requested_history_revision command = Some ?revision \\<and> ?payload = abstract_query_value query (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take snapshot_index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))) (initial_sourced_observations ?balances ?regulatory ?contexts))) \\<and> target_revision (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take snapshot_index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))) (initial_sourced_observations ?balances ?regulatory ?contexts))) = ?revision"
+    },
+    {
+      "id": "completed-sourced-raw-and-operational-queries-keep-their-fields",
+      "file": "Sourced_Response_Link.thy",
+      "theorem": "Sourced_Response_Link.source_attestation.completed_sourced_raw_and_operational_queries_keep_their_fields",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; call_invocations (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (Endpoint_Request ?command, ?began); call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (Sourced_Observation ?reply)\\<rbrakk> \\<Longrightarrow> \\<exists>index. call_authority_results (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (Endpoint_Request ?command, Sourced_Observation ?reply, index) \\<and> index < length (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial))) \\<and> (\\<forall>query. ?command = Read_Raw query \\<longrightarrow> ?reply = Raw_Value (abstract_query_value query (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial)))) \\<and> (\\<forall>endpoint key. ?command = Read_Operation endpoint key \\<longrightarrow> ?reply = Operation_Status (target_phase (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial)) key) (observation_secondary (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial) endpoint)) \\<and> (?command = Read_Raw_Journal \\<longrightarrow> ?reply = Journal_Events (target_journal (sourced_response_alpha (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial))))"
+    },
+    {
+      "id": "completed-sourced-physical-inspections-keep-the-source-fields",
+      "file": "Sourced_Response_Link.thy",
+      "theorem": "Sourced_Response_Link.source_attestation.completed_sourced_physical_inspections_keep_the_source_fields",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; call_invocations (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (?request, ?began); call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some ?reply\\<rbrakk> \\<Longrightarrow> \\<exists>index. call_authority_results (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)) ?call_id = Some (?request, ?reply, index) \\<and> index < length (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial))) \\<and> (\\<forall>account. ?request = Inspect_Source_Units account \\<longrightarrow> ?reply = (if observation_source_available (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial) then Source_Unit_Value (boundary_units (controlled_endpoint (coupled_source (observation_source (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial)))) account) else Sourced_Observation Observation_Unavailable)) \\<and> (?request = Inspect_Source_Effects \\<longrightarrow> ?reply = (if observation_source_available (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial) then Source_Effect_History (boundary_effects (controlled_endpoint (coupled_source (observation_source (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (take index (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))) ?initial))))) else Sourced_Observation Observation_Unavailable))"
+    },
+    {
+      "id": "sourced-completed-replies-survive-finite-continuations",
+      "file": "Sourced_Response_Link.thy",
+      "theorem": "Sourced_Response_Link.source_attestation.sourced_completed_replies_survive_finite_continuations",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; call_completions ?m ?call_id = Some ?reply\\<rbrakk> \\<Longrightarrow> call_completions (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions ?m) ?call_id = Some ?reply"
+    },
+    {
+      "id": "later-sourced-invocation-cannot-complete-an-older-current-revision",
+      "file": "Sourced_Call_Order.thy",
+      "theorem": "Sourced_Call_Order.source_attestation.later_sourced_invocation_cannot_complete_an_older_current_revision",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 10,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; ?before_completion = durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?before (initial_call_machine ?initial); ?after_completion = durable_call_protocol.call_step (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (Complete_Call ?first_call) ?before_completion; call_completions ?before_completion ?first_call = None; call_completions ?after_completion ?first_call = Some (Sourced_Observation (Current_Value ?first_revision ?first_payload)); ?before_begin = durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?gap ?after_completion; call_invocations ?before_begin ?later_call = None; ?after_begin = durable_call_protocol.call_step (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (Begin_Call ?later_call ?later_request) ?before_begin; ?finished = durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?after ?after_begin; call_completions ?finished ?later_call = Some (Sourced_Observation (Current_Value ?later_revision ?later_payload))\\<rbrakk> \\<Longrightarrow> ?first_revision \\<le> ?later_revision"
+    },
+    {
+      "id": "generated-sourced-calls-refine-both-product-words",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.source_attestation.generated_sourced_calls_refine_both_product_words",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (core_parent (coupled_core (observation_source ?initial)))\\<rbrakk> \\<Longrightarrow> fst (finality_alpha (coupled_core (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))))) = run_transfer_ledger (source_attestation.finality_transfer_word ?roster ?threshold ?verifies (source_attestation.sourced_core_operations ?roster ?threshold ?verifies (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial))) ?initial) (coupled_core (observation_source ?initial))) (fst (finality_alpha (coupled_core (observation_source ?initial)))) \\<and> run_regulatory_word (source_attestation.finality_regulatory_word ?roster ?threshold ?verifies (source_attestation.sourced_core_operations ?roster ?threshold ?verifies (call_authority_log (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial))) ?initial) (coupled_core (observation_source ?initial))) (snd (finality_alpha (coupled_core (observation_source ?initial)))) = Some (snd (finality_alpha (coupled_core (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine ?initial)))))))"
+    },
+    {
+      "id": "sourced-replay-supplies-the-financial-and-regulatory-premises",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.source_attestation.sourced_replay_supplies_the_financial_and_regulatory_premises",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (core_parent (coupled_core (observation_source ?initial))); valid_state (receiver_snapshot (core_regulatory (coupled_core (observation_source ?initial))))\\<rbrakk> \\<Longrightarrow> source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances (core_parent (coupled_core (observation_source (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?entries ?initial)))) \\<and> valid_state (receiver_snapshot (core_regulatory (coupled_core (observation_source (durable_call_protocol.replay_call_authority (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?entries ?initial)))))"
+    },
+    {
+      "id": "actual-sourced-calls-preserve-the-physical-pool",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.source_attestation.actual_sourced_calls_preserve_the_physical_pool",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> coupling_remote_returns (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))) \\<inter> coupling_credits (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))) = {} \\<and> int (boundary_units (controlled_endpoint (coupled_source (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))))) ?pool) + coupling_remote_pending_mass (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts))))) ?pool + regulation_case.destination_pool_funding (machine_state (core_parent (coupled_core (observation_source (call_authority_state (durable_call_protocol.run_calls (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?actions (initial_call_machine (initial_sourced_observations ?balances ?regulatory ?contexts)))))))) ?pool = int (?balances ?pool)"
+    },
+    {
+      "id": "exact-sourced-recovery-preserves-source-and-current-consumers",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.source_attestation.exact_sourced_recovery_preserves_source_and_current_consumers",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; durable_call_protocol.authority_replay_contract (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?source; durable_call_protocol.checked_current_replay (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?source ?candidate = Some ?restored\\<rbrakk> \\<Longrightarrow> source_observation_alpha ?restored = source_observation_alpha (call_authority_state ?source) \\<and> source_attestation.execute_sourced_request ?roster ?threshold ?verifies ?request ?restored = source_attestation.execute_sourced_request ?roster ?threshold ?verifies ?request (call_authority_state ?source)"
+    },
+    {
+      "id": "restored-sourced-dispatch-still-uses-the-actual-source-guard",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.source_attestation.restored_sourced_dispatch_still_uses_the_actual_source_guard",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; durable_call_protocol.authority_replay_contract (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (recovery_source ?runtime); recovery_connected ?runtime; durable_call_protocol.checked_current_replay (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) (recovery_source ?runtime) ?candidate = Some ?state\\<rbrakk> \\<Longrightarrow> recovery_source (durable_call_protocol.dispatch_from_recovered_replica (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) ?call_id ?command (durable_call_protocol.restore_current_replica (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) (source_attestation.execute_sourced_environment ?roster ?threshold ?verifies) ?candidate ?runtime)) = durable_call_protocol.dispatch_client_call (source_attestation.execute_sourced_request ?roster ?threshold ?verifies) ?call_id ?command (recovery_source ?runtime)"
+    },
+    {
+      "id": "generated-parent-supplies-root-continuation-frame",
+      "file": "Root_Continuation.thy",
+      "theorem": "Root_Continuation.source_attestation.generated_parent_supplies_root_continuation_frame",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; ?b \\<in> set (credit_history (received_messages (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?prefix (initial_reservation_machine ?balances))))); \\<forall>action\\<in>set ?actions. avoids_root (binding_key ?b) action\\<rbrakk> \\<Longrightarrow> snd (execute_descendant ?c ?r ?b ?sender ?recipient ?amount (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?prefix (initial_reservation_machine ?balances)))) = snd (execute_descendant ?c ?r ?b ?sender ?recipient ?amount (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?prefix (initial_reservation_machine ?balances)))"
+    },
+    {
+      "id": "all-other-reservation-state-fields-do-not-determine-actual-continuation",
+      "file": "Root_Information.thy",
+      "theorem": "Root_Information.all_other_reservation_state_fields_do_not_determine_actual_continuation",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<nexists>decide. \\<forall>m\\<in>{lineage_history 17, lineage_history 23}. decide (erase_lineage_state m) = two_holder_continuation m"
+    },
+    {
+      "id": "one-financial-root-suffices-for-the-actual-consumer",
+      "file": "Root_Information.thy",
+      "theorem": "Root_Information.one_financial_root_suffices_for_the_actual_consumer",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 7,
+      "statement": "\\<lbrakk>financial_history_agreement ?balances ?m; financial_history_agreement ?balances ?n; ?b \\<in> set (credit_history (received_messages (machine_state ?m))); ?b \\<in> set (credit_history (received_messages (machine_state ?n))); financial_keys (machine_state ?m) \\<subseteq> {binding_key ?b}; financial_keys (machine_state ?n) \\<subseteq> {binding_key ?b}; erase_lineage_state ?m = erase_lineage_state ?n\\<rbrakk> \\<Longrightarrow> snd (execute_descendant ?c ?r ?b ?sender ?recipient ?amount ?m) = snd (execute_descendant ?c ?r ?b ?sender ?recipient ?amount ?n)"
+    },
+    {
+      "id": "one-holder-account-suffices-for-the-actual-consumer",
+      "file": "Root_Information.thy",
+      "theorem": "Root_Information.source_attestation.one_holder_account_suffices_for_the_actual_consumer",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 7,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?n; ?b \\<in> set (credit_history (received_messages (machine_state ?m))); ?b \\<in> set (credit_history (received_messages (machine_state ?n))); financial_accounts (machine_state ?m) \\<subseteq> {?account}; financial_accounts (machine_state ?n) \\<subseteq> {?account}\\<rbrakk> \\<Longrightarrow> snd (execute_descendant ?c ?r ?b ?sender ?recipient ?amount ?m) = snd (execute_descendant ?c ?r ?b ?sender ?recipient ?amount ?n)"
+    },
+    {
+      "id": "holder-funding-equality-iff-all-actual-descendant-decisions",
+      "file": "Funding_Decision_Information.thy",
+      "theorem": "Funding_Decision_Information.holder_funding_equality_iff_all_actual_descendant_decisions",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 4,
+      "statement": "\\<lbrakk>financial_history_agreement ?balances ?first_machine; financial_history_agreement ?balances ?second_machine; ?root \\<in> set (credit_history (received_messages (machine_state ?first_machine))); ?root \\<in> set (credit_history (received_messages (machine_state ?second_machine)))\\<rbrakk> \\<Longrightarrow> (\\<forall>holder. funded_units (machine_state ?first_machine) (binding_key ?root, holder_account ?root holder) = funded_units (machine_state ?second_machine) (binding_key ?root, holder_account ?root holder)) = (\\<forall>context request sender recipient amount. snd (execute_descendant context request ?root sender recipient amount ?first_machine) = snd (execute_descendant context request ?root sender recipient amount ?second_machine))"
+    },
+    {
+      "id": "empty-policy-hides-the-actual-two-root-funding-difference",
+      "file": "Funding_Decision_Information.thy",
+      "theorem": "Funding_Decision_Information.empty_policy_hides_the_actual_two_root_funding_difference",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "funded_units (machine_state (lineage_history 17)) ((0, 17), 2, 17, 4) = 5 \\<and> funded_units (machine_state (lineage_history 23)) ((0, 17), 2, 17, 4) = 0 \\<and> (\\<forall>request sender recipient amount. snd (execute_descendant (sample_context ACTIVE\\<lparr>lock_spend_permissions := {}\\<rparr>) request (sample_binding 17) sender recipient amount (lineage_history 17)) = snd (execute_descendant (sample_context ACTIVE\\<lparr>lock_spend_permissions := {}\\<rparr>) request (sample_binding 17) sender recipient amount (lineage_history 23)))"
+    },
+    {
+      "id": "valid-return-uses-the-actual-source-and-child",
+      "file": "Source_Coupling.thy",
+      "theorem": "Source_Coupling.valid_return_uses_the_actual_source_and_child",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (linked.source_coupling_step (Coupling_Client True (Client_Protocol 0 0 (Return_Intent linked_return_request 0 []))) coupling_before_return) = Coupling_Client_Reply (Protocol_Response Reservation_Released) \\<and> coupled_source (fst (linked.source_coupling_step (Coupling_Client True (Client_Protocol 0 0 (Return_Intent linked_return_request 0 []))) coupling_before_return)) = coupled_source coupling_before_return"
+    },
+    {
+      "id": "bare-child-fence-can-close-after-an-unacknowledged-source-effect",
+      "file": "Source_Coupling.thy",
+      "theorem": "Source_Coupling.bare_child_fence_can_close_after_an_unacknowledged_source_effect",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (linked.execute_finality_client (Client_Protocol 0 0 (Fence_Intent (sample_request 17) 0 [])) (coupled_core (coupling_lost_ack 17))) = Protocol_Response Source_Fenced \\<and> boundary_has_effect (sample_binding 17) (controlled_endpoint (coupled_source (coupling_lost_ack 17)))"
+    },
+    {
+      "id": "coupling-rejects-the-unsafe-local-fence",
+      "file": "Source_Coupling.thy",
+      "theorem": "Source_Coupling.coupling_rejects_the_unsafe_local_fence",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "linked.source_coupling_step (Coupling_Client True (Client_Protocol 0 0 (Fence_Intent (sample_request 17) 0 []))) (coupling_lost_ack 17) = (coupling_lost_ack 17, Coupling_Rejected)"
+    },
+    {
+      "id": "removing-only-the-finalization-guard-refunds-a-credited-root",
+      "file": "Source_Coupling_Conservation.thy",
+      "theorem": "Source_Coupling_Conservation.removing_only_the_finalization_guard_refunds_a_credited_root",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "sample_binding 17 \\<in> coupling_remote_returns mutated_after_credit \\<and> sample_binding 17 \\<in> coupling_credits mutated_after_credit \\<and> boundary_units (controlled_endpoint (coupled_source mutated_after_credit)) (0, 17) = 10 \\<and> regulation_case.destination_pool_funding (machine_state (core_parent (coupled_core mutated_after_credit))) (0, 17) = 5 \\<and> coupled_core mutated_after_credit = coupled_core conservation_credited"
+    },
+    {
+      "id": "mutated-credit-and-refund-break-the-actual-pool-equation",
+      "file": "Source_Coupling_Conservation.thy",
+      "theorem": "Source_Coupling_Conservation.mutated_credit_and_refund_break_the_actual_pool_equation",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "int (boundary_units (controlled_endpoint (coupled_source mutated_after_credit)) (0, 17)) + coupling_remote_pending_mass mutated_after_credit (0, 17) + regulation_case.destination_pool_funding (machine_state (core_parent (coupled_core mutated_after_credit))) (0, 17) = 15"
+    },
+    {
+      "id": "weak-source-mirror-conditions-allow-incompatible-fragments",
+      "file": "Source_Coupling_Conservation.thy",
+      "theorem": "Source_Coupling_Conservation.weak_source_mirror_conditions_allow_incompatible_fragments",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "linked.source_coupling_invariant sample_balances weakly_mixed_source_views"
+    },
+    {
+      "id": "local-view-cannot-reconstruct-every-physical-source-response",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.local_view_cannot_reconstruct_every_physical_source_response",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<nexists>read_units. \\<forall>s. observation_source_available s \\<longrightarrow> snd (linked.execute_sourced_request (Inspect_Source_Units (0, 17)) s) = read_units (sourced_view s)"
+    },
+    {
+      "id": "actual-source-gap-blocks-the-current-balance-response",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.actual_source_gap_blocks_the_current_balance_response",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (linked.execute_sourced_request (Endpoint_Request (Read_Current 0 (Source_Balance (0, 17)))) source_raw_refreshed) = Sourced_Observation Observation_Busy"
+    },
+    {
+      "id": "removing-the-source-gap-guard-exposes-a-stale-physical-balance",
+      "file": "Source_Observation_Projection.thy",
+      "theorem": "Source_Observation_Projection.removing_the_source_gap_guard_exposes_a_stale_physical_balance",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (linked.execute_sourced_endpoint (Read_Current 0 (Source_Balance (0, 17))) source_raw_refreshed) = Sourced_Observation (Current_Value 0 (Units_Value 10)) \\<and> snd (linked.execute_sourced_request (Inspect_Source_Units (0, 17)) source_raw_refreshed) = Source_Unit_Value 5"
+    },
+    {
+      "id": "full-regulatory-scenario-is-an-actual-child-execution",
+      "file": "Regulatory_Finality_Scenarios.thy",
+      "theorem": "Regulatory_Finality_Scenarios.full_regulatory_scenario_is_an_actual_child_execution",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "regulation_settled = regulation_case.run_finality (regulation_credit_trace @ [Record_Terminal (example_certificate 20), Invoke_Regulatory 2 8 0 (example_request 20), Publish_Primary (0, 20), Invoke_Protocol 2 10 0 regulation_ordinary_intent, Invoke_Protocol 2 11 0 regulation_enforcement_intent, Invoke_Protocol 0 12 0 (Reconcile_Intent regulation_money_request 0 [])]) regulation_genesis"
+    },
+    {
+      "id": "actual-reconciliation-preserves-financial-lineage-and-freeze",
+      "file": "Regulatory_Finality_Scenarios.thy",
+      "theorem": "Regulatory_Finality_Scenarios.actual_reconciliation_preserves_financial_lineage_and_freeze",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "transfer_projection (core_parent regulation_settled) = transfer_projection (core_parent regulation_enforced) \\<and> core_regulatory regulation_settled = core_regulatory regulation_enforced"
+    },
+    {
+      "id": "terminal-record-removal-applies-freeze-without-its-protocol-record",
+      "file": "Regulatory_Finality_Scenarios.thy",
+      "theorem": "Regulatory_Finality_Scenarios.terminal_record_removal_applies_freeze_without_its_protocol_record",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (regulation_case.invoke_regulatory 2 7 0 (example_request 20) regulation_root_ready) = Finality_Rejected \\<and> snd (regulatory_apply_without_terminal_record 2 7 (example_request 20) regulation_root_ready) = Regulatory_Applied \\<and> get_reg_state (receiver_snapshot (core_regulatory (fst (regulatory_apply_without_terminal_record 2 7 (example_request 20) regulation_root_ready)))) 2 20 = Some FROZEN \\<and> core_records (fst (regulatory_apply_without_terminal_record 2 7 (example_request 20) regulation_root_ready)) (0, 20) = None"
+    },
+    {
+      "id": "normal-bypass-credit-uses-the-terminal-record",
+      "file": "Finality_Scenarios.thy",
+      "theorem": "Finality_Scenarios.normal_bypass_credit_uses_the_terminal_record",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (sample.execute_finality_client (Client_Protocol 2 0 (Deliver_Intent Bypass_Route (sample_request 17))) (finality_sample_certified 17)) = Protocol_Response (Delivery_Response (New_Credit (sample_binding 17)))"
+    },
+    {
+      "id": "normal-reverse-returns-the-recorded-source",
+      "file": "Finality_Scenarios.thy",
+      "theorem": "Finality_Scenarios.normal_reverse_returns_the_recorded_source",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (sample.execute_finality_client (Client_Protocol 0 0 (Return_Intent (sample_request 22) 0 [])) (finality_sample_certified 22)) = Protocol_Response Reservation_Released"
+    },
+    {
+      "id": "removal-accepts-a-wrong-reference-at-a-generated-state",
+      "file": "Finality_Scenarios.thy",
+      "theorem": "Finality_Scenarios.removal_accepts_a_wrong_reference_at_a_generated_state",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (sample.invoke_protocol 2 (core_epoch (finality_sample_certified 17)) 1 (Deliver_Intent Bypass_Route (sample_request 17)) (finality_sample_certified 17)) = Finality_Rejected \\<and> snd (sample.invoke_without_terminal_reference 2 (core_epoch (finality_sample_certified 17)) 1 (Deliver_Intent Bypass_Route (sample_request 17)) (finality_sample_certified 17)) = Protocol_Response (Delivery_Response (New_Credit (sample_binding 17)))"
+    },
+    {
+      "id": "no-exact-atomic-endpoint-observer-for-the-raw-intermediate-pair",
+      "file": "Finality_Scenarios.thy",
+      "theorem": "Finality_Scenarios.no_exact_atomic_endpoint_observer_for_the_raw_intermediate_pair",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(5, 0) \\<noteq> (10, 0) \\<and> (5, 0) \\<noteq> (5, 5)"
+    },
+    {
+      "id": "exact-descendant-source-recovers-the-real-completed-effect",
+      "file": "Finality_Recovery.thy",
+      "theorem": "Finality_Recovery.exact_descendant_source_recovers_the_real_completed_effect",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "sample.finality_calls.checked_current_replay call_example_once (current_source_candidate call_example_once) = Some (call_authority_state call_example_once)"
+    },
+    {
+      "id": "removal-of-current-source-check-loses-actual-descendant-funding",
+      "file": "Finality_Recovery.thy",
+      "theorem": "Finality_Recovery.removal_of_current_source_check_loses_actual_descendant_funding",
+      "role": "actual-control",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "destination_units (machine_state (core_parent call_example_ready)) (2, 17, 4) = 0 \\<and> destination_units (machine_state (core_parent (call_authority_state call_example_once))) (2, 17, 4) = 1"
+    },
+    {
+      "id": "reachable-root-funding-bounded-by-destination-balance",
+      "file": "Root_Funding_Bounds.thy",
+      "theorem": "Root_Funding_Bounds.source_attestation.reachable_root_funding_bounded_by_destination_balance",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 1,
+      "statement": "source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source \\<Longrightarrow> funded_units (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) (?key, ?account) \\<le> destination_units (machine_state (source_attestation.run_reservations ?roster ?threshold ?verifies ?balances ?actions (initial_reservation_machine ?balances))) ?account"
+    },
+    {
+      "id": "source-pool-destination-funding-bounds",
+      "file": "Root_Funding_Bounds.thy",
+      "theorem": "Root_Funding_Bounds.source_attestation.source_pool_destination_funding_bounds",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m\\<rbrakk> \\<Longrightarrow> 0 \\<le> regulation_case.destination_pool_funding (machine_state ?m) ?pool \\<and> regulation_case.destination_pool_funding (machine_state ?m) ?pool \\<le> int (?balances ?pool) - int (source_units (machine_state ?m) ?pool) \\<and> int (?balances ?pool) - int (source_units (machine_state ?m) ?pool) \\<le> int (?balances ?pool)"
+    },
+    {
+      "id": "source-pool-funding-equals-spent-allocation-iff",
+      "file": "Root_Funding_Bounds.thy",
+      "theorem": "Root_Funding_Bounds.source_attestation.source_pool_funding_equals_spent_allocation_iff",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m\\<rbrakk> \\<Longrightarrow> (regulation_case.destination_pool_funding (machine_state ?m) ?pool = int (?balances ?pool) - int (source_units (machine_state ?m) ?pool)) = (regulation_case.unresolved_pool_mass (machine_state ?m) ?pool = 0)"
+    },
+    {
+      "id": "source-pool-funding-equals-genesis-iff",
+      "file": "Root_Funding_Bounds.thy",
+      "theorem": "Root_Funding_Bounds.source_attestation.source_pool_funding_equals_genesis_iff",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.reservation_contract ?roster ?threshold ?verifies ?stable_source ?balances ?m\\<rbrakk> \\<Longrightarrow> (regulation_case.destination_pool_funding (machine_state ?m) ?pool = int (?balances ?pool)) = (source_units (machine_state ?m) ?pool = 0 \\<and> regulation_case.unresolved_pool_mass (machine_state ?m) ?pool = 0)"
+    },
+    {
+      "id": "an-uninterrupted-fresh-call-completes-its-actual-reply",
+      "file": "Finality_Progress.thy",
+      "theorem": "Finality_Progress.durable_call_protocol.an_uninterrupted_fresh_call_completes_its_actual_reply",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 5,
+      "statement": "\\<lbrakk>call_local_status ?m = Endpoint_Up; call_connection ?m = Authority_Connected; call_invocations ?m ?call_id = None; call_authority_results ?m ?call_id = None; call_completions ?m ?call_id = None\\<rbrakk> \\<Longrightarrow> call_completions (durable_call_protocol.run_calls ?execute ?environment_execute (complete_call_program ?call_id ?command) ?m) ?call_id = Some (snd (?execute ?command (call_authority_state ?m))) \\<and> call_authority_state (durable_call_protocol.run_calls ?execute ?environment_execute (complete_call_program ?call_id ?command) ?m) = fst (?execute ?command (call_authority_state ?m))"
+    },
+    {
+      "id": "a-ready-read-completes-after-a-quiescent-refresh",
+      "file": "Finality_Progress.thy",
+      "theorem": "Finality_Progress.source_attestation.a_ready_read_completes_after_a_quiescent_refresh",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; snapshot_query_ready ?query (capture_snapshot (observed_core ?state)); public_balance_query ?query\\<rbrakk> \\<Longrightarrow> call_completions (durable_call_protocol.run_calls (source_attestation.execute_observed ?roster ?threshold ?verifies) (source_attestation.execute_observed_environment ?roster ?threshold ?verifies) (complete_call_program ?call_id (Read_Current ?endpoint ?query)) (initial_call_machine (fst (source_attestation.execute_observed ?roster ?threshold ?verifies (Refresh_Endpoint ?endpoint) ?state)))) ?call_id = Some (Current_Value (core_epoch (observed_core ?state)) (abstract_query_value ?query (observation_alpha (observed_core ?state))))"
+    },
+    {
+      "id": "arbitrarily-long-refresh-and-retry-runs-can-remain-busy",
+      "file": "Finality_Progress.thy",
+      "theorem": "Finality_Progress.source_attestation.arbitrarily_long_refresh_and_retry_runs_can_remain_busy",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; public_balance_query ?query\\<rbrakk> \\<Longrightarrow> snd (source_attestation.interference_cycle ?roster ?threshold ?verifies ?endpoint ?c ?query (source_attestation.interference_prefix ?roster ?threshold ?verifies ?n ?endpoint ?c ?query ?state)) = Observation_Busy"
+    },
+    {
+      "id": "actual-nonoverlapping-sourced-completions-activate-revision-order",
+      "file": "Sourced_Completion_Scenarios.thy",
+      "theorem": "Sourced_Completion_Scenarios.actual_nonoverlapping_sourced_completions_activate_revision_order",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "0 \\<le> 1"
+    },
+    {
+      "id": "actual-current-completion-activates-the-full-response-contract",
+      "file": "Sourced_Completion_Scenarios.thy",
+      "theorem": "Sourced_Completion_Scenarios.actual_current_completion_activates_the_full_response_contract",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<exists>command query index. call_authority_results completion_finished (0, 4) = Some (Endpoint_Request command, Sourced_Observation (Current_Value 1 (Units_Value 10)), index) \\<and> index < length (call_authority_log completion_finished) \\<and> command_query command = Some query \\<and> Units_Value 10 = abstract_query_value query (sourced_response_alpha (linked.sourced_calls.replay_call_authority (take index (call_authority_log completion_finished)) source_raw_start)) \\<and> 1 = target_revision (sourced_response_alpha (linked.sourced_calls.replay_call_authority (take index (call_authority_log completion_finished)) source_raw_start)) \\<and> (\\<forall>account. current_source_query command = Some account \\<longrightarrow> observation_source_available (linked.sourced_calls.replay_call_authority (take index (call_authority_log completion_finished)) source_raw_start) \\<and> source_view_is_reconciled (observation_source (linked.sourced_calls.replay_call_authority (take index (call_authority_log completion_finished)) source_raw_start)) account)"
+    },
+    {
+      "id": "actual-historical-completion-activates-the-prior-snapshot-contract",
+      "file": "Sourced_Completion_Scenarios.thy",
+      "theorem": "Sourced_Completion_Scenarios.actual_historical_completion_activates_the_prior_snapshot_contract",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "\\<exists>command query execution_index snapshot_index. call_authority_results completion_history_finished (0, 5) = Some (Endpoint_Request command, Sourced_Observation (Historical_Value 0 (Units_Value 10)), execution_index) \\<and> execution_index < length (call_authority_log completion_history_finished) \\<and> snapshot_index \\<le> execution_index \\<and> command_query command = Some query \\<and> requested_history_revision command = Some 0 \\<and> Units_Value 10 = abstract_query_value query (sourced_response_alpha (linked.sourced_calls.replay_call_authority (take snapshot_index (call_authority_log completion_history_finished)) source_raw_start)) \\<and> target_revision (sourced_response_alpha (linked.sourced_calls.replay_call_authority (take snapshot_index (call_authority_log completion_history_finished)) source_raw_start)) = 0"
+    },
+    {
+      "id": "old-busy-id-stays-completed-while-a-fresh-id-succeeds",
+      "file": "Sourced_Completion_Scenarios.thy",
+      "theorem": "Sourced_Completion_Scenarios.old_busy_id_stays_completed_while_a_fresh_id_succeeds",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "call_completions completion_caught_up (0, 9) = Some (Sourced_Observation Observation_Busy) \\<and> call_completions completion_caught_up (0, 11) = Some (Sourced_Observation (Current_Value 1 (Units_Value 10)))"
+    },
+    {
+      "id": "the-nonempty-other-root-action-really-executes",
+      "file": "Root_Continuation_Scenarios.thy",
+      "theorem": "Root_Continuation_Scenarios.the_nonempty_other_root_action_really_executes",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (execute_descendant (sample_context ACTIVE) (spend_request 23 4 1) (sample_binding 23) 3 4 1 root_continuation_initial) = Descendant_Executed"
+    },
+    {
+      "id": "the-actual-other-root-continuation-activates-the-general-frame",
+      "file": "Root_Continuation_Scenarios.thy",
+      "theorem": "Root_Continuation_Scenarios.the_actual_other_root_continuation_activates_the_general_frame",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "(\\<forall>account. funded_units (machine_state root_continuation_after) (binding_key (sample_binding 17), account) = funded_units (machine_state root_continuation_initial) (binding_key (sample_binding 17), account)) \\<and> filter (\\<lambda>effect. binding_key (lineage_root effect) = binding_key (sample_binding 17)) (lawful_descendants (machine_state root_continuation_after)) = filter (\\<lambda>effect. binding_key (lineage_root effect) = binding_key (sample_binding 17)) (lawful_descendants (machine_state root_continuation_initial)) \\<and> snd (execute_descendant (sample_context ACTIVE) (spend_request 17 3 1) (sample_binding 17) 4 3 1 root_continuation_after) = snd (execute_descendant (sample_context ACTIVE) (spend_request 17 3 1) (sample_binding 17) 4 3 1 root_continuation_initial)"
+    },
+    {
+      "id": "confirmed-source-has-a-finite-primary-program",
+      "file": "Finality_Terminal_Progress.thy",
+      "theorem": "Finality_Terminal_Progress.source_attestation.confirmed_source_has_a_finite_primary_program",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 8,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.terminal_evidence_inputs ?roster ?threshold ?verifies ?cert ?s; source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances ?s; statement_binding (certificate_statement ?cert) = request_binding ?r; request_certificate ?r = ?cert; statement_status (certificate_statement ?cert) = Finalized; source_attestation.credit_admissible ?roster ?threshold ?verifies (lock_authority (current_lock_view (coupled_core ?s) ?endpoint)) ?r; credit_marker (request_binding ?r) \\<notin> consumed_at (received_messages (machine_state (core_parent (coupled_core ?s))))\\<rbrakk> \\<Longrightarrow> snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client True (Client_Protocol ?endpoint 0 (Deliver_Intent ?route ?r))) (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_evidence_actions ?endpoint ?cert) ?s)) = Coupling_Client_Reply (Protocol_Response (Delivery_Response (New_Credit (request_binding ?r)))) \\<and> snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client True (Client_Publication (binding_key (request_binding ?r)))) (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_effect_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s)) = Coupling_Client_Reply Primary_Published \\<and> binding_key (request_binding ?r) \\<in> core_published (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s)) \\<and> request_binding ?r \\<in> set (credit_history (received_messages (machine_state (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s)))))) \\<and> core_records (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s)) (binding_key (request_binding ?r)) = Some (progress_terminal_record ?cert Confirmed_Decision) \\<and> coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s) = coupled_source ?s \\<and> source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s) \\<and> call_completions (durable_call_protocol.run_calls (source_attestation.execute_finality_client ?roster ?threshold ?verifies) (source_attestation.execute_finality_environment ?roster ?threshold ?verifies) (complete_call_program ?call_id (Client_Publication (binding_key (request_binding ?r)))) (initial_call_machine (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_effect_actions ?endpoint ?cert (Deliver_Intent ?route ?r)) ?s)))) ?call_id = Some Primary_Published"
+    },
+    {
+      "id": "reversed-source-has-a-finite-primary-program",
+      "file": "Finality_Terminal_Progress.thy",
+      "theorem": "Finality_Terminal_Progress.source_attestation.reversed_source_has_a_finite_primary_program",
+      "role": "principal-result",
+      "oracle_dependencies": 0,
+      "premise_count": 9,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; source_attestation.terminal_evidence_inputs ?roster ?threshold ?verifies ?cert ?s; source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances ?s; statement_binding (certificate_statement ?cert) = request_binding ?r; request_certificate ?r = ?cert; statement_status (certificate_statement ?cert) = Reversed; certificate_epoch ?cert = context_relay_epoch (lock_authority (current_lock_view (coupled_core ?s) ?endpoint)); owns_recorded_reservation (current_lock_view (coupled_core ?s) ?endpoint) ?r ?generation (vector_lookup ?versions) (machine_state (core_parent (coupled_core ?s))); phase_at (machine_state (core_parent (coupled_core ?s))) (binding_key (request_binding ?r)) = Some Source_Pending\\<rbrakk> \\<Longrightarrow> snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client True (Client_Protocol ?endpoint 0 (Return_Intent ?r ?generation ?versions))) (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_evidence_actions ?endpoint ?cert) ?s)) = Coupling_Client_Reply (Protocol_Response Reservation_Released) \\<and> snd (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client True (Client_Publication (binding_key (request_binding ?r)))) (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_effect_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s)) = Coupling_Client_Reply Primary_Published \\<and> binding_key (request_binding ?r) \\<in> core_published (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s)) \\<and> phase_at (machine_state (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s)))) (binding_key (request_binding ?r)) = Some Source_Returned \\<and> source_units (machine_state (core_parent (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s)))) (source_account_of (request_binding ?r)) = source_units (machine_state (core_parent (coupled_core ?s))) (source_account_of (request_binding ?r)) + binding_amount (request_binding ?r) \\<and> core_records (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s)) (binding_key (request_binding ?r)) = Some (progress_terminal_record ?cert Reversed_Decision) \\<and> coupled_source (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s) = coupled_source ?s \\<and> source_attestation.source_coupling_invariant ?roster ?threshold ?verifies ?stable_source ?balances (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_finish_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s) \\<and> call_completions (durable_call_protocol.run_calls (source_attestation.execute_finality_client ?roster ?threshold ?verifies) (source_attestation.execute_finality_environment ?roster ?threshold ?verifies) (complete_call_program ?call_id (Client_Publication (binding_key (request_binding ?r)))) (initial_call_machine (coupled_core (source_attestation.run_source_coupling ?roster ?threshold ?verifies (terminal_effect_actions ?endpoint ?cert (Return_Intent ?r ?generation ?versions)) ?s)))) ?call_id = Some Primary_Published"
+    },
+    {
+      "id": "observed-evidence-cannot-record-a-terminal",
+      "file": "Finality_Terminal_Progress.thy",
+      "theorem": "Finality_Terminal_Progress.source_attestation.observed_evidence_cannot_record_a_terminal",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; statement_status (certificate_statement ?cert) = Observed\\<rbrakk> \\<Longrightarrow> snd (source_attestation.record_terminal ?roster ?threshold ?verifies ?cert ?core) = Finality_Rejected"
+    },
+    {
+      "id": "unissued-monetary-evidence-rejects-the-actual-terminal-call",
+      "file": "Finality_Terminal_Progress.thy",
+      "theorem": "Finality_Terminal_Progress.source_attestation.unissued_monetary_evidence_rejects_the_actual_terminal_call",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 3,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; binding_operation (statement_binding (certificate_statement ?cert)) = Destination_Credit; ?cert \\<notin> set (coupled_receipts ?s)\\<rbrakk> \\<Longrightarrow> source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client True (Client_Terminal ?cert)) ?s = (?s, Coupling_Rejected)"
+    },
+    {
+      "id": "unknown-source-outcome-does-not-enable-return",
+      "file": "Finality_Terminal_Progress.thy",
+      "theorem": "Finality_Terminal_Progress.source_attestation.unknown_source_outcome_does_not_enable_return",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; controlled_source_fact (coupled_source ?s) (binding_key (request_binding ?r)) = None\\<rbrakk> \\<Longrightarrow> source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Client ?available (Client_Protocol ?endpoint ?index (Return_Intent ?r ?generation ?versions))) ?s = (?s, Coupling_Rejected)"
+    },
+    {
+      "id": "absent-current-fact-does-not-issue-terminal-evidence",
+      "file": "Finality_Terminal_Progress.thy",
+      "theorem": "Finality_Terminal_Progress.source_attestation.absent_current_fact_does_not_issue_terminal_evidence",
+      "role": "negative-control",
+      "oracle_dependencies": 0,
+      "premise_count": 2,
+      "statement": "\\<lbrakk>source_attestation ?roster ?faulty ?fault_bound ?threshold ?verifies ?signed ?source_truth ?stable_source; controlled_source_fact (coupled_source ?s) (binding_key (statement_binding (certificate_statement ?cert))) \\<noteq> Some (certificate_statement ?cert)\\<rbrakk> \\<Longrightarrow> coupled_receipts (fst (source_attestation.source_coupling_step ?roster ?threshold ?verifies (Coupling_Issue True ?cert) ?s)) = coupled_receipts ?s"
+    },
+    {
+      "id": "actual-confirm-prefix-activates-the-terminal-program",
+      "file": "Finality_Terminal_Scenarios.thy",
+      "theorem": "Finality_Terminal_Scenarios.actual_confirm_prefix_activates_the_terminal_program",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (linked.source_coupling_step (Coupling_Client True (Client_Protocol 2 0 (Deliver_Intent Bypass_Route conservation_credit_request))) terminal_confirm_ready) = Coupling_Client_Reply (Protocol_Response (Delivery_Response (New_Credit (sample_binding 17)))) \\<and> snd (linked.source_coupling_step (Coupling_Client True (Client_Publication (0, 17))) terminal_confirm_effect) = Coupling_Client_Reply Primary_Published \\<and> (0, 17) \\<in> core_published (coupled_core terminal_confirm_finished) \\<and> sample_binding 17 \\<in> set (credit_history (received_messages (machine_state (core_parent (coupled_core terminal_confirm_finished))))) \\<and> coupled_source terminal_confirm_finished = coupled_source terminal_confirm_cut"
+    },
+    {
+      "id": "actual-reverse-prefix-activates-the-terminal-program",
+      "file": "Finality_Terminal_Scenarios.thy",
+      "theorem": "Finality_Terminal_Scenarios.actual_reverse_prefix_activates_the_terminal_program",
+      "role": "concrete-consumer",
+      "oracle_dependencies": 0,
+      "premise_count": 0,
+      "statement": "snd (linked.source_coupling_step (Coupling_Client True (Client_Protocol 0 0 (Return_Intent linked_return_request 0 []))) terminal_reverse_ready) = Coupling_Client_Reply (Protocol_Response Reservation_Released) \\<and> snd (linked.source_coupling_step (Coupling_Client True (Client_Publication (0, 22))) terminal_reverse_effect) = Coupling_Client_Reply Primary_Published \\<and> (0, 22) \\<in> core_published (coupled_core terminal_reverse_finished) \\<and> phase_at (machine_state (core_parent (coupled_core terminal_reverse_finished))) (0, 22) = Some Source_Returned \\<and> coupled_source terminal_reverse_finished = coupled_source terminal_reverse_cut"
+    }
+  ]
+}

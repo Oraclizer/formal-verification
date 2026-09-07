@@ -1,6 +1,6 @@
 # Formal Model to Implementation Mapping
 
-**Version:** 0.8.0
+**Version:** 0.9.0
 **Last updated:** 2026-09-07
 **Status:** Pre-implementation (model-only; implementation columns to be populated during development)
 
@@ -15,6 +15,8 @@ This document tracks the correspondence between formally verified model elements
 ## Coverage Scope
 
 This mapping covers:
+
+- **Evidence Atomic Binding**: source-qualified terminal records and actual financial/regulatory consumers, source allocation, completed current/history/raw responses, guarded recovery and explicit progress conditions
 
 - **Preemptive Lock Correctness**: complete-footprint reservations, worker leases, source/destination/return uniqueness, evidence-based settlement, rooted funding, timeout information boundaries and complete-journal recovery
 - **Cross-Chain Message Integrity**: authenticated source binding, destination-credit uniqueness, route and checked-summary equivalence, credit-marker recovery and actual regulatory consumers
@@ -51,6 +53,44 @@ The current proofs do **not** establish:
 - An executable recovery, queue, priority, or BFT algorithm for convergence; `oss_realize` uses existential choice and ignores its event when selecting recovery.
 - Network-level properties such as message loss, partial synchrony, or dynamic topology changes; these remain unverified external/refinement obligations.
 - Properties of unverified external components: P2P networking, external cryptographic libraries (BLS), UI, database layer.
+
+---
+
+# Evidence Atomic Binding
+
+The [session](Evidence_Atomic_Binding/README.md) binds a separate terminal record
+to source evidence and to the actual message, reservation, financial and
+regulatory operations. Its [claim ledger](Evidence_Atomic_Binding/claims.json)
+contains checked theorem statements and assumptions. The
+[model contract](Evidence_Atomic_Binding/model-contract.md) defines the scope;
+the [bidirectional product obligations](Evidence_Atomic_Binding/product-obligations.json)
+and [API inventory](Evidence_Atomic_Binding/product-api-inventory.json) identify
+existing source defenses, planned tests and unverified compiled consumers.
+
+| Formal result | Actual formal consumer | Remaining product correspondence |
+|---|---|---|
+| Immutable exact binding and terminal kind; generated source evidence | Record creation, certificate publication, credit, return, regulatory application and primary publication | Production terminal agreement and PFR verification across quorum, round, epoch and restart |
+| Current finalized source for child credits, disjoint credit/return sets and physical allocation equation | Joint source dispatcher and source-aware callback executions; actual finalization-guard removal control | Physical adapter identity, deduplication, durable fences, outcome authentication and allocation mapping |
+| Current/historical/operational/raw responses and actual completion provenance | Actual callback result table, independent readers and execution/snapshot indices | Every public getter, raw field and event; coherent current authority and full check-to-use binding |
+| A fresh invocation after completed current success cannot complete an older current revision | Durable invocation/execution/collection/completion kernel | Invocation identity, crash persistence and physical serialization; overlapping calls retain their own response contract |
+| Finite transfer/regulatory action words and separate response relations | Actual parent operations and CDSP regulatory synchronization | Core projection is not a full physical transition simulation or a classifier for every API reply |
+| Exact current-journal recovery and restored guarded dispatch | Candidate genesis/journal comparison against the current authority, followed by actual callbacks | Authenticity, completeness, freshness and persistence of the supplied authority source |
+| Other-root continuation, allocation bounds and funding/decision equivalence | Actual descendant consumer under common current context/request inputs | Full protocol inverse realization and whole-machine information sufficiency remain separate questions |
+
+The declared call and source alphabets include delayed or lost responses,
+unknown source outcomes, local cache loss and interleaved authority inputs.
+Those abstract failures are not a refinement of a deployed network, storage
+engine or distributed agreement protocol. Current reads compare the whole
+logical snapshot; a production barrier or equivalent current-state mechanism
+still requires evidence. A ready endpoint need not wait for every secondary
+settlement, while a lagging endpoint cannot label an old cache current.
+
+The public token's replay rejection differs from retransmitting a recorded
+formal reply. Its existing authority, dependency and current-effect guards
+remain relevant implementation defenses. The settlement authorization seam
+does not itself execute secondary application. Physical producers and all
+compiled-consumer rows remain **PLANNED / UNVERIFIED**. Neither raw observers
+nor supported source classes are removed to obtain these model results.
 
 ---
 
@@ -543,6 +583,7 @@ Changes are committed with the message format: `mapping update: [reason]`
 
 | Version | Date | Change |
 |---|---|---|
+| 0.9.0 | 2026-09-07 | Added evidence-qualified terminal consumers, joint source accounting, completed observation/recovery contracts and explicit implementation obligations. Existing parent meanings are unchanged. |
 | 0.7.0 | 2026-09-06 | Added authenticated message execution results, exact formal consumers and explicitly unverified implementation obligations. Existing CDSP/RAC meanings are unchanged. |
 | 0.6.1 | 2026-08-13 | Added only an out-of-scope pointer to an independent research companion. This does not expand Oraclizer product coverage or add an implementation/refinement mapping. |
 | 0.6.0 | 2026-07-31 | Added the standalone `Regulatory_Action_Composition` session to repository-level mapping: outcome separation, complete 12/9 pair classification, legal-effect and transfer-gate boundaries, trace/frame and completed atomic-queue targets, 60 normal forms, proposed tests, and an explicit program-mapping completion gate. No implementation refinement is claimed. |

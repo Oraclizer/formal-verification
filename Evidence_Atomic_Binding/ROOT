@@ -1,0 +1,39 @@
+chapter Oraclizer
+
+session Evidence_Atomic_Binding = Preemptive_Lock_Correctness +
+  options [document = false, timeout = 600]
+  theories
+    Abstract_Observation_Types
+    Abstract_Response_Link
+    Call_Order
+    Controlled_Source_Outcomes
+    Finality_Calls
+    Finality_Observations
+    Finality_Progress
+    Finality_Protocol
+    Finality_Records
+    Finality_Recovery
+    Finality_Refinement
+    Finality_Scenarios
+    Finality_Terminal_Progress
+    Finality_Terminal_Scenarios
+    Finality_Types
+    Funding_Decision_Information
+    Historical_Snapshot_Provenance
+    Observation_Scenarios
+    Observed_Protocol_Link
+    Regulatory_Finality_Scenarios
+    Root_Continuation
+    Root_Continuation_Scenarios
+    Root_Funding_Bounds
+    Root_Information
+    Source_Coupling
+    Source_Coupling_Conservation
+    Source_Effect_Boundary
+    Source_Finality_Link
+    Source_Observation_Projection
+    Sourced_Call_Order
+    Sourced_Completion_Scenarios
+    Sourced_Observations
+    Sourced_Response_Link
+    Transfer_Ledger_Refinement

@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "session": "Evidence_Atomic_Binding",
+  "state": "FORMAL_MODEL",
+  "implementation_refinement": "NOT_ESTABLISHED",
+  "scope": "Conditional formal model and direct source inspection. Existing product defenses are recorded without attributing this model's source, observation or durability guarantees to them.",
+  "inputs": [
+    {
+      "id": "trust-token",
+      "repository": "https://github.com/Oraclizer/erc-trust",
+      "revision": "dfbd779ef5a49d5907ead2e8d3322859378519ec",
+      "path": "implementation/src/TrustToken.sol",
+      "sha256": "deeedf231b461035ac4496b36438d6ea28298ed2935b920bf9c01cb31f94ef1b",
+      "inspection": "The identified source bytes were inspected. Compiled and deployment correspondence remains unverified."
+    },
+    {
+      "id": "settlement-seam",
+      "repository": "https://github.com/Oraclizer/statesync-gkr",
+      "revision": "56a2ba8e1ec152d39e5de8c3faeda0fad6d377cc",
+      "path": "crates/wrap/src/settlement.rs",
+      "sha256": "8ba31a7c58a56abeb7a9c463008616de48b3e4ae4b3f64f6e6c375bf9f9671c9"
+    },
+    {
+      "id": "trust-dependency",
+      "repository": "https://github.com/Oraclizer/erc-trust",
+      "revision": "dfbd779ef5a49d5907ead2e8d3322859378519ec",
+      "path": "implementation/src/TrustDependencyBinding.sol",
+      "sha256": "53fb6a74a5168f7f2b9f005657ee7df5528974d53dae2359ea1e4ae3fb063020"
+    },
+    {
+      "id": "trust-storage",
+      "repository": "https://github.com/Oraclizer/erc-trust",
+      "revision": "dfbd779ef5a49d5907ead2e8d3322859378519ec",
+      "path": "implementation/src/TrustStorage.sol",
+      "sha256": "610170dbd24ba2791d459db9a24e2c05e7d699594c035074379a5700dbdb7931"
+    },
+    {
+      "id": "trust-interface",
+      "repository": "https://github.com/Oraclizer/erc-trust",
+      "revision": "dfbd779ef5a49d5907ead2e8d3322859378519ec",
+      "path": "implementation/src/generated/IERCTrustKernel.sol",
+      "sha256": "8f179a21b04fa1f172bdddef2f8878a01524d3429570c0abf9aa60cfc8738f7d"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "terminal-decision-producer",
+      "formal_consumers": [
+        "Finality_Protocol.thy: record_terminal",
+        "Finality_Records.thy",
+        "Source_Finality_Link.thy"
+      ],
+      "product_inputs": [
+        "settlement-seam"
+      ],
+      "source_anchors": [
+        "PrimaryFinalityVerifier::verify",
+        "PrimaryFinalityRecordV1"
+      ],
+      "source_finding": "The verifier is an external trait. Its production implementation must verify the signer epoch, uniqueness, threshold and signatures over the exact record. This is not a supplied implementation of persistent distributed terminal agreement across restart or epoch change. TestPfrVerifier in settlement_encoding.rs is an epoch/verdict-byte/record-id test shim, not a quorum/signature producer. The test named primary_certificate_binds_every_signed_record_field changes only checkpoint in its inspected body.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "An actual producer emits one exact binding decision and the application consumer accepts it."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove the decision-reference check at the compiled application consumer and observe unauthorized credit or publication."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "source-effect-and-persistent-fence",
+      "formal_consumers": [
+        "Source_Effect_Boundary.thy: boundary_step",
+        "Controlled_Source_Outcomes.thy: controlled_source_step",
+        "Source_Coupling.thy: coupling_source_result"
+      ],
+      "product_inputs": [],
+      "source_anchors": [],
+      "source_finding": "No bank, chain or DAML adapter implementation supplying the specified immutable effect identity, atomic deduplication, permanent no-effect fence and authenticated outcome query was supplied. The controlled source is an explicit abstract producer.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "Apply, lose acknowledgment, query the exact effect, and complete through the same adapter."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove source finalization's reversal barrier after actual destination credit; observe the restored source amount coexisting with that credit."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "SOURCE_BLOCKED"
+    },
+    {
+      "id": "atomic-durable-call-results",
+      "formal_consumers": [
+        "Finality_Calls.thy: execute_authority_once",
+        "Sourced_Observations.thy: sourced_calls"
+      ],
+      "product_inputs": [
+        "trust-token"
+      ],
+      "source_anchors": [
+        "_validateAndAuthorizeAction",
+        "actionRecord",
+        "receipt"
+      ],
+      "source_finding": "The token checks action lifecycle and exposes recorded effects and receipts. This is a real local replay defense. A proof relating its transaction durability and a cross-domain authority result journal to the model's single atomic execution boundary remains absent. Repeating an applied action or reversal reverts with TrustReplay rather than retransmitting the previous formal reply. A reverted transaction retains neither its attempted effect nor its failed-call receipt. A formal invocation ID is not automatically a token nonce; a wrapper must supply exact invocation/result identity and completed Busy/Unavailable storage.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "An effect executes once, its response is lost, and the same invocation retrieves and completes the recorded result after restart."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove durable invocation deduplication and demonstrate a second actual financial effect."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "current-authority-and-policy-consumption",
+      "formal_consumers": [
+        "Finality_Types.thy: current_lock_view",
+        "Finality_Protocol.thy: invoke_protocol",
+        "Finality_Observations.thy: protected_read_access"
+      ],
+      "product_inputs": [
+        "trust-token",
+        "trust-dependency"
+      ],
+      "source_anchors": [
+        "_validateAndAuthorizeAction",
+        "_validateAndAuthorizeReversal",
+        "_requireAuthority",
+        "_validateCurrentEffect",
+        "dependencyState",
+        "_assessOrRevert",
+        "_assessBinding",
+        "TrustDependencyBinding.assess",
+        "executeERC7943Action",
+        "executeERC7943Reversal",
+        "_prepareRoute",
+        "_consumeRoute",
+        "setFrozenTokens",
+        "forcedTransfer"
+      ],
+      "source_finding": "Actual action validation checks the identifier/hash, lifecycle, time interval, current authority/epoch, dependency root/epoch and nonce. Reversal additionally checks the current original effect and allowed pairing. These defenses must be related field-by-field to the current execution context; matching a version number alone is insufficient. Actual assessment also checks the bound dependency code/configuration, response length and command/binding echoes. Sensitive raw selectors consume a live same-transaction route ticket tied to the exact selector, calldata and current dependency root/epoch.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "A current authorized request succeeds at consumption after primary publication."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove one current authority or dependency check and accept a stale request that the model rejects."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "public-current-and-raw-observations",
+      "formal_consumers": [
+        "Finality_Observations.thy: current_query_reply",
+        "Sourced_Observations.thy: execute_sourced_request",
+        "Source_Observation_Projection.thy: source_observation_alpha"
+      ],
+      "product_inputs": [
+        "trust-token",
+        "trust-storage",
+        "trust-interface"
+      ],
+      "source_anchors": [
+        "balanceOf",
+        "getFrozenTokens",
+        "canTransfer",
+        "_ordinaryAvailable",
+        "actionRecord",
+        "receipt",
+        "caseRecord",
+        "dependencyState",
+        "trustProfile",
+        "Transfer event",
+        "totalSupply",
+        "allowance",
+        "canSend",
+        "canReceive",
+        "Approval",
+        "Frozen",
+        "ForcedTransfer",
+        "RegulatoryActionApplied",
+        "RegulatoryReversalApplied",
+        "TrustDependencyChanged",
+        "TrustAuthorityChanged",
+        "TrustStorage"
+      ],
+      "source_finding": "balanceOf exposes physical token balances directly. The ordinary-available calculation excludes custody backing and frozen units. These public views and events are distinct from protected source-data reads and are not removed by the model. Cross-domain current-value coherence is not established for them by local getters alone. getFrozenTokens returns min(stored frozen target, current balance). _ordinaryAvailable is an internal calculation; canTransfer is a public consumer. Supply, allowances, dependency metadata and the other enumerated public storage/events remain open ABI observation obligations; they are not silently represented by protected source-data reads.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "A ready endpoint returns the coherent current value while secondary settlement may still lag."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove the current-state or source-gap check and expose a stale successful current response after a newer completed invocation."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "historical-and-completed-response-contract",
+      "formal_consumers": [
+        "Sourced_Response_Link.thy",
+        "Sourced_Call_Order.thy"
+      ],
+      "product_inputs": [
+        "trust-token"
+      ],
+      "source_anchors": [
+        "actionRecord",
+        "receipt",
+        "caseRecord"
+      ],
+      "source_finding": "Records and receipts are actual observable interfaces. An authenticated snapshot API, exact invocation identity and an implementation preserving completed Busy/Unavailable responses across recovery have not been connected to the formal history. An OIP asOfTimestamp request must also be related to the snapshot revision and provenance; a token current getter does not implement this timestamp contract.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "Current and explicitly historical requests return their respective authenticated cuts; a completed Busy stays completed and a new invocation may succeed."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Weaken snapshot provenance or completed-call immutability and obtain an invented history or changed completed result."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "source-allocation-and-rooted-funding",
+      "formal_consumers": [
+        "Root_Funding_Bounds.thy",
+        "Funding_Decision_Information.thy",
+        "Source_Coupling_Conservation.thy",
+        "Source_Observation_Projection.thy: actual_sourced_calls_preserve_the_physical_pool"
+      ],
+      "product_inputs": [
+        "trust-token"
+      ],
+      "source_anchors": [
+        "_ordinaryAvailable",
+        "_move"
+      ],
+      "source_finding": "The token maintains pooled balances and excludes restricted custody from ordinary availability. That does not supply an implementation of the model's per-source-root funding table or prove its correspondence to physical source allocation pools.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "Credit, transfer within the credited root, and reconcile while preserving the exact physical source/return/credit partition."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Replace root-specific funding by pooled balance and admit a descendant request with no funding from its stated root."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "regulatory-effects-and-lawful-successors",
+      "formal_consumers": [
+        "Finality_Refinement.thy",
+        "Regulatory_Finality_Scenarios.thy"
+      ],
+      "product_inputs": [
+        "trust-token"
+      ],
+      "source_anchors": [
+        "_validateAndAuthorizeReversal",
+        "_applyReversalPrepared",
+        "_validateCurrentEffect",
+        "_ordinaryAvailable"
+      ],
+      "source_finding": "A token reversal uses a distinct reversal identity, parent action and current-effect checks. It must not be interpreted as changing the old source key's immutable Finalized terminal fact. Actual regulatory state, token quantity and lawful later effects need a separate correspondence. The token changes the old ActionRecord.lifecycle to REVERSED and puts parentCommandId in a new reversal receipt; a TERMINAL case rejects reversal. Neither ActionRecord.lifecycle nor CasePhase is identical to the model source key stable fact.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "After monetary primary finality, apply a lawful freeze, reject ordinary transfer, accept authorized enforcement, and preserve the earlier completed allocation."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove the actual terminal/current-policy consumer and obtain an unrecorded regulatory effect or unauthorized ordinary transfer."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    },
+    {
+      "id": "complete-current-recovery-source",
+      "formal_consumers": [
+        "Finality_Recovery.thy: checked_current_replay",
+        "Source_Observation_Projection.thy: restored_sourced_dispatch_still_uses_the_actual_source_guard"
+      ],
+      "product_inputs": [],
+      "source_anchors": [],
+      "source_finding": "No implementation supplying the authenticated complete current authority journal and genesis to the replica recovery checker was identified. An internally replayable candidate is not evidence of completeness or freshness.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "Recover the current journal including a successful bypass and resume through current authority and source guards."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Remove independent current-source comparison and accept a truncated but internally replayable journal that loses an actual completed effect."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "SOURCE_BLOCKED"
+    },
+    {
+      "id": "primary-versus-secondary-settlement",
+      "formal_consumers": [
+        "Finality_Protocol.thy: publish_primary",
+        "Finality_Observations.thy: secondary_progress",
+        "Finality_Progress.thy"
+      ],
+      "product_inputs": [
+        "settlement-seam"
+      ],
+      "source_anchors": [
+        "FinalizedReceiptRootSource",
+        "SettlementAuthorizationV1",
+        "ReferenceSettlementConsumer::authorize_new"
+      ],
+      "source_finding": "Receipt finality is an external source trait. Authorization checks and records a local settlement/claim identity but does not mutate application state or declare SECONDARY_FINALIZED. No production CDK L3 application or settlement execution is supplied by that return value.",
+      "normal_test": {
+        "status": "PLANNED",
+        "target": "A relevant ready endpoint serves and consumes primary state while a secondary endpoint remains behind, then performs authenticated settlement and reconciliation."
+      },
+      "guard_removal": {
+        "status": "PLANNED",
+        "target": "Weaken the exact primary/receipt identity check and obtain acceptance for a mismatched route, root or replay identity."
+      },
+      "compiled_consumer": {
+        "status": "UNVERIFIED",
+        "artifact": null
+      },
+      "closure": "OPEN"
+    }
+  ],
+  "inverse_consumers": {
+    "trust-token": [
+      "atomic-durable-call-results",
+      "current-authority-and-policy-consumption",
+      "public-current-and-raw-observations",
+      "historical-and-completed-response-contract",
+      "source-allocation-and-rooted-funding",
+      "regulatory-effects-and-lawful-successors"
+    ],
+    "settlement-seam": [
+      "terminal-decision-producer",
+      "primary-versus-secondary-settlement"
+    ],
+    "trust-dependency": [
+      "current-authority-and-policy-consumption"
+    ],
+    "trust-storage": [
+      "public-current-and-raw-observations"
+    ],
+    "trust-interface": [
+      "public-current-and-raw-observations"
+    ]
+  },
+  "nonclaims": [
+    "Formal input types do not establish ABI, hash-preimage or bytecode equivalence.",
+    "No product test, mutation, compiled artifact or deployment is newly certified by this source inspection.",
+    "The full integration's normal-form inverse realization, whole information sufficiency and recovery/composition decision preservation remain distinct goals."
+  ],
+  "observation_inventory": [
+    {
+      "surface": "balances and supply",
+      "entries": [
+        "balanceOf",
+        "totalSupply",
+        "_balances",
+        "_totalSupply"
+      ],
+      "formal_correspondence": "Source_Balance/Destination_Balance cover modeled allocation quantities; ABI and totalSupply aggregation correspondence remain open."
+    },
+    {
+      "surface": "allowances",
+      "entries": [
+        "allowance",
+        "approve",
+        "transferFrom",
+        "Approval",
+        "_allowances"
+      ],
+      "formal_correspondence": "No allowance-table refinement is established by the root funding decision theorem. Current policy and actual token allowance checks require a separate mapping."
+    },
+    {
+      "surface": "restrictions and custody",
+      "entries": [
+        "canSend",
+        "canReceive",
+        "canTransfer",
+        "getFrozenTokens",
+        "_restricted",
+        "_frozen",
+        "_custodyBacking",
+        "_freezeHeads",
+        "_restrictionHeads"
+      ],
+      "formal_correspondence": "The model distinguishes quantity from regulatory support; exact token targets, custody floors and public boolean views require ABI refinement."
+    },
+    {
+      "surface": "records, current dependencies and authorities",
+      "entries": [
+        "actionRecord",
+        "receipt",
+        "caseRecord",
+        "dependencyState",
+        "trustProfile",
+        "_authorities",
+        "_usedNonces",
+        "_bindings",
+        "_dependencyRoot",
+        "_dependencyEpoch"
+      ],
+      "formal_correspondence": "Explicit current/historical/operational/raw model queries exist. Action, case, source terminal and invocation identities are distinct pending mappings."
+    },
+    {
+      "surface": "events",
+      "entries": [
+        "Transfer",
+        "Approval",
+        "Frozen",
+        "ForcedTransfer",
+        "RegulatoryActionApplied",
+        "RegulatoryReversalApplied",
+        "TrustDependencyChanged",
+        "TrustAuthorityChanged"
+      ],
+      "formal_correspondence": "Events remain observable. Canonical product event order and absence of reverted-transaction events are not replaced by abstract Current_Value responses."
+    }
+  ],
+  "test_source_candidates": [
+    {
+      "repository": "https://github.com/Oraclizer/erc-trust",
+      "revision": "dfbd779ef5a49d5907ead2e8d3322859378519ec",
+      "path": "implementation/test/TrustActions.unit.t.sol",
+      "sha256": "8dc0d6643700eb2545ab23ee8f5629e0fdb87efb9431ec9fde168f1f58786400",
+      "status": "SOURCE_INSPECTED_NOT_RUN",
+      "tests": [
+        "testEveryDependencyRebindMakesEarlierCommandsStale",
+        "testRootAndEpochAreCheckedIndependently",
+        "testReplayNonceAndAuthorityRotation",
+        "testAssessmentOutcomesAndReasonClasses",
+        "testERC7943ExactUseRoutesAndRawClosure",
+        "testCanonicalEventOrderAndRevertedTransactionsLeaveNothing",
+        "testDispositionOnOpenOverlayCaseIsRejectedAndTerminalCasesRejectReversals",
+        "testCustodyBackingAndOwnFrozenFloorDoNotDoubleCount"
+      ],
+      "limit": "Existing input and route controls are candidates. This task has not executed these tests or removed the modeled cross-domain guards in compiled token code."
+    },
+    {
+      "repository": "https://github.com/Oraclizer/statesync-gkr",
+      "revision": "56a2ba8e1ec152d39e5de8c3faeda0fad6d377cc",
+      "path": "tests/settlement_encoding.rs",
+      "sha256": "c0778a58643cc19a0a86106da1a547574e7a77a618c4ec6ccf980911eb660ae2",
+      "status": "SOURCE_INSPECTED_NOT_RUN",
+      "tests": [
+        "route_rotation_cannot_replay_one_transition",
+        "pfr_revision_and_claim_id_change_cannot_replay",
+        "wrong_destination_and_action_kind_are_rejected",
+        "revoked_route_rejects_new_but_preserves_historical_verification"
+      ],
+      "limit": "Reference-consumer input controls use a TestPfrVerifier shim. They do not implement production D-quencer agreement, application-state mutation or secondary settlement."
+    }
+  ],
+  "api_inventory": "product-api-inventory.json"
+}
