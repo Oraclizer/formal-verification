@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="720" viewBox="0 0 1180 720" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="ta-title ta-desc">
-  <title id="ta-title">Theory architecture</title>
-  <desc id="ta-desc">Import graph of the two Isabelle sessions in this repository. The CDSP session contains ten theories: State_Preservation feeds Regulatory_Instance, Composition, Proof_Automation, Functor_Laws, Hierarchy and External_Instance; Priority_Resolution feeds DQuencer_Instance, which feeds Composition; Composition and Regulatory_Instance feed Functor_Laws; Functor_Laws feeds Hierarchy and Canton_Bridge; Regulatory_Instance also feeds Canton_Bridge. The external AFP session ADS_Functor feeds Functor_Laws and Canton_Bridge. The RAC session contains Regulatory_Action_Composition, which imports Regulatory_Instance from CDSP.</desc>
+  <title id="ta-title">CDSP and RAC foundation: direct theory imports</title>
+  <desc id="ta-desc">Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The separate session overview includes all seven registered artifacts.</desc>
 
   <defs>
     <linearGradient id="ta-bg" x1="0" y1="0" x2="1" y2="1">
@@ -36,26 +36,25 @@
 
   <!-- edges: session-internal -->
   <g fill="none" stroke="#5f7aa8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ta-arrow)">
-    <path d="M350 173 V239"/>
-    <path d="M310 173 V208 H145 V239"/>
-    <path d="M390 173 V208 H555 V239"/>
-    <path d="M290 173 V196 H42 V598 H61"/>
-    <path d="M330 173 V205 H247 V486 H266"/>
-    <path d="M410 173 V196 H862 V374 H844"/>
-    <path d="M760 173 V239"/>
-    <path d="M760 285 V351"/>
-    <path d="M740 397 V422 H374 V463"/>
-    <path d="M350 285 V463"/>
-    <path d="M390 285 V320 H657 V598 H639"/>
-    <path d="M420 285 V410 H900 V614 H920"/>
-    <path d="M310 509 V545 H145 V575"/>
-    <path d="M390 509 V545 H555 V575"/>
+    <path data-from="Composition" data-to="Functor_Laws" d="M740 397 V422 H374 V463"/>
+    <path data-from="DQuencer_Instance" data-to="Functor_Laws" d="M676 280 H661 V442 H450 V480 H434"/>
+    <path data-from="Functor_Laws" data-to="Canton_Bridge" d="M390 509 V545 H555 V575"/>
+    <path data-from="Functor_Laws" data-to="Hierarchy" d="M310 509 V545 H145 V575"/>
+    <path data-from="Priority_Resolution" data-to="DQuencer_Instance" d="M760 173 V239"/>
+    <path data-from="Proof_Automation" data-to="External_Instance" d="M145 285 V307 H555 V285"/>
+    <path data-from="Proof_Automation" data-to="Functor_Laws" d="M125 285 V432 H300 V463"/>
+    <path data-from="Regulatory_Instance" data-to="DQuencer_Instance" d="M434 270 H451 V325 H656 V262 H676"/>
+    <path data-from="Regulatory_Instance" data-to="Functor_Laws" d="M350 285 V463"/>
+    <path data-from="Regulatory_Instance" data-to="Regulatory_Action_Composition" d="M420 285 V410 H900 V614 H920"/>
+    <path data-from="State_Preservation" data-to="Composition" d="M410 173 V196 H862 V374 H844"/>
+    <path data-from="State_Preservation" data-to="Proof_Automation" d="M310 173 V208 H145 V239"/>
+    <path data-from="State_Preservation" data-to="Regulatory_Instance" d="M350 173 V239"/>
   </g>
 
   <!-- edges: external AFP dependency -->
   <g fill="none" stroke="#8b76e8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#ta-arrow-ext)">
-    <path d="M985 181 V445 H410 V463"/>
-    <path d="M1035 181 V530 H600 V575"/>
+    <path data-from="ADS_Functor" data-to="Canton_Bridge" d="M1035 181 V530 H600 V575"/>
+    <path data-from="ADS_Functor" data-to="Functor_Laws" d="M985 181 V451 H410 V463"/>
   </g>
 
   <!-- nodes -->
@@ -96,8 +95,8 @@
   <!-- legend -->
   <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" fill="#8397b5">
     <path d="M42 686 H86" fill="none" stroke="#5f7aa8" stroke-width="1.7" marker-end="url(#ta-arrow)"/>
-    <text x="96" y="690">imports within this repository</text>
+    <text x="96" y="690">dependency → direct importer</text>
     <path d="M330 686 H374" fill="none" stroke="#8b76e8" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#ta-arrow-ext)"/>
-    <text x="384" y="690">imports the external AFP session</text>
+    <text x="384" y="690">external AFP dependency → importer</text>
   </g>
 </svg>

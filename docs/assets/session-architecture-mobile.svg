@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1450" viewBox="0 0 600 1450" role="img" aria-labelledby="title desc">
+<title id="title">Repository session dependencies</title><desc id="desc">All seven ROOTS-registered artifact sessions. Six form the CDSP to Evidence Binding Composition parent chain. Protected Behavior Obstructions independently extends HOL. Additional direct CDSP session dependencies are HOL-Library, HOL-Eisbach, and AFP ADS_Functor. Auxiliary audit sessions are not separate artifact entries.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>
+<rect width="600" height="1450" rx="20" fill="#0b142a"/>
+<g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">
+<text x="28" y="48" font-size="27" fill="#e1eaf8">Repository session dependencies</text>
+<text x="28" y="83" font-size="19" fill="#a8bbd5">Seven registered artifacts · dependency → child</text>
+<path data-from="ADS_Functor" data-to="Cross_Domain_State_Preservation" d="M490.0 184 V217.0 H300.0 V250" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="Cross_Chain_Message_Integrity" data-to="Preemptive_Lock_Correctness" d="M300.0 580 V602.5 H300.0 V625" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="Cross_Domain_State_Preservation" data-to="Regulatory_Action_Composition" d="M300.0 330 V352.5 H300.0 V375" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="Evidence_Atomic_Binding" data-to="Evidence_Binding_Composition" d="M300.0 830 V852.5 H300.0 V875" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="HOL" data-to="Protected_Behavior_Obstructions" d="M300.0 1148 V1169.0 H300.0 V1190" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="HOL-Eisbach" data-to="Cross_Domain_State_Preservation" d="M301.0 184 V217.0 H300.0 V250" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="HOL-Library" data-to="Cross_Domain_State_Preservation" d="M111.0 184 V217.0 H300.0 V250" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="Preemptive_Lock_Correctness" data-to="Evidence_Atomic_Binding" d="M300.0 705 V727.5 H300.0 V750" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="Regulatory_Action_Composition" data-to="Cross_Chain_Message_Integrity" d="M300.0 455 V477.5 H300.0 V500" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-node="Cross_Domain_State_Preservation"><rect x="32" y="250" width="536" height="80" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="283.5" text-anchor="middle" font-size="24">Cross-Domain State</text>
+<text x="300.0" y="310.5" text-anchor="middle" font-size="24">Preservation</text>
+</g>
+<g data-node="Regulatory_Action_Composition"><rect x="32" y="375" width="536" height="80" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="408.5" text-anchor="middle" font-size="24">Regulatory Action</text>
+<text x="300.0" y="435.5" text-anchor="middle" font-size="24">Composition</text>
+</g>
+<g data-node="Cross_Chain_Message_Integrity"><rect x="32" y="500" width="536" height="80" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="533.5" text-anchor="middle" font-size="24">Cross-Chain Message</text>
+<text x="300.0" y="560.5" text-anchor="middle" font-size="24">Integrity</text>
+</g>
+<g data-node="Preemptive_Lock_Correctness"><rect x="32" y="625" width="536" height="80" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="658.5" text-anchor="middle" font-size="24">Preemptive Lock</text>
+<text x="300.0" y="685.5" text-anchor="middle" font-size="24">Correctness</text>
+</g>
+<g data-node="Evidence_Atomic_Binding"><rect x="32" y="750" width="536" height="80" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="783.5" text-anchor="middle" font-size="24">Evidence Atomic</text>
+<text x="300.0" y="810.5" text-anchor="middle" font-size="24">Binding</text>
+</g>
+<g data-node="Evidence_Binding_Composition"><rect x="32" y="875" width="536" height="80" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="908.5" text-anchor="middle" font-size="24">Evidence Binding</text>
+<text x="300.0" y="935.5" text-anchor="middle" font-size="24">Composition</text>
+</g>
+<g data-node="HOL-Library"><rect x="24" y="126" width="174" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
+<text x="111.0" y="162.0" text-anchor="middle" font-size="18">HOL-Library</text>
+</g>
+<g data-node="HOL-Eisbach"><rect x="214" y="126" width="174" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
+<text x="301.0" y="162.0" text-anchor="middle" font-size="18">HOL-Eisbach</text>
+</g>
+<g data-node="ADS_Functor"><rect x="404" y="126" width="172" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
+<text x="490.0" y="162.0" text-anchor="middle" font-size="18">AFP ADS_Functor</text>
+</g>
+<g data-node="HOL"><rect x="180" y="1090" width="240" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
+<text x="300.0" y="1126.0" text-anchor="middle" font-size="18">HOL</text>
+</g>
+<g data-node="Protected_Behavior_Obstructions"><rect x="32" y="1190" width="536" height="88" rx="12" fill="#11233c" stroke="#527aa1"/>
+<text x="300.0" y="1227.5" text-anchor="middle" font-size="24">Protected Behavior</text>
+<text x="300.0" y="1254.5" text-anchor="middle" font-size="24">Obstructions</text>
+</g>
+<text x="28" y="1330" font-size="18" fill="#a8bbd5">Protected Behavior Obstructions is independent.</text>
+<text x="28" y="1360" font-size="18" fill="#a8bbd5">Auxiliary audit sessions are separate from this catalog.</text>
+</g></svg>

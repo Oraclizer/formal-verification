@@ -127,10 +127,26 @@ consumer classes and separates those results from deployed behavior.
 
 ## Theory architecture
 
+### Registered session dependencies
+
+<div align="center">
+  <picture>
+    <source media="(max-width: 900px)" srcset="docs/assets/session-architecture-mobile.svg">
+    <img src="docs/assets/session-architecture.svg" alt="Seven registered artifact sessions: CDSP to RAC to Cross-Chain Message Integrity to Preemptive Lock Correctness to Evidence Atomic Binding to Evidence Binding Composition. Protected Behavior Obstructions independently extends HOL. CDSP also depends on HOL-Library, HOL-Eisbach and AFP ADS_Functor." width="900">
+  </picture>
+</div>
+
+Arrows run from a dependency to the session that uses it. The independent
+companion has no dependency on the six-session chain. The auxiliary
+[composition audit](Evidence_Binding_Composition/Audit/README.md) is a separate
+verification session, not an additional catalog artifact.
+
+### CDSP and RAC foundation imports
+
 <div align="center">
   <picture>
     <source media="(max-width: 900px)" srcset="docs/assets/theory-architecture-mobile.svg">
-    <img src="docs/assets/theory-architecture.svg" alt="Import graph of the CDSP and RAC sessions. State_Preservation feeds Regulatory_Instance, Composition, Proof_Automation, Functor_Laws, Hierarchy and External_Instance. Priority_Resolution feeds DQuencer_Instance, which feeds Composition. Composition and Regulatory_Instance feed Functor_Laws, which feeds Hierarchy and Canton_Bridge. The external AFP session ADS_Functor feeds Functor_Laws and Canton_Bridge. Regulatory_Action_Composition in the RAC session imports Regulatory_Instance." width="900">
+    <img src="docs/assets/theory-architecture.svg" alt="Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importer. Standard Isabelle libraries are omitted; ADS_Functor imports are grouped by AFP session." width="900">
   </picture>
 </div>
 
@@ -147,8 +163,14 @@ Evidence Atomic Binding adds controlled source outcomes, terminal records and
 guarded consumers, then connects actual callback executions to completed
 responses and independent financial/regulatory observations. Evidence Binding
 Composition adds finite allocation, historical-state projection and actual
-call/recovery applications without changing those parent operations. The diagram
-continues to show the CDSP/RAC foundation only.
+call/recovery applications without changing those parent operations.
+
+The foundation view shows direct imports, with AFP theories grouped under
+their session and standard Isabelle library imports omitted. The narrow view
+lists the same dependencies per importing theory. Regenerate both views and
+their Mermaid sources with `python scripts/render-architecture.py`;
+`node scripts/verify-repository-health.mjs` compares their edge inventories
+with the actual `ROOTS`, `ROOT`, and theory headers.
 
 ## Assurance boundary
 
@@ -268,9 +290,9 @@ this short as the catalog grows:
 
 | Path | Purpose |
 | --- | --- |
-| `ROOTS` | Registers every session |
+| `ROOTS` | Registers the seven catalog artifact sessions; auxiliary audit sessions are invoked separately |
 | `<Session>/` | One directory per catalog artifact: the authoritative `*.thy` theories and the session `ROOT`. Sessions that produce a reading copy add `document/` (LaTeX source) and `release/` (session-named PDF and manifest); session-scoped docs such as a scope README or a cross-prover mapping live inside the same directory |
-| `docs/assets/` | README banner and the theory-architecture diagram, with the diagram's Mermaid source |
+| `docs/assets/` | README banner, full session overview and foundation import views, with Mermaid sources and narrow-screen variants |
 | `FORMAL_MODEL_MAPPING.md` | Oraclizer theorem-to-target mapping, assumptions, gaps, and proposed tests |
 | `CONTRIBUTING.md`, `SECURITY.md`, `CITATION.cff` | Review channels and proof reproduction, sensitive-report routing, and citation metadata |
 
