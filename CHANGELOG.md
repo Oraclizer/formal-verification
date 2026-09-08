@@ -5,6 +5,12 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Synchronized the architecture views with direct theory imports and all
+  seven registered artifact sessions. Corrected stale foundation edges and
+  alternative text, distinguished auxiliary audit sessions, and added source-derived
+  diagram regeneration and edge checks. Formal sources, claim ledgers and
+  source manifests are unchanged.
+
 - Added `Evidence_Binding_Composition` as a child of Evidence Atomic Binding.
   It characterizes finite funding allocations under supplied current contexts
   and connects actual source operations to fresh completed calls, historical

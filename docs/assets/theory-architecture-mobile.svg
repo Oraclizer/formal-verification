@@ -1,54 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1640" viewBox="0 0 600 1640" role="img" aria-labelledby="title desc" preserveAspectRatio="xMidYMid meet">
-  <title id="title">Theory architecture for narrow screens</title>
-  <desc id="desc">A mobile import map for the CDSP and RAC Isabelle sessions. State Preservation feeds six CDSP theories; Priority Resolution feeds DQuencer Instance and Composition; Composition and Regulatory Instance feed Functor Laws; Functor Laws feeds Hierarchy and Canton Bridge; Regulatory Instance also feeds Canton Bridge. External ADS Functor feeds Functor Laws and Canton Bridge. RAC Regulatory Action Composition imports Regulatory Instance.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#070b18"/><stop offset=".58" stop-color="#10182d"/><stop offset="1" stop-color="#13273b"/></linearGradient>
-    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0v32" fill="none" stroke="#bdd6ee" stroke-width="1" opacity=".04"/></pattern>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#7f9ac6"/></marker>
-    <style>.stage{fill:#0b142a;fill-opacity:.72;stroke:#33507c;stroke-width:2}.box{fill:#101b34;stroke:#496b9b;stroke-width:2}.ext{fill:#161232;stroke:#8b76e8;stroke-width:2;stroke-dasharray:8 6}.rac{fill:#0e2333;stroke:#4c9fd2;stroke-width:2}.title{font:750 27px Inter,Segoe UI,Arial,sans-serif;fill:#f4f6ff}.label{font:700 22px Inter,Segoe UI,Arial,sans-serif;fill:#dbe6f5}.text{font:18px Inter,Segoe UI,Arial,sans-serif;fill:#dbe6f5}.small{font:15px Inter,Segoe UI,Arial,sans-serif;fill:#9eb1c8}.eyebrow{font:700 14px Inter,Segoe UI,Arial,sans-serif;letter-spacing:1.7px;fill:#9d91ee}.flow{fill:none;stroke:#7f9ac6;stroke-width:3;marker-end:url(#arrow)}.link{fill:none;stroke:#7f9ac6;stroke-width:3}</style>
-  </defs>
-  <rect width="600" height="1640" rx="24" fill="url(#bg)"/>
-  <rect width="600" height="1640" rx="24" fill="url(#grid)"/>
-  <text class="title" x="30" y="50">Theory architecture</text>
-  <text class="small" x="30" y="80">Isabelle session imports and external dependencies</text>
-
-  <rect class="stage" x="24" y="110" width="552" height="1020" rx="22"/>
-  <text class="eyebrow" x="48" y="150">CDSP SESSION</text>
-  <rect class="box" x="84" y="174" width="432" height="66" rx="14"/><text class="text" x="300" y="214" text-anchor="middle">State_Preservation</text>
-
-  <path class="link" d="M84 207H38v376"/>
-  <path class="flow" d="M38 306h42"/><path class="flow" d="M38 416h42"/><path class="flow" d="M38 526h42"/>
-  <rect class="box" x="84" y="274" width="210" height="66" rx="14"/><text class="text" x="189" y="314" text-anchor="middle">Proof_Automation</text>
-  <rect class="box" x="84" y="384" width="210" height="66" rx="14"/><text class="text" x="189" y="424" text-anchor="middle">Regulatory_Instance</text>
-  <rect class="box" x="84" y="494" width="210" height="66" rx="14"/><text class="text" x="189" y="534" text-anchor="middle">External_Instance</text>
-
-  <rect class="box" x="318" y="274" width="210" height="66" rx="14"/><text class="text" x="423" y="314" text-anchor="middle">Priority_Resolution</text>
-  <path class="flow" d="M423 340v40"/>
-  <rect class="box" x="318" y="384" width="210" height="66" rx="14"/><text class="text" x="423" y="424" text-anchor="middle">DQuencer_Instance</text>
-  <path class="flow" d="M423 450v40"/>
-  <rect class="box" x="318" y="494" width="210" height="66" rx="14"/><text class="text" x="423" y="534" text-anchor="middle">Composition</text>
-
-  <path class="link" d="M189 450v142h111M423 560v32H300"/><path class="flow" d="M300 592v36"/>
-  <rect class="box" x="84" y="632" width="432" height="70" rx="14"/><text class="text" x="300" y="675" text-anchor="middle">Functor_Laws</text>
-  <path class="link" d="M300 702v42H189M300 744H411"/>
-  <path class="flow" d="M189 744v36"/><path class="flow" d="M411 744v36"/>
-  <rect class="box" x="84" y="784" width="210" height="66" rx="14"/><text class="text" x="189" y="824" text-anchor="middle">Hierarchy</text>
-  <rect class="box" x="318" y="784" width="210" height="66" rx="14"/><text class="text" x="423" y="824" text-anchor="middle">Canton_Bridge</text>
-
-  <rect x="48" y="892" width="504" height="190" rx="16" fill="#0c1830" stroke="#496b9b" stroke-width="2"/>
-  <text class="eyebrow" x="72" y="928">DIRECT IMPORTS FROM STATE_PRESERVATION</text>
-  <text class="small" x="72" y="965">Proof_Automation · Regulatory_Instance</text>
-  <text class="small" x="72" y="995">External_Instance · Composition · Functor_Laws</text>
-  <text class="small" x="72" y="1025">Hierarchy</text>
-  <text class="small" x="72" y="1055">Canton_Bridge also imports Regulatory_Instance.</text>
-
-  <rect class="ext" x="24" y="1174" width="552" height="166" rx="22"/>
-  <text class="eyebrow" x="48" y="1214">EXTERNAL AFP SESSION</text>
-  <rect class="ext" x="72" y="1236" width="456" height="66" rx="14"/><text class="text" x="300" y="1265" text-anchor="middle">ADS_Functor</text><text class="small" x="300" y="1288" text-anchor="middle">imports into Functor_Laws + Canton_Bridge</text>
-
-  <rect class="stage" x="24" y="1384" width="552" height="166" rx="22"/>
-  <text class="eyebrow" x="48" y="1424" fill="#8fbccb">RAC SESSION</text>
-  <rect class="rac" x="72" y="1446" width="456" height="66" rx="14"/><text class="text" x="300" y="1475" text-anchor="middle">Regulatory_Action_Composition</text><text class="small" x="300" y="1498" text-anchor="middle">imports Regulatory_Instance from CDSP</text>
-  <text class="small" x="30" y="1588">Solid arrows show imports within this repository.</text>
-  <text class="small" x="30" y="1614">Dashed violet marks the external AFP dependency.</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1632" viewBox="0 0 600 1632" role="img" aria-labelledby="title desc">
+<title id="title">CDSP and RAC foundation: direct imports</title><desc id="desc">Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The separate session overview includes all seven registered artifacts.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>
+<rect width="600" height="1632" rx="20" fill="#0b142a"/>
+<g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">
+<text x="28" y="46" font-size="27" fill="#e1eaf8">Foundation direct imports</text>
+<text x="28" y="80" font-size="18" fill="#a8bbd5">Each card names a theory and its direct dependencies.</text>
+<text x="28" y="108" font-size="18" fill="#a8bbd5">Standard Isabelle libraries omitted; AFP grouped.</text>
+<g data-node="State_Preservation"><rect x="24" y="136" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="168" font-size="21" fill="#e1eaf8">State_Preservation</text>
+<text x="42" y="195" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<text x="58" y="221" font-size="19" fill="#a8bbd5">Standard Isabelle library only</text>
+</g>
+<g data-node="Priority_Resolution"><rect x="24" y="248" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="280" font-size="21" fill="#e1eaf8">Priority_Resolution</text>
+<text x="42" y="307" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<text x="58" y="333" font-size="19" fill="#a8bbd5">Standard Isabelle library only</text>
+</g>
+<g data-node="Proof_Automation"><rect x="24" y="360" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="392" font-size="21" fill="#e1eaf8">Proof_Automation</text>
+<text x="42" y="419" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="State_Preservation" data-to="Proof_Automation"><text x="58" y="445" font-size="20" fill="#e1eaf8">State_Preservation</text></g>
+</g>
+<g data-node="Regulatory_Instance"><rect x="24" y="472" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="504" font-size="21" fill="#e1eaf8">Regulatory_Instance</text>
+<text x="42" y="531" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="State_Preservation" data-to="Regulatory_Instance"><text x="58" y="557" font-size="20" fill="#e1eaf8">State_Preservation</text></g>
+</g>
+<g data-node="Composition"><rect x="24" y="584" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="616" font-size="21" fill="#e1eaf8">Composition</text>
+<text x="42" y="643" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="State_Preservation" data-to="Composition"><text x="58" y="669" font-size="20" fill="#e1eaf8">State_Preservation</text></g>
+</g>
+<g data-node="DQuencer_Instance"><rect x="24" y="696" width="552" height="126" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="728" font-size="21" fill="#e1eaf8">DQuencer_Instance</text>
+<text x="42" y="755" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="Priority_Resolution" data-to="DQuencer_Instance"><text x="58" y="781" font-size="20" fill="#e1eaf8">Priority_Resolution</text></g>
+<g data-from="Regulatory_Instance" data-to="DQuencer_Instance"><text x="58" y="810" font-size="20" fill="#e1eaf8">Regulatory_Instance</text></g>
+</g>
+<g data-node="External_Instance"><rect x="24" y="837" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="869" font-size="21" fill="#e1eaf8">External_Instance</text>
+<text x="42" y="896" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="Proof_Automation" data-to="External_Instance"><text x="58" y="922" font-size="20" fill="#e1eaf8">Proof_Automation</text></g>
+</g>
+<g data-node="Functor_Laws"><rect x="24" y="949" width="552" height="213" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="981" font-size="21" fill="#e1eaf8">Functor_Laws</text>
+<text x="42" y="1008" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="ADS_Functor" data-to="Functor_Laws"><text x="58" y="1034" font-size="20" fill="#e1eaf8">ADS_Functor</text></g>
+<g data-from="Composition" data-to="Functor_Laws"><text x="58" y="1063" font-size="20" fill="#e1eaf8">Composition</text></g>
+<g data-from="DQuencer_Instance" data-to="Functor_Laws"><text x="58" y="1092" font-size="20" fill="#e1eaf8">DQuencer_Instance</text></g>
+<g data-from="Proof_Automation" data-to="Functor_Laws"><text x="58" y="1121" font-size="20" fill="#e1eaf8">Proof_Automation</text></g>
+<g data-from="Regulatory_Instance" data-to="Functor_Laws"><text x="58" y="1150" font-size="20" fill="#e1eaf8">Regulatory_Instance</text></g>
+</g>
+<g data-node="Hierarchy"><rect x="24" y="1177" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="1209" font-size="21" fill="#e1eaf8">Hierarchy</text>
+<text x="42" y="1236" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="Functor_Laws" data-to="Hierarchy"><text x="58" y="1262" font-size="20" fill="#e1eaf8">Functor_Laws</text></g>
+</g>
+<g data-node="Canton_Bridge"><rect x="24" y="1289" width="552" height="126" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="1321" font-size="21" fill="#e1eaf8">Canton_Bridge</text>
+<text x="42" y="1348" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="ADS_Functor" data-to="Canton_Bridge"><text x="58" y="1374" font-size="20" fill="#e1eaf8">ADS_Functor</text></g>
+<g data-from="Functor_Laws" data-to="Canton_Bridge"><text x="58" y="1403" font-size="20" fill="#e1eaf8">Functor_Laws</text></g>
+</g>
+<g data-node="Regulatory_Action_Composition"><rect x="24" y="1430" width="552" height="97" rx="12" fill="#111f39" stroke="#49678e"/>
+<text x="42" y="1462" font-size="21" fill="#e1eaf8">Regulatory_Action_Composition</text>
+<text x="42" y="1489" font-size="17" fill="#a8bbd5">Direct imports:</text>
+<g data-from="Regulatory_Instance" data-to="Regulatory_Action_Composition"><text x="58" y="1515" font-size="20" fill="#e1eaf8">Regulatory_Instance</text></g>
+</g>
+<text x="28" y="1569" font-size="18" fill="#a8bbd5">The full session chain is shown in the overview.</text>
+</g></svg>

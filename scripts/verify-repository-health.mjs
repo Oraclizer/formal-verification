@@ -472,6 +472,49 @@ for (const match of workflow.matchAll(/^\s*uses:\s*([^#\s]+)(?:\s+#.*)?$/gm)) {
   }
 }
 
+
+// Diagram inventories are checked against source, not a hand-maintained edge list.
+const artifactNames = readFileSync(resolve(root, "ROOTS"), "utf8").trim().split(/\s+/);
+const sessionEdges = new Set();
+const pairKey = (a, b) => `${a}|${b}`;
+for (const name of artifactNames) {
+  const input = readFileSync(resolve(root, name, "ROOT"), "utf8");
+  const parent = /\bsession\s+\w+\s*=\s*"?([\w-]+)"?\s*\+/.exec(input);
+  if (!parent) throw Error(`Cannot parse session parent: ${name}`);
+  sessionEdges.add(pairKey(parent[1], name));
+  const additional = /^\s+sessions\s+([\s\S]*?)^\s+theories\b/m.exec(input);
+  if (additional) for (const dep of additional[1].trim().split(/\s+/)) sessionEdges.add(pairKey(dep.replaceAll('"', ''), name));
+}
+const directImports = new Map();
+for (const dir of ["Cross_Domain_State_Preservation", "Regulatory_Action_Composition"]) {
+  for (const name of readdirSync(resolve(root, dir)).filter(name => name.endsWith(".thy"))) {
+    const input = readFileSync(resolve(root, dir, name), "utf8");
+    const header = /^theory\s+(\w+)\s+imports\s+([\s\S]*?)\s+begin/m.exec(input);
+    if (!header) throw Error(`Cannot parse theory header: ${dir}/${name}`);
+    directImports.set(header[1], header[2].trim().split(/\s+/).map(s => s.replaceAll('"', '')));
+  }
+}
+const foundationEdges = new Set();
+for (const [name, deps] of directImports) {
+  for (const dep of deps) {
+    const target = dep.startsWith("ADS_Functor.") ? "ADS_Functor" : dep.split(".").at(-1);
+    if (directImports.has(target) || target === "ADS_Functor") foundationEdges.add(pairKey(target, name));
+  }
+}
+for (const [stem, expected] of [["session-architecture", sessionEdges], ["theory-architecture", foundationEdges]]) {
+  for (const suffix of [".svg", "-mobile.svg", ".mmd"]) {
+    const path = `docs/assets/${stem}${suffix}`;
+    const input = readFileSync(resolve(root, path), "utf8");
+    const pairs = suffix === ".mmd"
+      ? [...input.matchAll(/^\s*(\w+) --> (\w+)\s*$/gm)].map(m => pairKey(m[1], m[2]))
+      : [...input.matchAll(/data-from="([^"]+)" data-to="([^"]+)"/g)].map(m => pairKey(m[1], m[2]));
+    const wanted = new Set([...expected].map(s => suffix === ".mmd" ? s.replaceAll("-", "_") : s));
+    if (pairs.length !== wanted.size || new Set(pairs).size !== wanted.size || pairs.some(s => !wanted.has(s))) {
+      failures.push(`Diagram edge inventory differs from source: ${path}`);
+    }
+  }
+}
+
 if (failures.length) {
   for (const failure of failures) console.error(failure);
   process.exit(1);
