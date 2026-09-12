@@ -9,9 +9,10 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
   source-derived affected-session closure checks. Every changed Isabelle
   session and local downstream consumer is selected, proof-control changes
   force the complete graph, documentation-only changes avoid native builds,
-  and pushes to `main` still rebuild the full graph. Added selector/coverage
-  tests, auxiliary composition-audit checking, and source-aware Isabelle heap
-  reuse without weakening Isabelle's own currency checks.
+  and pushes to `main` still validate the full graph. Added selector/coverage
+  tests, auxiliary composition-audit checking, source-aware Isabelle heap
+  reuse without weakening Isabelle's own currency checks, and a weekly or
+  manually requested cache-independent clean replay.
 
 - Synchronized the architecture views with direct theory imports and all
   seven registered artifact sessions. Corrected stale foundation edges and

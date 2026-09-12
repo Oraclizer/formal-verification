@@ -5,10 +5,19 @@ on:
   push:
     branches:
       - main
+  schedule:
+    # Weekly clean replay: do not restore project proof heaps.
+    - cron: "23 4 * * 0"
   workflow_dispatch:
+    inputs:
+      clean:
+        description: Rebuild every proof session without restoring project heaps
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
-  group: proofs-${{ github.workflow }}-${{ github.ref }}
+  group: proofs-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ github.event.inputs.clean || 'false' }}
   cancel-in-progress: true
 
 permissions:
@@ -30,6 +39,7 @@ jobs:
       product_sessions: ${{ steps.select.outputs.product_sessions }}
       audit: ${{ steps.select.outputs.audit }}
       force_all: ${{ steps.select.outputs.force_all }}
+      clean: ${{ steps.select.outputs.clean }}
     steps:
       - name: Check out source and comparison commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -43,6 +53,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CLEAN_RUN: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.clean) }}
         run: |
           set -euo pipefail
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
@@ -54,12 +65,18 @@ jobs:
             # validate the complete graph, independent companion and audit.
             node scripts/select-proof-sessions.mjs --all
           fi
+          if [[ "$CLEAN_RUN" == "true" ]]; then
+            echo "clean=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "clean=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Explain the selected validation boundary
         run: |
           echo "force_all=${{ steps.select.outputs.force_all }}"
           echo "protected=${{ steps.select.outputs.protected }}"
           echo "product_sessions=${{ steps.select.outputs.product_sessions }}"
           echo "audit=${{ steps.select.outputs.audit }}"
+          echo "clean=${{ steps.select.outputs.clean }}"
 
   source-integrity:
     name: Proof source integrity
@@ -120,6 +137,7 @@ jobs:
           tar -xzf "$archive" -C "$RUNNER_TEMP"
           test "$("$isabelle_home/bin/isabelle" version)" = "Isabelle2025-2"
       - name: Restore verified Isabelle heaps as an accelerator
+        if: needs.affected-sessions.outputs.clean != 'true'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.isabelle/Isabelle2025-2/heaps
@@ -128,11 +146,17 @@ jobs:
             proof-heaps-protected-${{ runner.os }}-${{ env.ISABELLE_SHA256 }}-
       - name: Build the affected independent session
         shell: bash
-        run: >-
-          "$RUNNER_TEMP/Isabelle2025-2/bin/isabelle" build
-          -j 1 -o threads=1 -o parallel_proofs=0
-          -D Protected_Behavior_Obstructions
-          Protected_Behavior_Obstructions
+        env:
+          CLEAN_REPLAY: ${{ needs.affected-sessions.outputs.clean }}
+        run: |
+          set -euo pipefail
+          clean_args=()
+          if [[ "$CLEAN_REPLAY" == "true" ]]; then clean_args=(-c); fi
+          "$RUNNER_TEMP/Isabelle2025-2/bin/isabelle" build \
+            "${clean_args[@]}" \
+            -j 1 -o threads=1 -o parallel_proofs=0 \
+            -D Protected_Behavior_Obstructions \
+            Protected_Behavior_Obstructions
 
   product-model-sessions:
     name: Isabelle2025-2 / Affected product sessions
@@ -186,6 +210,7 @@ jobs:
           tar -xzf "$archive" -C "$RUNNER_TEMP/afp"
           test -f "$RUNNER_TEMP/afp/ADS_Functor/ROOT"
       - name: Restore verified Isabelle heaps as an accelerator
+        if: needs.affected-sessions.outputs.clean != 'true'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           # Isabelle still checks current sources, options and parent heaps. A
@@ -199,10 +224,14 @@ jobs:
         shell: bash
         env:
           AFFECTED_SESSIONS: ${{ needs.affected-sessions.outputs.product_sessions }}
+          CLEAN_REPLAY: ${{ needs.affected-sessions.outputs.clean }}
         run: |
           set -euo pipefail
           read -r -a sessions <<< "$AFFECTED_SESSIONS"
+          clean_args=()
+          if [[ "$CLEAN_REPLAY" == "true" ]]; then clean_args=(-c); fi
           "$RUNNER_TEMP/Isabelle2025-2/bin/isabelle" build \
+            "${clean_args[@]}" \
             -j 1 -o threads=1 -o parallel_proofs=0 \
             -d "$RUNNER_TEMP/afp/ADS_Functor" -d . \
             "${sessions[@]}"
