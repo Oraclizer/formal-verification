@@ -103,6 +103,23 @@ node scripts/verify-repository-health.mjs
 This lightweight check validates the public repository surface. It does not
 replace the Isabelle build.
 
+For pull requests, Continuous Integration derives the changed Isabelle
+sessions from `ROOTS`, the session `ROOT` files, and the changed paths. It
+builds every changed session and every local downstream consumer, including
+the auxiliary composition audit where applicable. A change to `ROOTS`, a
+workflow, or the selector itself forces the complete graph; documentation-only
+changes still run source-integrity and repository-health checks but do not
+start an Isabelle build. Pushes to `main` and manual Proofs runs rebuild the
+complete graph as coherent release checkpoints. Restored Isabelle heaps are
+only accelerators: Isabelle still checks source, options, and parent-session
+currency before accepting a session.
+
+The selector and its proof-registration coverage checks can be tested locally:
+
+```bash
+node --test scripts/select-proof-sessions.test.mjs
+```
+
 ## Pull Request requirements
 
 A Pull Request should:
