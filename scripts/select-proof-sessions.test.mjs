@@ -73,3 +73,11 @@ test("ROOTS and proof-control changes force the complete registered graph", () =
     assert.equal(selected.forceAll, true);
   }
 });
+
+test("a graph-control change safely covers proof paths removed by a migration", () => {
+  const selected = selectProofSessions(root, ["Removed_Session/Old_Theory.thy", "ROOTS"]);
+  assert.deepEqual(selected.productSessions, productChain);
+  assert.equal(selected.audit, true);
+  assert.equal(selected.protected, true);
+  assert.equal(selected.forceAll, true);
+});

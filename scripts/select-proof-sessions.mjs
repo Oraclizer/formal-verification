@@ -147,11 +147,10 @@ export function selectProofSessions(repositoryRoot, changedPaths, { forceAll = f
   const graph = assertProofCoverage(repositoryRoot);
   const changed = [...new Set(changedPaths.map(posix).filter(Boolean))];
   const affected = new Set();
-  let global = forceAll;
+  const global = forceAll || changed.some(isGlobalProofControl);
 
   for (const path of changed) {
     if (isGlobalProofControl(path)) {
-      global = true;
       continue;
     }
 
@@ -164,7 +163,7 @@ export function selectProofSessions(repositoryRoot, changedPaths, { forceAll = f
       affected.add(AUDIT_SESSION);
     }
 
-    if ((/\.(?:thy|ML)$/.test(path) || basename(path) === "ROOT") && !owner) {
+    if ((/\.(?:thy|ML)$/.test(path) || basename(path) === "ROOT") && !owner && !global) {
       throw new Error(`Proof input is outside every declared session: ${path}`);
     }
   }
