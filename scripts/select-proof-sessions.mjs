@@ -24,9 +24,16 @@ function parseSessionRoot(rootPath, repositoryRoot) {
   const text = readFileSync(rootPath, "utf8");
   const match = /\bsession\s+"?([A-Za-z0-9_-]+)"?\s*=\s*"?([A-Za-z0-9_-]+)"?\s*\+/.exec(text);
   if (!match) throw new Error(`Cannot parse Isabelle session declaration: ${relative(repositoryRoot, rootPath)}`);
+  const additional = /^\s+sessions\s+([\s\S]*?)^\s+theories\b/m.exec(text);
+  const dependencies = [match[2]];
+  for (const token of additional?.[1].match(/"[^"]+"|[A-Za-z0-9_-]+/g) ?? []) {
+    const dependency = token.replaceAll('"', "");
+    if (!dependencies.includes(dependency)) dependencies.push(dependency);
+  }
   return {
     name: match[1],
     parent: match[2],
+    dependencies,
     directory: posix(relative(repositoryRoot, dirname(rootPath))),
     rootPath,
     text,
@@ -70,7 +77,9 @@ export function readSessionGraph(repositoryRoot) {
 
   const children = new Map(sessions.map((session) => [session.name, []]));
   for (const session of sessions) {
-    if (children.has(session.parent)) children.get(session.parent).push(session.name);
+    for (const dependency of session.dependencies) {
+      if (children.has(dependency)) children.get(dependency).push(session.name);
+    }
   }
 
   const order = [];
@@ -78,7 +87,9 @@ export function readSessionGraph(repositoryRoot) {
   function visit(name) {
     if (visited.has(name)) return;
     const session = byName.get(name);
-    if (session && byName.has(session.parent)) visit(session.parent);
+    for (const dependency of session?.dependencies ?? []) {
+      if (byName.has(dependency)) visit(dependency);
+    }
     visited.add(name);
     order.push(name);
   }

@@ -22,6 +22,8 @@ test("every tracked theory belongs to and is registered by one session", () => {
     "Protected_Behavior_Obstructions",
     ...productChain.slice(1),
   ]);
+  assert.deepEqual(graph.byName.get("Cross_Domain_State_Preservation").dependencies,
+    ["HOL-Library", "HOL-Eisbach", "ADS_Functor"]);
 });
 
 test("an EAB leaf change rebuilds EAB, its composition consumer and the audit", () => {
