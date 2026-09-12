@@ -109,10 +109,16 @@ builds every changed session and every local downstream consumer, including
 the auxiliary composition audit where applicable. A change to `ROOTS`, a
 workflow, or the selector itself forces the complete graph; documentation-only
 changes still run source-integrity and repository-health checks but do not
-start an Isabelle build. Pushes to `main` and manual Proofs runs rebuild the
+start an Isabelle build. Pushes to `main` and manual Proofs runs validate the
 complete graph as coherent release checkpoints. Restored Isabelle heaps are
 only accelerators: Isabelle still checks source, options, and parent-session
 currency before accepting a session.
+
+The Proofs workflow also runs a weekly clean replay that selects the complete
+graph without restoring repository proof heaps. Maintainers can run the same
+path with the `clean` option in a manual workflow dispatch. This keeps ordinary
+pull requests incremental while retaining a cache-independent whole-repository
+check for periodic validation and important releases.
 
 The selector and its proof-registration coverage checks can be tested locally:
 
