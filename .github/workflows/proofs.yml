@@ -25,7 +25,7 @@ permissions:
 
 env:
   ISABELLE_SHA256: a20a507bc7c1270d8be96a9f3fbec06345387789d2dc2c4d3df6260d47bfb33c
-  ISABELLE_URL: https://www.cl.cam.ac.uk/research/hvg/Isabelle/dist/Isabelle2025-2_linux.tar.gz
+  ISABELLE_URL: https://isabelle.in.tum.de/website-Isabelle2025-2/dist/Isabelle2025-2_linux.tar.gz
   AFP_ADS_FUNCTOR_SHA256: 10d6fa8671c461022ae5e71859a07610d616681fed79e2f1c81029a124203c85
   AFP_ADS_FUNCTOR_URL: https://isa-afp.org/release/afp-ADS_Functor-2026-02-06.tar.gz
 
