@@ -1,0 +1,15 @@
+{
+  "origin_version": 1,
+  "kernel_inputs_sha256": "07791f464f162e28e7863afc77f6c62fa9ba6c5b8b8ed62875b94ae73b148598",
+  "wire_schema": 1,
+  "abi": "intinf-response-full-v1",
+  "scope": "wire-response-sender-client-v1",
+  "entrypoint": "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle",
+  "natural_refinement": "HOL-Library.Code_Target_Nat",
+  "runtime_source_hash": "28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207",
+  "public_namespace": "Oracle_Interoperability_Protocol",
+  "identity_function": "OIP_Wire_Response_Boundary.code_response_full_model_identity",
+  "model_sha256": "8d6cfcc7f65f1890b1f007a7a52e0c62ca5cda92c14583517999d02a9f3fdd55",
+  "driver_sha256": "c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703",
+  "diagnostics_sha256": "9d8e8ad3accf2ee623970a3f6d2c22811e057746835ed2169f5a436f975b26ab"
+}

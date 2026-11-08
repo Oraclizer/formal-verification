@@ -1,0 +1,57 @@
+{
+  "lock_version": 1,
+  "binding_status": "bound",
+  "artifact_transport": "github-git-blob-v1",
+  "repository": "Oraclizer/formal-verification",
+  "wire_schema": 1,
+  "abi": "intinf-response-full-v1",
+  "scope": "wire-response-sender-client-v1",
+  "entrypoint": "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle",
+  "natural_refinement": "HOL-Library.Code_Target_Nat",
+  "runtime_source_hash": "28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207",
+  "verified_export_sha256": "8d6cfcc7f65f1890b1f007a7a52e0c62ca5cda92c14583517999d02a9f3fdd55",
+  "public_namespace": "Oracle_Interoperability_Protocol",
+  "input_schema": "tests/response-full-abi.json",
+  "egress_entries": {
+    "queries": "code_response_egress_queries_flat",
+    "boundary_queries": "code_response_encode_boundary_queries_flat",
+    "sender": "code_response_egress_flat_oracle",
+    "boundary_sender": "code_response_encode_boundary_flat_oracle",
+    "prefix": "code_response_egress_prefix_flat",
+    "boundary_prefix": "code_response_encode_boundary_prefix_flat",
+    "client_queries": "code_response_admit_queries_flat",
+    "client": "code_response_admit_flat_oracle",
+    "combined": "code_response_egress_and_admit_flat_oracle"
+  },
+  "files": [
+    {
+      "role": "model",
+      "name": "oip_wire_response_full.ML",
+      "git_blob_sha1": "f807cecefba5f503cf1738bef6a9e9cd0ab4412a",
+      "sha256": "8d6cfcc7f65f1890b1f007a7a52e0c62ca5cda92c14583517999d02a9f3fdd55",
+      "bytes": 404377
+    },
+    {
+      "role": "driver",
+      "name": "response-full-driver.ML",
+      "git_blob_sha1": "8590100fda29b7e12ec7eed0ebd66a132d8dd9c1",
+      "sha256": "c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703",
+      "bytes": 4764
+    },
+    {
+      "role": "origin",
+      "name": "response-full-origin.json",
+      "git_blob_sha1": "72f16680a5ac7166b486305cecb06fdea459b7d9",
+      "sha256": "a79fdbc4c5d022d0163eb915efc306d6798218c8b4fe8b5adfd90ae3ca853fbb",
+      "bytes": 858
+    },
+    {
+      "role": "diagnostics",
+      "name": "response-full-diagnostics.json",
+      "git_blob_sha1": "81f2c963770ced9bcb6ebb8cbe08fd4a3b61c6d6",
+      "sha256": "9d8e8ad3accf2ee623970a3f6d2c22811e057746835ed2169f5a436f975b26ab",
+      "bytes": 1692
+    }
+  ],
+  "identity_function": "OIP_Wire_Response_Boundary.code_response_full_model_identity"
+}

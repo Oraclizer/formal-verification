@@ -1,0 +1,70 @@
+theory Wire_Code_Oracle_Theorem_Check
+  imports Wire_Code_Pilot_Oracle_Check Wire_Code_Transport_Closure Wire_Code_JSON_Canary
+begin
+
+ML_val \<open>
+  if null (Thm_Deps.all_oracles @{thms
+    a_source_nonreceipt_query_has_the_existing_product_query_and_no_deadline
+    a_present_query_deadline_is_a_source_format_refusal
+    a_source_counted_set_retains_exactly_its_counted_ordered_items
+    capabilities_keep_the_exact_outer_deployment_and_peer_directions
+    a_liveness_record_has_exactly_two_words
+    heartbeat_payloads_cannot_enter_the_reference_product
+    a_nonboolean_optional_presence_is_a_format_failure
+    a_source_legal_result_keeps_the_stage_endpoint_origin_epoch_and_proof
+    a_source_spend_has_the_exact_destination_and_two_u64_amounts
+    the_source_settlement_ack_parser_has_the_existing_exact_product_value
+    two_source_acknowledgements_for_one_slot_require_the_existing_product_serialization
+    decimal_source_accumulation_keeps_the_u64_bound
+    a_governance_json_integer_cannot_be_truncated
+    accepted_governance_contexts_are_nonempty_and_in_exact_endpoint_order
+    accepted_session_bindings_keep_strict_session_key_order
+    a_governance_deadline_is_refused_before_json_parsing
+    governance_requires_two_nonempty_authorization_blobs
+    an_unknown_number_is_accepted_only_as_its_declared_category
+    unknown_delivery_or_validation_statuses_cannot_carry_a_commit
+    a_known_status_keeps_the_existing_kind_and_commit_table
+    a_noncategory_word_has_no_status_interpretation
+    every_old_compatible_result_is_a_known_number
+    the_extended_receiver_preserves_the_complete_old_compatibility_relation
+    a_known_number_has_exactly_the_old_compatibility_relation
+    every_existing_native_response_correlation_survives_the_status_extension
+    the_status_extension_keeps_the_exact_original_header_and_commit_binding
+    source_response_words_have_the_existing_model_word_sequence
+    source_response_generation_cannot_emit_an_unknown_result_code
+    a_response_around_an_exact_receipt_checks_the_inner_version_identity_and_debit_cut
+    a_receipt_with_another_inner_version_is_a_source_refusal
+    a_receipt_with_a_different_inner_principal_is_a_source_refusal
+    an_inner_debit_cannot_substitute_its_retained_commit_position
+    another_response_cannot_be_the_nested_response_original
+    a_receipt_tree_accepts_only_a_decoded_call
+    the_recursive_response_slice_keeps_the_header_and_inner_check
+    an_inner_failure_precedes_every_response_word_or_header_check
+    an_unimplemented_nested_scope_cannot_be_silently_accepted
+    ordinary_legal_and_spend_models_have_no_pending_constructor
+    receipt_pending_is_exactly_a_pending_inner_decode
+    response_word_and_header_checks_have_no_pending_constructor
+    response_pending_is_exactly_a_pending_inner_decode
+    every_declared_operand_family_has_an_executable_model_branch
+    every_refused_transport_keeps_the_prior_binding
+    an_unfinished_operand_scope_cannot_be_reported_as_an_acceptance
+    a_conflicting_retained_core_is_never_overwritten
+    a_known_numeric_profile_family_has_the_exact_model_membership
+    an_in_domain_integer_call_keeps_the_transport_result
+    a_frame_limit_outside_the_common_host_domain_is_bad_metadata
+    a_nesting_limit_outside_the_common_host_domain_is_bad_metadata
+    the_common_host_domain_reads_only_frame_and_nesting_positions
+    the_maximum_common_host_limits_are_in_domain
+    a_full_u64_deployment_does_not_narrow_the_common_host_limits
+    the_published_context_json_has_the_exact_typed_value
+    the_published_session_binding_json_has_the_exact_typed_value
+    reversing_the_two_permission_variants_is_not_a_canonical_set
+    canonical_json_never_rounds_an_integer_above_two_to_fifty_three
+    a_json_integer_at_two_to_sixty_four_is_outside_the_source_domain
+    noncanonical_leading_zero_and_trailing_space_are_refused
+    every_transport_acceptance_has_the_exact_received_canonical_core
+    an_accepted_transport_model_reuses_the_original_wire_gate_contract})
+  then () else error "Unexpected oracle in the complete transport model theorem list"
+\<close>
+
+end

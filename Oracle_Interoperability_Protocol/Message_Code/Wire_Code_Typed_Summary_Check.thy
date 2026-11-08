@@ -1,0 +1,34 @@
+theory Wire_Code_Typed_Summary_Check
+  imports Wire_Code_Typed_Summary_Codegen
+begin
+
+ML_val \<open>
+  if null (Thm_Deps.all_oracles @{thms
+    the_typed_ir_scalar_preserves_the_entire_integer
+    the_typed_ir_byte_node_preserves_its_entire_typed_field
+    a_typed_ir_domain_constructor_keeps_its_tag_and_arity
+    a_decoded_finite_set_has_an_executable_canonical_order
+    an_ordinary_summary_consumes_its_actual_decoded_values
+    a_legal_summary_consumes_its_actual_decoded_values
+    a_spend_summary_consumes_its_actual_decoded_values
+    the_native_summary_keeps_the_actual_binding_owner_endpoint_and_caller
+    different_typed_commands_are_not_collapsed_to_an_accept_boolean
+    a_parsed_current_read_keeps_both_the_actual_query_and_expected_cut
+    a_settlement_ack_summary_is_from_the_existing_native_product_parser
+    governance_summary_keeps_the_decoded_contexts_and_both_proofs
+    a_typed_observation_cannot_bypass_a_refused_existing_decoder
+    an_accepted_ordinary_observation_reuses_the_actual_ordinary_decoder
+    an_accepted_legal_observation_reuses_the_actual_legal_decoder
+    an_accepted_nonreceipt_read_observation_reuses_the_actual_query_decoder
+    an_accepted_ack_observation_reuses_the_actual_native_ack_decoder
+    the_typed_summary_does_not_replace_the_existing_transport_decision
+    a_transport_refusal_does_not_supply_fake_typed_observations
+    a_typed_observation_uses_only_its_own_decoded_packet_and_typed_result
+    the_summary_transport_key_has_the_authenticated_components
+    a_summary_packet_reencoding_is_the_received_canonical_packet
+    the_typed_summary_identity_has_four_independent_interface_fields
+    code_typed_operand_ir_integer_code})
+  then () else error "Unexpected oracle in exact typed wire summary helpers"
+\<close>
+
+end

@@ -14,6 +14,15 @@ const productChain = [
   "Evidence_Atomic_Binding",
   "Evidence_Binding_Composition",
 ];
+const expectedOipChain = [
+  "OIP_Product_Base", "OIP_Product", "OIP_Reference_Profile", "OIP_Reference_Execution",
+  "OIP_Record_Reopening", "OIP_Recovery_Boundary", "OIP_Message_Code",
+  "OIP_Message_Response", "OIP_Message_Egress",
+];
+const initialGraph = assertProofCoverage(root);
+const oipChain = initialGraph.registeredNames.filter((name) => name.startsWith("OIP_"));
+if (oipChain.length) assert.deepEqual(oipChain, expectedOipChain);
+const completeProductChain = [...productChain, ...oipChain];
 
 test("every tracked theory belongs to and is registered by one session", () => {
   const graph = assertProofCoverage(root);
@@ -21,6 +30,7 @@ test("every tracked theory belongs to and is registered by one session", () => {
     "Cross_Domain_State_Preservation",
     "Protected_Behavior_Obstructions",
     ...productChain.slice(1),
+    ...oipChain,
   ]);
   assert.deepEqual(graph.byName.get("Cross_Domain_State_Preservation").dependencies,
     ["HOL-Library", "HOL-Eisbach", "ADS_Functor"]);
@@ -28,7 +38,7 @@ test("every tracked theory belongs to and is registered by one session", () => {
 
 test("an EAB leaf change rebuilds EAB, its composition consumer and the audit", () => {
   const selected = selectProofSessions(root, ["Evidence_Atomic_Binding/Finality_Protocol.thy"]);
-  assert.deepEqual(selected.productSessions, ["Evidence_Atomic_Binding", "Evidence_Binding_Composition"]);
+  assert.deepEqual(selected.productSessions, ["Evidence_Atomic_Binding", "Evidence_Binding_Composition", ...oipChain]);
   assert.equal(selected.audit, true);
   assert.equal(selected.protected, false);
 });
@@ -56,7 +66,7 @@ test("documentation-only changes do not request a native proof build", () => {
 
 test("session document inputs rebuild their session and downstream consumers", () => {
   const selected = selectProofSessions(root, ["Regulatory_Action_Composition/document/root.tex"]);
-  assert.deepEqual(selected.productSessions, productChain.slice(1));
+  assert.deepEqual(selected.productSessions, [...productChain.slice(1), ...oipChain]);
   assert.equal(selected.audit, true);
 });
 
@@ -69,7 +79,7 @@ test("the auxiliary audit can be checked without selecting catalog descendants",
 test("ROOTS and proof-control changes force the complete registered graph", () => {
   for (const path of ["ROOTS", ".github/workflows/proofs.yml", "scripts/select-proof-sessions.mjs"]) {
     const selected = selectProofSessions(root, [path]);
-    assert.deepEqual(selected.productSessions, productChain);
+    assert.deepEqual(selected.productSessions, completeProductChain);
     assert.equal(selected.audit, true);
     assert.equal(selected.protected, true);
     assert.equal(selected.forceAll, true);
@@ -78,7 +88,7 @@ test("ROOTS and proof-control changes force the complete registered graph", () =
 
 test("a graph-control change safely covers proof paths removed by a migration", () => {
   const selected = selectProofSessions(root, ["Removed_Session/Old_Theory.thy", "ROOTS"]);
-  assert.deepEqual(selected.productSessions, productChain);
+  assert.deepEqual(selected.productSessions, completeProductChain);
   assert.equal(selected.audit, true);
   assert.equal(selected.protected, true);
   assert.equal(selected.forceAll, true);

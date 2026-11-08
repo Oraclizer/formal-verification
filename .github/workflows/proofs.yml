@@ -17,8 +17,8 @@ on:
         default: false
 
 concurrency:
-  group: proofs-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ github.event.inputs.clean || 'false' }}
-  cancel-in-progress: true
+  group: proofs-${{ github.repository }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -95,7 +95,7 @@ jobs:
         run: |
           set -euo pipefail
           if grep -R -n -E '^\s*(sorry|oops|axiomatization|oracle)\b|\bby\s+eval\b|\bnative_decide\b|\bskip_proof\b|\bsledgehammer\b|\bsmt_oracle\b' \
-            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Evidence_Atomic_Binding Evidence_Binding_Composition Protected_Behavior_Obstructions --include='*.thy'; then
+            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Evidence_Atomic_Binding Evidence_Binding_Composition Protected_Behavior_Obstructions Oracle_Interoperability_Protocol --include='*.thy'; then
             exit 1
           fi
       - name: Verify model source manifests
@@ -104,6 +104,7 @@ jobs:
           node Preemptive_Lock_Correctness/verify-source.mjs
           node Evidence_Atomic_Binding/verify-source.mjs
           node Evidence_Binding_Composition/verify-source.mjs
+          node Oracle_Interoperability_Protocol/verify-source.mjs
 
   protected-behavior-obstructions:
     name: Isabelle2025-2 / Protected Behavior Obstructions
@@ -160,8 +161,8 @@ jobs:
 
   product-model-sessions:
     name: Isabelle2025-2 / Affected product sessions
-    if: needs.affected-sessions.outputs.product_sessions != '' || needs.affected-sessions.outputs.audit == 'true'
-    needs: affected-sessions
+    if: ${{ !cancelled() && needs.affected-sessions.result == 'success' && (needs.affected-sessions.outputs.product_sessions != '' || needs.affected-sessions.outputs.audit == 'true') }}
+    needs: [affected-sessions, protected-behavior-obstructions]
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:

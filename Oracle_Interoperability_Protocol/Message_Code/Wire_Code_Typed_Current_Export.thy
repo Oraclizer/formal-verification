@@ -1,0 +1,8 @@
+theory Wire_Code_Typed_Current_Export
+  imports Wire_Code_Typed_Current_Identity
+begin
+
+export_code code_typed_transport_flat_oracle code_typed_model_identity
+  in SML module_name OIP_Wire_Oracle file_prefix "oip_wire_values_current"
+
+end

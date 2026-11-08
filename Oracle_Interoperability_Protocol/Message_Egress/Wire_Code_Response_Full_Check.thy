@@ -1,0 +1,43 @@
+theory Wire_Code_Response_Full_Check
+  imports Wire_Code_Response_Full_Bridge
+begin
+
+ML_val \<open>
+  if null (Thm_Deps.all_oracles @{thms
+    the_full_getters_preserve_every_peer_domain_and_key_pair
+    the_full_getters_keep_local_identity_window_and_frame_limit
+    the_full_getters_do_not_identify_the_two_clock_reads
+    the_full_getters_keep_the_actual_channel_atomicity_set
+    a_hash_transcript_is_selected_only_by_the_model_preimage
+    a_signature_transcript_is_selected_by_both_key_and_model_preimage
+    a_verification_transcript_is_selected_by_key_preimage_and_signature
+    a_true_primitive_probe_cannot_come_from_a_missing_record
+    the_full_sender_is_the_existing_original_preflight_encoder
+    a_full_emission_keeps_its_actual_original_preflight
+    a_boundary_emission_is_the_existing_encoder_of_its_decoded_input
+    a_boundary_emission_returns_the_actual_converted_kind_number_and_position
+    the_full_client_does_not_substitute_the_emitters_boundary
+    an_admitted_client_uses_its_own_peer_key_and_received_preimage
+    an_admitted_client_keeps_a_typed_known_or_unknown_status
+    an_admitted_general_client_consumes_the_existing_hol_correlation
+    combined_client_input_is_only_the_model_senders_packet
+    the_whole_planner_has_no_response_requests_before_original_preflight
+    an_absent_boundary_result_preserves_the_existing_preflight_refusal
+    a_ready_call_without_an_actual_boundary_result_is_incomplete
+    an_unknown_client_status_is_preserved_as_unknown
+    a_refused_signer_guard_does_not_invent_a_curve_signature
+    response_fixed_preflight_selects_one_canonical_original_and_exact_peer_preimage
+    response_fixed_encoding_has_actual_source_getter_preimage_and_postcheck_evidence
+    response_fixed_emission_sends_only_the_exact_constructed_preimage_to_the_signer
+    response_fixed_emission_returns_the_exact_converted_kind_code_and_position
+    response_fixed_client_admission_verifies_the_exact_received_preimage_with_the_current_peer
+    response_general_source_emission_correlates_for_the_selected_legal_or_spend
+    response_general_current_client_correlates_the_same_legal_or_spend_original
+    response_fixed_expected_decode_error_precedes_original_byte_comparison
+    response_fixed_original_mismatch_precedes_caller_projection
+    response_fixed_matching_original_reaches_the_actual_caller_projection
+    response_general_current_client_does_not_accept_an_expected_query})
+  then () else error "Unexpected oracle in full wire sender/client integer wrappers"
+\<close>
+
+end
