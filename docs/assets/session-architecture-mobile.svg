@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1450" viewBox="0 0 600 1450" role="img" aria-labelledby="title desc">
-<title id="title">Repository session dependencies</title><desc id="desc">All seven ROOTS-registered artifact sessions. Six form the CDSP to Evidence Binding Composition parent chain. Protected Behavior Obstructions independently extends HOL. Additional direct CDSP session dependencies are HOL-Library, HOL-Eisbach, and AFP ADS_Functor. Auxiliary audit sessions are not separate artifact entries.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="2320" viewBox="0 0 600 2320" role="img" aria-labelledby="title desc">
+<title id="title">Repository session dependencies</title><desc id="desc">All sixteen ROOTS-registered sessions. The original six-session model chain and independent Protected Behavior Obstructions remain. A compact OIP namespace inset shows nine distinct model/profile/reopening/boundary/message sessions. Arrows are HOL source parent dependencies, not deployment or whole-implementation assurance. Auxiliary audit sessions are not separate catalog entries.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>
-<rect width="600" height="1450" rx="20" fill="#0b142a"/>
+<rect width="600" height="2320" rx="20" fill="#0b142a"/>
 <g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">
 <text x="28" y="48" font-size="27" fill="#e1eaf8">Repository session dependencies</text>
-<text x="28" y="83" font-size="19" fill="#a8bbd5">Seven registered artifacts · dependency → child</text>
+<text x="28" y="83" font-size="19" fill="#a8bbd5">Sixteen registered sessions · dependency → child</text>
 <path data-from="ADS_Functor" data-to="Cross_Domain_State_Preservation" d="M490.0 184 V217.0 H300.0 V250" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
 <path data-from="Cross_Chain_Message_Integrity" data-to="Preemptive_Lock_Correctness" d="M300.0 580 V602.5 H300.0 V625" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
 <path data-from="Cross_Domain_State_Preservation" data-to="Regulatory_Action_Composition" d="M300.0 330 V352.5 H300.0 V375" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
@@ -56,4 +56,32 @@
 </g>
 <text x="28" y="1330" font-size="18" fill="#a8bbd5">Protected Behavior Obstructions is independent.</text>
 <text x="28" y="1360" font-size="18" fill="#a8bbd5">Auxiliary audit sessions are separate from this catalog.</text>
+<g aria-label="OIP namespace source dependency inset">
+<rect x="20" y="1415" width="560" height="875" rx="16" fill="#0f1d32" stroke="#36516d"/>
+<text x="40" y="1455" font-size="22">OIP namespace</text>
+<text x="40" y="1482" font-size="16" fill="#a8bbd5">HOL source dependencies · model-level scope</text>
+<text x="48" y="1880" font-size="15" fill="#a8bbd5">Separate profile,</text>
+<text x="48" y="1903" font-size="15" fill="#a8bbd5">reopening and boundary</text>
+<text x="48" y="1926" font-size="15" fill="#a8bbd5">scopes remain visible.</text>
+<text x="40" y="2190" font-size="16" fill="#a8bbd5">Arrows show source dependencies.</text>
+<text x="40" y="2217" font-size="16" fill="#a8bbd5">They are not deployment or full-code guarantees.</text>
+<path data-from="Evidence_Atomic_Binding" data-to="OIP_Product_Base" d="M568 790 H586 V1492 H156 V1510" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Product_Base" data-to="OIP_Product" d="M269 1539 H320" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Product" data-to="OIP_Reference_Profile" d="M435 1568 V1620" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Product" data-to="OIP_Record_Reopening" d="M435 1568 V1594 H156.5 V1620" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Reference_Profile" data-to="OIP_Reference_Execution" d="M435 1678 V1730" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Reference_Profile" data-to="OIP_Recovery_Boundary" d="M320 1649 H294 V1704 H156 V1730" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Reference_Execution" data-to="OIP_Message_Code" d="M435 1788 V1840" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Message_Code" data-to="OIP_Message_Response" d="M435 1898 V1950" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<path data-from="OIP_Message_Response" data-to="OIP_Message_Egress" d="M435 2008 V2060" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
+<g data-node="OIP_Product_Base"><rect x="44" y="1510" width="225" height="58" rx="9" fill="#11233c" stroke="#527aa1"/><text x="156.5" y="1531" text-anchor="middle" font-size="16">Base model</text><text x="156.5" y="1552" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Product_Base</text></g>
+<g data-node="OIP_Product"><rect x="320" y="1510" width="230" height="58" rx="9" fill="#11233c" stroke="#527aa1"/><text x="435" y="1531" text-anchor="middle" font-size="16">Product model</text><text x="435" y="1552" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Product</text></g>
+<g data-node="OIP_Reference_Profile"><rect x="320" y="1620" width="230" height="58" rx="9" fill="#10303b" stroke="#4b9b99"/><text x="435" y="1641" text-anchor="middle" font-size="16">Reference profile</text><text x="435" y="1662" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Reference_Profile</text></g>
+<g data-node="OIP_Reference_Execution"><rect x="320" y="1730" width="230" height="58" rx="9" fill="#10303b" stroke="#4b9b99"/><text x="435" y="1751" text-anchor="middle" font-size="16">Reference execution</text><text x="435" y="1772" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Reference_Execution</text></g>
+<g data-node="OIP_Record_Reopening"><rect x="44" y="1620" width="225" height="58" rx="9" fill="#302a35" stroke="#b49a7b"/><text x="156.5" y="1641" text-anchor="middle" font-size="16">Record reopening</text><text x="156.5" y="1662" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Record_Reopening</text></g>
+<g data-node="OIP_Recovery_Boundary"><rect x="44" y="1730" width="225" height="58" rx="9" fill="#302536" stroke="#ad85ac"/><text x="156.5" y="1751" text-anchor="middle" font-size="16">Recovery boundary</text><text x="156.5" y="1772" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Recovery_Boundary</text></g>
+<g data-node="OIP_Message_Code"><rect x="320" y="1840" width="230" height="58" rx="9" fill="#14283f" stroke="#6794cf"/><text x="435" y="1861" text-anchor="middle" font-size="16">Message code</text><text x="435" y="1882" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Message_Code</text></g>
+<g data-node="OIP_Message_Response"><rect x="320" y="1950" width="230" height="58" rx="9" fill="#14283f" stroke="#6794cf"/><text x="435" y="1971" text-anchor="middle" font-size="16">Response model</text><text x="435" y="1992" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Message_Response</text></g>
+<g data-node="OIP_Message_Egress"><rect x="320" y="2060" width="230" height="58" rx="9" fill="#14283f" stroke="#6794cf"/><text x="435" y="2081" text-anchor="middle" font-size="16">Response egress</text><text x="435" y="2102" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Message_Egress</text></g>
+</g>
 </g></svg>

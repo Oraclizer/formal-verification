@@ -5,6 +5,12 @@ import { fileURLToPath } from "node:url";
 
 const PROTECTED_SESSION = "Protected_Behavior_Obstructions";
 const AUDIT_SESSION = "Composition_Proof_Audit";
+const MODEL_ARTIFACT_INPUTS = new Set([
+  "Oracle_Interoperability_Protocol/artifacts/typed/oip_wire_oracle.ML",
+  "Oracle_Interoperability_Protocol/artifacts/typed/mirror-driver.ML",
+  "Oracle_Interoperability_Protocol/artifacts/full/oip_wire_response_full.ML",
+  "Oracle_Interoperability_Protocol/artifacts/full/response-full-driver.ML",
+]);
 
 function posix(path) {
   return path.replaceAll("\\", "/").replace(/^\.\//, "").replace(/^\/+|\/+$/g, "");
@@ -20,24 +26,32 @@ function walk(directory, wantedName, files = []) {
   return files;
 }
 
-function parseSessionRoot(rootPath, repositoryRoot) {
+export function parseSessionRoots(rootPath, repositoryRoot) {
   const text = readFileSync(rootPath, "utf8");
-  const match = /\bsession\s+"?([A-Za-z0-9_-]+)"?\s*=\s*"?([A-Za-z0-9_-]+)"?\s*\+/.exec(text);
-  if (!match) throw new Error(`Cannot parse Isabelle session declaration: ${relative(repositoryRoot, rootPath)}`);
-  const additional = /^\s+sessions\s+([\s\S]*?)^\s+theories\b/m.exec(text);
-  const dependencies = [match[2]];
-  for (const token of additional?.[1].match(/"[^"]+"|[A-Za-z0-9_-]+/g) ?? []) {
-    const dependency = token.replaceAll('"', "");
-    if (!dependencies.includes(dependency)) dependencies.push(dependency);
-  }
-  return {
-    name: match[1],
-    parent: match[2],
-    dependencies,
-    directory: posix(relative(repositoryRoot, dirname(rootPath))),
-    rootPath,
-    text,
-  };
+  const declarations = [...text.matchAll(/^\s*session\s+"?([A-Za-z0-9_-]+)"?(?:\s+in\s+"([^"\r\n]+)")?\s*=\s*"?([A-Za-z0-9_-]+)"?\s*\+/gm)];
+  if (!declarations.length) throw new Error(`Cannot parse Isabelle session declaration: ${relative(repositoryRoot, rootPath)}`);
+  if ([...text.matchAll(/^\s*session\b/gm)].length !== declarations.length) throw new Error(`Unsupported Isabelle session declaration: ${relative(repositoryRoot, rootPath)}`);
+  const rootDirectory = posix(relative(repositoryRoot, dirname(rootPath)));
+  const rootRelativePath = posix(relative(repositoryRoot, rootPath));
+  return declarations.map((match, index) => {
+    const block = text.slice(match.index, declarations[index + 1]?.index ?? text.length);
+    const sessionDirectory = resolve(dirname(rootPath), match[2] ?? ".");
+    const insideRoot = relative(dirname(rootPath), sessionDirectory);
+    if (insideRoot === ".." || insideRoot.startsWith("../") || insideRoot.startsWith("..\\")) {
+      throw new Error(`Session directory escapes its ROOT: ${match[1]}`);
+    }
+    // Absolute Windows/POSIX paths are not valid namespace-relative in dirs.
+    if (match[2] && (/^(?:[A-Za-z]:|[\\/])/.test(match[2]))) throw new Error(`Absolute session directory: ${match[1]}`);
+    const additional = /^\s+sessions\s+([\s\S]*?)^\s+theories\b/m.exec(block);
+    const dependencies = [match[3]];
+    for (const token of additional?.[1].match(/"[^"]+"|[A-Za-z0-9_-]+/g) ?? []) {
+      const dependency = token.replaceAll('"', "");
+      if (!dependencies.includes(dependency)) dependencies.push(dependency);
+    }
+    return { name: match[1], parent: match[3], dependencies,
+      directory: posix(relative(repositoryRoot, sessionDirectory)),
+      rootDirectory, rootRelativePath, rootPath, text: block };
+  });
 }
 
 function declaredTheories(session) {
@@ -59,15 +73,18 @@ export function readSessionGraph(repositoryRoot) {
     .flatMap((line) => line.replace(/#.*/, "").trim().split(/\s+/))
     .map(posix)
     .filter(Boolean);
-  const sessions = walk(root, "ROOT").map((path) => parseSessionRoot(path, root));
+  const sessions = walk(root, "ROOT").flatMap((path) => parseSessionRoots(path, root));
   const byName = new Map(sessions.map((session) => [session.name, session]));
   if (byName.size !== sessions.length) throw new Error("Duplicate Isabelle session name");
 
   const registeredNames = [];
   for (const directory of registeredDirectories) {
-    const candidates = sessions.filter((session) => session.directory === directory);
-    if (candidates.length !== 1) throw new Error(`ROOTS entry must identify one session: ${directory}`);
-    registeredNames.push(candidates[0].name);
+    const candidates = sessions.filter((session) => session.rootDirectory === directory);
+    if (!candidates.length) throw new Error(`ROOTS entry must identify a session ROOT: ${directory}`);
+    for (const session of candidates) {
+      if (registeredNames.includes(session.name)) throw new Error(`Duplicate ROOTS registration: ${session.name}`);
+      registeredNames.push(session.name);
+    }
   }
   for (const session of sessions) {
     if (!registeredNames.includes(session.name) && session.name !== AUDIT_SESSION) {
@@ -84,12 +101,16 @@ export function readSessionGraph(repositoryRoot) {
 
   const order = [];
   const visited = new Set();
+  const visiting = new Set();
   function visit(name) {
     if (visited.has(name)) return;
+    if (visiting.has(name)) throw new Error(`Cyclic Isabelle session dependency: ${name}`);
+    visiting.add(name);
     const session = byName.get(name);
     for (const dependency of session?.dependencies ?? []) {
       if (byName.has(dependency)) visit(dependency);
     }
+    visiting.delete(name);
     visited.add(name);
     order.push(name);
   }
@@ -103,6 +124,9 @@ function ownerForPath(graph, path) {
   const candidates = graph.sessions
     .filter((session) => path === session.directory || path.startsWith(`${session.directory}/`))
     .sort((left, right) => right.directory.length - left.directory.length);
+  if (candidates.length > 1 && candidates[0].directory.length === candidates[1].directory.length) {
+    throw new Error(`Ambiguous Isabelle source ownership: ${path}`);
+  }
   return candidates[0];
 }
 
@@ -149,7 +173,7 @@ function isGlobalProofControl(path) {
 }
 
 function affectsSessionBuild(path, session) {
-  if (path === `${session.directory}/ROOT`) return true;
+  if (path === session.rootRelativePath) return true;
   if (!path.startsWith(`${session.directory}/`)) return false;
   return /\.(?:thy|ML)$/.test(path) || path.startsWith(`${session.directory}/document/`);
 }
@@ -166,6 +190,8 @@ export function selectProofSessions(repositoryRoot, changedPaths, { forceAll = f
     }
 
     const owner = ownerForPath(graph, path);
+    const rootOwners = graph.sessions.filter((session) => session.rootRelativePath === path);
+    for (const session of rootOwners) affected.add(session.name);
     if (owner && affectsSessionBuild(path, owner)) affected.add(owner.name);
 
     if ((path === "Evidence_Binding_Composition/claims.json" ||
@@ -174,7 +200,7 @@ export function selectProofSessions(repositoryRoot, changedPaths, { forceAll = f
       affected.add(AUDIT_SESSION);
     }
 
-    if ((/\.(?:thy|ML)$/.test(path) || basename(path) === "ROOT") && !owner && !global) {
+    if ((/\.(?:thy|ML)$/.test(path) || basename(path) === "ROOT") && !owner && !rootOwners.length && !MODEL_ARTIFACT_INPUTS.has(path) && !global) {
       throw new Error(`Proof input is outside every declared session: ${path}`);
     }
   }

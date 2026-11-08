@@ -20,19 +20,22 @@
   [Mapping](FORMAL_MODEL_MAPPING.md)
 </div>
 
-> **Mechanized assurance.** The repository contains seven Isabelle/HOL
+> **Mechanized assurance.** The repository registers sixteen Isabelle/HOL
 > sessions. CDSP, RAC, Cross-Chain Message Integrity, Preemptive Lock Correctness,
 > Evidence Atomic Binding and Evidence Binding Composition form a dependency chain.
 > `Protected_Behavior_Obstructions` is an
 > independent HOL companion to an external Lean development: its rows are
 > graded `PARTIAL`, never `SAME` (both grades are defined in
 > [`Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md)).
-> The tracked theories are `sorry`/`oops`-free and
+> The seven sessions in the result table have `sorry`/`oops`-free theories and
 > reproducibly check under Isabelle2025-2 with the declared AFP dependency.
 > Claims are model-level and bounded by the assumptions recorded here. The
 > Oraclizer product mapping remains in
 > [`FORMAL_MODEL_MAPPING.md`](FORMAL_MODEL_MAPPING.md); the independent
-> companion's exact boundary is folder-local.
+> companion's exact boundary is folder-local. The nine-session
+> [OIP prototype namespace](Oracle_Interoperability_Protocol/README.md) adds
+> conditional HOL models, manual Rust source correspondence and bounded
+> executable wire comparisons under its own stated scope.
 
 ## Repository maintenance status
 
@@ -46,11 +49,13 @@ deployment, audit, legal opinion, or model-to-code refinement.
 ## Formal artifact catalog
 
 This catalog lists the formal-verification artifacts in this
-repository. Each row is an independently buildable Isabelle session and a
-separate review and release unit. **Source** opens the authoritative session
+repository. The seven established rows are independently buildable Isabelle
+sessions and separate review and release units. The OIP prototype row groups
+nine sessions in one namespace. **Source** opens the authoritative session
 `ROOT`; **PDF** is the session-named reading copy; and **Manifest** records the
 source and PDF hashes together with the document-build identity. A **Source
-manifest** instead records the tracked proof and documentation inputs.
+manifest** records the artifact's tracked source inputs; the OIP manifest
+covers ROOT and its theories.
 
 | Artifact | Role | Verification focus | Entry points |
 | --- | --- | --- | --- |
@@ -61,6 +66,7 @@ manifest** instead records the tracked proof and documentation inputs.
 | **Evidence Atomic Binding** | Extension | Source-qualified terminal records, guarded financial/regulatory effects, completed observations and checked recovery | [Source](Evidence_Atomic_Binding/ROOT) · [Scope and build](Evidence_Atomic_Binding/README.md) · [Claims](Evidence_Atomic_Binding/claims.json) · [Source manifest](Evidence_Atomic_Binding/source-manifest.json) |
 | **Evidence Binding Composition** | Extension | Finite allocation characterization, actual source-to-call execution, historical projection and recovery of completed decisions | [Source](Evidence_Binding_Composition/ROOT) · [Scope and build](Evidence_Binding_Composition/README.md) · [Claims](Evidence_Binding_Composition/claims.json) · [Source manifest](Evidence_Binding_Composition/source-manifest.json) |
 | **Protected Behavior Obstructions** | Partial companion | Set/profile consequences, explicit stochastic assumptions, set-level morphism laws, preorder facts, and bounded controls | [Source](Protected_Behavior_Obstructions/ROOT) · [Scope](Protected_Behavior_Obstructions/README.md) · [Cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md) · PDF/manifest not produced (`document = false`) |
+| **OIP prototype** | Extension | Conditional HOL models, manually maintained Rust source correspondence and bounded typed-wire / sender-client comparisons | [Source](Oracle_Interoperability_Protocol/ROOT) · [Scope](Oracle_Interoperability_Protocol/README.md) · [Reproduction](Oracle_Interoperability_Protocol/REPRODUCING.md) · [Source manifest](Oracle_Interoperability_Protocol/source-manifest.json) |
 
 **Role taxonomy**
 
@@ -125,6 +131,11 @@ reorderings can remain distinguishable through raw journals. Its
 [model boundary](Evidence_Binding_Composition/MODEL_BOUNDARY.md) states the
 consumer classes and separates those results from deployed behavior.
 
+The OIP prototype has a separate [model and source boundary](Oracle_Interoperability_Protocol/README.md).
+Its consumers compare the selected typed-wire and sender/client cases; these
+comparisons do not establish a verified compiler, universal Rust/Go refinement
+or a production Witness/storage deployment.
+
 ## Theory architecture
 
 ### Registered session dependencies
@@ -132,7 +143,7 @@ consumer classes and separates those results from deployed behavior.
 <div align="center">
   <picture>
     <source media="(max-width: 900px)" srcset="docs/assets/session-architecture-mobile.svg">
-    <img src="docs/assets/session-architecture.svg" alt="Seven registered artifact sessions: CDSP to RAC to Cross-Chain Message Integrity to Preemptive Lock Correctness to Evidence Atomic Binding to Evidence Binding Composition. Protected Behavior Obstructions independently extends HOL. CDSP also depends on HOL-Library, HOL-Eisbach and AFP ADS_Functor." width="900">
+    <img src="docs/assets/session-architecture.svg" alt="Sixteen registered artifact sessions: the CDSP to Evidence Binding Composition chain and independent Protected Behavior Obstructions companion, plus nine OIP prototype sessions branching from Evidence Atomic Binding into product, profile/execution, record reopening, recovery boundary and message/response layers. CDSP also depends on HOL-Library, HOL-Eisbach and AFP ADS_Functor. Arrows describe HOL source dependencies." width="900">
   </picture>
 </div>
 
@@ -176,7 +187,7 @@ with the actual `ROOTS`, `ROOT`, and theory headers.
 
 ### Established within the models
 
-- all seven declared sessions and their registered theories build;
+- the seven sessions represented in the result table and their registered theories build;
 - the theory sources contain no `sorry` or `oops`;
 - named results follow from the definitions, locales, and assumptions stated
   in the theories;
@@ -221,7 +232,7 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Check all seven sessions from the repository root:
+Check the seven sessions in the result table from the repository root:
 
 ```bash
 isabelle build \
@@ -280,18 +291,23 @@ document uses `pdflatex` and `bibtex`:
 node Evidence_Binding_Composition/build-document.mjs output/Evidence_Binding_Composition
 ```
 
+For the nine OIP prototype sessions, exact source-manifest bytes, logical-session
+exports and the bounded wire consumers, use
+[OIP reproduction](Oracle_Interoperability_Protocol/REPRODUCING.md).
+
 An independent assurance claim should identify the exact commit, Isabelle and
 AFP revisions, command, and resulting session log.
 
 ## Repository map
 
-Every session follows one directory convention, so the map stays
-this short as the catalog grows:
+Each established artifact has its own directory. The OIP prototype groups
+nine sessions beneath one namespace:
 
 | Path | Purpose |
 | --- | --- |
-| `ROOTS` | Registers the seven catalog artifact sessions; auxiliary audit sessions are invoked separately |
+| `ROOTS` | Registers sixteen artifact sessions; auxiliary audit sessions are invoked separately |
 | `<Session>/` | One directory per catalog artifact: the authoritative `*.thy` theories and the session `ROOT`. Sessions that produce a reading copy add `document/` (LaTeX source) and `release/` (session-named PDF and manifest); session-scoped docs such as a scope README or a cross-prover mapping live inside the same directory |
+| `Oracle_Interoperability_Protocol/` | Nine prototype sessions declared with source subdirectories in ROOT, their exact 345-file compiler-input manifest, scope and reproduction instructions |
 | `docs/assets/` | README banner, full session overview and foundation import views, with Mermaid sources and narrow-screen variants |
 | `FORMAL_MODEL_MAPPING.md` | Oraclizer theorem-to-target mapping, assumptions, gaps, and proposed tests |
 | `CONTRIBUTING.md`, `SECURITY.md`, `CITATION.cff` | Review channels and proof reproduction, sensitive-report routing, and citation metadata |

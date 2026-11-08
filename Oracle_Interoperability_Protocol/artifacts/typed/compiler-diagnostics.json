@@ -1,0 +1,25 @@
+{
+  "schema": "oip-compiler-diagnostics-v1",
+  "model_sha256": "192e2bb8e1ae655fb27db68bbcb99cd538509d131ec6b6b29f670cd05a9d129b",
+  "driver_sha256": "a1c8f5be6a637a59610010efcc489c965e82d9e0a59b72481731adf45d385bdc",
+  "allowed": [
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:691: warning: Matches are not exhaustive.",
+        "Found near",
+        "  fun nth (x :: xs) n = (if ... ... zero_nata then x else ... ... (... ...))"
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:1616: warning: Matches are not exhaustive.",
+        "Found near",
+        "  fun sorted_list_of_set (A1_, ...) (... ...) = ... ... (fn ...) (... ... xs)"
+      ],
+      "maximum": 1
+    }
+  ]
+}

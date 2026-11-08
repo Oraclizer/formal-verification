@@ -1,0 +1,37 @@
+theory Wire_Code_Core_Oracle_Check
+  imports Wire_Code_Reencoding_Canary
+begin
+
+ML_val \<open>
+  if null (Thm_Deps.all_oracles @{thms
+    an_accepted_generated_value_passes_the_exact_encoder
+    changing_the_generated_decoder_cannot_bypass_the_encoding_check
+    every_checked_core_is_the_model_decoding_of_the_received_bytes
+    every_checked_packet_is_the_model_decoding_of_the_received_bytes
+    two_checked_generated_decoders_cannot_disagree_on_the_core
+    two_checked_generated_decoders_cannot_disagree_on_the_packet
+    appending_varint_bytes_is_the_canonical_numeric_encoding
+    source_field_emitters_are_the_model_field_emitters
+    source_deadline_emission_is_the_model_emission
+    source_fixed64_emitter_is_the_model_function
+    source_bytes_emitter_is_the_model_function
+    the_source_operation_emitter_has_the_exact_model_bytes
+    generated_operation_presence_and_deadline_are_preserved_exactly
+    a_present_false_deadline_has_no_accepted_encoding
+    source_shape_and_machine_domain_are_exactly_model_wellformedness
+    the_source_core_field_sequence_is_the_exact_model_sequence
+    the_typed_source_encoder_is_the_checked_canonical_encoder
+    the_typed_source_core_encoder_discharges_the_reencoding_obligation
+    the_source_packet_field_sequence_is_the_exact_model_sequence
+    the_typed_source_packet_encoder_discharges_the_reencoding_obligation
+    a_generated_core_accepted_by_the_typed_source_encoder_has_the_model_value
+    a_generated_packet_accepted_by_the_typed_source_encoder_has_the_model_value
+    the_canary_encoder_is_the_source_encoder_function
+    the_canary_encoder_meets_the_explicit_encoder_obligation
+    a_typed_canonical_core_passes_the_actual_reencoding_consumer
+    a_different_byte_string_does_not_pass_the_reencoding_consumer
+    removing_the_comparison_reaches_a_false_semantic_acceptance})
+  then () else error "Unexpected oracle in the complete common-code canary theorem list"
+\<close>
+
+end

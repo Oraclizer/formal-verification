@@ -1,0 +1,59 @@
+{
+  "schema": "oip-compiler-diagnostics-v1",
+  "model_sha256": "8d6cfcc7f65f1890b1f007a7a52e0c62ca5cda92c14583517999d02a9f3fdd55",
+  "driver_sha256": "c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703",
+  "allowed": [
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:962: warning: Matches are not exhaustive.",
+        "Found near",
+        "  fun nth (x :: xs) n = (if ... ... zero_nata then x else ... ... (... ...))"
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:996: warning: Matches are not exhaustive.",
+        "Found near fun image f (... ...) = Set (... ... xs)"
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:1864: warning: Matches are not exhaustive.",
+        "Found near",
+        "  fun mina A_ (... ...) = abort_empty_set (mina A_) | mina A_ ... = ... ... x"
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:2575: warning: Pattern 3 is redundant.",
+        "Found near",
+        "  fun",
+        "     equal_bool false p = not p |",
+        "        equal_bool true ... = p |",
+        "        equal_bool ... = ... ... |",
+        "        equal_bool ... = ..."
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:2576: warning: Pattern 4 is redundant.",
+        "Found near",
+        "  fun",
+        "     equal_bool false p = not p |",
+        "        equal_bool true ... = p |",
+        "        equal_bool ... = ... ... |",
+        "        equal_bool ... = ..."
+      ],
+      "maximum": 1
+    }
+  ]
+}

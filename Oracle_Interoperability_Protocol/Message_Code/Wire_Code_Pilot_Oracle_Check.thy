@@ -1,0 +1,80 @@
+theory Wire_Code_Pilot_Oracle_Check
+  imports Wire_Code_Core_Oracle_Check Wire_Code_Packet_Presence
+    Wire_Code_Precheck_Canary Wire_Code_Debit_Canary Wire_Code_Debit_Selection
+begin
+
+ML_val \<open>
+  if null (Thm_Deps.all_oracles @{thms
+    present_u64_fields_have_bounded_projected_values
+    a_projected_source_operation_has_the_machine_field_domain
+    a_missing_required_scalar_has_no_semantic_source_projection
+    a_missing_core_uuid_or_body_has_no_semantic_source_projection
+    a_conflicting_declared_family_has_no_semantic_source_projection
+    source_projection_preserves_the_complete_unsigned_header
+    a_projected_source_core_has_the_machine_field_domain
+    a_typed_generated_core_encoding_has_the_exact_model_value_and_bytes
+    reencoding_a_typed_generated_core_gives_the_received_model_value
+    a_missing_packet_core_or_signature_has_no_source_encoding
+    a_typed_generated_packet_encoding_has_the_exact_model_value_and_bytes
+    reencoding_a_typed_generated_packet_gives_the_received_model_value
+    the_bounded_source_varint_reader_preserves_the_model_value
+    the_source_varint_reader_preserves_the_model_value
+    the_bounded_reader_accepts_every_canonical_remaining_u64_prefix
+    the_source_reader_accepts_every_canonical_u64_prefix
+    the_source_reader_refuses_a_nonshortest_zero_suffix
+    the_source_reader_refuses_an_overflowing_tenth_octet
+    canonical_core_starts_with_its_exact_declared_version
+    the_source_declared_version_reads_the_canonical_core_version
+    unsupported_declared_versions_are_refused_without_reading_later_fields
+    a_canonical_current_packet_passes_the_declared_version_precheck
+    the_size_refusal_precedes_the_version_refusal
+    every_accepted_reference_operation_is_a_protocol_operation
+    unsupported_reference_operations_cannot_reach_a_signature_consumer
+    every_precheck_refusal_is_before_any_state_effect
+    source_checked_expiry_is_exactly_the_model_sum_when_representable
+    the_source_admission_order_matches_the_model_with_threshold_disabled
+    threshold_two_is_always_a_source_refusal
+    prechecked_current_input_reuses_the_model_admission
+    a_noncurrent_library_profile_has_a_documented_error_priority_difference
+    a_new_declared_version_has_a_documented_predecode_difference
+    the_default_delivery_ttl_configuration_adds_no_check
+    an_above_limit_signed_delivery_ttl_is_a_refusal
+    the_source_transport_key_has_the_exact_authenticated_model_components
+    a_conflicting_source_binding_cannot_replace_an_earlier_body
+    source_fixed_word_concatenation_value
+    source_zero_octets_have_zero_value
+    source_octet_value_is_within_its_width
+    source_fixed_width_splits_at_the_exact_high_quotient
+    source_zero_high_amount_octets_preserve_the_full_model_value
+    source_zero_high_amount_octets_iff_model_value_fits_u64
+    the_source_amount_check_is_exactly_the_model_value_and_u64_limit
+    a_source_amount_has_no_high_byte_truncation
+    source_native_prefix_is_the_existing_prefix_with_its_actual_amount_limit
+    a_source_native_prefix_has_the_exact_product_header
+    parsed_version_pairs_consume_exactly_twice_the_declared_count
+    the_source_checked_pair_count_does_not_reject_any_representable_list
+    every_source_ordinary_result_retains_the_existing_decoded_operands
+    every_source_debit_meets_the_existing_debit_selector_header
+    an_exact_source_debit_attachment_reaches_the_existing_product_action
+    source_ordinary_deadlines_are_refused_before_the_native_call
+    the_source_endpoint_refusal_precedes_the_proof_count_refusal
+    the_two_no_appeal_deadline_encodings_have_the_same_product_value
+    an_entire_declared_core_can_select_another_version_before_later_checks
+    a_version_prefix_in_a_truncated_core_is_not_a_declared_version
+    nonshortest_packet_tags_and_lengths_do_not_select_a_version
+    nonshortest_core_tags_and_versions_do_not_select_a_version
+    a_different_first_packet_or_core_tag_does_not_select_a_version
+    lack_of_a_selector_is_not_an_acceptance_of_a_current_version
+    a_large_frame_still_precedes_an_otherwise_complete_version_selector
+    the_runtime_guard_debit_has_the_source_decoded_operands
+    the_runtime_guard_debit_reaches_the_existing_product_selector_header
+    the_runtime_guard_debit_keeps_the_exact_source_encoder_anchor
+    the_same_debit_with_only_its_target_changed_is_a_source_refusal
+    deleting_only_the_endpoint_check_reaches_a_semantically_wrong_debit
+    the_existing_product_selector_also_rejects_the_changed_target
+    source_attestation.the_prechecked_source_debit_selector_is_the_existing_service_selector
+    source_attestation.the_source_selected_debit_keeps_the_received_amount_recipient_generation_and_funding_owner})
+  then () else error "Unexpected oracle in the checked-code debit pilot theorem list"
+\<close>
+
+end

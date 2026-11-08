@@ -1,0 +1,50 @@
+{
+  "lock_version": 1,
+  "binding_status": "bound",
+  "artifact_transport": "github-git-blob-v1",
+  "repository": "Oraclizer/formal-verification",
+  "wire_schema": 1,
+  "abi": "intinf-wire-values-v2",
+  "scope": "wire-v6-general-31-values",
+  "entrypoint": "OIP_Wire_Oracle.code_typed_transport_flat_oracle",
+  "natural_refinement": "HOL-Library.Code_Target_Nat",
+  "runtime_source_hash": "28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207",
+  "verified_export_sha256": "192e2bb8e1ae655fb27db68bbcb99cd538509d131ec6b6b29f670cd05a9d129b",
+  "corpus": {
+    "path": "tests/vectors/wire-operations.jsonl",
+    "rows": 673,
+    "sha256": "7191613236625c876f41976c44cc98cf1047876e319ee7c03abfe6bb0a1e8588"
+  },
+  "files": [
+    {
+      "role": "model",
+      "name": "oip_wire_oracle.ML",
+      "git_blob_sha1": "72fee1bd9d3d35814b44cea890c37a38f40cd3cc",
+      "sha256": "192e2bb8e1ae655fb27db68bbcb99cd538509d131ec6b6b29f670cd05a9d129b",
+      "bytes": 209891
+    },
+    {
+      "role": "driver",
+      "name": "mirror-driver.ML",
+      "git_blob_sha1": "c7f7913898d658ae0741493b6f3efc5bacb13043",
+      "sha256": "a1c8f5be6a637a59610010efcc489c965e82d9e0a59b72481731adf45d385bdc",
+      "bytes": 2460
+    },
+    {
+      "role": "origin",
+      "name": "export-origin.json",
+      "git_blob_sha1": "074690d7a4811b39ff822cb8c319508acfbb246c",
+      "sha256": "ca5d83f4b2554542751f6e8412de52923876a3f2ff9641adf15becabd3530009",
+      "bytes": 821
+    },
+    {
+      "role": "diagnostics",
+      "name": "compiler-diagnostics.json",
+      "git_blob_sha1": "309a95eca95eb6b3ca3d8d20d84fef57ddce31f0",
+      "sha256": "164f2793fda6817596c3c547f9549c9eb5d45b2a131ff2267b6d8d7e7d840118",
+      "bytes": 758
+    }
+  ],
+  "public_namespace": "Oracle_Interoperability_Protocol",
+  "identity_function": "OIP_Wire_Oracle.code_typed_model_identity"
+}

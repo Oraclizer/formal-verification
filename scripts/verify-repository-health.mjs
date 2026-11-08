@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { repositorySessionInventory } from "./repository-session-inventory.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
@@ -474,17 +475,9 @@ for (const match of workflow.matchAll(/^\s*uses:\s*([^#\s]+)(?:\s+#.*)?$/gm)) {
 
 
 // Diagram inventories are checked against source, not a hand-maintained edge list.
-const artifactNames = readFileSync(resolve(root, "ROOTS"), "utf8").trim().split(/\s+/);
-const sessionEdges = new Set();
+const sessionInventory = repositorySessionInventory(root, files.map((path) => relative(root, path).replaceAll("\\", "/")));
+const sessionEdges = sessionInventory.sessionEdges;
 const pairKey = (a, b) => `${a}|${b}`;
-for (const name of artifactNames) {
-  const input = readFileSync(resolve(root, name, "ROOT"), "utf8");
-  const parent = /\bsession\s+\w+\s*=\s*"?([\w-]+)"?\s*\+/.exec(input);
-  if (!parent) throw Error(`Cannot parse session parent: ${name}`);
-  sessionEdges.add(pairKey(parent[1], name));
-  const additional = /^\s+sessions\s+([\s\S]*?)^\s+theories\b/m.exec(input);
-  if (additional) for (const dep of additional[1].trim().split(/\s+/)) sessionEdges.add(pairKey(dep.replaceAll('"', ''), name));
-}
 const directImports = new Map();
 for (const dir of ["Cross_Domain_State_Preservation", "Regulatory_Action_Composition"]) {
   for (const name of readdirSync(resolve(root, dir)).filter(name => name.endsWith(".thy"))) {
@@ -520,4 +513,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`repository health PASS: ${files.length} files, ${cdspTheories.length + 1 + protectedTheories.length + messageTheories.length + reservationTheories.length + bindingTheories.length + compositionTheories.length} theories, 7 sessions`);
+console.log(`repository health PASS: ${files.length} files, ${sessionInventory.theoryFileCount} theory files, ${sessionInventory.registeredSessionCount} registered sessions (${sessionInventory.auxiliarySessionCount} auxiliary)`);
