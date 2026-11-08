@@ -82,3 +82,5 @@ the signed root has been observed through the public API. That link is separate
 metadata: CodeCommit is not an input to the source fingerprint, model identity,
 export, artifact origin or lock. Creating the formal sources and model bytes
 does not depend on that later public code link.
+
+The exact public code commit and model content pins are listed in [consumer-binding.json](consumer-binding.json).
