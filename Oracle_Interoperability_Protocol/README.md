@@ -40,11 +40,11 @@ storage assumptions remain explicit in the relevant statements.
 | `OIP_Message_Response` | Correlation, response boundary and client-facing interfaces |
 | `OIP_Message_Egress` | Sender, primitive-query and current-client interfaces |
 
-The [ROOT](ROOT) declares the nine sessions. Record reopening and the current
-reference profile remain separate model branches; equal local theory names do
-not identify the same source or context. The
-[source manifest](source-manifest.json) pins ROOT and the 344 theory files.
-It is a compiler-input inventory, not a publication or test-result receipt.
+The [ROOT](ROOT) declares the base sessions above and the v0.6.1 extension
+sessions. Record reopening and the current reference profile are separate
+model branches with distinct source contexts. The [source manifest](source-manifest.json)
+pins ROOT and each theory file in this namespace. The compiler-input seal
+records the checked build separately.
 
 ## Executable interfaces and comparison consumers
 

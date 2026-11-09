@@ -9,12 +9,12 @@ ABI loading and sampled value comparisons have separate purposes.
 
 `source-manifest.json` contains ROOT plus 398 theory records with relative path,
 byte count and SHA256. The raw manifest SHA256 is
-`5614df566381f75e08e480d057cb1f37a1a325c6ae1c1f8a346877f4bb5f2acd`.
+`05c18602e03737f7d94503f6a7e0d732fa8f0b840538884abb33086b32771563`.
 The canonical inventory identity is
-`a9ea540cd07d2eedd244dfe78a08c6f74159cfce637d8deef5b41b8bc60e3447`:
+`fa28a301c30c77618acc4726f26a5a6d0c396bf5f6b10d8f073d72cf92c6b079`:
 SHA256 of ASCII JSON with sorted keys, compact separators and no final newline.
 ROOT separately hashes to
-`28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6`.
+`f79ab1c2d2ea32f4e70a2c21df3e1dd92eabdc06b5af663d6679dec90d02563d`.
 These are source identities, not assertions of a build or comparison result.
 
 The following reads the actual bytes and displays the two compiler-input
@@ -26,7 +26,7 @@ from pathlib import Path
 import hashlib, json, stat
 root = Path('Oracle_Interoperability_Protocol')
 raw = (root / 'source-manifest.json').read_bytes()
-assert hashlib.sha256(raw).hexdigest() == '5614df566381f75e08e480d057cb1f37a1a325c6ae1c1f8a346877f4bb5f2acd'
+assert hashlib.sha256(raw).hexdigest() == '05c18602e03737f7d94503f6a7e0d732fa8f0b840538884abb33086b32771563'
 manifest = json.loads(raw)
 assert manifest['format'] == 'oip-public-formal-source-inventory-v1'
 assert manifest['namespace'] == 'Oracle_Interoperability_Protocol'
@@ -44,8 +44,8 @@ for row in rows:
 canonical = json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
 formal = hashlib.sha256(canonical).hexdigest()
 root_sha = hashlib.sha256((root / 'ROOT').read_bytes()).hexdigest()
-assert formal == 'a9ea540cd07d2eedd244dfe78a08c6f74159cfce637d8deef5b41b8bc60e3447'
-assert root_sha == '28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6'
+assert formal == 'fa28a301c30c77618acc4726f26a5a6d0c396bf5f6b10d8f073d72cf92c6b079'
+assert root_sha == 'f79ab1c2d2ea32f4e70a2c21df3e1dd92eabdc06b5af663d6679dec90d02563d'
 print('formal_root_sha256=' + formal)
 print('ROOT_sha256=' + root_sha)
 PY
@@ -74,11 +74,10 @@ dependency instructions as the repository proof lane.
   OIP_Record_Reopening OIP_Recovery_Boundary OIP_Sync_V061_Typed_Artifact OIP_Response_Egress_V061_Export
 ```
 
-The three named leaves include all nine namespace sessions through ROOT parent
-dependencies. An optional `build -n` plan reports whether work is needed; a
-planning-only result is not a completed proof build. The separate repository
-Proofs workflow serializes its selected native jobs and retains selected-child
-and aggregate failure checks.
+The four targets build the two recovery boundaries, the two export sessions
+and their dependencies from ROOT. `build -n` prints the build plan. The
+repository Proofs workflow selects the affected sessions and their downstream
+consumers and checks each selected result.
 
 ## Exact logical-session exports
 
@@ -122,7 +121,7 @@ Run the unchanged production drivers from that same checkout:
 
 | Driver | SHA256 |
 | --- | --- |
-| `tests/wire-values-driver.ML` | `a1c8f5be6a637a59610010efcc489c965e82d9e0a59b72481731adf45d385bdc` |
+| `tests/wire-values-driver.ML` | `c9ed19c6c27c6eed5aa0bc07b0e2c899fb83fa92e7f5f861dc1da64ab6b356bc` |
 | `tests/response-full-driver.ML` | `c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703` |
 
 ```bash
@@ -132,9 +131,10 @@ printf '' | env OIP_WIRE_RESPONSE_MODEL="$OUT/full/code/oip_wire_response_full_v
   "$POLYML" -q --error-exit --script tests/response-full-driver.ML
 ```
 
-The typed identity is returned by `code_typed_model_identity ()`; the Full
-identity by `code_response_full_model_identity ()`. Both return six ASCII
-fields. For this source epoch they are:
+`OIP_Wire_Oracle_V061.sync_v061_typed_model_identity ()` and
+`OIP_Wire_Response_Boundary.code_response_full_model_identity ()` each return
+six ASCII fields. The last field must match the `runtime_source_hash` in the
+corresponding [artifact lock](artifacts/locks/).
 
 | Field | Typed transport | Full sender/client |
 | --- | --- | --- |
@@ -143,7 +143,7 @@ fields. For this source epoch they are:
 | Scope | `wire-v6-general-33-values` | `wire-response-sender-client-v2` |
 | Entrypoint | `OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat` | `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` |
 | Natural refinement | `HOL-Library.Code_Target_Nat` | `HOL-Library.Code_Target_Nat` |
-| Runtime source fingerprint | `e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1` | `e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1` |
+| Runtime source fingerprint | `model-artifact.lock.json` | `wire-response-artifact.lock.json` |
 
 A private namespace export, four-field interface, caller-supplied fingerprint
 or edited model is not interchangeable with these interfaces. ABI loading
