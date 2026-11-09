@@ -1,9 +1,9 @@
-structure OIP_Wire_Oracle : sig
+structure OIP_Wire_Oracle_V061 : sig
   type nat
-  type num
   type char
-  val code_typed_model_identity : unit -> (IntInf.int list) list
-  val code_typed_transport_flat_oracle :
+  type 'a wire_core_ext
+  type code_operand_verdict
+  val sync_v061_nested_transport_flat :
     IntInf.int list ->
       IntInf.int list ->
         IntInf.int ->
@@ -22,6 +22,7 @@ structure OIP_Wire_Oracle : sig
                                   (IntInf.int list *
                                     (IntInf.int list *
                                       (IntInf.int list * IntInf.int list))))))
+  val sync_v061_typed_model_identity : unit -> (IntInf.int list) list
 end = struct
 
 datatype nat = Nat of IntInf.int;
@@ -452,6 +453,14 @@ fun equal_lista A_ [] (x21 :: x22) = false
 
 fun equal_list A_ = {equal = equal_lista A_} : ('a list) equal;
 
+fun equal_proda A_ B_ (x1, x2) (y1, y2) = eq A_ x1 y1 andalso eq B_ x2 y2;
+
+fun equal_prod A_ B_ = {equal = equal_proda A_ B_} : ('a * 'b) equal;
+
+fun equal_unita u v = true;
+
+val equal_unit = {equal = equal_unita} : unit equal;
+
 val one_integera : IntInf.int = (1 : IntInf.int);
 
 val one_integer = {one = one_integera} : IntInf.int one;
@@ -527,6 +536,8 @@ datatype 'a set = Set of 'a list | Coset of 'a list;
 
 datatype char = Chara of bool * bool * bool * bool * bool * bool * bool * bool;
 
+datatype ('a, 'b) sum = Inl of 'a | Inr of 'b;
+
 datatype wire_deadline = Deadline_Absent | Deadline_Indefinite |
   Deadline_At of nat;
 
@@ -568,8 +579,13 @@ datatype parsed_wire_query =
   Wire_Read_Request of unit session_proof_ext * identity_read_request |
   Wire_Cache_Request of unit session_proof_ext * application_query;
 
+datatype sync_mode = Sync_Initial | Sync_Incremental | Sync_Full;
+
 datatype 'a wire_packet_ext =
   Wire_packet_ext of unit wire_core_ext * nat list * 'a;
+
+datatype 'a sync_query_ext =
+  Sync_query_ext of nat * unit product_cut_ext * (nat * nat) * 'a;
 
 datatype ordinary_wire_command = Wire_Reserve of nat | Wire_Dispatch of nat |
   Wire_Debit of nat | Wire_Cancel of nat | Wire_Fence of nat |
@@ -632,14 +648,18 @@ datatype code_nested_operand =
   Code_Nested_Receipt of unit wire_core_ext | Code_Nested_Response |
   Code_Nested_Other;
 
+datatype reference_response_kind = Recorded_Result | Delivery_Refusal |
+  Validation_Refusal;
+
+datatype code_response_status =
+  Code_Known_Response of reference_response_kind * nat |
+  Code_Unknown_Response of reference_response_kind * nat;
+
 datatype code_operand_tree_result = Code_Tree_Refused of wire_refusal |
   Code_Tree_Ready of code_nested_operand | Code_Tree_Pending;
 
 datatype code_operand_verdict = Code_Operand_Accept |
   Code_Operand_Refuse of wire_refusal | Code_Operand_Pending;
-
-datatype reference_response_kind = Recorded_Result | Delivery_Refusal |
-  Validation_Refusal;
 
 datatype code_heartbeat_fields =
   Code_Capabilities of nat * nat * nat set * nat set * nat set * nat set |
@@ -665,6 +685,26 @@ datatype code_governance_fields =
       nat * unit product_cut_ext * nat *
         unit code_json_endpoint_context_ext list *
         (nat * unit code_json_session_binding_ext) list * nat list;
+
+datatype 'a sync_entry_ext = Sync_entry_ext of nat list * nat * nat * nat * 'a;
+
+datatype 'a sync_request_ext =
+  Sync_request_ext of
+    (nat * nat) * nat * nat * unit product_cut_ext * (nat * nat) *
+      unit sync_entry_ext * sync_mode * (nat list) option * nat list * 'a;
+
+datatype 'a sync_link_original_ext =
+  Sync_link_original_ext of
+    unit wire_core_ext * unit wire_core_ext * unit sync_request_ext * 'a;
+
+datatype 'a sync_link_ack_ext =
+  Sync_link_ack_ext of
+    nat list * unit sync_link_original_ext * (nat * nat) *
+      reference_response_kind * nat * nat option * 'a;
+
+datatype 'a sync_receipt_original_ext =
+  Sync_receipt_original_ext of
+    nat * nat list * unit wire_core_ext * unit sync_request_ext * 'a;
 
 datatype 'a code_source_binding_ext =
   Code_source_binding_ext of (nat * nat) * nat * nat * nat * nat * nat * 'a;
@@ -735,8 +775,13 @@ fun member A_ x (Set xs) = membera A_ xs x
 
 fun concat xss = foldr (fn a => fn b => a @ b) xss [];
 
+fun filter p [] = []
+  | filter p (x :: xs) = (if p x then x :: filter p xs else filter p xs);
+
 fun bind NONE f = NONE
   | bind (SOME x) f = f x;
+
+fun hd (x21 :: x22) = x21;
 
 fun remdups A_ [] = []
   | remdups A_ (x :: xs) =
@@ -1122,6 +1167,9 @@ fun map_option f NONE = NONE
   | map_option f (SOME x2) = SOME (f x2);
 
 val bot_set : 'a set = Set [];
+
+fun sup_set A_ (Set xs) a = fold (insert A_) xs a
+  | sup_set A_ (Coset xs) a = Coset (filter (fn x => not (member A_ x a)) xs);
 
 fun numeral A_ One = one (one_numeral A_)
   | numeral A_ (Bit0 n) =
@@ -1586,6 +1634,9 @@ fun insort_key B_ f x [] = [x]
 
 fun sort_key B_ f xs = foldr (insort_key B_ f) xs [];
 
+fun sync_operation core =
+  (wire_message_family core, wire_opcode (wire_operation_body core));
+
 fun cut_authority_epoch
   (Product_cut_ext (cut_authority_epoch, cut_revision, more)) =
   cut_authority_epoch;
@@ -1661,8 +1712,178 @@ fun decode_wire_packet bytes =
            else NONE)
     | SOME (Proto_Bytes (_, _) :: Proto_Bytes (_, _) :: _ :: _) => NONE);
 
+fun equal_proto_field (Proto_Fixed64 (x21, x22)) (Proto_Bytes (x31, x32)) =
+  false
+  | equal_proto_field (Proto_Bytes (x31, x32)) (Proto_Fixed64 (x21, x22)) =
+    false
+  | equal_proto_field (Proto_Varint (x11, x12)) (Proto_Bytes (x31, x32)) = false
+  | equal_proto_field (Proto_Bytes (x31, x32)) (Proto_Varint (x11, x12)) = false
+  | equal_proto_field (Proto_Varint (x11, x12)) (Proto_Fixed64 (x21, x22)) =
+    false
+  | equal_proto_field (Proto_Fixed64 (x21, x22)) (Proto_Varint (x11, x12)) =
+    false
+  | equal_proto_field (Proto_Bytes (x31, x32)) (Proto_Bytes (y31, y32)) =
+    equal_nata x31 y31 andalso equal_lista equal_nat x32 y32
+  | equal_proto_field (Proto_Fixed64 (x21, x22)) (Proto_Fixed64 (y21, y22)) =
+    equal_nata x21 y21 andalso equal_nata x22 y22
+  | equal_proto_field (Proto_Varint (x11, x12)) (Proto_Varint (y11, y12)) =
+    equal_nata x11 y11 andalso equal_nata x12 y12;
+
+fun wire_operation_body_update wire_operation_bodya
+  (Wire_core_ext
+    (wire_version, wire_purpose, wire_deployment, wire_source_domain,
+      wire_target_domain, wire_principal, wire_key_number, wire_authority_epoch,
+      wire_sent_seconds, wire_ttl_seconds, wire_uuid, wire_message_family,
+      wire_primary_code, wire_secondary_code, wire_signature_scheme,
+      wire_operation_body, wire_atomicity, wire_priority, wire_route_scope,
+      more))
+  = Wire_core_ext
+      (wire_version, wire_purpose, wire_deployment, wire_source_domain,
+        wire_target_domain, wire_principal, wire_key_number,
+        wire_authority_epoch, wire_sent_seconds, wire_ttl_seconds, wire_uuid,
+        wire_message_family, wire_primary_code, wire_secondary_code,
+        wire_signature_scheme, wire_operation_bodya wire_operation_body,
+        wire_atomicity, wire_priority, wire_route_scope, more);
+
+fun wire_opcode_update wire_opcodea
+  (Wire_body_ext (wire_opcode, wire_words, wire_blobs, wire_deadline, more)) =
+  Wire_body_ext
+    (wire_opcodea wire_opcode, wire_words, wire_blobs, wire_deadline, more);
+
+fun sync_added_operation core =
+  member (equal_prod equal_wire_family equal_nat) (sync_operation core)
+    (insert (equal_prod equal_wire_family equal_nat)
+      (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+      (insert (equal_prod equal_wire_family equal_nat)
+        (Wire_Query, nat_of_integer (9 : IntInf.int)) bot_set));
+
+fun sync_new_body_field (Proto_Bytes (tag, raw)) =
+  (if member equal_nat tag
+        (insert equal_nat (nat_of_integer (16 : IntInf.int))
+          (insert equal_nat (nat_of_integer (19 : IntInf.int)) bot_set))
+    then bind (decode_wire_body raw)
+           (fn body =>
+             (if member (equal_prod equal_nat equal_nat) (tag, wire_opcode body)
+                   (insert (equal_prod equal_nat equal_nat)
+                     (nat_of_integer (16 : IntInf.int),
+                       nat_of_integer (7 : IntInf.int))
+                     (insert (equal_prod equal_nat equal_nat)
+                       (nat_of_integer (19 : IntInf.int),
+                         nat_of_integer (9 : IntInf.int))
+                       bot_set))
+               then SOME (tag, body) else NONE))
+    else NONE)
+  | sync_new_body_field (Proto_Varint (v, va)) = NONE
+  | sync_new_body_field (Proto_Fixed64 (v, va)) = NONE;
+
+fun sync_parse_new_core wire_items =
+  bind (find (fn field => not (is_none (sync_new_body_field field))) wire_items)
+    (fn candidate =>
+      bind (sync_new_body_field candidate)
+        (fn (tag, body) =>
+          let
+            val alias =
+              Proto_Bytes
+                (tag, encode_wire_body
+                        (wire_opcode_update (fn _ => one_nata) body));
+          in
+            bind (parse_core_fields
+                   (map (fn field =>
+                          (if equal_proto_field field candidate then alias
+                            else field))
+                     wire_items))
+              (fn legacy =>
+                let
+                  val original =
+                    wire_operation_body_update (fn _ => body) legacy;
+                in
+                  (if wire_core_wellformed legacy andalso
+                        sync_added_operation original
+                    then SOME original else NONE)
+                end)
+          end));
+
+fun sync_decode_core raw =
+  (case decode_wire_core raw
+    of NONE =>
+      bind (read_canonical_proto_fields raw)
+        (fn wire_items =>
+          bind (sync_parse_new_core wire_items)
+            (fn core =>
+              (if equal_lista equal_nat (encode_wire_core core) raw
+                then SOME core else NONE)))
+    | SOME a => SOME a);
+
 fun code_ir_bytes oip_binder_bytes =
   [one_nata, size_list oip_binder_bytes] @ oip_binder_bytes;
+
+fun equal_wire_deadline Deadline_Indefinite (Deadline_At x3) = false
+  | equal_wire_deadline (Deadline_At x3) Deadline_Indefinite = false
+  | equal_wire_deadline Deadline_Absent (Deadline_At x3) = false
+  | equal_wire_deadline (Deadline_At x3) Deadline_Absent = false
+  | equal_wire_deadline Deadline_Absent Deadline_Indefinite = false
+  | equal_wire_deadline Deadline_Indefinite Deadline_Absent = false
+  | equal_wire_deadline (Deadline_At x3) (Deadline_At y3) = equal_nata x3 y3
+  | equal_wire_deadline Deadline_Indefinite Deadline_Indefinite = true
+  | equal_wire_deadline Deadline_Absent Deadline_Absent = true;
+
+fun sync_read_query core =
+  let
+    val body = wire_operation_body core;
+  in
+    (if not (equal_proda equal_wire_family equal_nat (sync_operation core)
+              (Wire_Query, nat_of_integer (9 : IntInf.int))) orelse
+          (not (equal_wire_deadline (wire_deadline body) Deadline_Absent) orelse
+            not (null (wire_blobs body)))
+      then NONE
+      else (case wire_words body of [] => NONE | [_] => NONE | [_, _] => NONE
+             | [_, _, _] => NONE
+             | [session, revision_word, asset, origin] =>
+               SOME (Sync_query_ext
+                      (session,
+                        Product_cut_ext
+                          (wire_authority_epoch core, revision_word, ()),
+                        (asset, origin), ()))
+             | _ :: _ :: _ :: _ :: _ :: _ => NONE))
+  end;
+
+fun sync_decode_packet raw =
+  (case decode_wire_packet raw
+    of NONE =>
+      (case read_canonical_proto_fields raw of NONE => NONE | SOME [] => NONE
+        | SOME (Proto_Varint (_, _) :: _) => NONE
+        | SOME (Proto_Fixed64 (_, _) :: _) => NONE
+        | SOME [Proto_Bytes (_, _)] => NONE
+        | SOME (Proto_Bytes (_, _) :: Proto_Varint (_, _) :: _) => NONE
+        | SOME (Proto_Bytes (_, _) :: Proto_Fixed64 (_, _) :: _) => NONE
+        | SOME [Proto_Bytes (core_tag, original),
+                 Proto_Bytes (signature_tag, signaturea)]
+          => (if equal_nata core_tag one_nata andalso
+                   equal_nata signature_tag (nat_of_integer (2 : IntInf.int))
+               then bind (sync_decode_core original)
+                      (fn core =>
+                        let
+                          val packet = Wire_packet_ext (core, signaturea, ());
+                        in
+                          (if sync_added_operation core andalso
+                                (less_nat (size_list original)
+                                   (power power_nat
+                                     (nat_of_integer (256 : IntInf.int))
+                                     (nat_of_integer (4 : IntInf.int))) andalso
+                                  (wire_octets (numeral_nat, ord_nat)
+                                     signaturea andalso
+                                    ((if equal_nata (wire_signature_scheme core)
+   one_nata
+                                       then equal_nata (size_list signaturea)
+      (nat_of_integer (64 : IntInf.int))
+                                       else not (null signaturea)) andalso
+                                      equal_lista equal_nat
+(encode_wire_packet packet) raw)))
+                            then SOME packet else NONE)
+                        end)
+               else NONE)
+        | SOME (Proto_Bytes (_, _) :: Proto_Bytes (_, _) :: _ :: _) => NONE)
+    | SOME a => SOME a);
 
 fun boundary_critical_allowed
   (Wire_boundary_ext
@@ -1779,6 +2000,793 @@ fun envelope_signing_bytes core =
             (size_list encoded)) @
         encoded
   end;
+
+fun sync_mode_number Sync_Initial = one_nata
+  | sync_mode_number Sync_Incremental = nat_of_integer (2 : IntInf.int)
+  | sync_mode_number Sync_Full = nat_of_integer (3 : IntInf.int);
+
+fun response_kind_at number =
+  (if equal_nata number one_nata then SOME Recorded_Result
+    else (if equal_nata number (nat_of_integer (2 : IntInf.int))
+           then SOME Delivery_Refusal
+           else (if equal_nata number (nat_of_integer (3 : IntInf.int))
+                  then SOME Validation_Refusal else NONE)));
+
+fun response_result_words words =
+  (case words of [] => NONE | [_] => NONE | [_, _] => NONE | [_, _, _] => NONE
+    | [_, _, _, _] => NONE
+    | [namespace, sequence, kind, code, present] =>
+      (if equal_nata present zero_nata
+        then map_option (fn tag => ((namespace, sequence), (tag, (code, NONE))))
+               (response_kind_at kind)
+        else NONE)
+    | [namespace, sequence, kind, code, present, revision] =>
+      (if equal_nata present one_nata
+        then map_option
+               (fn tag => ((namespace, sequence), (tag, (code, SOME revision))))
+               (response_kind_at kind)
+        else NONE)
+    | _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ => NONE);
+
+fun equal_reference_response_kind Delivery_Refusal Validation_Refusal = false
+  | equal_reference_response_kind Validation_Refusal Delivery_Refusal = false
+  | equal_reference_response_kind Recorded_Result Validation_Refusal = false
+  | equal_reference_response_kind Validation_Refusal Recorded_Result = false
+  | equal_reference_response_kind Recorded_Result Delivery_Refusal = false
+  | equal_reference_response_kind Delivery_Refusal Recorded_Result = false
+  | equal_reference_response_kind Validation_Refusal Validation_Refusal = true
+  | equal_reference_response_kind Delivery_Refusal Delivery_Refusal = true
+  | equal_reference_response_kind Recorded_Result Recorded_Result = true;
+
+fun equal_wire_body_ext A_
+  (Wire_body_ext
+    (wire_opcodea, wire_wordsa, wire_blobsa, wire_deadlinea, morea))
+  (Wire_body_ext (wire_opcode, wire_words, wire_blobs, wire_deadline, more)) =
+  equal_nata wire_opcodea wire_opcode andalso
+    (equal_lista equal_nat wire_wordsa wire_words andalso
+      (equal_lista (equal_list equal_nat) wire_blobsa wire_blobs andalso
+        (equal_wire_deadline wire_deadlinea wire_deadline andalso
+          eq A_ morea more)));
+
+fun equal_option A_ NONE (SOME x2) = false
+  | equal_option A_ (SOME x2) NONE = false
+  | equal_option A_ (SOME x2) (SOME y2) = eq A_ x2 y2
+  | equal_option A_ NONE NONE = true;
+
+fun equal_wire_core_ext A_
+  (Wire_core_ext
+    (wire_versiona, wire_purposea, wire_deploymenta, wire_source_domaina,
+      wire_target_domaina, wire_principala, wire_key_numbera,
+      wire_authority_epocha, wire_sent_secondsa, wire_ttl_secondsa, wire_uuida,
+      wire_message_familya, wire_primary_codea, wire_secondary_codea,
+      wire_signature_schemea, wire_operation_bodya, wire_atomicitya,
+      wire_prioritya, wire_route_scopea, morea))
+  (Wire_core_ext
+    (wire_version, wire_purpose, wire_deployment, wire_source_domain,
+      wire_target_domain, wire_principal, wire_key_number, wire_authority_epoch,
+      wire_sent_seconds, wire_ttl_seconds, wire_uuid, wire_message_family,
+      wire_primary_code, wire_secondary_code, wire_signature_scheme,
+      wire_operation_body, wire_atomicity, wire_priority, wire_route_scope,
+      more))
+  = equal_nata wire_versiona wire_version andalso
+      (equal_nata wire_purposea wire_purpose andalso
+        (equal_nata wire_deploymenta wire_deployment andalso
+          (equal_nata wire_source_domaina wire_source_domain andalso
+            (equal_nata wire_target_domaina wire_target_domain andalso
+              (equal_nata wire_principala wire_principal andalso
+                (equal_nata wire_key_numbera wire_key_number andalso
+                  (equal_nata wire_authority_epocha wire_authority_epoch andalso
+                    (equal_nata wire_sent_secondsa wire_sent_seconds andalso
+                      (equal_nata wire_ttl_secondsa wire_ttl_seconds andalso
+                        (equal_lista equal_nat wire_uuida wire_uuid andalso
+                          (equal_wire_familya wire_message_familya
+                             wire_message_family andalso
+                            (equal_nata wire_primary_codea
+                               wire_primary_code andalso
+                              (equal_option equal_nat wire_secondary_codea
+                                 wire_secondary_code andalso
+                                (equal_nata wire_signature_schemea
+                                   wire_signature_scheme andalso
+                                  (equal_wire_body_ext equal_unit
+                                     wire_operation_bodya
+                                     wire_operation_body andalso
+                                    (equal_nata wire_atomicitya
+                                       wire_atomicity andalso
+                                      (equal_nata wire_prioritya
+ wire_priority andalso
+(equal_nata wire_route_scopea wire_route_scope andalso
+  eq A_ morea more))))))))))))))))));
+
+fun sync_link_call_core
+  (Sync_link_original_ext
+    (sync_link_enclosed, sync_link_call_core, sync_link_request, more))
+  = sync_link_call_core;
+
+fun sync_link_enclosed
+  (Sync_link_original_ext
+    (sync_link_enclosed, sync_link_call_core, sync_link_request, more))
+  = sync_link_enclosed;
+
+fun sync_link_request
+  (Sync_link_original_ext
+    (sync_link_enclosed, sync_link_call_core, sync_link_request, more))
+  = sync_link_request;
+
+fun sync_call
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_call;
+
+fun sync_link_original_view
+  (Sync_link_ack_ext
+    (sync_link_exact_original, sync_link_original_view, sync_link_id,
+      sync_link_kind, sync_link_code, sync_link_commit, more))
+  = sync_link_original_view;
+
+fun sync_link_commit
+  (Sync_link_ack_ext
+    (sync_link_exact_original, sync_link_original_view, sync_link_id,
+      sync_link_kind, sync_link_code, sync_link_commit, more))
+  = sync_link_commit;
+
+fun reference_result_codes (A1_, A2_) kind committed =
+  (case kind
+    of Recorded_Result =>
+      (if committed
+        then atLeastAtMost (A1_, A2_)
+               (numeral
+                 ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                    semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_)
+                 (Bit0 (Bit1 (Bit0 One))))
+               (numeral
+                 ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                    semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_)
+                 (Bit0 (Bit0 (Bit1 (Bit1 One)))))
+        else sup_set A1_
+               (atLeastAtMost (A1_, A2_)
+                 (one ((one_numeral o numeral_semiring_numeral o
+                         semiring_numeral_semiring_1 o
+                         semiring_1_comm_semiring_1 o
+                         comm_semiring_1_comm_semiring_1_cancel o
+                         comm_semiring_1_cancel_interval)
+                        A2_))
+                 (numeral
+                   ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                      semiring_1_comm_semiring_1 o
+                      comm_semiring_1_comm_semiring_1_cancel o
+                      comm_semiring_1_cancel_interval)
+                     A2_)
+                   (Bit0 (Bit0 One))))
+               (atLeastAtMost (A1_, A2_)
+                 (numeral
+                   ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                      semiring_1_comm_semiring_1 o
+                      comm_semiring_1_comm_semiring_1_cancel o
+                      comm_semiring_1_cancel_interval)
+                     A2_)
+                   (Bit0 (Bit1 (Bit1 (Bit1 One)))))
+                 (numeral
+                   ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                      semiring_1_comm_semiring_1 o
+                      comm_semiring_1_comm_semiring_1_cancel o
+                      comm_semiring_1_cancel_interval)
+                     A2_)
+                   (Bit0 (Bit1 (Bit1 (Bit0 (Bit0 One))))))))
+    | Delivery_Refusal =>
+      (if committed then bot_set
+        else atLeastAtMost (A1_, A2_)
+               (numeral
+                 ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                    semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_)
+                 (Bit0 (Bit1 (Bit0 (Bit0 (Bit1 One))))))
+               (numeral
+                 ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                    semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_)
+                 (Bit0 (Bit0 (Bit0 (Bit1 (Bit1 One)))))))
+    | Validation_Refusal =>
+      (if committed then bot_set
+        else atLeastAtMost (A1_, A2_)
+               (numeral
+                 ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                    semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_)
+                 (Bit0 (Bit1 (Bit1 (Bit0 (Bit0 (Bit0 One)))))))
+               (numeral
+                 ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                    semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_)
+                 (Bit1 (Bit0 (Bit1 (Bit1 (Bit0 (Bit0 One)))))))));
+
+fun code_known_response_number (A1_, A2_) number =
+  member A1_ number
+    (sup_set A1_
+      (sup_set A1_
+        (sup_set A1_ (reference_result_codes (A1_, A2_) Recorded_Result true)
+          (reference_result_codes (A1_, A2_) Recorded_Result false))
+        (reference_result_codes (A1_, A2_) Delivery_Refusal false))
+      (reference_result_codes (A1_, A2_) Validation_Refusal false));
+
+fun code_decode_response_status kind number committed =
+  (if code_known_response_number (equal_nat, interval_nat) number
+    then (if member equal_nat number
+               (reference_result_codes (equal_nat, interval_nat) kind committed)
+           then SOME (Code_Known_Response (kind, number)) else NONE)
+    else (if not (equal_reference_response_kind kind Recorded_Result) andalso
+               committed
+           then NONE else SOME (Code_Unknown_Response (kind, number))));
+
+fun sync_link_kind
+  (Sync_link_ack_ext
+    (sync_link_exact_original, sync_link_original_view, sync_link_id,
+      sync_link_kind, sync_link_code, sync_link_commit, more))
+  = sync_link_kind;
+
+fun sync_link_code
+  (Sync_link_ack_ext
+    (sync_link_exact_original, sync_link_original_view, sync_link_id,
+      sync_link_kind, sync_link_code, sync_link_commit, more))
+  = sync_link_code;
+
+fun reference_result_targets code =
+  (if equal_nata code (nat_of_integer (10 : IntInf.int))
+    then insert (equal_prod equal_wire_family equal_nat) (Wire_Lock, one_nata)
+           bot_set
+    else (if equal_nata code (nat_of_integer (11 : IntInf.int))
+           then insert (equal_prod equal_wire_family equal_nat)
+                  (Wire_Lock, nat_of_integer (2 : IntInf.int)) bot_set
+           else (if member equal_nat code
+                      (insert equal_nat (nat_of_integer (4 : IntInf.int))
+                        (insert equal_nat (nat_of_integer (12 : IntInf.int))
+                          bot_set))
+                  then insert (equal_prod equal_wire_family equal_nat)
+                         (Wire_State_Sync, one_nata) bot_set
+                  else (if equal_nata code (nat_of_integer (13 : IntInf.int))
+                         then insert (equal_prod equal_wire_family equal_nat)
+                                (Wire_Lock, nat_of_integer (3 : IntInf.int))
+                                (insert (equal_prod equal_wire_family equal_nat)
+                                  (Wire_Lock, nat_of_integer (4 : IntInf.int))
+                                  bot_set)
+                         else (if equal_nata code
+                                    (nat_of_integer (14 : IntInf.int))
+                                then insert
+                                       (equal_prod equal_wire_family equal_nat)
+                                       (Wire_Lock,
+ nat_of_integer (5 : IntInf.int))
+                                       bot_set
+                                else (if equal_nata code
+   (nat_of_integer (15 : IntInf.int))
+                                       then insert
+      (equal_prod equal_wire_family equal_nat)
+      (Wire_Lock, nat_of_integer (8 : IntInf.int)) bot_set
+                                       else (if member equal_nat code
+          (insert equal_nat (nat_of_integer (16 : IntInf.int))
+            (insert equal_nat (nat_of_integer (21 : IntInf.int))
+              (insert equal_nat (nat_of_integer (23 : IntInf.int)) bot_set)))
+      then insert (equal_prod equal_wire_family equal_nat)
+             (Wire_State_Sync, nat_of_integer (2 : IntInf.int)) bot_set
+      else (if member equal_nat code
+                 (insert equal_nat (nat_of_integer (17 : IntInf.int))
+                   (insert equal_nat (nat_of_integer (24 : IntInf.int))
+                     bot_set))
+             then insert (equal_prod equal_wire_family equal_nat)
+                    (Wire_State_Sync, nat_of_integer (3 : IntInf.int)) bot_set
+             else (if equal_nata code (nat_of_integer (18 : IntInf.int))
+                    then insert (equal_prod equal_wire_family equal_nat)
+                           (Wire_Lock, nat_of_integer (6 : IntInf.int)) bot_set
+                    else (if member equal_nat code
+                               (insert equal_nat
+                                 (nat_of_integer (19 : IntInf.int))
+                                 (insert equal_nat
+                                   (nat_of_integer (25 : IntInf.int)) bot_set))
+                           then insert (equal_prod equal_wire_family equal_nat)
+                                  (Wire_State_Sync,
+                                    nat_of_integer (4 : IntInf.int))
+                                  bot_set
+                           else (if equal_nata code
+                                      (nat_of_integer (20 : IntInf.int))
+                                  then insert
+ (equal_prod equal_wire_family equal_nat)
+ (Wire_Lock, nat_of_integer (7 : IntInf.int)) bot_set
+                                  else (if equal_nata code
+     (nat_of_integer (22 : IntInf.int))
+ then insert (equal_prod equal_wire_family equal_nat)
+        (Wire_State_Sync, nat_of_integer (5 : IntInf.int)) bot_set
+ else (if equal_nata code (nat_of_integer (26 : IntInf.int))
+        then insert (equal_prod equal_wire_family equal_nat)
+               (Wire_Regulatory, one_nata) bot_set
+        else (if equal_nata code (nat_of_integer (27 : IntInf.int))
+               then insert (equal_prod equal_wire_family equal_nat)
+                      (Wire_Regulatory, nat_of_integer (2 : IntInf.int)) bot_set
+               else (if equal_nata code (nat_of_integer (28 : IntInf.int))
+                      then insert (equal_prod equal_wire_family equal_nat)
+                             (Wire_State_Sync, nat_of_integer (6 : IntInf.int))
+                             (insert (equal_prod equal_wire_family equal_nat)
+                               (Wire_Regulatory,
+                                 nat_of_integer (3 : IntInf.int))
+                               bot_set)
+                      else (if member equal_nat code
+                                 (atLeastAtMost (equal_nat, interval_nat)
+                                   (nat_of_integer (30 : IntInf.int))
+                                   (nat_of_integer (38 : IntInf.int)))
+                             then insert
+                                    (equal_prod equal_wire_family equal_nat)
+                                    (Wire_Regulatory, one_nata)
+                                    (insert
+                                      (equal_prod equal_wire_family equal_nat)
+                                      (Wire_Regulatory,
+nat_of_integer (2 : IntInf.int))
+                                      bot_set)
+                             else bot_set))))))))))))))));
+
+fun reference_response_compatible family opcode kind code committed =
+  member equal_nat code
+    (reference_result_codes (equal_nat, interval_nat) kind committed) andalso
+    (member (equal_prod equal_wire_family equal_nat) (family, opcode)
+       (reference_result_targets code) orelse
+      (not (equal_reference_response_kind kind Recorded_Result) orelse
+        member equal_nat code
+          (insert equal_nat one_nata
+            (insert equal_nat (nat_of_integer (2 : IntInf.int))
+              (insert equal_nat (nat_of_integer (3 : IntInf.int))
+                bot_set)))) andalso
+        (equal_wire_familya family Wire_State_Sync andalso
+           member equal_nat opcode
+             (atLeastAtMost (equal_nat, interval_nat) one_nata
+               (nat_of_integer (6 : IntInf.int))) orelse
+          (equal_wire_familya family Wire_Regulatory andalso
+             member equal_nat opcode
+               (atLeastAtMost (equal_nat, interval_nat) one_nata
+                 (nat_of_integer (3 : IntInf.int))) orelse
+            equal_wire_familya family Wire_Lock andalso
+              member equal_nat opcode
+                (atLeastAtMost (equal_nat, interval_nat) one_nata
+                  (nat_of_integer (8 : IntInf.int))))));
+
+fun code_response_call_shape (A1_, A2_) family operation =
+  equal_wire_familya family Wire_State_Sync andalso
+    member A1_ operation
+      (atLeastAtMost (A1_, A2_)
+        (one ((one_numeral o numeral_semiring_numeral o
+                semiring_numeral_semiring_1 o semiring_1_comm_semiring_1 o
+                comm_semiring_1_comm_semiring_1_cancel o
+                comm_semiring_1_cancel_interval)
+               A2_))
+        (numeral
+          ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+             semiring_1_comm_semiring_1 o
+             comm_semiring_1_comm_semiring_1_cancel o
+             comm_semiring_1_cancel_interval)
+            A2_)
+          (Bit0 (Bit1 One)))) orelse
+    (equal_wire_familya family Wire_Regulatory andalso
+       member A1_ operation
+         (atLeastAtMost (A1_, A2_)
+           (one ((one_numeral o numeral_semiring_numeral o
+                   semiring_numeral_semiring_1 o semiring_1_comm_semiring_1 o
+                   comm_semiring_1_comm_semiring_1_cancel o
+                   comm_semiring_1_cancel_interval)
+                  A2_))
+           (numeral
+             ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                semiring_1_comm_semiring_1 o
+                comm_semiring_1_comm_semiring_1_cancel o
+                comm_semiring_1_cancel_interval)
+               A2_)
+             (Bit1 One))) orelse
+      equal_wire_familya family Wire_Lock andalso
+        member A1_ operation
+          (atLeastAtMost (A1_, A2_)
+            (one ((one_numeral o numeral_semiring_numeral o
+                    semiring_numeral_semiring_1 o semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_))
+            (numeral
+              ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                 semiring_1_comm_semiring_1 o
+                 comm_semiring_1_comm_semiring_1_cancel o
+                 comm_semiring_1_cancel_interval)
+                A2_)
+              (Bit0 (Bit0 (Bit0 One))))));
+
+fun code_response_compatible family operation kind number committed =
+  (if code_known_response_number (equal_nat, interval_nat) number
+    then reference_response_compatible family operation kind number committed
+    else code_response_call_shape (equal_nat, interval_nat) family
+           operation andalso
+           (equal_reference_response_kind kind Recorded_Result orelse
+             not committed));
+
+fun equal_bool false p = not p
+  | equal_bool true p = p
+  | equal_bool p false = not p
+  | equal_bool p true = p;
+
+fun sync_added_status (A1_, A2_) number =
+  member A1_ number
+    (insert A1_ (numeral A2_ (Bit1 (Bit0 (Bit1 (Bit1 One)))))
+      (insert A1_ (numeral A2_ (Bit1 (Bit1 (Bit1 (Bit0 (Bit0 One))))))
+        (insert A1_ (numeral A2_ (Bit0 (Bit0 (Bit0 (Bit1 (Bit0 One))))))
+          (insert A1_ (numeral A2_ (Bit1 (Bit0 (Bit0 (Bit1 (Bit0 One))))))
+            bot_set))));
+
+fun sync_known_response_compatible original kind number committed =
+  (if sync_added_status (equal_nat, numeral_nat) number
+    then equal_proda equal_wire_family equal_nat (sync_operation original)
+           (Wire_State_Sync, nat_of_integer (7 : IntInf.int)) andalso
+           (equal_reference_response_kind kind Recorded_Result andalso
+             equal_bool committed
+               (equal_nata number (nat_of_integer (29 : IntInf.int))))
+    else (if equal_proda equal_wire_family equal_nat (sync_operation original)
+               (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+           then (if code_known_response_number (equal_nat, interval_nat) number
+                  then member equal_nat number
+                         (reference_result_codes (equal_nat, interval_nat) kind
+                           committed) andalso
+                         (not (equal_reference_response_kind kind
+                                Recorded_Result) orelse
+                           member equal_nat number
+                             (insert equal_nat one_nata
+                               (insert equal_nat
+                                 (nat_of_integer (2 : IntInf.int))
+                                 (insert equal_nat
+                                   (nat_of_integer (3 : IntInf.int)) bot_set))))
+                  else equal_reference_response_kind kind Recorded_Result orelse
+                         not committed)
+           else code_response_compatible (wire_message_family original)
+                  (wire_opcode (wire_operation_body original)) kind number
+                  committed));
+
+fun sync_link_response_status view =
+  let
+    val kind = sync_link_kind view;
+    val code = sync_link_code view;
+    val committed = not (is_none (sync_link_commit view));
+  in
+    (if not (sync_known_response_compatible
+              (sync_link_call_core (sync_link_original_view view)) kind code
+              committed)
+      then NONE
+      else (if sync_added_status (equal_nat, numeral_nat) code
+             then SOME (Code_Known_Response (kind, code))
+             else code_decode_response_status kind code committed))
+  end;
+
+fun sync_link_response_header outer enclosed caller =
+  equal_nata (wire_version outer) (wire_version enclosed) andalso
+    (equal_nata (wire_deployment outer) (wire_deployment enclosed) andalso
+      (equal_nata (wire_principal enclosed) (fst caller) andalso
+        (equal_nata (wire_source_domain outer)
+           (wire_target_domain enclosed) andalso
+          equal_nata (wire_target_domain outer)
+            (wire_source_domain enclosed))));
+
+fun code_same_original core original =
+  equal_nata (wire_deployment core) (wire_deployment original) andalso
+    (equal_nata (wire_source_domain core) (wire_source_domain original) andalso
+      (equal_nata (wire_target_domain core)
+         (wire_target_domain original) andalso
+        (equal_nata (wire_principal core) (wire_principal original) andalso
+          (equal_nata (wire_authority_epoch core)
+             (wire_authority_epoch original) andalso
+            equal_nata (wire_version original)
+              (nat_of_integer (6 : IntInf.int))))));
+
+fun sync_link_finish_parse raw_status outer raw original caller kind code commit
+  = let
+      val enclosed = sync_link_enclosed original;
+      val inner = sync_link_call_core original;
+      val committed = not (is_none commit);
+      val view =
+        Sync_link_ack_ext (raw, original, caller, kind, code, commit, ());
+    in
+      (if not (equal_reference_response_kind kind Recorded_Result) andalso
+            committed orelse
+            raw_status andalso
+              (sync_added_status (equal_nat, numeral_nat) code andalso
+                (not (equal_reference_response_kind kind Recorded_Result) orelse
+                  not (equal_bool committed
+                        (equal_nata code (nat_of_integer (29 : IntInf.int))))))
+        then Inl Invalid_Wire_Format
+        else (if not (sync_link_response_header outer enclosed caller)
+               then Inl Invalid_Wire_Source
+               else (if not (equal_wire_core_ext equal_unit enclosed
+                              inner) andalso
+                          not (code_same_original enclosed inner)
+                      then Inl Invalid_Wire_Source
+                      else (if not (equal_proda equal_nat equal_nat caller
+                                     (sync_call (sync_link_request original)))
+                             then Inl Invalid_Wire_Format
+                             else (if raw_status andalso
+is_none (sync_link_response_status view)
+                                    then Inl Invalid_Wire_Format
+                                    else Inr view)))))
+    end;
+
+fun sync_receipt_request
+  (Sync_receipt_original_ext
+    (sync_receipt_session, sync_receipt_exact_core, sync_receipt_inner,
+      sync_receipt_request, more))
+  = sync_receipt_request;
+
+fun sync_receipt_inner
+  (Sync_receipt_original_ext
+    (sync_receipt_session, sync_receipt_exact_core, sync_receipt_inner,
+      sync_receipt_request, more))
+  = sync_receipt_inner;
+
+fun equal_sync_mode Sync_Incremental Sync_Full = false
+  | equal_sync_mode Sync_Full Sync_Incremental = false
+  | equal_sync_mode Sync_Initial Sync_Full = false
+  | equal_sync_mode Sync_Full Sync_Initial = false
+  | equal_sync_mode Sync_Initial Sync_Incremental = false
+  | equal_sync_mode Sync_Incremental Sync_Initial = false
+  | equal_sync_mode Sync_Full Sync_Full = true
+  | equal_sync_mode Sync_Incremental Sync_Incremental = true
+  | equal_sync_mode Sync_Initial Sync_Initial = true;
+
+fun sync_mode_at tag =
+  (if equal_nata tag one_nata then SOME Sync_Initial
+    else (if equal_nata tag (nat_of_integer (2 : IntInf.int))
+           then SOME Sync_Incremental
+           else (if equal_nata tag (nat_of_integer (3 : IntInf.int))
+                  then SOME Sync_Full else NONE)));
+
+fun sync_read_operands core =
+  let
+    val body = wire_operation_body core;
+  in
+    (if not (equal_wire_familya (wire_message_family core)
+              Wire_State_Sync) orelse
+          (not (equal_nata (wire_opcode body)
+                 (nat_of_integer (7 : IntInf.int))) orelse
+            not (equal_wire_deadline (wire_deadline body) Deadline_Absent))
+      then NONE
+      else (case (wire_words body, wire_blobs body) of ([], _) => NONE
+             | ([_], _) => NONE | ([_, _], _) => NONE | ([_, _, _], _) => NONE
+             | ([_, _, _, _], _) => NONE | ([_, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _, _, _, _], []) => NONE
+             | ([_, _, _, _, _, _, _, _, _, _], [_]) => NONE
+             | ([_, _, _, _, _, _, _, _, _, _], [_, _]) => NONE
+             | ([message, call_sequence, session, revision_word, epoch, origin,
+                  event, asset, pos, mode],
+                 [commitment, prior, proof])
+               => bind (sync_mode_at mode)
+                    (fn m =>
+                      (if equal_nata (size_list commitment)
+                            (nat_of_integer (32 : IntInf.int)) andalso
+                            equal_nata (size_list prior)
+                              (if equal_sync_mode m Sync_Incremental
+                                then nat_of_integer (32 : IntInf.int)
+                                else zero_nata)
+                        then SOME (Sync_request_ext
+                                    ((wire_principal core, call_sequence),
+                                      message, session,
+                                      Product_cut_ext
+(wire_authority_epoch core, revision_word, ()),
+                                      (asset, origin),
+                                      Sync_entry_ext
+(commitment, pos, epoch, event, ()),
+                                      m, (if equal_sync_mode m Sync_Incremental
+   then SOME prior else NONE),
+                                      proof, ()))
+                        else NONE))
+             | ([_, _, _, _, _, _, _, _, _, _], _ :: _ :: _ :: _ :: _) => NONE
+             | (_ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _, _) =>
+               NONE))
+  end;
+
+fun sync_parse_query_eight fuel outer =
+  let
+    val body = wire_operation_body outer;
+  in
+    (if less_nat fuel (nat_of_integer (2 : IntInf.int)) orelse
+          (not (equal_proda equal_wire_family equal_nat (sync_operation outer)
+                 (Wire_Query, nat_of_integer (8 : IntInf.int))) orelse
+            not (equal_wire_deadline (wire_deadline body) Deadline_Absent))
+      then NONE
+      else (case (wire_words body, wire_blobs body) of ([], _) => NONE
+             | ([_], []) => NONE
+             | ([session], [raw]) =>
+               bind (sync_decode_core raw)
+                 (fn original =>
+                   map_option
+                     (fn request =>
+                       Sync_receipt_original_ext
+                         (session, raw, original, request, ()))
+                     (sync_read_operands original))
+             | ([_], _ :: _ :: _) => NONE | (_ :: _ :: _, _) => NONE))
+  end;
+
+fun sync_link_original_at fuel enclosed =
+  (if less_nat fuel (nat_of_integer (2 : IntInf.int)) then NONE
+    else (case sync_read_operands enclosed
+           of NONE =>
+             map_option
+               (fn receipt =>
+                 Sync_link_original_ext
+                   (enclosed, sync_receipt_inner receipt,
+                     sync_receipt_request receipt, ()))
+               (sync_parse_query_eight (minus_nata fuel one_nata) enclosed)
+           | SOME request =>
+             SOME (Sync_link_original_ext (enclosed, enclosed, request, ()))));
+
+fun sync_link_parse_ack raw_status fuel outer =
+  let
+    val body = wire_operation_body outer;
+  in
+    (if not (equal_proda equal_wire_family equal_nat (sync_operation outer)
+              (Wire_Ack, nat_of_integer (2 : IntInf.int))) orelse
+          not (equal_wire_deadline (wire_deadline body) Deadline_Absent)
+      then Inl Invalid_Wire_Format
+      else (case wire_blobs body of [] => Inl Invalid_Wire_Format
+             | [raw] =>
+               (case sync_decode_core raw of NONE => Inl Invalid_Wire_Format
+                 | SOME enclosed =>
+                   (case sync_link_original_at fuel enclosed
+                     of NONE => Inl Invalid_Wire_Format
+                     | SOME original =>
+                       (case response_result_words (wire_words body)
+                         of NONE => Inl Invalid_Wire_Format
+                         | SOME (caller, (kind, (a, b))) =>
+                           sync_link_finish_parse raw_status outer raw original
+                             caller kind a b)))
+             | _ :: _ :: _ => Inl Invalid_Wire_Format))
+  end;
+
+fun sync_link_exact_original
+  (Sync_link_ack_ext
+    (sync_link_exact_original, sync_link_original_view, sync_link_id,
+      sync_link_kind, sync_link_code, sync_link_commit, more))
+  = sync_link_exact_original;
+
+fun sync_link_id
+  (Sync_link_ack_ext
+    (sync_link_exact_original, sync_link_original_view, sync_link_id,
+      sync_link_kind, sync_link_code, sync_link_commit, more))
+  = sync_link_id;
+
+fun sync_response_kind_number A_ Recorded_Result = one (one_numeral A_)
+  | sync_response_kind_number A_ Delivery_Refusal = numeral A_ (Bit0 One)
+  | sync_response_kind_number A_ Validation_Refusal = numeral A_ (Bit1 One);
+
+fun sync_claimed_prior
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_claimed_prior;
+
+fun sync_attestation
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_attestation;
+
+fun sync_signed_cut
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_signed_cut;
+
+fun sync_origin_epoch
+  (Sync_entry_ext
+    (sync_commitment, sync_position, sync_origin_epoch, sync_event, more))
+  = sync_origin_epoch;
+
+fun sync_requested
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_requested;
+
+fun sync_commitment
+  (Sync_entry_ext
+    (sync_commitment, sync_position, sync_origin_epoch, sync_event, more))
+  = sync_commitment;
+
+fun sync_session
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_session;
+
+fun sync_message
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_message;
+
+fun sync_position
+  (Sync_entry_ext
+    (sync_commitment, sync_position, sync_origin_epoch, sync_event, more))
+  = sync_position;
+
+fun sync_mode
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_mode;
+
+fun sync_key
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_key;
+
+fun sync_event
+  (Sync_entry_ext
+    (sync_commitment, sync_position, sync_origin_epoch, sync_event, more))
+  = sync_event;
+
+fun sync_call_operand_ir request =
+  let
+    val item = sync_requested request;
+    val stream = sync_key request;
+  in
+    code_ir_node (nat_of_integer (22 : IntInf.int))
+      [code_ir_scalar (sync_message request), code_ir_pair (sync_call request),
+        code_ir_scalar (sync_session request),
+        code_ir_cut (sync_signed_cut request),
+        code_ir_scalar (sync_origin_epoch item),
+        code_ir_pair (snd stream, sync_event item), code_ir_scalar (fst stream),
+        code_ir_scalar (sync_position item),
+        code_ir_scalar (sync_mode_number (sync_mode request)),
+        code_ir_bytes (sync_commitment item),
+        code_ir_option code_ir_bytes (sync_claimed_prior request),
+        code_ir_bytes (sync_attestation request)]
+  end;
+
+fun sync_receipt_operand_ir session original request =
+  code_ir_node (nat_of_integer (15 : IntInf.int))
+    [code_ir_scalar session, code_ir_bytes (encode_wire_core original),
+      sync_call_operand_ir request];
+
+fun sync_enclosed_operand_ir original =
+  let
+    val enclosed = sync_link_enclosed original;
+    val effective = sync_link_call_core original;
+    val request = sync_link_request original;
+  in
+    (if equal_wire_core_ext equal_unit enclosed effective
+      then sync_call_operand_ir request
+      else sync_receipt_operand_ir
+             (hd (wire_words (wire_operation_body enclosed))) effective request)
+  end;
+
+fun sync_ack_operand_ir view =
+  code_ir_node (nat_of_integer (16 : IntInf.int))
+    [code_ir_pair (sync_link_id view),
+      code_ir_scalar
+        (sync_response_kind_number numeral_nat (sync_link_kind view)),
+      code_ir_scalar (sync_link_code view),
+      code_ir_option code_ir_scalar (sync_link_commit view),
+      code_ir_bytes (sync_link_exact_original view),
+      sync_enclosed_operand_ir (sync_link_original_view view)];
+
+fun sync_ack_wire_ir depth core =
+  (case sync_link_parse_ack true depth core of Inl a => Inl a
+    | Inr view => Inr (sync_ack_operand_ir view));
 
 fun boundary_asset_ttl_floor
   (Wire_boundary_ext
@@ -2153,16 +3161,6 @@ fun code_parse_enforcement_fields deadline words =
                             (officer, jurisdiction, basis, assets, prior,
                               code_product_deadline deadline, ()))))));
 
-fun equal_wire_deadline Deadline_Indefinite (Deadline_At x3) = false
-  | equal_wire_deadline (Deadline_At x3) Deadline_Indefinite = false
-  | equal_wire_deadline Deadline_Absent (Deadline_At x3) = false
-  | equal_wire_deadline (Deadline_At x3) Deadline_Absent = false
-  | equal_wire_deadline Deadline_Absent Deadline_Indefinite = false
-  | equal_wire_deadline Deadline_Indefinite Deadline_Absent = false
-  | equal_wire_deadline (Deadline_At x3) (Deadline_At y3) = equal_nata x3 y3
-  | equal_wire_deadline Deadline_Indefinite Deadline_Indefinite = true
-  | equal_wire_deadline Deadline_Absent Deadline_Absent = true;
-
 fun code_parse_spend_fields family deadline native =
   (case native_tail_words native of [] => NONE | [_] => NONE | [_, _] => NONE
     | [_, _, _] => NONE
@@ -2244,8 +3242,6 @@ fun code_take_varint_from fuel index input =
 
 fun code_take_varint bytes =
   code_take_varint_from (nat_of_integer (10 : IntInf.int)) zero_nata bytes;
-
-fun equal_prod A_ B_ (x1, x2) (y1, y2) = eq A_ x1 y1 andalso eq B_ x2 y2;
 
 val code_json_permissions : (char list) list =
   [[Chara (false, true, false, false, true, false, true, false),
@@ -2438,6 +3434,10 @@ fun code_json_grant x =
   code_json_triple code_json_u64 (code_json_enum code_json_routes)
     (code_json_enum code_json_permissions) x;
 
+fun sync_single_original core =
+  (case wire_blobs (wire_operation_body core) of [] => NONE
+    | [raw] => sync_decode_core raw | _ :: _ :: _ => NONE);
+
 fun code_compare_binding A_ retained exact =
   (case retained of NONE => Code_First
     | SOME bytes =>
@@ -2539,6 +3539,32 @@ else (if equal_nata opa (nat_of_integer (6 : IntInf.int))
                      | _ :: _ :: _ => NONE)
               else NONE))))))
                end))
+  end;
+
+fun sync_query_session
+  (Sync_query_ext (sync_query_session, sync_query_cut, sync_query_key, more)) =
+  sync_query_session;
+
+fun sync_query_key
+  (Sync_query_ext (sync_query_session, sync_query_cut, sync_query_key, more)) =
+  sync_query_key;
+
+fun sync_query_cut
+  (Sync_query_ext (sync_query_session, sync_query_cut, sync_query_key, more)) =
+  sync_query_cut;
+
+fun sync_query_operand_ir request =
+  let
+    val cut = sync_query_cut request;
+    val stream = sync_query_key request;
+  in
+    code_ir_node (nat_of_integer (13 : IntInf.int))
+      [code_ir_node (nat_of_integer (104 : IntInf.int))
+         [code_ir_scalar (sync_query_session request),
+           code_ir_scalar (cut_authority_epoch cut)],
+        code_ir_node (nat_of_integer (156 : IntInf.int))
+          [code_ir_cut cut, code_ir_scalar (fst stream),
+            code_ir_scalar (snd stream)]]
   end;
 
 fun code_json_write_permission x =
@@ -2870,6 +3896,13 @@ fun code_declared_version bytes =
                               else map_option fst
                                      (code_take_varint version_tail)))))));
 
+fun sync_direct_operand_ir depth core =
+  (if equal_nata depth zero_nata then NONE
+    else (if equal_proda equal_wire_family equal_nat (sync_operation core)
+               (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+           then map_option sync_call_operand_ir (sync_read_operands core)
+           else map_option sync_query_operand_ir (sync_read_query core)));
+
 fun json_context_endpoint
   (Code_json_endpoint_context_ext
     (json_context_endpoint, json_context_epoch, json_context_grants,
@@ -3083,145 +4116,39 @@ fun code_ir_native oip_binder_core oip_binder_native =
 fun proof_epoch (Session_proof_ext (proof_session, proof_epoch, more)) =
   proof_epoch;
 
-fun code_ir_command (Wire_Reserve oip_binder_value) =
-  code_ir_node (nat_of_integer (110 : IntInf.int))
-    [code_ir_scalar oip_binder_value]
-  | code_ir_command (Wire_Dispatch oip_binder_value) =
-    code_ir_node (nat_of_integer (111 : IntInf.int))
-      [code_ir_scalar oip_binder_value]
-  | code_ir_command (Wire_Debit oip_binder_value) =
-    code_ir_node (nat_of_integer (112 : IntInf.int))
-      [code_ir_scalar oip_binder_value]
-  | code_ir_command (Wire_Cancel oip_binder_value) =
-    code_ir_node (nat_of_integer (113 : IntInf.int))
-      [code_ir_scalar oip_binder_value]
-  | code_ir_command (Wire_Fence oip_binder_value) =
-    code_ir_node (nat_of_integer (114 : IntInf.int))
-      [code_ir_scalar oip_binder_value]
-  | code_ir_command (Wire_Preempt oip_binder_value) =
-    code_ir_node (nat_of_integer (115 : IntInf.int))
-      [code_ir_scalar oip_binder_value]
-  | code_ir_command (Wire_Timeout oip_binder_value) =
-    code_ir_node (nat_of_integer (116 : IntInf.int))
-      [code_ir_scalar oip_binder_value]
-  | code_ir_command
-    (Wire_Record_Terminal (oip_binder_kind, oip_binder_reference)) =
-    code_ir_node (nat_of_integer (117 : IntInf.int))
-      [code_ir_scalar oip_binder_kind, code_ir_scalar oip_binder_reference]
-  | code_ir_command (Wire_Deliver oip_binder_reference) =
-    code_ir_node (nat_of_integer (118 : IntInf.int))
-      [code_ir_scalar oip_binder_reference]
-  | code_ir_command (Wire_Refund (oip_binder_generation, oip_binder_reference))
-    = code_ir_node (nat_of_integer (119 : IntInf.int))
-        [code_ir_scalar oip_binder_generation,
-          code_ir_scalar oip_binder_reference]
-  | code_ir_command
-    (Wire_Reconcile (oip_binder_generation, oip_binder_reference)) =
-    code_ir_node (nat_of_integer (120 : IntInf.int))
-      [code_ir_scalar oip_binder_generation,
-        code_ir_scalar oip_binder_reference]
-  | code_ir_command (Wire_Write (oip_binder_generation, oip_binder_value)) =
-    code_ir_node (nat_of_integer (121 : IntInf.int))
-      [code_ir_scalar oip_binder_generation, code_ir_scalar oip_binder_value]
-  | code_ir_command Wire_Publish =
-    code_ir_node (nat_of_integer (122 : IntInf.int)) [];
+fun sync_direct_added_original core =
+  (case sync_single_original core of NONE => false
+    | SOME a => sync_added_operation a);
 
-fun scheduled_ack_destination
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_destination;
+fun sync_ack_has_added_original core =
+  (case sync_single_original core of NONE => false
+    | SOME original =>
+      sync_added_operation original orelse
+        equal_proda equal_wire_family equal_nat (sync_operation original)
+          (Wire_Query, nat_of_integer (8 : IntInf.int)) andalso
+          sync_direct_added_original original);
 
-fun scheduled_ack_recipient
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_recipient;
+fun sync_receipt_session
+  (Sync_receipt_original_ext
+    (sync_receipt_session, sync_receipt_exact_core, sync_receipt_inner,
+      sync_receipt_request, more))
+  = sync_receipt_session;
 
-fun scheduled_ack_target
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_target;
+fun sync_query_eight_wire_ir depth core =
+  (case sync_parse_query_eight depth core of NONE => Inl Invalid_Wire_Format
+    | SOME receipt =>
+      Inr (sync_receipt_operand_ir (sync_receipt_session receipt)
+            (sync_receipt_inner receipt) (sync_receipt_request receipt)));
 
-fun scheduled_ack_amount
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_amount;
-
-fun scheduled_ack_owner
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_owner;
-
-fun scheduled_ack_epoch
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_epoch;
-
-fun scheduled_ack_asset
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_asset;
-
-fun scheduled_ack_kind
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_kind;
-
-fun scheduled_ack_key
-  (Native_scheduled_ack_ext
-    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
-      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
-      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
-  = scheduled_ack_key;
-
-fun code_ir_ack oip_binder_ack =
-  code_ir_node (nat_of_integer (17 : IntInf.int))
-    [code_ir_node (nat_of_integer (105 : IntInf.int))
-       [code_ir_pair (fst (scheduled_ack_key oip_binder_ack)),
-         code_ir_scalar (snd (scheduled_ack_key oip_binder_ack)),
-         code_ir_scalar (scheduled_ack_target oip_binder_ack),
-         code_ir_scalar (scheduled_ack_asset oip_binder_ack),
-         code_ir_scalar (scheduled_ack_owner oip_binder_ack),
-         code_ir_scalar (scheduled_ack_destination oip_binder_ack),
-         code_ir_scalar (scheduled_ack_recipient oip_binder_ack),
-         code_ir_scalar (scheduled_ack_amount oip_binder_ack),
-         code_ir_scalar (scheduled_ack_epoch oip_binder_ack),
-         code_ir_scalar
-           (case scheduled_ack_kind oip_binder_ack
-             of Confirmed_Decision => one_nata
-             | Reversed_Decision => nat_of_integer (2 : IntInf.int))]];
-
-fun token_asset
-  (Product_lock_token_ext (token_asset, token_owner, token_generation, more)) =
-  token_asset;
-
-fun token_owner
-  (Product_lock_token_ext (token_asset, token_owner, token_generation, more)) =
-  token_owner;
-
-fun code_integer_reply (Code_Transport_First, binding) =
-  ((0 : IntInf.int), map_option (map integer_of_nat) binding)
-  | code_integer_reply (Code_Transport_Identical, binding) =
-    ((1 : IntInf.int), map_option (map integer_of_nat) binding)
-  | code_integer_reply (Code_Transport_Refusal number, binding) =
-    (integer_of_nat number, map_option (map integer_of_nat) binding)
-  | code_integer_reply (Code_Transport_Pending, binding) =
-    ((~1 : IntInf.int), map_option (map integer_of_nat) binding);
+fun sync_selected_nested_ir depth core =
+  (if equal_proda equal_wire_family equal_nat (sync_operation core)
+        (Wire_Query, nat_of_integer (8 : IntInf.int)) andalso
+        sync_direct_added_original core
+    then SOME (sync_query_eight_wire_ir depth core)
+    else (if equal_proda equal_wire_family equal_nat (sync_operation core)
+               (Wire_Ack, nat_of_integer (2 : IntInf.int)) andalso
+               sync_ack_has_added_original core
+           then SOME (sync_ack_wire_ir depth core) else NONE));
 
 fun code_decode_query_nonreceipt core =
   (if not (equal_wire_deadline (wire_deadline (wire_operation_body core))
@@ -3370,29 +4297,6 @@ fun code_decode_governance core =
              | (_ :: _ :: _, _ :: _ :: _ :: _ :: _) => NONE))
   end;
 
-fun response_kind_at number =
-  (if equal_nata number one_nata then SOME Recorded_Result
-    else (if equal_nata number (nat_of_integer (2 : IntInf.int))
-           then SOME Delivery_Refusal
-           else (if equal_nata number (nat_of_integer (3 : IntInf.int))
-                  then SOME Validation_Refusal else NONE)));
-
-fun response_result_words words =
-  (case words of [] => NONE | [_] => NONE | [_, _] => NONE | [_, _, _] => NONE
-    | [_, _, _, _] => NONE
-    | [namespace, sequence, kind, code, present] =>
-      (if equal_nata present zero_nata
-        then map_option (fn tag => ((namespace, sequence), (tag, (code, NONE))))
-               (response_kind_at kind)
-        else NONE)
-    | [namespace, sequence, kind, code, present, revision] =>
-      (if equal_nata present one_nata
-        then map_option
-               (fn tag => ((namespace, sequence), (tag, (code, SOME revision))))
-               (response_kind_at kind)
-        else NONE)
-    | _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ => NONE);
-
 fun json_session_principal
   (Code_json_session_binding_ext
     (json_session_principal, json_session_epoch, more))
@@ -3492,6 +4396,14 @@ fun token_generation
   (Product_lock_token_ext (token_asset, token_owner, token_generation, more)) =
   token_generation;
 
+fun token_owner
+  (Product_lock_token_ext (token_asset, token_owner, token_generation, more)) =
+  token_owner;
+
+fun token_asset
+  (Product_lock_token_ext (token_asset, token_owner, token_generation, more)) =
+  token_asset;
+
 fun code_ir_credential oip_binder_credential =
   let
     val oip_binder_token = credential_token oip_binder_credential;
@@ -3503,6 +4415,49 @@ fun code_ir_credential oip_binder_credential =
         code_ir_scalar (credential_epoch oip_binder_credential),
         code_ir_pair (credential_origin oip_binder_credential)]
   end;
+
+fun code_ir_command (Wire_Reserve oip_binder_value) =
+  code_ir_node (nat_of_integer (110 : IntInf.int))
+    [code_ir_scalar oip_binder_value]
+  | code_ir_command (Wire_Dispatch oip_binder_value) =
+    code_ir_node (nat_of_integer (111 : IntInf.int))
+      [code_ir_scalar oip_binder_value]
+  | code_ir_command (Wire_Debit oip_binder_value) =
+    code_ir_node (nat_of_integer (112 : IntInf.int))
+      [code_ir_scalar oip_binder_value]
+  | code_ir_command (Wire_Cancel oip_binder_value) =
+    code_ir_node (nat_of_integer (113 : IntInf.int))
+      [code_ir_scalar oip_binder_value]
+  | code_ir_command (Wire_Fence oip_binder_value) =
+    code_ir_node (nat_of_integer (114 : IntInf.int))
+      [code_ir_scalar oip_binder_value]
+  | code_ir_command (Wire_Preempt oip_binder_value) =
+    code_ir_node (nat_of_integer (115 : IntInf.int))
+      [code_ir_scalar oip_binder_value]
+  | code_ir_command (Wire_Timeout oip_binder_value) =
+    code_ir_node (nat_of_integer (116 : IntInf.int))
+      [code_ir_scalar oip_binder_value]
+  | code_ir_command
+    (Wire_Record_Terminal (oip_binder_kind, oip_binder_reference)) =
+    code_ir_node (nat_of_integer (117 : IntInf.int))
+      [code_ir_scalar oip_binder_kind, code_ir_scalar oip_binder_reference]
+  | code_ir_command (Wire_Deliver oip_binder_reference) =
+    code_ir_node (nat_of_integer (118 : IntInf.int))
+      [code_ir_scalar oip_binder_reference]
+  | code_ir_command (Wire_Refund (oip_binder_generation, oip_binder_reference))
+    = code_ir_node (nat_of_integer (119 : IntInf.int))
+        [code_ir_scalar oip_binder_generation,
+          code_ir_scalar oip_binder_reference]
+  | code_ir_command
+    (Wire_Reconcile (oip_binder_generation, oip_binder_reference)) =
+    code_ir_node (nat_of_integer (120 : IntInf.int))
+      [code_ir_scalar oip_binder_generation,
+        code_ir_scalar oip_binder_reference]
+  | code_ir_command (Wire_Write (oip_binder_generation, oip_binder_value)) =
+    code_ir_node (nat_of_integer (121 : IntInf.int))
+      [code_ir_scalar oip_binder_generation, code_ir_scalar oip_binder_value]
+  | code_ir_command Wire_Publish =
+    code_ir_node (nat_of_integer (122 : IntInf.int)) [];
 
 fun code_typed_ordinary_ir oip_binder_core =
   (case code_decode_ordinary oip_binder_core of Code_Ordinary_Refused _ => NONE
@@ -3875,34 +4830,13 @@ fun code_typed_legal_ir oip_binder_core =
                   code_ir_legal_fields oip_binder_order,
                   code_ir_bytes oip_binder_proof]));
 
-fun equal_reference_response_kind Delivery_Refusal Validation_Refusal = false
-  | equal_reference_response_kind Validation_Refusal Delivery_Refusal = false
-  | equal_reference_response_kind Recorded_Result Validation_Refusal = false
-  | equal_reference_response_kind Validation_Refusal Recorded_Result = false
-  | equal_reference_response_kind Recorded_Result Delivery_Refusal = false
-  | equal_reference_response_kind Delivery_Refusal Recorded_Result = false
-  | equal_reference_response_kind Validation_Refusal Validation_Refusal = true
-  | equal_reference_response_kind Delivery_Refusal Delivery_Refusal = true
-  | equal_reference_response_kind Recorded_Result Recorded_Result = true;
-
 fun code_response_commit_matches position revision =
   (case position of NONE => true
     | SOME retained => equal_nata retained revision);
 
-fun code_same_original core original =
-  equal_nata (wire_deployment core) (wire_deployment original) andalso
-    (equal_nata (wire_source_domain core) (wire_source_domain original) andalso
-      (equal_nata (wire_target_domain core)
-         (wire_target_domain original) andalso
-        (equal_nata (wire_principal core) (wire_principal original) andalso
-          (equal_nata (wire_authority_epoch core)
-             (wire_authority_epoch original) andalso
-            equal_nata (wire_version original)
-              (nat_of_integer (6 : IntInf.int))))));
-
 fun code_check_nested_response nested (Code_Nested_Ordinary (native, command))
   call_id position =
-  (if not (equal_prod equal_nat equal_nat (native_id native) call_id) orelse
+  (if not (equal_proda equal_nat equal_nat (native_id native) call_id) orelse
         (case command of Wire_Reserve _ => false | Wire_Dispatch _ => false
           | Wire_Debit _ => true | Wire_Cancel _ => false
           | Wire_Fence _ => false | Wire_Preempt _ => false
@@ -3915,11 +4849,11 @@ fun code_check_nested_response nested (Code_Nested_Ordinary (native, command))
     then SOME Invalid_Wire_Format else NONE)
   | code_check_nested_response nested (Code_Nested_Legal nested_id) call_id
     position =
-    (if not (equal_prod equal_nat equal_nat nested_id call_id)
+    (if not (equal_proda equal_nat equal_nat nested_id call_id)
       then SOME Invalid_Wire_Format else NONE)
   | code_check_nested_response nested (Code_Nested_Spend nested_id) call_id
     position =
-    (if not (equal_prod equal_nat equal_nat nested_id call_id)
+    (if not (equal_proda equal_nat equal_nat nested_id call_id)
       then SOME Invalid_Wire_Format else NONE)
   | code_check_nested_response nested (Code_Nested_Receipt original) call_id
     position =
@@ -3927,7 +4861,7 @@ fun code_check_nested_response nested (Code_Nested_Ordinary (native, command))
       else (case code_native_call_prefix original
              of NONE => SOME Invalid_Wire_Format
              | SOME native =>
-               (if not (equal_prod equal_nat equal_nat (native_id native)
+               (if not (equal_proda equal_nat equal_nat (native_id native)
                          call_id) orelse
                      equal_wire_familya (wire_message_family original)
                        Wire_State_Sync andalso
@@ -4051,6 +4985,86 @@ fun code_decode_operand_tree fuel core =
                else Code_Tree_Refused Invalid_Wire_Format)))))))
          end);
 
+fun scheduled_ack_destination
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_destination;
+
+fun scheduled_ack_recipient
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_recipient;
+
+fun scheduled_ack_target
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_target;
+
+fun scheduled_ack_amount
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_amount;
+
+fun scheduled_ack_owner
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_owner;
+
+fun scheduled_ack_epoch
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_epoch;
+
+fun scheduled_ack_asset
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_asset;
+
+fun scheduled_ack_kind
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_kind;
+
+fun scheduled_ack_key
+  (Native_scheduled_ack_ext
+    (scheduled_ack_key, scheduled_ack_target, scheduled_ack_asset,
+      scheduled_ack_owner, scheduled_ack_destination, scheduled_ack_recipient,
+      scheduled_ack_amount, scheduled_ack_epoch, scheduled_ack_kind, more))
+  = scheduled_ack_key;
+
+fun code_ir_ack oip_binder_ack =
+  code_ir_node (nat_of_integer (17 : IntInf.int))
+    [code_ir_node (nat_of_integer (105 : IntInf.int))
+       [code_ir_pair (fst (scheduled_ack_key oip_binder_ack)),
+         code_ir_scalar (snd (scheduled_ack_key oip_binder_ack)),
+         code_ir_scalar (scheduled_ack_target oip_binder_ack),
+         code_ir_scalar (scheduled_ack_asset oip_binder_ack),
+         code_ir_scalar (scheduled_ack_owner oip_binder_ack),
+         code_ir_scalar (scheduled_ack_destination oip_binder_ack),
+         code_ir_scalar (scheduled_ack_recipient oip_binder_ack),
+         code_ir_scalar (scheduled_ack_amount oip_binder_ack),
+         code_ir_scalar (scheduled_ack_epoch oip_binder_ack),
+         code_ir_scalar
+           (case scheduled_ack_kind oip_binder_ack
+             of Confirmed_Decision => one_nata
+             | Reversed_Decision => nat_of_integer (2 : IntInf.int))]];
+
 fun code_typed_operand_ir oip_binder_depth oip_binder_core =
   (if equal_nata oip_binder_depth zero_nata then NONE
     else (case code_decode_operand_tree oip_binder_depth oip_binder_core
@@ -4142,44 +5156,9 @@ fun code_typed_operand_ir oip_binder_depth oip_binder_core =
              end
            | Code_Tree_Pending => NONE));
 
-fun boundary_max_frame
-  (Wire_boundary_ext
-    (boundary_profile, boundary_deployment, boundary_source, boundary_target,
-      boundary_principal, boundary_key, boundary_epoch, boundary_route_scope,
-      boundary_now, boundary_asset_ttl_floor, boundary_future_skew,
-      boundary_max_frame, boundary_version_floor, boundary_critical_allowed,
-      boundary_threshold_supported, more))
-  = boundary_max_frame;
-
-fun code_check_declared_version bytes max_frame =
-  (if less_nat max_frame (size_list bytes) then SOME Invalid_Wire_Format
-    else (case code_declared_version bytes of NONE => NONE
-           | SOME version =>
-             (if not (equal_nata version (nat_of_integer (6 : IntInf.int)))
-               then SOME Unsupported_Wire_Version else NONE)));
-
-fun code_numeric_family_set numbers =
-  Set (maps (fn number =>
-              (case family_at_number number of NONE => []
-                | SOME family => [family]))
-        numbers);
-
-fun code_contract_boundary values version families atomicities schemes critical
-  = Wire_boundary_ext
-      (Negotiated_wire_profile_ext
-         (version, code_numeric_family_set families, Set atomicities,
-           Set schemes, ()),
-        nth values zero_nata, nth values one_nata,
-        nth values (nat_of_integer (2 : IntInf.int)),
-        nth values (nat_of_integer (3 : IntInf.int)),
-        nth values (nat_of_integer (4 : IntInf.int)),
-        nth values (nat_of_integer (5 : IntInf.int)),
-        nth values (nat_of_integer (6 : IntInf.int)),
-        nth values (nat_of_integer (7 : IntInf.int)),
-        nth values (nat_of_integer (8 : IntInf.int)),
-        nth values (nat_of_integer (9 : IntInf.int)),
-        nth values (nat_of_integer (10 : IntInf.int)),
-        nth values (nat_of_integer (11 : IntInf.int)), critical, false, ());
+fun sync_v061_operand_ir depth core =
+  (if sync_added_operation core then sync_direct_operand_ir depth core
+    else code_typed_operand_ir depth core);
 
 fun code_transport_refusal_number Invalid_Wire_Format =
   nat_of_integer (70 : IntInf.int)
@@ -4216,14 +5195,30 @@ fun code_transport_after_operands operand_check packet max_nesting prior =
     | Code_Operand_Refuse a => code_transport_refusal prior a
     | Code_Operand_Pending => (Code_Transport_Pending, prior));
 
-fun code_transport_oracle operand_check bytes authority max_nesting
-  signature_valid attestation_valid prior =
+fun code_check_declared_version bytes max_frame =
+  (if less_nat max_frame (size_list bytes) then SOME Invalid_Wire_Format
+    else (case code_declared_version bytes of NONE => NONE
+           | SOME version =>
+             (if not (equal_nata version (nat_of_integer (6 : IntInf.int)))
+               then SOME Unsupported_Wire_Version else NONE)));
+
+fun boundary_max_frame
+  (Wire_boundary_ext
+    (boundary_profile, boundary_deployment, boundary_source, boundary_target,
+      boundary_principal, boundary_key, boundary_epoch, boundary_route_scope,
+      boundary_now, boundary_asset_ttl_floor, boundary_future_skew,
+      boundary_max_frame, boundary_version_floor, boundary_critical_allowed,
+      boundary_threshold_supported, more))
+  = boundary_max_frame;
+
+fun sync_transport_oracle operand_check raw authority depth signature_valid
+  attestation_valid prior =
   (if not (equal_nata (negotiated_version (boundary_profile authority))
             (nat_of_integer (6 : IntInf.int)))
     then code_transport_refusal prior Unsupported_Wire_Version
-    else (case code_check_declared_version bytes (boundary_max_frame authority)
+    else (case code_check_declared_version raw (boundary_max_frame authority)
            of NONE =>
-             (case decode_wire_packet bytes
+             (case sync_decode_packet raw
                of NONE => code_transport_refusal prior Invalid_Wire_Format
                | SOME packet =>
                  (case code_admit_packet
@@ -4233,16 +5228,115 @@ fun code_transport_oracle operand_check bytes authority max_nesting
                      (if not attestation_valid
                        then code_transport_refusal prior Invalid_Wire_Source
                        else code_transport_after_operands operand_check packet
-                              max_nesting prior)
+                              depth prior)
                    | SOME a => code_transport_refusal prior a))
            | SOME a => code_transport_refusal prior a));
 
-fun code_integer_u64_values values =
+fun code_integer_reply (Code_Transport_First, binding) =
+  ((0 : IntInf.int), map_option (map integer_of_nat) binding)
+  | code_integer_reply (Code_Transport_Identical, binding) =
+    ((1 : IntInf.int), map_option (map integer_of_nat) binding)
+  | code_integer_reply (Code_Transport_Refusal number, binding) =
+    (integer_of_nat number, map_option (map integer_of_nat) binding)
+  | code_integer_reply (Code_Transport_Pending, binding) =
+    ((~1 : IntInf.int), map_option (map integer_of_nat) binding);
+
+fun sync_ack_uses_added_number core =
+  (case response_result_words (wire_words (wire_operation_body core))
+    of NONE => false
+    | SOME (_, (_, (code, _))) =>
+      sync_added_status (equal_nat, numeral_nat) code);
+
+fun sync_v061_full_operand_ir depth core =
+  (case sync_selected_nested_ir depth core
+    of NONE =>
+      (if equal_proda equal_wire_family equal_nat (sync_operation core)
+            (Wire_Ack, nat_of_integer (2 : IntInf.int)) andalso
+            sync_ack_uses_added_number core
+        then NONE else sync_v061_operand_ir depth core)
+    | SOME (Inl _) => NONE | SOME (Inr a) => SOME a);
+
+fun sync_legacy_ack_new_number depth core =
+  (if less_eq_nat depth one_nata orelse
+        not (equal_wire_deadline (wire_deadline (wire_operation_body core))
+              Deadline_Absent)
+    then Code_Operand_Refuse Invalid_Wire_Format
+    else (case sync_single_original core
+           of NONE => Code_Operand_Refuse Invalid_Wire_Format
+           | SOME original =>
+             (case code_decode_operand_tree (minus_nata depth one_nata) original
+               of Code_Tree_Refused a => Code_Operand_Refuse a
+               | Code_Tree_Ready decoded =>
+                 (case response_result_words
+                         (wire_words (wire_operation_body core))
+                   of NONE => Code_Operand_Refuse Invalid_Wire_Format
+                   | SOME (_, (kind, (code, position))) =>
+                     (if not (equal_reference_response_kind kind
+                               Recorded_Result) orelse
+                           not (equal_bool (not (is_none position))
+                                 (equal_nata code
+                                   (nat_of_integer (29 : IntInf.int))))
+                       then Code_Operand_Refuse Invalid_Wire_Format
+                       else (case code_response_tree_finish core original
+                                    decoded
+                              of Code_Tree_Refused a => Code_Operand_Refuse a
+                              | Code_Tree_Ready _ =>
+                                Code_Operand_Refuse Invalid_Wire_Format
+                              | Code_Tree_Pending => Code_Operand_Pending)))
+               | Code_Tree_Pending => Code_Operand_Pending)));
+
+fun code_transport_operand_verdict core max_nesting =
+  (case code_decode_operand_tree max_nesting core
+    of Code_Tree_Refused a => Code_Operand_Refuse a
+    | Code_Tree_Ready _ => Code_Operand_Accept
+    | Code_Tree_Pending => Code_Operand_Pending);
+
+fun sync_v061_operand_verdict core depth =
+  (if sync_added_operation core
+    then (if is_none (sync_direct_operand_ir depth core)
+           then Code_Operand_Refuse Invalid_Wire_Format
+           else Code_Operand_Accept)
+    else code_transport_operand_verdict core depth);
+
+fun code_numeric_family_set numbers =
+  Set (maps (fn number =>
+              (case family_at_number number of NONE => []
+                | SOME family => [family]))
+        numbers);
+
+fun code_contract_boundary values version families atomicities schemes critical
+  = Wire_boundary_ext
+      (Negotiated_wire_profile_ext
+         (version, code_numeric_family_set families, Set atomicities,
+           Set schemes, ()),
+        nth values zero_nata, nth values one_nata,
+        nth values (nat_of_integer (2 : IntInf.int)),
+        nth values (nat_of_integer (3 : IntInf.int)),
+        nth values (nat_of_integer (4 : IntInf.int)),
+        nth values (nat_of_integer (5 : IntInf.int)),
+        nth values (nat_of_integer (6 : IntInf.int)),
+        nth values (nat_of_integer (7 : IntInf.int)),
+        nth values (nat_of_integer (8 : IntInf.int)),
+        nth values (nat_of_integer (9 : IntInf.int)),
+        nth values (nat_of_integer (10 : IntInf.int)),
+        nth values (nat_of_integer (11 : IntInf.int)), critical, false, ());
+
+fun code_integer_common_host_values values =
+  not (equal_nata (size_list values) (nat_of_integer (13 : IntInf.int))) orelse
+    IntInf.< (nth values
+                (nat_of_integer
+                  (10 : IntInf.int)), power power_integer (2 : IntInf.int)
+(nat_of_integer (63 : IntInf.int))) andalso
+      IntInf.< (nth values
+                  (nat_of_integer
+                    (12 : IntInf.int)), power power_integer (2 : IntInf.int)
+  (nat_of_integer (63 : IntInf.int)));
+
+fun code_integer_octet_values values =
   list_all
     (fn value =>
       IntInf.<= ((0 : IntInf.int), value) andalso
-        IntInf.< (value, power power_integer (2 : IntInf.int)
-                           (nat_of_integer (64 : IntInf.int))))
+        IntInf.< (value, (256 : IntInf.int)))
     values;
 
 fun code_ir_transport_key oip_binder_core =
@@ -4256,60 +5350,90 @@ fun code_ir_transport_key oip_binder_core =
         code_ir_scalar oip_binder_principal, code_ir_bytes oip_binder_uuid]
   end;
 
-fun code_integer_octet_values values =
+fun sync_typed_value_observation typed_check raw depth =
+  bind (sync_decode_packet raw)
+    (fn packet =>
+      let
+        val core = packet_core packet;
+      in
+        map_option
+          (fn typed =>
+            (typed,
+              (encode_wire_core core,
+                (envelope_signing_bytes core, code_ir_transport_key core))))
+          (typed_check depth core)
+      end);
+
+fun code_integer_u64_values values =
   list_all
     (fn value =>
       IntInf.<= ((0 : IntInf.int), value) andalso
-        IntInf.< (value, (256 : IntInf.int)))
+        IntInf.< (value, power power_integer (2 : IntInf.int)
+                           (nat_of_integer (64 : IntInf.int))))
     values;
 
-fun code_typed_observations oip_binder_bytes oip_binder_values =
-  (if not (equal_nata (size_list oip_binder_values)
-            (nat_of_integer (13 : IntInf.int)))
-    then NONE
-    else bind (decode_wire_packet oip_binder_bytes)
-           (fn packet =>
-             map_option
-               (fn oip_binder_typed =>
-                 (oip_binder_typed,
-                   (encode_wire_core (packet_core packet),
-                     (envelope_signing_bytes (packet_core packet),
-                       code_ir_transport_key (packet_core packet)))))
-               (code_typed_operand_ir
-                 (nth oip_binder_values (nat_of_integer (12 : IntInf.int)))
-                 (packet_core packet))));
+fun sync_transport_flat_values operand_check typed_check bytes values version
+  families atomicities schemes critical signature_valid attestation_valid
+  prior_present prior =
+  (if not (code_integer_octet_values bytes) orelse
+        (not (equal_nata (size_list values)
+               (nat_of_integer (13 : IntInf.int))) orelse
+          (not (code_integer_u64_values
+                 (values @ [version] @ families @ atomicities @ schemes)) orelse
+            (not (code_integer_common_host_values values) orelse
+              prior_present andalso not (code_integer_octet_values prior))))
+    then ((~1 : IntInf.int), (false, ([], (false, ([], ([], ([], [])))))))
+    else let
+           val raw = map nat_of_integer bytes;
+           val fields = map nat_of_integer values;
+           val depth = nth fields (nat_of_integer (12 : IntInf.int));
+           val scope =
+             code_contract_boundary fields (nat_of_integer version)
+               (map nat_of_integer families) (map nat_of_integer atomicities)
+               (map nat_of_integer schemes) critical;
+           val saved =
+             (if prior_present then SOME (map nat_of_integer prior) else NONE);
+           val (number, binding) =
+             code_integer_reply
+               (sync_transport_oracle operand_check raw scope depth
+                 signature_valid attestation_valid saved);
+           val present = not (is_none binding);
+           val exact = (case binding of NONE => [] | SOME bound => bound);
+         in
+           (if not ((number : IntInf.int) = (0 : IntInf.int)) andalso
+                 not ((number : IntInf.int) = (1 : IntInf.int))
+             then (number, (present, (exact, (false, ([], ([], ([], [])))))))
+             else (case sync_typed_value_observation typed_check raw depth
+                    of NONE =>
+                      (number,
+                        (present, (exact, (false, ([], ([], ([], [])))))))
+                    | SOME (typed, (canonical, (preimage, key))) =>
+                      (number,
+                        (present,
+                          (exact,
+                            (true,
+                              (map integer_of_nat typed,
+                                (map integer_of_nat canonical,
+                                  (map integer_of_nat preimage,
+                                    map integer_of_nat key)))))))))
+         end);
 
-fun code_transport_operand_verdict core max_nesting =
-  (case code_decode_operand_tree max_nesting core
-    of Code_Tree_Refused a => Code_Operand_Refuse a
-    | Code_Tree_Ready _ => Code_Operand_Accept
-    | Code_Tree_Pending => Code_Operand_Pending);
+fun sync_v061_full_operand_verdict core depth =
+  (case sync_selected_nested_ir depth core
+    of NONE =>
+      (if equal_proda equal_wire_family equal_nat (sync_operation core)
+            (Wire_Ack, nat_of_integer (2 : IntInf.int)) andalso
+            sync_ack_uses_added_number core
+        then sync_legacy_ack_new_number depth core
+        else sync_v061_operand_verdict core depth)
+    | SOME (Inl a) => Code_Operand_Refuse a
+    | SOME (Inr _) => Code_Operand_Accept);
 
-fun code_partial_transport_oracle x =
-  code_transport_oracle code_transport_operand_verdict x;
+fun sync_v061_nested_transport_flat x =
+  sync_transport_flat_values sync_v061_full_operand_verdict
+    sync_v061_full_operand_ir x;
 
-fun code_contract_transport_oracle bytes values version families atomicities
-  schemes critical signature_valid attestation_valid prior =
-  (if not (equal_nata (size_list values) (nat_of_integer (13 : IntInf.int)))
-    then (Code_Transport_Pending, prior)
-    else code_partial_transport_oracle bytes
-           (code_contract_boundary values version families atomicities schemes
-             critical)
-           (nth values (nat_of_integer (12 : IntInf.int))) signature_valid
-           attestation_valid prior);
-
-fun code_integer_common_host_values values =
-  not (equal_nata (size_list values) (nat_of_integer (13 : IntInf.int))) orelse
-    IntInf.< (nth values
-                (nat_of_integer
-                  (10 : IntInf.int)), power power_integer (2 : IntInf.int)
-(nat_of_integer (63 : IntInf.int))) andalso
-      IntInf.< (nth values
-                  (nat_of_integer
-                    (12 : IntInf.int)), power power_integer (2 : IntInf.int)
-  (nat_of_integer (63 : IntInf.int)));
-
-fun code_typed_model_identity x =
+fun sync_v061_typed_model_identity x =
   (fn _ =>
     map (map integer_of_nat o code_json_ascii)
       [[Chara (true, false, false, false, true, true, false, false)],
@@ -4351,7 +5475,7 @@ fun code_typed_model_identity x =
           Chara (false, false, true, true, false, true, true, false),
           Chara (true, false, true, true, false, true, false, false),
           Chara (true, true, false, false, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
+          Chara (true, true, false, false, true, true, false, false),
           Chara (true, false, true, true, false, true, false, false),
           Chara (false, true, true, false, true, true, true, false),
           Chara (true, false, false, false, false, true, true, false),
@@ -4374,15 +5498,26 @@ fun code_typed_model_identity x =
           Chara (true, true, false, false, false, true, true, false),
           Chara (false, false, true, true, false, true, true, false),
           Chara (true, false, true, false, false, true, true, false),
-          Chara (false, true, true, true, false, true, false, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
           Chara (true, true, true, true, true, false, true, false),
-          Chara (false, false, true, false, true, true, true, false),
+          Chara (false, true, true, false, true, false, true, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (false, true, true, true, false, true, false, false),
+          Chara (true, true, false, false, true, true, true, false),
           Chara (true, false, false, true, true, true, true, false),
-          Chara (false, false, false, false, true, true, true, false),
+          Chara (false, true, true, true, false, true, true, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (true, true, true, true, true, false, true, false),
+          Chara (false, true, true, false, true, true, true, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (true, true, true, true, true, false, true, false),
+          Chara (false, true, true, true, false, true, true, false),
+          Chara (true, false, true, false, false, true, true, false),
+          Chara (true, true, false, false, true, true, true, false),
+          Chara (false, false, true, false, true, true, true, false),
           Chara (true, false, true, false, false, true, true, false),
           Chara (false, false, true, false, false, true, true, false),
           Chara (true, true, true, true, true, false, true, false),
@@ -4399,14 +5534,7 @@ fun code_typed_model_identity x =
           Chara (false, true, true, false, false, true, true, false),
           Chara (false, false, true, true, false, true, true, false),
           Chara (true, false, false, false, false, true, true, false),
-          Chara (false, false, true, false, true, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (false, false, true, true, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false)],
+          Chara (false, false, true, false, true, true, true, false)],
         [Chara (false, false, false, true, false, false, true, false),
           Chara (true, true, true, true, false, false, true, false),
           Chara (false, false, true, true, false, false, true, false),
@@ -4434,128 +5562,70 @@ fun code_typed_model_identity x =
           Chara (false, true, true, true, false, false, true, false),
           Chara (true, false, false, false, false, true, true, false),
           Chara (false, false, true, false, true, true, true, false)],
-        [Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
+        [Chara (true, false, true, false, false, true, true, false),
           Chara (true, false, true, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (false, false, true, false, true, true, false, false),
           Chara (true, true, true, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
           Chara (false, true, false, false, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (false, true, false, false, false, true, true, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (false, false, true, false, false, true, true, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (false, true, false, false, false, true, true, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (true, true, false, false, true, true, false, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (false, true, false, false, true, true, false, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (false, false, true, false, false, true, true, false),
           Chara (true, false, false, true, true, true, false, false),
           Chara (true, false, false, false, true, true, false, false),
           Chara (true, true, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (true, true, true, false, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (false, false, true, false, true, true, false, false),
           Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
           Chara (true, true, false, false, true, true, false, false),
           Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
           Chara (true, false, false, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (false, false, true, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (true, false, false, false, false, true, true, false),
           Chara (true, false, true, false, false, true, true, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (true, false, false, false, true, true, false, false),
           Chara (false, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (true, false, true, false, false, true, true, false),
           Chara (false, false, true, false, false, true, true, false),
           Chara (false, true, true, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, false, false),
           Chara (false, false, false, false, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false)]])
+          Chara (false, true, false, false, false, true, true, false),
+          Chara (false, false, true, false, false, true, true, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (true, false, true, false, true, true, false, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (true, false, true, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (true, true, true, false, true, true, false, false),
+          Chara (false, true, false, false, true, true, false, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (true, false, false, false, true, true, false, false)]])
     x;
 
-fun code_partial_transport_integer_oracle bytes values version families
-  atomicities schemes critical signature_valid attestation_valid prior =
-  (if not (code_integer_octet_values bytes) orelse
-        (not (code_integer_u64_values
-               (values @ [version] @ families @ atomicities @ schemes)) orelse
-          (not (code_integer_common_host_values values) orelse
-            (case prior of NONE => false
-              | SOME retained => not (code_integer_octet_values retained))))
-    then ((~1 : IntInf.int), NONE)
-    else code_integer_reply
-           (code_contract_transport_oracle (map nat_of_integer bytes)
-             (map nat_of_integer values) (nat_of_integer version)
-             (map nat_of_integer families) (map nat_of_integer atomicities)
-             (map nat_of_integer schemes) critical signature_valid
-             attestation_valid (map_option (map nat_of_integer) prior)));
-
-fun code_partial_transport_flat_oracle bytes values version families atomicities
-  schemes critical signature_valid attestation_valid prior_present prior =
-  (case code_partial_transport_integer_oracle bytes values version families
-          atomicities schemes critical signature_valid attestation_valid
-          (if prior_present then SOME prior else NONE)
-    of (status, NONE) => (status, (false, []))
-    | (status, SOME retained) => (status, (true, retained)));
-
-fun code_typed_transport_flat_oracle oip_binder_bytes oip_binder_values version
-  oip_binder_families oip_binder_atomicities oip_binder_schemes
-  oip_binder_critical oip_binder_signature_valid oip_binder_attestation_valid
-  oip_binder_prior_present oip_binder_prior =
-  let
-    val (oip_binder_status, (oip_binder_present, oip_binder_binding)) =
-      code_partial_transport_flat_oracle oip_binder_bytes oip_binder_values
-        version oip_binder_families oip_binder_atomicities oip_binder_schemes
-        oip_binder_critical oip_binder_signature_valid
-        oip_binder_attestation_valid oip_binder_prior_present oip_binder_prior;
-  in
-    (if ((oip_binder_status : IntInf.int) = (0 : IntInf.int)) orelse
-          ((oip_binder_status : IntInf.int) = (1 : IntInf.int))
-      then (case code_typed_observations (map nat_of_integer oip_binder_bytes)
-                   (map nat_of_integer oip_binder_values)
-             of NONE =>
-               (oip_binder_status,
-                 (oip_binder_present,
-                   (oip_binder_binding, (false, ([], ([], ([], [])))))))
-             | SOME (oip_binder_typed,
-                      (oip_binder_core, (oip_binder_preimage, oip_binder_key)))
-               => (oip_binder_status,
-                    (oip_binder_present,
-                      (oip_binder_binding,
-                        (true,
-                          (map integer_of_nat oip_binder_typed,
-                            (map integer_of_nat oip_binder_core,
-                              (map integer_of_nat oip_binder_preimage,
-                                map integer_of_nat oip_binder_key))))))))
-      else (oip_binder_status,
-             (oip_binder_present,
-               (oip_binder_binding, (false, ([], ([], ([], []))))))))
-  end;
-
-end; (*struct OIP_Wire_Oracle*)
+end; (*struct OIP_Wire_Oracle_V061*)

@@ -7,14 +7,14 @@ ABI loading and sampled value comparisons have separate purposes.
 
 ## Compiler-input identity
 
-`source-manifest.json` contains ROOT plus 344 theory records with relative path,
+`source-manifest.json` contains ROOT plus 398 theory records with relative path,
 byte count and SHA256. The raw manifest SHA256 is
-`b73e4c823aa766a13895a9582990da4b227ebd493c33444d44dac1a27b8215fa`.
+`132cb4a00eab053cace5844fc5b374d573f3d71c340b5fd36d2a712eaa7ec445`.
 The canonical inventory identity is
-`7219abb349d4d0565ab933d2afb49ba831e05254e11a41d506b72fad914cae01`:
+`5631650726e18a01c98d7a66a89439d3eaefb5373dba0689f0011ae69031eb56`:
 SHA256 of ASCII JSON with sorted keys, compact separators and no final newline.
 ROOT separately hashes to
-`3c2faa94af7f0c0172009e243da280707b048da81cb15d4ac466ea15d511965e`.
+`28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6`.
 These are source identities, not assertions of a build or comparison result.
 
 The following reads the actual bytes and displays the two compiler-input
@@ -26,13 +26,13 @@ from pathlib import Path
 import hashlib, json, stat
 root = Path('Oracle_Interoperability_Protocol')
 raw = (root / 'source-manifest.json').read_bytes()
-assert hashlib.sha256(raw).hexdigest() == 'b73e4c823aa766a13895a9582990da4b227ebd493c33444d44dac1a27b8215fa'
+assert hashlib.sha256(raw).hexdigest() == '132cb4a00eab053cace5844fc5b374d573f3d71c340b5fd36d2a712eaa7ec445'
 manifest = json.loads(raw)
 assert manifest['format'] == 'oip-public-formal-source-inventory-v1'
 assert manifest['namespace'] == 'Oracle_Interoperability_Protocol'
 rows = manifest['files']
 expected = {'ROOT', *(p.relative_to(root).as_posix() for p in root.rglob('*.thy'))}
-assert len(rows) == 345 and {row['path'] for row in rows} == expected
+assert len(rows) == 399 and {row['path'] for row in rows} == expected
 for row in rows:
     relative = Path(row['path'])
     assert not relative.is_absolute() and '..' not in relative.parts
@@ -44,8 +44,8 @@ for row in rows:
 canonical = json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
 formal = hashlib.sha256(canonical).hexdigest()
 root_sha = hashlib.sha256((root / 'ROOT').read_bytes()).hexdigest()
-assert formal == '7219abb349d4d0565ab933d2afb49ba831e05254e11a41d506b72fad914cae01'
-assert root_sha == '3c2faa94af7f0c0172009e243da280707b048da81cb15d4ac466ea15d511965e'
+assert formal == '5631650726e18a01c98d7a66a89439d3eaefb5373dba0689f0011ae69031eb56'
+assert root_sha == '28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6'
 print('formal_root_sha256=' + formal)
 print('ROOT_sha256=' + root_sha)
 PY
@@ -71,7 +71,7 @@ dependency instructions as the repository proof lane.
 "$ISABELLE" build -b -j 1 -o threads=1 -o parallel_proofs=0 \
   -o document=false -o quick_and_dirty=false -o skip_proofs=false -o timeout_build=false \
   -d "$AFP_ENTRY" -d . \
-  OIP_Record_Reopening OIP_Recovery_Boundary OIP_Message_Egress
+  OIP_Record_Reopening OIP_Recovery_Boundary OIP_Sync_V061_Typed_Artifact OIP_Response_Egress_V061_Export
 ```
 
 The three named leaves include all nine namespace sessions through ROOT parent
@@ -89,19 +89,19 @@ Do not use wildcard extraction or edit generated ML.
 
 ```bash
 OUT="$(mktemp -d)"
-"$ISABELLE" export -n -l -d "$AFP_ENTRY" -d . OIP_Message_Code > "$OUT/typed-exports.txt"
-grep -Fx 'OIP_Message_Code.Wire_Code_Typed_Current_Export:code/oip_wire_values_current.ML' "$OUT/typed-exports.txt"
+"$ISABELLE" export -n -l -d "$AFP_ENTRY" -d . OIP_Sync_V061_Typed_Artifact > "$OUT/typed-exports.txt"
+grep -Fx 'OIP_Sync_V061_Typed_Artifact.Sync_V061_Typed_Identity:code/oip_wire_values_v061_current.ML' "$OUT/typed-exports.txt"
 "$ISABELLE" export -n -d "$AFP_ENTRY" -d . -O "$OUT/typed" -p 1 \
-  -x 'OIP_Message_Code.Wire_Code_Typed_Current_Export:code/oip_wire_values_current.ML' OIP_Message_Code
+  -x 'OIP_Sync_V061_Typed_Artifact.Sync_V061_Typed_Identity:code/oip_wire_values_v061_current.ML' OIP_Sync_V061_Typed_Artifact
 
-"$ISABELLE" export -n -l -d "$AFP_ENTRY" -d . OIP_Message_Egress > "$OUT/full-exports.txt"
-grep -Fx 'OIP_Message_Egress.Wire_Code_Response_Current_Export:code/oip_wire_response_current.ML' "$OUT/full-exports.txt"
+"$ISABELLE" export -n -l -d "$AFP_ENTRY" -d . OIP_Response_Egress_V061_Export > "$OUT/full-exports.txt"
+grep -Fx 'OIP_Response_Egress_V061_Export.Response_Egress_V061_Export:code/oip_wire_response_full_v061.ML' "$OUT/full-exports.txt"
 "$ISABELLE" export -n -d "$AFP_ENTRY" -d . -O "$OUT/full" -p 1 \
-  -x 'OIP_Message_Egress.Wire_Code_Response_Current_Export:code/oip_wire_response_current.ML' OIP_Message_Egress
+  -x 'OIP_Response_Egress_V061_Export.Response_Egress_V061_Export:code/oip_wire_response_full_v061.ML' OIP_Response_Egress_V061_Export
 ```
 
-The extracted files are `typed/code/oip_wire_values_current.ML` and
-`full/code/oip_wire_response_current.ML` beneath `OUT`. Record their actual
+The extracted files are `typed/code/oip_wire_values_v061_current.ML` and
+`full/code/oip_wire_response_full_v061.ML` beneath `OUT`. Record their actual
 bytes/hashes and the session database identity independently. The external
 runtime artifact names may differ; a packaging copy must preserve model bytes.
 
@@ -126,9 +126,9 @@ Run the unchanged production drivers from that same checkout:
 | `tests/response-full-driver.ML` | `c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703` |
 
 ```bash
-printf '' | env OIP_WIRE_MODEL="$OUT/typed/code/oip_wire_values_current.ML" \
+printf '' | env OIP_WIRE_MODEL="$OUT/typed/code/oip_wire_values_v061_current.ML" \
   "$POLYML" -q --error-exit --script tests/wire-values-driver.ML
-printf '' | env OIP_WIRE_RESPONSE_MODEL="$OUT/full/code/oip_wire_response_current.ML" \
+printf '' | env OIP_WIRE_RESPONSE_MODEL="$OUT/full/code/oip_wire_response_full_v061.ML" \
   "$POLYML" -q --error-exit --script tests/response-full-driver.ML
 ```
 
@@ -139,11 +139,11 @@ fields. For this source epoch they are:
 | Field | Typed transport | Full sender/client |
 | --- | --- | --- |
 | Schema | `1` | `1` |
-| ABI | `intinf-wire-values-v2` | `intinf-response-full-v1` |
-| Scope | `wire-v6-general-31-values` | `wire-response-sender-client-v1` |
-| Entrypoint | `OIP_Wire_Oracle.code_typed_transport_flat_oracle` | `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` |
+| ABI | `intinf-wire-values-v2` | `intinf-response-full-v2` |
+| Scope | `wire-v6-general-33-values` | `wire-response-sender-client-v2` |
+| Entrypoint | `OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat` | `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` |
 | Natural refinement | `HOL-Library.Code_Target_Nat` | `HOL-Library.Code_Target_Nat` |
-| Runtime source fingerprint | `28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207` | `28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207` |
+| Runtime source fingerprint | `e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1` | `e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1` |
 
 A private namespace export, four-field interface, caller-supplied fingerprint
 or edited model is not interchangeable with these interfaces. ABI loading
@@ -152,7 +152,7 @@ checks the interface and returned identity; it does not perform value cases.
 ## Standard bounded consumers
 
 The OIP source checkout uses Rust 1.96.1, Go 1.25.5 and the same locked Poly/ML.
-Its default typed consumer compares 673 rows across Rust, Go and the pinned
+Its default typed consumer compares 692 rows across Rust, Go and the pinned
 model, including all seven typed observation fields:
 
 ```bash
@@ -186,7 +186,7 @@ roles and match every content pin, origin and namespace check. Raw output and
 exact compiler diagnostics remain separate; an unknown diagnostic or missing
 primitive response is not success.
 
-The consumer compares 31 original-operation, 207 boundary and 21 current-client
+The consumer compares 33 original-operation, 207 boundary and 21 current-client
 inputs. Its model-side combined entry consumes the model's sender packet.
 These are bounded comparisons, not a theorem covering every compiled Rust/Go
 input or a running production Witness/storage deployment.

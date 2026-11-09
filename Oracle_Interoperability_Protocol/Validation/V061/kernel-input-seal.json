@@ -1,0 +1,31 @@
+{
+  "format": "oip-v061-compiler-input-seal-v1",
+  "namespace": "Oracle_Interoperability_Protocol",
+  "isabelle": "Isabelle2025-2",
+  "source_manifest_sha256": "132cb4a00eab053cace5844fc5b374d573f3d71c340b5fd36d2a712eaa7ec445",
+  "formal_root_sha256": "5631650726e18a01c98d7a66a89439d3eaefb5373dba0689f0011ae69031eb56",
+  "root_sha256": "28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6",
+  "compiler_inputs": 399,
+  "targets": [
+    "OIP_Record_Reopening",
+    "OIP_Recovery_Boundary",
+    "OIP_Ordered_Maintenance_Entry",
+    "OIP_Reference_Write_Raw_Ack_Seed",
+    "OIP_Current_Read_Vector_Export",
+    "OIP_Sync_V061_Supplier_ABI",
+    "OIP_Sync_V061_Mode_Product_ABI",
+    "OIP_Sync_V061_Ack_ABI",
+    "OIP_Sync_V061_Strict_Proof_Link_V1",
+    "OIP_Sync_V061_Seeds_V1",
+    "OIP_Sync_V061_Configured_Profile_ABI",
+    "OIP_Response_Code_IntInf_Runtime",
+    "OIP_Sync_V061_ID_Guard_ABI_V2",
+    "OIP_Reference_Write_Capacity",
+    "OIP_Sync_V061_Image_Binding_ABI",
+    "OIP_Sync_V061_Typed_Artifact",
+    "OIP_Response_Egress_V061_Export",
+    "OIP_Response_Egress_V061_Preservation_V7"
+  ],
+  "native_result_sha256": "eb58b851eb95f59f5b3a27c08bdc1c85d9d619e0f799ecbc13591944eecc2390",
+  "native_build_log_sha256": "b0b3401150390d89a3be400174d77da1eeb4de5d756eda242e9c345997a5cb64"
+}

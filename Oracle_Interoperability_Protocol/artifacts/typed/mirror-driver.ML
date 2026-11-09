@@ -9,7 +9,7 @@ fun mirror_csv values = String.concatWith "," (map IntInf.toString values);
 fun mirror_one line = case String.fields (fn c => c = #"\t") (mirror_clean line) of
   [ident,packet,boundary,version,families,atomicities,schemes,critical,signature_valid,attestation,prior_present,prior] =>
     let val (status,(present,(binding,(summary_present,(typed,(core,(preimage,key))))))) =
-          OIP_Wire_Oracle.code_typed_transport_flat_oracle
+          OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat
             (mirror_integers packet) (mirror_integers boundary) (mirror_integer version)
             (mirror_integers families) (mirror_integers atomicities) (mirror_integers schemes)
             (mirror_bool critical) (mirror_bool signature_valid) (mirror_bool attestation)
@@ -21,7 +21,7 @@ fun mirror_one line = case String.fields (fn c => c = #"\t") (mirror_clean line)
 fun mirror_loop () = case TextIO.inputLine TextIO.stdIn of NONE => () | SOME line => (mirror_one line;mirror_loop ());
 fun mirror_identity_text bytes = String.implode (map (fn byte =>
   if byte < 0 orelse byte > 127 then raise Fail "Non-ASCII typed model identity" else Char.chr (IntInf.toInt byte)) bytes);
-val _ = let val fields = map mirror_identity_text (OIP_Wire_Oracle.code_typed_model_identity ());
+val _ = let val fields = map mirror_identity_text (OIP_Wire_Oracle_V061.sync_v061_typed_model_identity ());
             val _ = if List.length fields = 6 then () else raise Fail "Wrong typed model identity shape";
         in TextIO.output (TextIO.stdOut,String.concatWith "\t" ("OIP-MODEL"::fields) ^ "\n");
            TextIO.flushOut TextIO.stdOut;mirror_loop () end;

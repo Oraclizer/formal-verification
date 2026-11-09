@@ -1,12 +1,12 @@
 {
   "schema": "oip-compiler-diagnostics-v1",
-  "model_sha256": "192e2bb8e1ae655fb27db68bbcb99cd538509d131ec6b6b29f670cd05a9d129b",
-  "driver_sha256": "a1c8f5be6a637a59610010efcc489c965e82d9e0a59b72481731adf45d385bdc",
+  "model_sha256": "c3ee85ddd3c37f6a8cbe849d66e0a89ba2071271beb5949f4057db93eac177b9",
+  "driver_sha256": "c9ed19c6c27c6eed5aa0bc07b0e2c899fb83fa92e7f5f861dc1da64ab6b356bc",
   "allowed": [
     {
       "stream": "stdout",
       "lines": [
-        "{model_path}:691: warning: Matches are not exhaustive.",
+        "{model_path}:731: warning: Matches are not exhaustive.",
         "Found near",
         "  fun nth (x :: xs) n = (if ... ... zero_nata then x else ... ... (... ...))"
       ],
@@ -15,9 +15,42 @@
     {
       "stream": "stdout",
       "lines": [
-        "{model_path}:1616: warning: Matches are not exhaustive.",
+        "{model_path}:784: warning: Matches are not exhaustive. Found near fun hd (x21 :: x22) = x21"
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:1667: warning: Matches are not exhaustive.",
         "Found near",
         "  fun sorted_list_of_set (A1_, ...) (... ...) = ... ... (fn ...) (... ... xs)"
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:2419: warning: Pattern 3 is redundant.",
+        "Found near",
+        "  fun",
+        "     equal_bool false p = not p |",
+        "        equal_bool true ... = p |",
+        "        equal_bool ... = ... ... |",
+        "        equal_bool ... = ..."
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:2420: warning: Pattern 4 is redundant.",
+        "Found near",
+        "  fun",
+        "     equal_bool false p = not p |",
+        "        equal_bool true ... = p |",
+        "        equal_bool ... = ... ... |",
+        "        equal_bool ... = ..."
       ],
       "maximum": 1
     }

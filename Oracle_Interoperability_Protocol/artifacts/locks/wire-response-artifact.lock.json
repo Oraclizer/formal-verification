@@ -4,12 +4,12 @@
   "artifact_transport": "github-git-blob-v1",
   "repository": "Oraclizer/formal-verification",
   "wire_schema": 1,
-  "abi": "intinf-response-full-v1",
-  "scope": "wire-response-sender-client-v1",
+  "abi": "intinf-response-full-v2",
+  "scope": "wire-response-sender-client-v2",
   "entrypoint": "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle",
   "natural_refinement": "HOL-Library.Code_Target_Nat",
-  "runtime_source_hash": "28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207",
-  "verified_export_sha256": "8d6cfcc7f65f1890b1f007a7a52e0c62ca5cda92c14583517999d02a9f3fdd55",
+  "runtime_source_hash": "e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1",
+  "verified_export_sha256": "45b2cfc5e44afe745dd54fa148e04d0f351a2084c5c907a4a2257f1b237f485b",
   "public_namespace": "Oracle_Interoperability_Protocol",
   "input_schema": "tests/response-full-abi.json",
   "egress_entries": {
@@ -27,9 +27,9 @@
     {
       "role": "model",
       "name": "oip_wire_response_full.ML",
-      "git_blob_sha1": "f807cecefba5f503cf1738bef6a9e9cd0ab4412a",
-      "sha256": "8d6cfcc7f65f1890b1f007a7a52e0c62ca5cda92c14583517999d02a9f3fdd55",
-      "bytes": 404377
+      "git_blob_sha1": "80ae3532f96732e1129e53907e1b512d33bffe09",
+      "sha256": "45b2cfc5e44afe745dd54fa148e04d0f351a2084c5c907a4a2257f1b237f485b",
+      "bytes": 418067
     },
     {
       "role": "driver",
@@ -41,16 +41,16 @@
     {
       "role": "origin",
       "name": "response-full-origin.json",
-      "git_blob_sha1": "72f16680a5ac7166b486305cecb06fdea459b7d9",
-      "sha256": "a79fdbc4c5d022d0163eb915efc306d6798218c8b4fe8b5adfd90ae3ca853fbb",
+      "git_blob_sha1": "bec7e477eec5a91a6bae771e3d545d637567bc66",
+      "sha256": "678ace83648ae02ee588ac4608a4084372eaf54b1844497463d0945c13cbc9d1",
       "bytes": 858
     },
     {
       "role": "diagnostics",
       "name": "response-full-diagnostics.json",
-      "git_blob_sha1": "81f2c963770ced9bcb6ebb8cbe08fd4a3b61c6d6",
-      "sha256": "9d8e8ad3accf2ee623970a3f6d2c22811e057746835ed2169f5a436f975b26ab",
-      "bytes": 1692
+      "git_blob_sha1": "88548522f1db53cfbb722497b0a3daaebb391799",
+      "sha256": "6571b637c711f078b33ae082b270f2ed705cf59e13881468b407a50cb2dfb66e",
+      "bytes": 1881
     }
   ],
   "identity_function": "OIP_Wire_Response_Boundary.code_response_full_model_identity"

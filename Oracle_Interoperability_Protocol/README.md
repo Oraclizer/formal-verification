@@ -49,8 +49,8 @@ It is a compiler-input inventory, not a publication or test-result receipt.
 ## Executable interfaces and comparison consumers
 
 The typed transport export exposes
-`OIP_Wire_Oracle.code_typed_transport_flat_oracle` and the parameterless
-`OIP_Wire_Oracle.code_typed_model_identity`. The Full response export exposes
+`OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat` and the parameterless
+`OIP_Wire_Oracle_V061.sync_v061_typed_model_identity`. The Full response export exposes
 the sender, current-client and combined interfaces, including
 `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` and
 `OIP_Wire_Response_Boundary.code_response_full_model_identity`.
@@ -62,9 +62,9 @@ and operational receipts are not embedded in the model identity.
 
 The typed consumer compares all seven observation fields: input identity,
 verdict, retained binding, reencoded Core bytes, signing preimage, transport-key
-IR and typed operand IR. Its corpus has 673 fixed/seeded rows.
+IR and typed operand IR. Its corpus has 692 fixed/seeded rows.
 
-The Full consumer compares 31 original-operation inputs, 207 typed boundary
+The Full consumer compares 33 original-operation inputs, 207 typed boundary
 inputs and 21 current-client inputs. It resolves the model's exact primitive
 requests through the separate provider, compares sender bytes and typed client
 results, and passes the model's own sender output to its combined client
