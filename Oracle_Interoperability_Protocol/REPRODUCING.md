@@ -9,9 +9,9 @@ ABI loading and sampled value comparisons have separate purposes.
 
 `source-manifest.json` contains ROOT plus 398 theory records with relative path,
 byte count and SHA256. The raw manifest SHA256 is
-`132cb4a00eab053cace5844fc5b374d573f3d71c340b5fd36d2a712eaa7ec445`.
+`5614df566381f75e08e480d057cb1f37a1a325c6ae1c1f8a346877f4bb5f2acd`.
 The canonical inventory identity is
-`5631650726e18a01c98d7a66a89439d3eaefb5373dba0689f0011ae69031eb56`:
+`a9ea540cd07d2eedd244dfe78a08c6f74159cfce637d8deef5b41b8bc60e3447`:
 SHA256 of ASCII JSON with sorted keys, compact separators and no final newline.
 ROOT separately hashes to
 `28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6`.
@@ -26,7 +26,7 @@ from pathlib import Path
 import hashlib, json, stat
 root = Path('Oracle_Interoperability_Protocol')
 raw = (root / 'source-manifest.json').read_bytes()
-assert hashlib.sha256(raw).hexdigest() == '132cb4a00eab053cace5844fc5b374d573f3d71c340b5fd36d2a712eaa7ec445'
+assert hashlib.sha256(raw).hexdigest() == '5614df566381f75e08e480d057cb1f37a1a325c6ae1c1f8a346877f4bb5f2acd'
 manifest = json.loads(raw)
 assert manifest['format'] == 'oip-public-formal-source-inventory-v1'
 assert manifest['namespace'] == 'Oracle_Interoperability_Protocol'
@@ -44,7 +44,7 @@ for row in rows:
 canonical = json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
 formal = hashlib.sha256(canonical).hexdigest()
 root_sha = hashlib.sha256((root / 'ROOT').read_bytes()).hexdigest()
-assert formal == '5631650726e18a01c98d7a66a89439d3eaefb5373dba0689f0011ae69031eb56'
+assert formal == 'a9ea540cd07d2eedd244dfe78a08c6f74159cfce637d8deef5b41b8bc60e3447'
 assert root_sha == '28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6'
 print('formal_root_sha256=' + formal)
 print('ROOT_sha256=' + root_sha)

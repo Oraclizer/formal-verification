@@ -1,15 +1,15 @@
 {
   "origin_version": 1,
-  "kernel_inputs_sha256": "ff9ee313915504fcc65e1b4753e5ed4a9bda8b941a19889a8ae197638a609a0c",
+  "kernel_inputs_sha256": "15e4d9524b7454547032193c7f2b8900019d60e1b913eae245c081ebced54ae5",
   "wire_schema": 1,
   "abi": "intinf-response-full-v2",
   "scope": "wire-response-sender-client-v2",
   "entrypoint": "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle",
   "natural_refinement": "HOL-Library.Code_Target_Nat",
-  "runtime_source_hash": "e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1",
+  "runtime_source_hash": "9fe7621c9aa01a48c90cecf91829290682dc63d2d7738571b872186f30a98c5c",
   "public_namespace": "Oracle_Interoperability_Protocol",
   "identity_function": "OIP_Wire_Response_Boundary.code_response_full_model_identity",
-  "model_sha256": "45b2cfc5e44afe745dd54fa148e04d0f351a2084c5c907a4a2257f1b237f485b",
+  "model_sha256": "e7588088fe03dfda8782006cefd40c53d8857f210d810a8f5b1e44c53a5f1d22",
   "driver_sha256": "c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703",
-  "diagnostics_sha256": "6571b637c711f078b33ae082b270f2ed705cf59e13881468b407a50cb2dfb66e"
+  "diagnostics_sha256": "1388954a796ca4af9eac6d4a9d78c9f3f301c38cf1f78c9cdd90805338087e44"
 }

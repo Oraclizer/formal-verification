@@ -2,8 +2,8 @@
   "format": "oip-v061-compiler-input-seal-v1",
   "namespace": "Oracle_Interoperability_Protocol",
   "isabelle": "Isabelle2025-2",
-  "source_manifest_sha256": "132cb4a00eab053cace5844fc5b374d573f3d71c340b5fd36d2a712eaa7ec445",
-  "formal_root_sha256": "5631650726e18a01c98d7a66a89439d3eaefb5373dba0689f0011ae69031eb56",
+  "source_manifest_sha256": "5614df566381f75e08e480d057cb1f37a1a325c6ae1c1f8a346877f4bb5f2acd",
+  "formal_root_sha256": "a9ea540cd07d2eedd244dfe78a08c6f74159cfce637d8deef5b41b8bc60e3447",
   "root_sha256": "28e707f3cf58261948bf406a10a726cc6176e530522fe3fefd4460f69f6b92b6",
   "compiler_inputs": 399,
   "targets": [
@@ -26,6 +26,6 @@
     "OIP_Response_Egress_V061_Export",
     "OIP_Response_Egress_V061_Preservation_V7"
   ],
-  "native_result_sha256": "eb58b851eb95f59f5b3a27c08bdc1c85d9d619e0f799ecbc13591944eecc2390",
-  "native_build_log_sha256": "b0b3401150390d89a3be400174d77da1eeb4de5d756eda242e9c345997a5cb64"
+  "native_result_sha256": "37915196b743b2f40d74d7c3637cea44b6502e62f2528b014f947f2fa3acabc5",
+  "native_build_log_sha256": "23291f9c91ea23d52631600dbe6e587c014e0380ec65ba02b73b5781e38007c9"
 }

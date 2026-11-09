@@ -8,8 +8,8 @@
   "scope": "wire-response-sender-client-v2",
   "entrypoint": "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle",
   "natural_refinement": "HOL-Library.Code_Target_Nat",
-  "runtime_source_hash": "e57264fb4d9ba302f6ccf4d91364e32acae4aac9a10afedf0bd9549ef729fff1",
-  "verified_export_sha256": "45b2cfc5e44afe745dd54fa148e04d0f351a2084c5c907a4a2257f1b237f485b",
+  "runtime_source_hash": "9fe7621c9aa01a48c90cecf91829290682dc63d2d7738571b872186f30a98c5c",
+  "verified_export_sha256": "e7588088fe03dfda8782006cefd40c53d8857f210d810a8f5b1e44c53a5f1d22",
   "public_namespace": "Oracle_Interoperability_Protocol",
   "input_schema": "tests/response-full-abi.json",
   "egress_entries": {
@@ -27,9 +27,9 @@
     {
       "role": "model",
       "name": "oip_wire_response_full.ML",
-      "git_blob_sha1": "80ae3532f96732e1129e53907e1b512d33bffe09",
-      "sha256": "45b2cfc5e44afe745dd54fa148e04d0f351a2084c5c907a4a2257f1b237f485b",
-      "bytes": 418067
+      "git_blob_sha1": "722fd469df3000ea92d2cbb092b29aa637d9ab6f",
+      "sha256": "e7588088fe03dfda8782006cefd40c53d8857f210d810a8f5b1e44c53a5f1d22",
+      "bytes": 418066
     },
     {
       "role": "driver",
@@ -41,15 +41,15 @@
     {
       "role": "origin",
       "name": "response-full-origin.json",
-      "git_blob_sha1": "bec7e477eec5a91a6bae771e3d545d637567bc66",
-      "sha256": "678ace83648ae02ee588ac4608a4084372eaf54b1844497463d0945c13cbc9d1",
+      "git_blob_sha1": "4fd8e5232de29016ecb482f602b671735d13ff0d",
+      "sha256": "5cc53ce8f93a2adb482b8639ab33a713e05bd984d7ca7c85646fcd55dcff0624",
       "bytes": 858
     },
     {
       "role": "diagnostics",
       "name": "response-full-diagnostics.json",
-      "git_blob_sha1": "88548522f1db53cfbb722497b0a3daaebb391799",
-      "sha256": "6571b637c711f078b33ae082b270f2ed705cf59e13881468b407a50cb2dfb66e",
+      "git_blob_sha1": "5849dc530af49d3ec576f9f63d1729fabe135435",
+      "sha256": "1388954a796ca4af9eac6d4a9d78c9f3f301c38cf1f78c9cdd90805338087e44",
       "bytes": 1881
     }
   ],
