@@ -134,7 +134,8 @@ printf '' | env OIP_WIRE_RESPONSE_MODEL="$OUT/full/code/oip_wire_response_full_v
 `OIP_Wire_Oracle_V061.sync_v061_typed_model_identity ()` and
 `OIP_Wire_Response_Boundary.code_response_full_model_identity ()` each return
 six ASCII fields. The last field must match the `runtime_source_hash` in the
-corresponding [artifact lock](artifacts/locks/).
+[typed lock](artifacts/locks/model-artifact.lock.json) or
+[full response lock](artifacts/locks/wire-response-artifact.lock.json), respectively.
 
 | Field | Typed transport | Full sender/client |
 | --- | --- | --- |

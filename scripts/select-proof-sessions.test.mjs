@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertProofCoverage, selectProofSessions } from "./select-proof-sessions.mjs";
@@ -80,6 +81,16 @@ test("documentation-only changes do not request a native proof build", () => {
   assert.deepEqual(selected.productSessions, []);
   assert.equal(selected.audit, false);
   assert.equal(selected.protected, false);
+});
+
+test("standalone OIP validation inputs retain an exact external boundary", () => {
+  if (!oipChain.length) return;
+  const prefix = "Oracle_Interoperability_Protocol/Validation/V061";
+  const inventory = JSON.parse(readFileSync(resolve(root, prefix, "input-manifest.json"), "utf8"));
+  const inputs = inventory.files.filter(({ path }) => path.endsWith(".ML")).map(({ path }) => `${prefix}/${path}`);
+  assert.equal(inputs.length, 10);
+  assert.deepEqual(selectProofSessions(root, inputs).productSessions, []);
+  assert.throws(() => selectProofSessions(root, [`${prefix}/drivers/unlisted.ML`]), /outside every declared session/);
 });
 
 test("session document inputs rebuild their session and downstream consumers", () => {

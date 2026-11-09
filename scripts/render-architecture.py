@@ -1,15 +1,15 @@
 """Regenerate dependency diagrams from ROOTS, ROOT, and direct theory imports.
 
-Run with Python 3.9+ from any directory. Standard Isabelle theory imports
+Run with Python 3.9+ and Node.js from any directory. Standard Isabelle theory imports
 are omitted from the foundation view; AFP imports are grouped by session.
 """
 from pathlib import Path
 from html import escape
 import re
+import subprocess
 
 root = Path(__file__).resolve().parents[1]
 assets = root / 'docs/assets'
-sessions = (root / 'ROOTS').read_text(encoding='utf-8').split()
 foundation = {}
 for folder in ['Cross_Domain_State_Preservation', 'Regulatory_Action_Composition']:
     for path in sorted((root / folder).glob('*.thy')):
@@ -19,16 +19,6 @@ for folder in ['Cross_Domain_State_Preservation', 'Regulatory_Action_Composition
                                   else 'ADS_Functor' for word in match[2].split()]
 edges = sorted({(dep, name) for name, deps in foundation.items() for dep in deps
                 if dep in foundation or dep == 'ADS_Functor'})
-session_edges = set()
-for name in sessions:
-    text = (root / name / 'ROOT').read_text(encoding='utf-8')
-    match = re.search(r'\bsession\s+' + re.escape(name) + r'\s*=\s*"?([\w-]+)"?\s*\+', text)
-    assert match, name
-    session_edges.add((match[1], name))
-    extra = re.search(r'(?m)^\s+sessions\s+(.*?)^\s+theories\b', text, re.S)
-    if extra:
-        session_edges.update((dep.strip('"'), name) for dep in extra[1].split())
-session_edges = sorted(session_edges)
 
 def write(name, text):
     with (assets / name).open('w', encoding='utf-8', newline='\n') as handle:
@@ -40,7 +30,7 @@ def mermaid(pairs, title):
                       'flowchart TB'] + [f'    {n.replace("-", "_")}["{n}"]' for n in nodes] +
                      [f'    {a.replace("-", "_")} --> {b.replace("-", "_")}' for a, b in pairs])
 
-desc = 'Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The separate session overview includes all seven registered artifacts.'
+desc = 'Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The session overview lists the registered repository dependencies.'
 paths = {
     ('State_Preservation', 'Regulatory_Instance'): 'M350 173 V239',
     ('State_Preservation', 'Proof_Automation'): 'M310 173 V208 H145 V239',
@@ -105,50 +95,4 @@ for name in order:
 mobile += [text(28,y+27,'The full session chain is shown in the overview.',18,'#a8bbd5'),'</g></svg>']
 write('theory-architecture-mobile.svg','\n'.join(mobile))
 
-chain = ['Cross_Domain_State_Preservation','Regulatory_Action_Composition','Cross_Chain_Message_Integrity',
-         'Preemptive_Lock_Correctness','Evidence_Atomic_Binding','Evidence_Binding_Composition']
-assert set(sessions) == set(chain + ['Protected_Behavior_Obstructions'])
-assert set(session_edges) == set(zip(chain,chain[1:])) | {('HOL-Library',chain[0]),('HOL-Eisbach',chain[0]),('ADS_Functor',chain[0]),('HOL','Protected_Behavior_Obstructions')}
-labels = {
-    chain[0]: ['Cross-Domain State','Preservation'], chain[1]: ['Regulatory Action','Composition'],
-    chain[2]: ['Cross-Chain Message','Integrity'], chain[3]: ['Preemptive Lock','Correctness'],
-    chain[4]: ['Evidence Atomic','Binding'], chain[5]: ['Evidence Binding','Composition'],
-    'Protected_Behavior_Obstructions':['Protected Behavior','Obstructions'],
-    'HOL-Library':['HOL-Library'], 'HOL-Eisbach':['HOL-Eisbach'], 'ADS_Functor':['AFP ADS_Functor'], 'HOL':['HOL']}
-detail = 'All seven ROOTS-registered artifact sessions. Six form the CDSP to Evidence Binding Composition parent chain. Protected Behavior Obstructions independently extends HOL. Additional direct CDSP session dependencies are HOL-Library, HOL-Eisbach, and AFP ADS_Functor. Auxiliary audit sessions are not separate artifact entries.'
-for narrow in [False, True]:
-    width,height = (600,1450) if narrow else (1120,830)
-    boxes = {}
-    if narrow:
-        for i,name in enumerate(chain): boxes[name]=(32,250+i*125,536,80)
-        boxes.update({'HOL-Library':(24,126,174,58),'HOL-Eisbach':(214,126,174,58),'ADS_Functor':(404,126,172,58),
-                      'HOL':(180,1090,240,58),'Protected_Behavior_Obstructions':(32,1190,536,88)})
-    else:
-        for i,name in enumerate(chain): boxes[name]=(40+(i%3)*355,260+(i//3)*188,300,90)
-        boxes.update({'HOL-Library':(40,124,200,58),'HOL-Eisbach':(280,124,200,58),'ADS_Functor':(520,124,200,58),
-                      'HOL':(40,649,190,64),'Protected_Behavior_Obstructions':(320,635,410,88)})
-    drawing = start(width,height,'Repository session dependencies',detail)
-    drawing += [text(28,48,'Repository session dependencies',27),text(28,83,'Seven registered artifacts · dependency → child',19,'#a8bbd5')]
-    for a,b in session_edges:
-        x,y,w,h=boxes[a];xx,yy,ww,hh=boxes[b]
-        if not narrow and a in chain and b in chain and chain.index(a)==2:
-            path=f'M{x+w/2} {y+h} V399 H{xx+ww/2} V{yy}'
-        elif not narrow and y==yy or (not narrow and a=='HOL'):
-            path=f'M{x+w} {y+h/2} H{xx}'
-        else:
-            middle=(y+h+yy)/2
-            path=f'M{x+w/2} {y+h} V{middle} H{xx+ww/2} V{yy}'
-        drawing += [f'<path data-from="{a}" data-to="{b}" d="{path}" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>']
-    for name,(x,y,w,h) in boxes.items():
-        external=name not in sessions
-        drawing += [f'<g data-node="{name}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="12" fill="{("#201b3e" if external else "#11233c")}" stroke="{("#9583db" if external else "#527aa1")}"/>']
-        for j,label in enumerate(labels[name]):
-            size=18 if external else (24 if narrow else 22)
-            drawing += [f'<text x="{x+w/2}" y="{y+h/2+(j-(len(labels[name])-1)/2)*27+7}" text-anchor="middle" font-size="{size}">{escape(label)}</text>']
-        drawing += ['</g>']
-    footer = 1330 if narrow else 770
-    drawing += [text(28,footer,'Protected Behavior Obstructions is independent.',18,'#a8bbd5'),
-                text(28,footer+30,'Auxiliary audit sessions are separate from this catalog.',18,'#a8bbd5'),'</g></svg>']
-    write('session-architecture'+('-mobile' if narrow else '')+'.svg','\n'.join(drawing))
-write('session-architecture.mmd',mermaid(session_edges,detail))
-print(f'Architecture generated: {len(sessions)} registered sessions, {len(session_edges)} session edges, {len(edges)} foundation edges.')
+subprocess.run(['node', str(root / 'scripts/render-session-architecture.mjs')], check=True)
