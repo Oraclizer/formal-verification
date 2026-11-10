@@ -383,3 +383,256 @@ session OIP_Message_Egress in "Message_Egress" = OIP_Message_Response +
     Wire_Code_Response_Current_Identity
     Wire_Code_Response_Current_Export
 
+session OIP_Ordered_Maintenance_G0_Core in "Extensions/V061/Base/Checks/OrderedMaintenanceCore" = OIP_Reference_Profile +
+  options [document = false]
+  theories
+    Ordered_Maintenance_Source_Input
+    Ordered_Maintenance_G0
+
+session OIP_Ordered_Maintenance_Entry in "Extensions/V061/Product/OrderedMaintenanceEntry" = OIP_Ordered_Maintenance_G0_Core +
+  options [document = false]
+  theories
+    Ordered_Maintenance_Entry_Inputs
+    Ordered_Maintenance_Entry
+
+session OIP_Write_Canary_Base in "Extensions/V061/Product/Write/Canary" = OIP_Reference_Profile +
+  options [document = false]
+  theories
+    Write_Canary_Base
+
+session OIP_Write_Canary_Removal in "Extensions/V061/Product/Write/Removal" = OIP_Write_Canary_Base +
+  options [document = false]
+  theories
+    Write_Canary_Removal
+
+session OIP_Write_Canary_DurableV6 in "Extensions/V061/Product/Write/Durable" = OIP_Reference_Profile +
+  options [document = false]
+  theories
+    Write_Canary_DurableV6
+
+session OIP_Reference_Write_Profile in "Extensions/V061/Product/Write/Profile" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Reference_Write_Profile
+
+session OIP_Reference_Write_AuthorityV4 in "Extensions/V061/Product/Write/Authority" = OIP_Reference_Write_Profile +
+  options [document = false]
+  theories
+    Reference_Write_Authority
+
+session OIP_Reference_Write_ChecksV9 in "Extensions/V061/Product/Write/Checks" = OIP_Reference_Write_AuthorityV4 +
+  options [document = false]
+  sessions
+    OIP_Write_Canary_Base
+    OIP_Write_Canary_Removal
+    OIP_Write_Canary_DurableV6
+  theories
+    Reference_Write_Checks
+
+session OIP_Reference_Write_Vector_Export in "Extensions/V061/Product/Write/VectorExport" = OIP_Reference_Write_ChecksV9 +
+  options [document = false]
+  theories
+    Reference_Write_Vector_Export
+
+session OIP_Reference_Write_Core_Seed in "Extensions/V061/Product/Write/CoreSeed" = OIP_Reference_Write_Vector_Export +
+  options [document = false]
+  theories
+    Reference_Write_Core_Seed
+
+session OIP_Sync_V061_Wire_V4 in "Extensions/V061/Product/SyncCommitment/Wire" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Sync_V061_Wire
+
+session OIP_Sync_V061_Position_Definitions in "Extensions/V061/Product/SyncCommitment/Definitions" = OIP_Sync_V061_Wire_V4 +
+  options [document = false]
+  theories
+    Sync_V061_Attestation_Model
+    Sync_V061_Product
+
+session OIP_Sync_V061_Position_Proofs in "Extensions/V061/Product/SyncCommitment/Proofs" = OIP_Sync_V061_Position_Definitions +
+  options [document = false]
+  theories
+    Sync_V061_Attestation
+    Sync_V061_Product_Proofs
+
+session OIP_Sync_V061_Position_Originals in "Extensions/V061/Product/SyncCommitment/Originals" = OIP_Sync_V061_Position_Proofs +
+  options [document = false]
+  theories
+    Sync_V061_Originals
+
+session OIP_Sync_V061_Position_Boundary in "Extensions/V061/Product/SyncCommitment/Boundary" = OIP_Sync_V061_Position_Originals +
+  options [document = false]
+  theories
+    Sync_V061_Reference_Boundary
+
+session OIP_Sync_V061_Position_Selection in "Extensions/V061/Product/SyncCommitment/Selection" = OIP_Sync_V061_Position_Proofs +
+  options [document = false]
+  theories
+    Sync_V061_Selection
+
+session OIP_Sync_V061_Position_Provider in "Extensions/V061/Product/SyncCommitment/Provider" = OIP_Sync_V061_Position_Selection +
+  options [document = false]
+  theories
+    Sync_V061_Provider
+
+session OIP_Sync_V061_Concrete_Supplier_V2 in "Extensions/V061/Product/SyncCommitment/ConcreteSupplierV2" = OIP_Sync_V061_Position_Provider +
+  options [document = false]
+  theories
+    Sync_V061_Supplier_Readback
+    Sync_V061_Concrete_Supplier
+
+session OIP_Sync_V061_Position_Direct_IR in "Extensions/V061/Product/SyncCommitment/DirectIR" = OIP_Sync_V061_Position_Definitions +
+  options [document = false]
+  theories
+    Sync_V061_Direct_IR
+
+session OIP_Sync_V061_Position_Transport in "Extensions/V061/Product/SyncCommitment/Transport" = OIP_Sync_V061_Position_Direct_IR +
+  options [document = false]
+  theories
+    Sync_V061_Transport_IR
+
+session OIP_Sync_V061_Position_Ack in "Extensions/V061/Product/SyncCommitment/Ack" = OIP_Sync_V061_Position_Originals +
+  options [document = false]
+  sessions OIP_Message_Response
+  theories
+    Sync_V061_Ack_Link_Draft
+
+session OIP_Sync_V061_Position_Nested_IR in "Extensions/V061/Product/SyncCommitment/NestedIR" = OIP_Sync_V061_Position_Transport +
+  options [document = false]
+  sessions OIP_Sync_V061_Position_Ack
+  theories
+    Sync_V061_Nested_IR
+
+session OIP_Sync_V061_Product_ABI in "Extensions/V061/Product/SyncCommitment/ProductABI" = OIP_Sync_V061_Position_Boundary +
+  options [document = false]
+  theories
+    Sync_V061_Product_ABI
+
+session OIP_Sync_V061_Ack_ABI in "Extensions/V061/Product/SyncCommitment/AckABI" = OIP_Sync_V061_Position_Ack +
+  options [document = false]
+  theories
+    Sync_V061_Ack_ABI
+
+session OIP_Sync_V061_Extraction_V1 in "Extensions/V061/Product/SyncCommitment/Structure" = OIP_Sync_V061_Position_Definitions +
+  options [document = false]
+  theories
+    Sync_V061_Observation_Export
+
+session OIP_Sync_V061_Seeds_V1 in "Extensions/V061/Product/SyncCommitment/Seeds" = OIP_Sync_V061_Extraction_V1 +
+  options [document = false]
+  theories
+    Sync_V061_Structure_Seeds
+
+session OIP_Sync_V061_Strict_Proof_Link_V1 in "Extensions/V061/Product/SyncCommitment/StrictProof" = OIP_Sync_V061_Extraction_V1 +
+  options [document = false]
+  theories
+    Sync_V061_Strict_Proof_Link
+
+session OIP_Response_Code_IntInf_Runtime in "Extensions/V061/Base/ResponseExtension/Export" = OIP_Response_Code_Extension +
+  options [document = false]
+  theories
+    Response_Code_Export
+
+session OIP_Response_Code_Allocation in "Extensions/V061/Base/ResponseExtension/Allocation" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Response_Code_Allocation
+    Response_Code_Extension_Input
+
+session OIP_Response_Code_Extension in "Extensions/V061/Base/ResponseExtension/Rules" = OIP_Response_Code_Allocation +
+  options [document = false]
+  theories
+    Response_Code_Extension
+
+session OIP_Sync_V061_Mode_Product_ABI in "Extensions/V061/Product/SyncCommitment/ModeProductABI" = OIP_Sync_V061_Product_ABI +
+  options [document = false]
+  theories
+    Sync_V061_Mode_Product_ABI
+
+session OIP_Current_Read_G0_V9 in "Extensions/V061/Product/CurrentRead/Fixed" = OIP_Current_Read_G0_Source +
+  options [document = false]
+  theories
+    Current_Read_G0
+
+session OIP_Current_Read_Vector_Export in "Extensions/V061/Product/CurrentRead/Export" = OIP_Current_Read_G0_V9 +
+  options [document = false]
+  theories
+    Current_Read_Vector_Export
+
+session OIP_Reference_Write_Raw_Ack_Seed in "Extensions/V061/Product/Write/RawAckSeed" = OIP_Reference_Write_Core_Seed +
+  options [document = false]
+  theories
+    Reference_Write_Raw_Ack_Seed
+
+session OIP_Response_Egress_V061_Runtime_V7 in "Extensions/V061/Product/ResponseEgress/Runtime" = OIP_Response_Egress_V061_V5 +
+  options [document = false]
+  theories
+    Response_Egress_V061_ABI
+
+session OIP_Response_Egress_V061_Preservation_V7 in "Extensions/V061/Product/ResponseEgress/Preservation" = OIP_Response_Egress_V061_V5 +
+  options [document = false]
+  theories
+    Response_Egress_V061_Preservation
+
+session OIP_Sync_V061_Typed_Artifact in "Extensions/V061/Product/SyncCommitment/CurrentArtifact" = OIP_Sync_V061_Position_Nested_IR +
+  options [document = false]
+  theories
+    Sync_V061_Typed_Identity
+
+session OIP_Current_Read_G0_Source in "Extensions/V061/Product/CurrentRead/Source" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Current_Read_G0_Source
+
+session OIP_Response_Egress_V061_Operands in "Extensions/V061/Product/ResponseEgress/Operands" = OIP_Message_Egress +
+  options [document = false]
+  sessions
+    OIP_Sync_V061_Position_Nested_IR
+    OIP_Response_Code_Extension
+  theories
+    Response_Egress_V061_Operands
+
+session OIP_Response_Egress_V061_V5 in "Extensions/V061/Product/ResponseEgress/Packet" = OIP_Response_Egress_V061_Operands +
+  options [document = false]
+  sessions
+    OIP_Sync_V061_Position_Boundary
+    OIP_Reference_Write_Profile
+  theories
+    Response_Egress_V061_Fields
+    Response_Egress_V061_Packet
+
+session OIP_Response_Egress_V061_Export in "Extensions/V061/Product/ResponseEgress/CurrentArtifact" = OIP_Response_Egress_V061_Runtime_V7 +
+  options [document = false]
+  theories
+    Response_Egress_V061_Export
+
+session OIP_Sync_V061_Configured_Profile_ABI in "Extensions/V061/Product/SyncCommitment/ConfiguredProfile" = OIP_Sync_V061_Wire_V4 +
+  options [document = false]
+  theories
+    Sync_V061_Configured_Profile_ABI
+
+session OIP_Sync_V061_Supplier_ABI in "Extensions/V061/Product/SyncCommitment/SupplierABI" = OIP_Sync_V061_Concrete_Supplier_V2 +
+  options [document = false]
+  theories
+    Sync_V061_Supplier_ABI
+
+session OIP_Sync_V061_Image_Link in "Extensions/V061/Product/SyncCommitment/ImageLink" = OIP_Sync_V061_Position_Selection +
+  options [document = false]
+  theories
+    Sync_V061_Image_Link
+
+session OIP_Sync_V061_ID_Guard_ABI_V2 in "Extensions/V061/Product/SyncCommitment/IDGuardABI" = OIP_Sync_V061_Product_ABI +
+  options [document = false]
+  theories
+    Sync_V061_ID_Guard_ABI
+
+session OIP_Reference_Write_Capacity in "Extensions/V061/Product/Write/Capacity" = OIP_Reference_Write_Core_Seed +
+  options [document = false]
+  theories
+    Reference_Write_Capacity
+
+session OIP_Sync_V061_Image_Binding_ABI in "Extensions/V061/Product/SyncCommitment/ImageBindingABI" = OIP_Sync_V061_Image_Link +
+  options [document = false]
+  theories
+    Sync_V061_Image_Binding_ABI

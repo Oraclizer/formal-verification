@@ -1,15 +1,28 @@
 structure OIP_Wire_Response_Boundary : sig
   type nat
   type num
-  type char
-  type ('a, 'b) sum
   type wire_refusal
   type 'a wire_packet_ext
   type reference_response_kind
   type code_response_status
+  type char
+  type ('a, 'b) sum
+  type response_v061_sender_stage
   type response_fixed_observation
+  type response_v061_observation
   type 'a response_fixed_channel_ext
   type 'a response_fixed_client_boundary_ext
+  val code_response_admit_flat_oracle :
+    (IntInf.int list) list ->
+      IntInf.int list ->
+        IntInf.int list ->
+          (IntInf.int list) list -> IntInf.int * IntInf.int list
+  val code_response_full_model_identity : unit -> (IntInf.int list) list
+  val code_response_admit_queries_flat :
+    (IntInf.int list) list ->
+      IntInf.int list ->
+        IntInf.int list ->
+          (IntInf.int list) list -> IntInf.int * (IntInf.int list) list
   val code_response_egress_flat_oracle :
     (IntInf.int list) list ->
       IntInf.int ->
@@ -32,11 +45,10 @@ structure OIP_Wire_Response_Boundary : sig
                   (IntInf.int list) list ->
                     (IntInf.int list) list ->
                       IntInf.int * (IntInf.int list) list
-  val code_response_admit_flat_oracle :
-    (IntInf.int list) list ->
+  val code_response_result_flat_oracle :
+    IntInf.int ->
       IntInf.int list ->
-        IntInf.int list ->
-          (IntInf.int list) list -> IntInf.int * IntInf.int list
+        bool -> IntInf.int list -> bool * (IntInf.int * (bool * IntInf.int))
   val code_response_egress_queries_flat :
     (IntInf.int list) list ->
       IntInf.int ->
@@ -48,31 +60,6 @@ structure OIP_Wire_Response_Boundary : sig
                   (IntInf.int list) list ->
                     (IntInf.int list) list ->
                       IntInf.int * (IntInf.int list) list
-  val code_response_admit_queries_flat :
-    (IntInf.int list) list ->
-      IntInf.int list ->
-        IntInf.int list ->
-          (IntInf.int list) list -> IntInf.int * (IntInf.int list) list
-  val code_response_result_flat_oracle :
-    IntInf.int ->
-      IntInf.int list ->
-        bool -> IntInf.int list -> bool * (IntInf.int * (bool * IntInf.int))
-  val code_response_binding_flat_oracle :
-    IntInf.int ->
-      IntInf.int list ->
-        bool ->
-          IntInf.int list ->
-            IntInf.int list ->
-              IntInf.int list ->
-                bool *
-                  (IntInf.int *
-                    (IntInf.int *
-                      (bool *
-                        (IntInf.int *
-                          (IntInf.int *
-                            (IntInf.int list *
-                              (IntInf.int list * IntInf.int list)))))))
-  val code_response_full_model_identity : unit -> (IntInf.int list) list
   val code_response_encode_boundary_flat_oracle :
     (IntInf.int list) list ->
       IntInf.int ->
@@ -121,6 +108,21 @@ structure OIP_Wire_Response_Boundary : sig
                   (IntInf.int list) list ->
                     (IntInf.int list) list ->
                       IntInf.int * (IntInf.int list) list
+  val code_response_binding_flat_oracle :
+    IntInf.int ->
+      IntInf.int list ->
+        bool ->
+          IntInf.int list ->
+            IntInf.int list ->
+              IntInf.int list ->
+                bool *
+                  (IntInf.int *
+                    (IntInf.int *
+                      (bool *
+                        (IntInf.int *
+                          (IntInf.int *
+                            (IntInf.int list *
+                              (IntInf.int list * IntInf.int list)))))))
   val code_response_uuid_preimage_flat_oracle :
     IntInf.int list -> IntInf.int list -> IntInf.int -> bool * IntInf.int list
 end = struct
@@ -615,6 +617,13 @@ fun equal_lista A_ [] (x21 :: x22) = false
 
 fun equal_list A_ = {equal = equal_lista A_} : ('a list) equal;
 
+fun equal_optiona A_ NONE (SOME x2) = false
+  | equal_optiona A_ (SOME x2) NONE = false
+  | equal_optiona A_ (SOME x2) (SOME y2) = eq A_ x2 y2
+  | equal_optiona A_ NONE NONE = true;
+
+fun equal_option A_ = {equal = equal_optiona A_} : ('a option) equal;
+
 fun equal_proda A_ B_ (x1, x2) (y1, y2) = eq A_ x1 y1 andalso eq B_ x2 y2;
 
 fun equal_prod A_ B_ = {equal = equal_proda A_ B_} : ('a * 'b) equal;
@@ -622,6 +631,9 @@ fun equal_prod A_ B_ = {equal = equal_proda A_ B_} : ('a * 'b) equal;
 fun equal_unita u v = true;
 
 val equal_unit = {equal = equal_unita} : unit equal;
+
+val equal_integer = {equal = (fn a => fn b => ((a : IntInf.int) = b))} :
+  IntInf.int equal;
 
 val one_integera : IntInf.int = (1 : IntInf.int);
 
@@ -694,21 +706,727 @@ fun equal_wire_familya Wire_Heartbeat Wire_Governance = false
 
 val equal_wire_family = {equal = equal_wire_familya} : wire_family equal;
 
+datatype wire_refusal = Invalid_Wire_Format | Unsupported_Wire_Version |
+  Invalid_Wire_Source | Invalid_Wire_Signature | Invalid_Wire_Threshold |
+  Wire_TTL_Expired | Wire_TTL_Invalid | Conflicting_Wire_Replay;
+
+fun equal_wire_refusala Wire_TTL_Invalid Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Expired Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Wire_TTL_Expired = false
+  | equal_wire_refusala Wire_TTL_Expired Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Invalid Wire_TTL_Expired = false
+  | equal_wire_refusala Invalid_Wire_Threshold Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Threshold Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Invalid Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Threshold Wire_TTL_Expired = false
+  | equal_wire_refusala Wire_TTL_Expired Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Signature Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Signature Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Invalid Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Signature Wire_TTL_Expired = false
+  | equal_wire_refusala Wire_TTL_Expired Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Signature Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Threshold Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Source Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Invalid_Wire_Source = false
+  | equal_wire_refusala Invalid_Wire_Source Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Invalid Invalid_Wire_Source = false
+  | equal_wire_refusala Invalid_Wire_Source Wire_TTL_Expired = false
+  | equal_wire_refusala Wire_TTL_Expired Invalid_Wire_Source = false
+  | equal_wire_refusala Invalid_Wire_Source Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Threshold Invalid_Wire_Source = false
+  | equal_wire_refusala Invalid_Wire_Source Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Signature Invalid_Wire_Source = false
+  | equal_wire_refusala Unsupported_Wire_Version Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Unsupported_Wire_Version = false
+  | equal_wire_refusala Unsupported_Wire_Version Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Invalid Unsupported_Wire_Version = false
+  | equal_wire_refusala Unsupported_Wire_Version Wire_TTL_Expired = false
+  | equal_wire_refusala Wire_TTL_Expired Unsupported_Wire_Version = false
+  | equal_wire_refusala Unsupported_Wire_Version Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Threshold Unsupported_Wire_Version = false
+  | equal_wire_refusala Unsupported_Wire_Version Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Signature Unsupported_Wire_Version = false
+  | equal_wire_refusala Unsupported_Wire_Version Invalid_Wire_Source = false
+  | equal_wire_refusala Invalid_Wire_Source Unsupported_Wire_Version = false
+  | equal_wire_refusala Invalid_Wire_Format Conflicting_Wire_Replay = false
+  | equal_wire_refusala Conflicting_Wire_Replay Invalid_Wire_Format = false
+  | equal_wire_refusala Invalid_Wire_Format Wire_TTL_Invalid = false
+  | equal_wire_refusala Wire_TTL_Invalid Invalid_Wire_Format = false
+  | equal_wire_refusala Invalid_Wire_Format Wire_TTL_Expired = false
+  | equal_wire_refusala Wire_TTL_Expired Invalid_Wire_Format = false
+  | equal_wire_refusala Invalid_Wire_Format Invalid_Wire_Threshold = false
+  | equal_wire_refusala Invalid_Wire_Threshold Invalid_Wire_Format = false
+  | equal_wire_refusala Invalid_Wire_Format Invalid_Wire_Signature = false
+  | equal_wire_refusala Invalid_Wire_Signature Invalid_Wire_Format = false
+  | equal_wire_refusala Invalid_Wire_Format Invalid_Wire_Source = false
+  | equal_wire_refusala Invalid_Wire_Source Invalid_Wire_Format = false
+  | equal_wire_refusala Invalid_Wire_Format Unsupported_Wire_Version = false
+  | equal_wire_refusala Unsupported_Wire_Version Invalid_Wire_Format = false
+  | equal_wire_refusala Conflicting_Wire_Replay Conflicting_Wire_Replay = true
+  | equal_wire_refusala Wire_TTL_Invalid Wire_TTL_Invalid = true
+  | equal_wire_refusala Wire_TTL_Expired Wire_TTL_Expired = true
+  | equal_wire_refusala Invalid_Wire_Threshold Invalid_Wire_Threshold = true
+  | equal_wire_refusala Invalid_Wire_Signature Invalid_Wire_Signature = true
+  | equal_wire_refusala Invalid_Wire_Source Invalid_Wire_Source = true
+  | equal_wire_refusala Unsupported_Wire_Version Unsupported_Wire_Version = true
+  | equal_wire_refusala Invalid_Wire_Format Invalid_Wire_Format = true;
+
+val equal_wire_refusal = {equal = equal_wire_refusala} : wire_refusal equal;
+
+datatype sync_failure = Sync_Busy | Sync_Unavailable | Sync_Proof_Rejected |
+  Sync_Mismatch | Sync_Stale;
+
+fun equal_sync_failure Sync_Mismatch Sync_Stale = false
+  | equal_sync_failure Sync_Stale Sync_Mismatch = false
+  | equal_sync_failure Sync_Proof_Rejected Sync_Stale = false
+  | equal_sync_failure Sync_Stale Sync_Proof_Rejected = false
+  | equal_sync_failure Sync_Proof_Rejected Sync_Mismatch = false
+  | equal_sync_failure Sync_Mismatch Sync_Proof_Rejected = false
+  | equal_sync_failure Sync_Unavailable Sync_Stale = false
+  | equal_sync_failure Sync_Stale Sync_Unavailable = false
+  | equal_sync_failure Sync_Unavailable Sync_Mismatch = false
+  | equal_sync_failure Sync_Mismatch Sync_Unavailable = false
+  | equal_sync_failure Sync_Unavailable Sync_Proof_Rejected = false
+  | equal_sync_failure Sync_Proof_Rejected Sync_Unavailable = false
+  | equal_sync_failure Sync_Busy Sync_Stale = false
+  | equal_sync_failure Sync_Stale Sync_Busy = false
+  | equal_sync_failure Sync_Busy Sync_Mismatch = false
+  | equal_sync_failure Sync_Mismatch Sync_Busy = false
+  | equal_sync_failure Sync_Busy Sync_Proof_Rejected = false
+  | equal_sync_failure Sync_Proof_Rejected Sync_Busy = false
+  | equal_sync_failure Sync_Busy Sync_Unavailable = false
+  | equal_sync_failure Sync_Unavailable Sync_Busy = false
+  | equal_sync_failure Sync_Stale Sync_Stale = true
+  | equal_sync_failure Sync_Mismatch Sync_Mismatch = true
+  | equal_sync_failure Sync_Proof_Rejected Sync_Proof_Rejected = true
+  | equal_sync_failure Sync_Unavailable Sync_Unavailable = true
+  | equal_sync_failure Sync_Busy Sync_Busy = true;
+
+datatype sync_outcome = Sync_Uncommitted of sync_failure |
+  Sync_Committed of nat;
+
+fun equal_sync_outcomea (Sync_Uncommitted x1) (Sync_Committed x2) = false
+  | equal_sync_outcomea (Sync_Committed x2) (Sync_Uncommitted x1) = false
+  | equal_sync_outcomea (Sync_Committed x2) (Sync_Committed y2) =
+    equal_nata x2 y2
+  | equal_sync_outcomea (Sync_Uncommitted x1) (Sync_Uncommitted y1) =
+    equal_sync_failure x1 y1;
+
+val equal_sync_outcome = {equal = equal_sync_outcomea} : sync_outcome equal;
+
+datatype wire_deadline = Deadline_Absent | Deadline_Indefinite |
+  Deadline_At of nat;
+
+fun equal_wire_deadline Deadline_Indefinite (Deadline_At x3) = false
+  | equal_wire_deadline (Deadline_At x3) Deadline_Indefinite = false
+  | equal_wire_deadline Deadline_Absent (Deadline_At x3) = false
+  | equal_wire_deadline (Deadline_At x3) Deadline_Absent = false
+  | equal_wire_deadline Deadline_Absent Deadline_Indefinite = false
+  | equal_wire_deadline Deadline_Indefinite Deadline_Absent = false
+  | equal_wire_deadline (Deadline_At x3) (Deadline_At y3) = equal_nata x3 y3
+  | equal_wire_deadline Deadline_Indefinite Deadline_Indefinite = true
+  | equal_wire_deadline Deadline_Absent Deadline_Absent = true;
+
+datatype 'a wire_body_ext =
+  Wire_body_ext of nat * nat list * (nat list) list * wire_deadline * 'a;
+
+fun equal_wire_body_ext A_
+  (Wire_body_ext
+    (wire_opcodea, wire_wordsa, wire_blobsa, wire_deadlinea, morea))
+  (Wire_body_ext (wire_opcode, wire_words, wire_blobs, wire_deadline, more)) =
+  equal_nata wire_opcodea wire_opcode andalso
+    (equal_lista equal_nat wire_wordsa wire_words andalso
+      (equal_lista (equal_list equal_nat) wire_blobsa wire_blobs andalso
+        (equal_wire_deadline wire_deadlinea wire_deadline andalso
+          eq A_ morea more)));
+
+datatype 'a wire_core_ext =
+  Wire_core_ext of
+    nat * nat * nat * nat * nat * nat * nat * nat * nat * nat * nat list *
+      wire_family * nat * nat option * nat * unit wire_body_ext * nat * nat *
+      nat * 'a;
+
+fun equal_wire_core_ext A_
+  (Wire_core_ext
+    (wire_versiona, wire_purposea, wire_deploymenta, wire_source_domaina,
+      wire_target_domaina, wire_principala, wire_key_numbera,
+      wire_authority_epocha, wire_sent_secondsa, wire_ttl_secondsa, wire_uuida,
+      wire_message_familya, wire_primary_codea, wire_secondary_codea,
+      wire_signature_schemea, wire_operation_bodya, wire_atomicitya,
+      wire_prioritya, wire_route_scopea, morea))
+  (Wire_core_ext
+    (wire_version, wire_purpose, wire_deployment, wire_source_domain,
+      wire_target_domain, wire_principal, wire_key_number, wire_authority_epoch,
+      wire_sent_seconds, wire_ttl_seconds, wire_uuid, wire_message_family,
+      wire_primary_code, wire_secondary_code, wire_signature_scheme,
+      wire_operation_body, wire_atomicity, wire_priority, wire_route_scope,
+      more))
+  = equal_nata wire_versiona wire_version andalso
+      (equal_nata wire_purposea wire_purpose andalso
+        (equal_nata wire_deploymenta wire_deployment andalso
+          (equal_nata wire_source_domaina wire_source_domain andalso
+            (equal_nata wire_target_domaina wire_target_domain andalso
+              (equal_nata wire_principala wire_principal andalso
+                (equal_nata wire_key_numbera wire_key_number andalso
+                  (equal_nata wire_authority_epocha wire_authority_epoch andalso
+                    (equal_nata wire_sent_secondsa wire_sent_seconds andalso
+                      (equal_nata wire_ttl_secondsa wire_ttl_seconds andalso
+                        (equal_lista equal_nat wire_uuida wire_uuid andalso
+                          (equal_wire_familya wire_message_familya
+                             wire_message_family andalso
+                            (equal_nata wire_primary_codea
+                               wire_primary_code andalso
+                              (equal_optiona equal_nat wire_secondary_codea
+                                 wire_secondary_code andalso
+                                (equal_nata wire_signature_schemea
+                                   wire_signature_scheme andalso
+                                  (equal_wire_body_ext equal_unit
+                                     wire_operation_bodya
+                                     wire_operation_body andalso
+                                    (equal_nata wire_atomicitya
+                                       wire_atomicity andalso
+                                      (equal_nata wire_prioritya
+ wire_priority andalso
+(equal_nata wire_route_scopea wire_route_scope andalso
+  eq A_ morea more))))))))))))))))));
+
+datatype 'a wire_packet_ext =
+  Wire_packet_ext of unit wire_core_ext * nat list * 'a;
+
+fun equal_wire_packet_exta A_
+  (Wire_packet_ext (packet_corea, packet_signaturea, morea))
+  (Wire_packet_ext (packet_core, packet_signature, more)) =
+  equal_wire_core_ext equal_unit packet_corea packet_core andalso
+    (equal_lista equal_nat packet_signaturea packet_signature andalso
+      eq A_ morea more);
+
+fun equal_wire_packet_ext A_ = {equal = equal_wire_packet_exta A_} :
+  'a wire_packet_ext equal;
+
+datatype reference_response_kind = Recorded_Result | Delivery_Refusal |
+  Validation_Refusal;
+
+fun equal_reference_response_kinda Delivery_Refusal Validation_Refusal = false
+  | equal_reference_response_kinda Validation_Refusal Delivery_Refusal = false
+  | equal_reference_response_kinda Recorded_Result Validation_Refusal = false
+  | equal_reference_response_kinda Validation_Refusal Recorded_Result = false
+  | equal_reference_response_kinda Recorded_Result Delivery_Refusal = false
+  | equal_reference_response_kinda Delivery_Refusal Recorded_Result = false
+  | equal_reference_response_kinda Validation_Refusal Validation_Refusal = true
+  | equal_reference_response_kinda Delivery_Refusal Delivery_Refusal = true
+  | equal_reference_response_kinda Recorded_Result Recorded_Result = true;
+
+datatype code_response_status =
+  Code_Known_Response of reference_response_kind * nat |
+  Code_Unknown_Response of reference_response_kind * nat;
+
+fun equal_code_response_statusa (Code_Known_Response (x11, x12))
+  (Code_Unknown_Response (x21, x22)) = false
+  | equal_code_response_statusa (Code_Unknown_Response (x21, x22))
+    (Code_Known_Response (x11, x12)) = false
+  | equal_code_response_statusa (Code_Unknown_Response (x21, x22))
+    (Code_Unknown_Response (y21, y22)) =
+    equal_reference_response_kinda x21 y21 andalso equal_nata x22 y22
+  | equal_code_response_statusa (Code_Known_Response (x11, x12))
+    (Code_Known_Response (y11, y12)) =
+    equal_reference_response_kinda x11 y11 andalso equal_nata x12 y12;
+
+val equal_code_response_status = {equal = equal_code_response_statusa} :
+  code_response_status equal;
+
+val equal_reference_response_kind = {equal = equal_reference_response_kinda} :
+  reference_response_kind equal;
+
+datatype 'a sync_entry_ext = Sync_entry_ext of nat list * nat * nat * nat * 'a;
+
+fun equal_sync_entry_ext A_
+  (Sync_entry_ext
+    (sync_commitmenta, sync_positiona, sync_origin_epocha, sync_eventa, morea))
+  (Sync_entry_ext
+    (sync_commitment, sync_position, sync_origin_epoch, sync_event, more))
+  = equal_lista equal_nat sync_commitmenta sync_commitment andalso
+      (equal_nata sync_positiona sync_position andalso
+        (equal_nata sync_origin_epocha sync_origin_epoch andalso
+          (equal_nata sync_eventa sync_event andalso eq A_ morea more)));
+
+datatype 'a product_cut_ext = Product_cut_ext of nat * nat * 'a;
+
+fun equal_product_cut_ext A_
+  (Product_cut_ext (cut_authority_epocha, cut_revisiona, morea))
+  (Product_cut_ext (cut_authority_epoch, cut_revision, more)) =
+  equal_nata cut_authority_epocha cut_authority_epoch andalso
+    (equal_nata cut_revisiona cut_revision andalso eq A_ morea more);
+
+datatype sync_mode = Sync_Initial | Sync_Incremental | Sync_Full;
+
+fun equal_sync_mode Sync_Incremental Sync_Full = false
+  | equal_sync_mode Sync_Full Sync_Incremental = false
+  | equal_sync_mode Sync_Initial Sync_Full = false
+  | equal_sync_mode Sync_Full Sync_Initial = false
+  | equal_sync_mode Sync_Initial Sync_Incremental = false
+  | equal_sync_mode Sync_Incremental Sync_Initial = false
+  | equal_sync_mode Sync_Full Sync_Full = true
+  | equal_sync_mode Sync_Incremental Sync_Incremental = true
+  | equal_sync_mode Sync_Initial Sync_Initial = true;
+
+datatype 'a sync_request_ext =
+  Sync_request_ext of
+    (nat * nat) * nat * nat * unit product_cut_ext * (nat * nat) *
+      unit sync_entry_ext * sync_mode * (nat list) option * nat list * 'a;
+
+fun equal_sync_request_ext A_
+  (Sync_request_ext
+    (sync_calla, sync_messagea, sync_sessiona, sync_signed_cuta, sync_keya,
+      sync_requesteda, sync_modea, sync_claimed_priora, sync_attestationa,
+      morea))
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = equal_proda equal_nat equal_nat sync_calla sync_call andalso
+      (equal_nata sync_messagea sync_message andalso
+        (equal_nata sync_sessiona sync_session andalso
+          (equal_product_cut_ext equal_unit sync_signed_cuta
+             sync_signed_cut andalso
+            (equal_proda equal_nat equal_nat sync_keya sync_key andalso
+              (equal_sync_entry_ext equal_unit sync_requesteda
+                 sync_requested andalso
+                (equal_sync_mode sync_modea sync_mode andalso
+                  (equal_optiona (equal_list equal_nat) sync_claimed_priora
+                     sync_claimed_prior andalso
+                    (equal_lista equal_nat sync_attestationa
+                       sync_attestation andalso
+                      eq A_ morea more))))))));
+
+datatype 'a wire_native_call_ext =
+  Wire_native_call_ext of
+    nat * (nat * nat) * nat * unit product_cut_ext * nat * (nat * nat) * nat *
+      nat * nat * nat * nat * nat list * (nat list) list * 'a;
+
+fun equal_wire_native_call_ext A_
+  (Wire_native_call_ext
+    (native_referencea, native_ida, native_sessiona, native_cuta,
+      native_origin_epocha, native_origina, native_asseta,
+      native_funding_ownera, native_destinationa, native_recipienta,
+      native_amounta, native_tail_wordsa, native_proof_bytesa, morea))
+  (Wire_native_call_ext
+    (native_reference, native_id, native_session, native_cut,
+      native_origin_epoch, native_origin, native_asset, native_funding_owner,
+      native_destination, native_recipient, native_amount, native_tail_words,
+      native_proof_bytes, more))
+  = equal_nata native_referencea native_reference andalso
+      (equal_proda equal_nat equal_nat native_ida native_id andalso
+        (equal_nata native_sessiona native_session andalso
+          (equal_product_cut_ext equal_unit native_cuta native_cut andalso
+            (equal_nata native_origin_epocha native_origin_epoch andalso
+              (equal_proda equal_nat equal_nat native_origina
+                 native_origin andalso
+                (equal_nata native_asseta native_asset andalso
+                  (equal_nata native_funding_ownera native_funding_owner andalso
+                    (equal_nata native_destinationa native_destination andalso
+                      (equal_nata native_recipienta native_recipient andalso
+                        (equal_nata native_amounta native_amount andalso
+                          (equal_lista equal_nat native_tail_wordsa
+                             native_tail_words andalso
+                            (equal_lista (equal_list equal_nat)
+                               native_proof_bytesa native_proof_bytes andalso
+                              eq A_ morea more))))))))))));
+
+datatype ordinary_wire_command = Wire_Reserve of nat | Wire_Dispatch of nat |
+  Wire_Debit of nat | Wire_Cancel of nat | Wire_Fence of nat |
+  Wire_Preempt of nat | Wire_Timeout of nat | Wire_Record_Terminal of nat * nat
+  | Wire_Deliver of nat | Wire_Refund of nat * nat | Wire_Reconcile of nat * nat
+  | Wire_Write of nat * nat | Wire_Publish;
+
+fun equal_ordinary_wire_command (Wire_Write (x121, x122)) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Write (x121, x122)) = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) Wire_Publish =
+    false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Reconcile (x111, x112)) =
+    false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
+    (Wire_Write (x121, x122)) = false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122))
+    (Wire_Reconcile (x111, x112)) = false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Refund (x101, x102)) = false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
+    (Wire_Write (x121, x122)) = false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122))
+    (Wire_Refund (x101, x102)) = false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
+    (Wire_Reconcile (x111, x112)) = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
+    (Wire_Refund (x101, x102)) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Deliver x9) =
+    false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Reconcile (x111, x112))
+    = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Deliver x9)
+    = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Deliver x9) =
+    false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82)) Wire_Publish =
+    false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Record_Terminal (x81, x82)) =
+    false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Write (x121, x122)) = false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122))
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Reconcile (x111, x112)) = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Refund (x101, x102)) = false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Timeout x7) =
+    false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Reconcile (x111, x112))
+    = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Timeout x7)
+    = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Timeout x7) =
+    false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Preempt x6) =
+    false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Reconcile (x111, x112))
+    = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Preempt x6)
+    = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Preempt x6) =
+    false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Fence x5) =
+    false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Reconcile (x111, x112)) =
+    false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Fence x5) =
+    false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Fence x5) =
+    false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Cancel x4) =
+    false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Reconcile (x111, x112)) =
+    false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Cancel x4) =
+    false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Cancel x4) =
+    false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Debit x3) =
+    false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Reconcile (x111, x112)) =
+    false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Debit x3) =
+    false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Debit x3) =
+    false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Dispatch x2) =
+    false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Reconcile (x111, x112))
+    = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Dispatch x2)
+    = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Dispatch x2) =
+    false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) Wire_Publish = false
+  | equal_ordinary_wire_command Wire_Publish (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Write (x121, x122)) =
+    false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Reserve x1) =
+    false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Reconcile (x111, x112))
+    = false
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Reserve x1)
+    = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Refund (x101, x102)) =
+    false
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Reserve x1) =
+    false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Deliver x9) = false
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1)
+    (Wire_Record_Terminal (x81, x82)) = false
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Timeout x7) = false
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Preempt x6) = false
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Fence x5) = false
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Cancel x4) = false
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Debit x3) = false
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Dispatch x2) = false
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Reserve x1) = false
+  | equal_ordinary_wire_command (Wire_Write (x121, x122))
+    (Wire_Write (y121, y122)) =
+    equal_nata x121 y121 andalso equal_nata x122 y122
+  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
+    (Wire_Reconcile (y111, y112)) =
+    equal_nata x111 y111 andalso equal_nata x112 y112
+  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
+    (Wire_Refund (y101, y102)) =
+    equal_nata x101 y101 andalso equal_nata x102 y102
+  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Deliver y9) =
+    equal_nata x9 y9
+  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
+    (Wire_Record_Terminal (y81, y82)) =
+    equal_nata x81 y81 andalso equal_nata x82 y82
+  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Timeout y7) =
+    equal_nata x7 y7
+  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Preempt y6) =
+    equal_nata x6 y6
+  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Fence y5) =
+    equal_nata x5 y5
+  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Cancel y4) =
+    equal_nata x4 y4
+  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Debit y3) =
+    equal_nata x3 y3
+  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Dispatch y2) =
+    equal_nata x2 y2
+  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Reserve y1) =
+    equal_nata x1 y1
+  | equal_ordinary_wire_command Wire_Publish Wire_Publish = true;
+
+datatype code_nested_operand =
+  Code_Nested_Ordinary of unit wire_native_call_ext * ordinary_wire_command |
+  Code_Nested_Legal of (nat * nat) | Code_Nested_Spend of (nat * nat) |
+  Code_Nested_Receipt of unit wire_core_ext | Code_Nested_Response |
+  Code_Nested_Other;
+
+fun equal_code_nested_operand Code_Nested_Response Code_Nested_Other = false
+  | equal_code_nested_operand Code_Nested_Other Code_Nested_Response = false
+  | equal_code_nested_operand (Code_Nested_Receipt x4) Code_Nested_Other = false
+  | equal_code_nested_operand Code_Nested_Other (Code_Nested_Receipt x4) = false
+  | equal_code_nested_operand (Code_Nested_Receipt x4) Code_Nested_Response =
+    false
+  | equal_code_nested_operand Code_Nested_Response (Code_Nested_Receipt x4) =
+    false
+  | equal_code_nested_operand (Code_Nested_Spend x3) Code_Nested_Other = false
+  | equal_code_nested_operand Code_Nested_Other (Code_Nested_Spend x3) = false
+  | equal_code_nested_operand (Code_Nested_Spend x3) Code_Nested_Response =
+    false
+  | equal_code_nested_operand Code_Nested_Response (Code_Nested_Spend x3) =
+    false
+  | equal_code_nested_operand (Code_Nested_Spend x3) (Code_Nested_Receipt x4) =
+    false
+  | equal_code_nested_operand (Code_Nested_Receipt x4) (Code_Nested_Spend x3) =
+    false
+  | equal_code_nested_operand (Code_Nested_Legal x2) Code_Nested_Other = false
+  | equal_code_nested_operand Code_Nested_Other (Code_Nested_Legal x2) = false
+  | equal_code_nested_operand (Code_Nested_Legal x2) Code_Nested_Response =
+    false
+  | equal_code_nested_operand Code_Nested_Response (Code_Nested_Legal x2) =
+    false
+  | equal_code_nested_operand (Code_Nested_Legal x2) (Code_Nested_Receipt x4) =
+    false
+  | equal_code_nested_operand (Code_Nested_Receipt x4) (Code_Nested_Legal x2) =
+    false
+  | equal_code_nested_operand (Code_Nested_Legal x2) (Code_Nested_Spend x3) =
+    false
+  | equal_code_nested_operand (Code_Nested_Spend x3) (Code_Nested_Legal x2) =
+    false
+  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
+    Code_Nested_Other = false
+  | equal_code_nested_operand Code_Nested_Other
+    (Code_Nested_Ordinary (x11, x12)) = false
+  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
+    Code_Nested_Response = false
+  | equal_code_nested_operand Code_Nested_Response
+    (Code_Nested_Ordinary (x11, x12)) = false
+  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
+    (Code_Nested_Receipt x4) = false
+  | equal_code_nested_operand (Code_Nested_Receipt x4)
+    (Code_Nested_Ordinary (x11, x12)) = false
+  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
+    (Code_Nested_Spend x3) = false
+  | equal_code_nested_operand (Code_Nested_Spend x3)
+    (Code_Nested_Ordinary (x11, x12)) = false
+  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
+    (Code_Nested_Legal x2) = false
+  | equal_code_nested_operand (Code_Nested_Legal x2)
+    (Code_Nested_Ordinary (x11, x12)) = false
+  | equal_code_nested_operand (Code_Nested_Receipt x4) (Code_Nested_Receipt y4)
+    = equal_wire_core_ext equal_unit x4 y4
+  | equal_code_nested_operand (Code_Nested_Spend x3) (Code_Nested_Spend y3) =
+    equal_proda equal_nat equal_nat x3 y3
+  | equal_code_nested_operand (Code_Nested_Legal x2) (Code_Nested_Legal y2) =
+    equal_proda equal_nat equal_nat x2 y2
+  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
+    (Code_Nested_Ordinary (y11, y12)) =
+    equal_wire_native_call_ext equal_unit x11 y11 andalso
+      equal_ordinary_wire_command x12 y12
+  | equal_code_nested_operand Code_Nested_Other Code_Nested_Other = true
+  | equal_code_nested_operand Code_Nested_Response Code_Nested_Response = true;
+
+datatype response_v061_nested =
+  Response_V061_Legacy_Operand of code_nested_operand |
+  Response_V061_Sync_Operand of unit sync_request_ext |
+  Response_V061_Receipt of unit wire_core_ext | Response_V061_Current;
+
+fun equal_response_v061_nesteda (Response_V061_Receipt x3) Response_V061_Current
+  = false
+  | equal_response_v061_nesteda Response_V061_Current (Response_V061_Receipt x3)
+    = false
+  | equal_response_v061_nesteda (Response_V061_Sync_Operand x2)
+    Response_V061_Current = false
+  | equal_response_v061_nesteda Response_V061_Current
+    (Response_V061_Sync_Operand x2) = false
+  | equal_response_v061_nesteda (Response_V061_Sync_Operand x2)
+    (Response_V061_Receipt x3) = false
+  | equal_response_v061_nesteda (Response_V061_Receipt x3)
+    (Response_V061_Sync_Operand x2) = false
+  | equal_response_v061_nesteda (Response_V061_Legacy_Operand x1)
+    Response_V061_Current = false
+  | equal_response_v061_nesteda Response_V061_Current
+    (Response_V061_Legacy_Operand x1) = false
+  | equal_response_v061_nesteda (Response_V061_Legacy_Operand x1)
+    (Response_V061_Receipt x3) = false
+  | equal_response_v061_nesteda (Response_V061_Receipt x3)
+    (Response_V061_Legacy_Operand x1) = false
+  | equal_response_v061_nesteda (Response_V061_Legacy_Operand x1)
+    (Response_V061_Sync_Operand x2) = false
+  | equal_response_v061_nesteda (Response_V061_Sync_Operand x2)
+    (Response_V061_Legacy_Operand x1) = false
+  | equal_response_v061_nesteda (Response_V061_Receipt x3)
+    (Response_V061_Receipt y3) = equal_wire_core_ext equal_unit x3 y3
+  | equal_response_v061_nesteda (Response_V061_Sync_Operand x2)
+    (Response_V061_Sync_Operand y2) = equal_sync_request_ext equal_unit x2 y2
+  | equal_response_v061_nesteda (Response_V061_Legacy_Operand x1)
+    (Response_V061_Legacy_Operand y1) = equal_code_nested_operand x1 y1
+  | equal_response_v061_nesteda Response_V061_Current Response_V061_Current =
+    true;
+
+val equal_response_v061_nested = {equal = equal_response_v061_nesteda} :
+  response_v061_nested equal;
+
 datatype 'a set = Set of 'a list | Coset of 'a list;
 
 datatype char = Chara of bool * bool * bool * bool * bool * bool * bool * bool;
 
 datatype ('a, 'b) sum = Inl of 'a | Inr of 'b;
 
-datatype wire_deadline = Deadline_Absent | Deadline_Indefinite |
-  Deadline_At of nat;
-
 datatype proto_field = Proto_Varint of nat * nat | Proto_Fixed64 of nat * nat |
   Proto_Bytes of nat * nat list;
-
-datatype wire_refusal = Invalid_Wire_Format | Unsupported_Wire_Version |
-  Invalid_Wire_Source | Invalid_Wire_Signature | Invalid_Wire_Threshold |
-  Wire_TTL_Expired | Wire_TTL_Invalid | Conflicting_Wire_Replay;
 
 datatype terminal_kind = Confirmed_Decision | Reversed_Decision;
 
@@ -717,23 +1435,12 @@ datatype legal_refusal = Invalid_Legal_Authority | Invalid_Legal_State |
   Appeal_Still_Open | Missing_Confiscation_Destination | Conflicting_Legal_Order
   | Invalid_Legal_Binding;
 
-datatype 'a wire_body_ext =
-  Wire_body_ext of nat * nat list * (nat list) list * wire_deadline * 'a;
-
-datatype 'a wire_core_ext =
-  Wire_core_ext of
-    nat * nat * nat * nat * nat * nat * nat * nat * nat * nat * nat list *
-      wire_family * nat * nat option * nat * unit wire_body_ext * nat * nat *
-      nat * 'a;
-
 datatype 'a session_proof_ext = Session_proof_ext of nat * nat * 'a;
 
 datatype application_query = Source_Balance of (nat * nat) |
   Destination_Balance of (nat * (nat * nat)) |
   Root_Balance of (nat * nat) * (nat * (nat * nat)) | Application_Value of nat |
   Regulatory_State of nat * nat | Terminal_Receipt of (nat * nat);
-
-datatype 'a product_cut_ext = Product_cut_ext of nat * nat * 'a;
 
 datatype identity_read_request =
   Current_Data of application_query * unit product_cut_ext |
@@ -744,14 +1451,8 @@ datatype parsed_wire_query =
   Wire_Read_Request of unit session_proof_ext * identity_read_request |
   Wire_Cache_Request of unit session_proof_ext * application_query;
 
-datatype 'a wire_packet_ext =
-  Wire_packet_ext of unit wire_core_ext * nat list * 'a;
-
-datatype ordinary_wire_command = Wire_Reserve of nat | Wire_Dispatch of nat |
-  Wire_Debit of nat | Wire_Cancel of nat | Wire_Fence of nat |
-  Wire_Preempt of nat | Wire_Timeout of nat | Wire_Record_Terminal of nat * nat
-  | Wire_Deliver of nat | Wire_Refund of nat * nat | Wire_Reconcile of nat * nat
-  | Wire_Write of nat * nat | Wire_Publish;
+datatype 'a sync_query_ext =
+  Sync_query_ext of nat * unit product_cut_ext * (nat * nat) * 'a;
 
 datatype code_legal_stage = Code_Source_Emission | Code_Receiving_Commit;
 
@@ -769,11 +1470,6 @@ datatype 'a product_lock_token_ext =
 datatype 'a product_lock_credential_ext =
   Product_lock_credential_ext of
     unit product_lock_token_ext * nat * (nat * nat) * 'a;
-
-datatype 'a wire_native_call_ext =
-  Wire_native_call_ext of
-    nat * (nat * nat) * nat * unit product_cut_ext * nat * (nat * nat) * nat *
-      nat * nat * nat * nat * nat list * (nat list) list * 'a;
 
 datatype code_ordinary_result = Code_Ordinary_Refused of wire_refusal |
   Code_Ordinary_Ready of
@@ -801,12 +1497,6 @@ datatype 'a code_spend_fields_ext =
 
 datatype code_spend_result = Code_Spend_Refused of wire_refusal |
   Code_Spend_Ready of unit wire_native_call_ext * unit code_spend_fields_ext;
-
-datatype code_nested_operand =
-  Code_Nested_Ordinary of unit wire_native_call_ext * ordinary_wire_command |
-  Code_Nested_Legal of (nat * nat) | Code_Nested_Spend of (nat * nat) |
-  Code_Nested_Receipt of unit wire_core_ext | Code_Nested_Response |
-  Code_Nested_Other;
 
 datatype code_source_spend_reply = Code_Source_Spend_Executed of nat |
   Code_Source_Spend_Rejected | Code_Source_Spend_Busy |
@@ -843,13 +1533,6 @@ datatype code_source_receipt =
   Code_Source_Legal_Receipt of code_source_legal_reply |
   Code_Source_Spend_Receipt of code_source_spend_reply;
 
-datatype reference_response_kind = Recorded_Result | Delivery_Refusal |
-  Validation_Refusal;
-
-datatype code_response_status =
-  Code_Known_Response of reference_response_kind * nat |
-  Code_Unknown_Response of reference_response_kind * nat;
-
 datatype code_operand_tree_result = Code_Tree_Refused of wire_refusal |
   Code_Tree_Ready of code_nested_operand | Code_Tree_Pending;
 
@@ -872,6 +1555,9 @@ datatype code_source_wire_error = Code_Source_Wire_Validation of wire_refusal |
   Code_Source_Wire_Deadline | Code_Source_Wire_Response_Lost |
   Code_Source_Wire_Unresolved |
   Code_Source_Wire_Recovery of code_source_recovery_error;
+
+datatype response_v061_sender_stage = Response_V061_Plan | Response_V061_Prefix
+  | Response_V061_Emit;
 
 datatype code_source_action_reply =
   Code_Source_Ordinary_Collected of unit code_source_outcome_ext |
@@ -904,12 +1590,13 @@ datatype response_fixed_observation =
   | Response_Fixed_Resolved of code_source_resolution |
   Response_Fixed_Error of code_source_wire_error;
 
+datatype response_v061_observation =
+  Response_V061_Legacy of response_fixed_observation |
+  Response_V061_Sync of sync_outcome * sync_outcome option;
+
 datatype response_fixed_encoding_error =
   Response_Fixed_Encoding_Refused of wire_refusal |
   Response_Fixed_Signature_Unavailable;
-
-datatype 'a code_channel_guard_ext =
-  Code_channel_guard_ext of nat * nat * nat * nat * nat * nat list * bool * 'a;
 
 datatype 'a response_fixed_site_ext =
   Response_fixed_site_ext of
@@ -998,6 +1685,9 @@ fun image f (Set xs) = Set (map f xs);
 fun foldr f [] = id
   | foldr f (x :: xs) = f x o foldr f xs;
 
+fun map_of A_ [] k = NONE
+  | map_of A_ ((l, v) :: ps) k = (if eq A_ l k then SOME v else map_of A_ ps k);
+
 fun removeAll A_ x [] = []
   | removeAll A_ x (y :: xs) =
     (if eq A_ x y then removeAll A_ x xs else y :: removeAll A_ x xs);
@@ -1021,6 +1711,11 @@ fun filter p [] = []
 fun bind NONE f = NONE
   | bind (SOME x) f = f x;
 
+fun hd (x21 :: x22) = x21;
+
+fun tl [] = []
+  | tl (x21 :: x22) = x22;
+
 fun distinct A_ [] = true
   | distinct A_ (x :: xs) = not (membera A_ xs x) andalso distinct A_ xs;
 
@@ -1041,6 +1736,9 @@ fun list_update [] i y = []
   | list_update (x :: xs) i y =
     (if equal_nata i zero_nata then y :: xs
       else x :: list_update xs (minus_nata i one_nata) y);
+
+fun map_sum f1 f2 (Inl a) = Inl (f1 a)
+  | map_sum f1 f2 (Inr a) = Inr (f2 a);
 
 fun length_tailrec [] n = n
   | length_tailrec (x :: xs) n = length_tailrec xs (suc n);
@@ -1824,6 +2522,9 @@ fun decode_wire_core bytes =
 
 fun nat_of_char c = Nat (integer_of_char c);
 
+fun sync_operation core =
+  (wire_message_family core, wire_opcode (wire_operation_body core));
+
 fun wire_packet_wellformed packet =
   wire_core_wellformed (packet_core packet) andalso
     (wire_octets (numeral_nat, ord_nat) (packet_signature packet) andalso
@@ -1864,6 +2565,171 @@ fun decode_wire_packet bytes =
 fun mina A_ (Set []) = abort_empty_set (mina A_)
   | mina A_ (Set (x :: xs)) =
     fold (min ((ord_preorder o preorder_order o order_linorder) A_)) xs x;
+
+fun equal_proto_field (Proto_Fixed64 (x21, x22)) (Proto_Bytes (x31, x32)) =
+  false
+  | equal_proto_field (Proto_Bytes (x31, x32)) (Proto_Fixed64 (x21, x22)) =
+    false
+  | equal_proto_field (Proto_Varint (x11, x12)) (Proto_Bytes (x31, x32)) = false
+  | equal_proto_field (Proto_Bytes (x31, x32)) (Proto_Varint (x11, x12)) = false
+  | equal_proto_field (Proto_Varint (x11, x12)) (Proto_Fixed64 (x21, x22)) =
+    false
+  | equal_proto_field (Proto_Fixed64 (x21, x22)) (Proto_Varint (x11, x12)) =
+    false
+  | equal_proto_field (Proto_Bytes (x31, x32)) (Proto_Bytes (y31, y32)) =
+    equal_nata x31 y31 andalso equal_lista equal_nat x32 y32
+  | equal_proto_field (Proto_Fixed64 (x21, x22)) (Proto_Fixed64 (y21, y22)) =
+    equal_nata x21 y21 andalso equal_nata x22 y22
+  | equal_proto_field (Proto_Varint (x11, x12)) (Proto_Varint (y11, y12)) =
+    equal_nata x11 y11 andalso equal_nata x12 y12;
+
+fun wire_operation_body_update wire_operation_bodya
+  (Wire_core_ext
+    (wire_version, wire_purpose, wire_deployment, wire_source_domain,
+      wire_target_domain, wire_principal, wire_key_number, wire_authority_epoch,
+      wire_sent_seconds, wire_ttl_seconds, wire_uuid, wire_message_family,
+      wire_primary_code, wire_secondary_code, wire_signature_scheme,
+      wire_operation_body, wire_atomicity, wire_priority, wire_route_scope,
+      more))
+  = Wire_core_ext
+      (wire_version, wire_purpose, wire_deployment, wire_source_domain,
+        wire_target_domain, wire_principal, wire_key_number,
+        wire_authority_epoch, wire_sent_seconds, wire_ttl_seconds, wire_uuid,
+        wire_message_family, wire_primary_code, wire_secondary_code,
+        wire_signature_scheme, wire_operation_bodya wire_operation_body,
+        wire_atomicity, wire_priority, wire_route_scope, more);
+
+fun wire_opcode_update wire_opcodea
+  (Wire_body_ext (wire_opcode, wire_words, wire_blobs, wire_deadline, more)) =
+  Wire_body_ext
+    (wire_opcodea wire_opcode, wire_words, wire_blobs, wire_deadline, more);
+
+fun sync_added_operation core =
+  member (equal_prod equal_wire_family equal_nat) (sync_operation core)
+    (insert (equal_prod equal_wire_family equal_nat)
+      (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+      (insert (equal_prod equal_wire_family equal_nat)
+        (Wire_Query, nat_of_integer (9 : IntInf.int)) bot_set));
+
+fun sync_new_body_field (Proto_Bytes (tag, raw)) =
+  (if member equal_nat tag
+        (insert equal_nat (nat_of_integer (16 : IntInf.int))
+          (insert equal_nat (nat_of_integer (19 : IntInf.int)) bot_set))
+    then bind (decode_wire_body raw)
+           (fn body =>
+             (if member (equal_prod equal_nat equal_nat) (tag, wire_opcode body)
+                   (insert (equal_prod equal_nat equal_nat)
+                     (nat_of_integer (16 : IntInf.int),
+                       nat_of_integer (7 : IntInf.int))
+                     (insert (equal_prod equal_nat equal_nat)
+                       (nat_of_integer (19 : IntInf.int),
+                         nat_of_integer (9 : IntInf.int))
+                       bot_set))
+               then SOME (tag, body) else NONE))
+    else NONE)
+  | sync_new_body_field (Proto_Varint (v, va)) = NONE
+  | sync_new_body_field (Proto_Fixed64 (v, va)) = NONE;
+
+fun sync_parse_new_core wire_items =
+  bind (find (fn field => not (is_none (sync_new_body_field field))) wire_items)
+    (fn candidate =>
+      bind (sync_new_body_field candidate)
+        (fn (tag, body) =>
+          let
+            val alias =
+              Proto_Bytes
+                (tag, encode_wire_body
+                        (wire_opcode_update (fn _ => one_nata) body));
+          in
+            bind (parse_core_fields
+                   (map (fn field =>
+                          (if equal_proto_field field candidate then alias
+                            else field))
+                     wire_items))
+              (fn legacy =>
+                let
+                  val original =
+                    wire_operation_body_update (fn _ => body) legacy;
+                in
+                  (if wire_core_wellformed legacy andalso
+                        sync_added_operation original
+                    then SOME original else NONE)
+                end)
+          end));
+
+fun sync_decode_core raw =
+  (case decode_wire_core raw
+    of NONE =>
+      bind (read_canonical_proto_fields raw)
+        (fn wire_items =>
+          bind (sync_parse_new_core wire_items)
+            (fn core =>
+              (if equal_lista equal_nat (encode_wire_core core) raw
+                then SOME core else NONE)))
+    | SOME a => SOME a);
+
+fun equal_sum A_ B_ (Inl x1) (Inr x2) = false
+  | equal_sum A_ B_ (Inr x2) (Inl x1) = false
+  | equal_sum A_ B_ (Inr x2) (Inr y2) = eq B_ x2 y2
+  | equal_sum A_ B_ (Inl x1) (Inl y1) = eq A_ x1 y1;
+
+fun sync_read_query core =
+  let
+    val body = wire_operation_body core;
+  in
+    (if not (equal_proda equal_wire_family equal_nat (sync_operation core)
+              (Wire_Query, nat_of_integer (9 : IntInf.int))) orelse
+          (not (equal_wire_deadline (wire_deadline body) Deadline_Absent) orelse
+            not (null (wire_blobs body)))
+      then NONE
+      else (case wire_words body of [] => NONE | [_] => NONE | [_, _] => NONE
+             | [_, _, _] => NONE
+             | [session, revision_word, asset, origin] =>
+               SOME (Sync_query_ext
+                      (session,
+                        Product_cut_ext
+                          (wire_authority_epoch core, revision_word, ()),
+                        (asset, origin), ()))
+             | _ :: _ :: _ :: _ :: _ :: _ => NONE))
+  end;
+
+fun sync_decode_packet raw =
+  (case decode_wire_packet raw
+    of NONE =>
+      (case read_canonical_proto_fields raw of NONE => NONE | SOME [] => NONE
+        | SOME (Proto_Varint (_, _) :: _) => NONE
+        | SOME (Proto_Fixed64 (_, _) :: _) => NONE
+        | SOME [Proto_Bytes (_, _)] => NONE
+        | SOME (Proto_Bytes (_, _) :: Proto_Varint (_, _) :: _) => NONE
+        | SOME (Proto_Bytes (_, _) :: Proto_Fixed64 (_, _) :: _) => NONE
+        | SOME [Proto_Bytes (core_tag, original),
+                 Proto_Bytes (signature_tag, signaturea)]
+          => (if equal_nata core_tag one_nata andalso
+                   equal_nata signature_tag (nat_of_integer (2 : IntInf.int))
+               then bind (sync_decode_core original)
+                      (fn core =>
+                        let
+                          val packet = Wire_packet_ext (core, signaturea, ());
+                        in
+                          (if sync_added_operation core andalso
+                                (less_nat (size_list original)
+                                   (power power_nat
+                                     (nat_of_integer (256 : IntInf.int))
+                                     (nat_of_integer (4 : IntInf.int))) andalso
+                                  (wire_octets (numeral_nat, ord_nat)
+                                     signaturea andalso
+                                    ((if equal_nata (wire_signature_scheme core)
+   one_nata
+                                       then equal_nata (size_list signaturea)
+      (nat_of_integer (64 : IntInf.int))
+                                       else not (null signaturea)) andalso
+                                      equal_lista equal_nat
+(encode_wire_packet packet) raw)))
+                            then SOME packet else NONE)
+                        end)
+               else NONE)
+        | SOME (Proto_Bytes (_, _) :: Proto_Bytes (_, _) :: _ :: _) => NONE)
+    | SOME a => SOME a);
 
 fun boundary_critical_allowed
   (Wire_boundary_ext
@@ -2123,10 +2989,12 @@ fun code_encode_packet packet =
                          (packet_signature packet))
                then NONE else SOME (code_packet_bytes packet))));
 
-fun equal_option A_ NONE (SOME x2) = false
-  | equal_option A_ (SOME x2) NONE = false
-  | equal_option A_ (SOME x2) (SOME y2) = eq A_ x2 y2
-  | equal_option A_ NONE NONE = true;
+fun sync_added_status number =
+  member equal_nat number
+    (insert equal_nat (nat_of_integer (29 : IntInf.int))
+      (insert equal_nat (nat_of_integer (39 : IntInf.int))
+        (insert equal_nat (nat_of_integer (40 : IntInf.int))
+          (insert equal_nat (nat_of_integer (41 : IntInf.int)) bot_set))));
 
 fun negotiated_schemes
   (Negotiated_wire_profile_ext
@@ -2478,16 +3346,6 @@ fun code_parse_enforcement_fields deadline words =
                             (officer, jurisdiction, basis, assets, prior,
                               code_product_deadline deadline, ()))))));
 
-fun equal_wire_deadline Deadline_Indefinite (Deadline_At x3) = false
-  | equal_wire_deadline (Deadline_At x3) Deadline_Indefinite = false
-  | equal_wire_deadline Deadline_Absent (Deadline_At x3) = false
-  | equal_wire_deadline (Deadline_At x3) Deadline_Absent = false
-  | equal_wire_deadline Deadline_Absent Deadline_Indefinite = false
-  | equal_wire_deadline Deadline_Indefinite Deadline_Absent = false
-  | equal_wire_deadline (Deadline_At x3) (Deadline_At y3) = equal_nata x3 y3
-  | equal_wire_deadline Deadline_Indefinite Deadline_Indefinite = true
-  | equal_wire_deadline Deadline_Absent Deadline_Absent = true;
-
 fun code_parse_spend_fields family deadline native =
   (case native_tail_words native of [] => NONE | [_] => NONE | [_, _] => NONE
     | [_, _, _] => NONE
@@ -2765,6 +3623,17 @@ fun code_json_u64 bytes =
 fun code_json_grant x =
   code_json_triple code_json_u64 (code_json_enum code_json_routes)
     (code_json_enum code_json_permissions) x;
+
+fun sync_mode_at tag =
+  (if equal_nata tag one_nata then SOME Sync_Initial
+    else (if equal_nata tag (nat_of_integer (2 : IntInf.int))
+           then SOME Sync_Incremental
+           else (if equal_nata tag (nat_of_integer (3 : IntInf.int))
+                  then SOME Sync_Full else NONE)));
+
+fun sync_single_original core =
+  (case wire_blobs (wire_operation_body core) of [] => NONE
+    | [raw] => sync_decode_core raw | _ :: _ :: _ => NONE);
 
 fun code_json_lex3 first second =
   let
@@ -3369,6 +4238,54 @@ fun code_response_words (A1_, A2_) call_id kind number position =
                       revision]))
     else NONE);
 
+fun sync_read_operands core =
+  let
+    val body = wire_operation_body core;
+  in
+    (if not (equal_wire_familya (wire_message_family core)
+              Wire_State_Sync) orelse
+          (not (equal_nata (wire_opcode body)
+                 (nat_of_integer (7 : IntInf.int))) orelse
+            not (equal_wire_deadline (wire_deadline body) Deadline_Absent))
+      then NONE
+      else (case (wire_words body, wire_blobs body) of ([], _) => NONE
+             | ([_], _) => NONE | ([_, _], _) => NONE | ([_, _, _], _) => NONE
+             | ([_, _, _, _], _) => NONE | ([_, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _, _, _], _) => NONE
+             | ([_, _, _, _, _, _, _, _, _, _], []) => NONE
+             | ([_, _, _, _, _, _, _, _, _, _], [_]) => NONE
+             | ([_, _, _, _, _, _, _, _, _, _], [_, _]) => NONE
+             | ([message, call_sequence, session, revision_word, epoch, origin,
+                  event, asset, pos, mode],
+                 [commitment, prior, proof])
+               => bind (sync_mode_at mode)
+                    (fn m =>
+                      (if equal_nata (size_list commitment)
+                            (nat_of_integer (32 : IntInf.int)) andalso
+                            equal_nata (size_list prior)
+                              (if equal_sync_mode m Sync_Incremental
+                                then nat_of_integer (32 : IntInf.int)
+                                else zero_nata)
+                        then SOME (Sync_request_ext
+                                    ((wire_principal core, call_sequence),
+                                      message, session,
+                                      Product_cut_ext
+(wire_authority_epoch core, revision_word, ()),
+                                      (asset, origin),
+                                      Sync_entry_ext
+(commitment, pos, epoch, event, ()),
+                                      m, (if equal_sync_mode m Sync_Incremental
+   then SOME prior else NONE),
+                                      proof, ()))
+                        else NONE))
+             | ([_, _, _, _, _, _, _, _, _, _], _ :: _ :: _ :: _ :: _) => NONE
+             | (_ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _ :: _, _) =>
+               NONE))
+  end;
+
 fun response_parameter_principal
   (Response_fixed_parameters_ext
     (response_parameter_principal, response_parameter_key,
@@ -3467,67 +4384,179 @@ fun response_kind_at number =
            else (if equal_nata number (nat_of_integer (3 : IntInf.int))
                   then SOME Validation_Refusal else NONE)));
 
-fun boundary_max_frame
+fun reference_accepts_write family opcode =
+  code_reference_accepts family opcode orelse
+    equal_wire_familya family Wire_Lock andalso
+      equal_nata opcode (nat_of_integer (7 : IntInf.int));
+
+val sync_response_operation : wire_family * nat =
+  (Wire_State_Sync, nat_of_integer (7 : IntInf.int));
+
+val sync_response_allocations :
+  (nat * (reference_response_kind * (bool * (wire_family * nat) list))) list
+  = [(nat_of_integer (29 : IntInf.int),
+       (Recorded_Result, (true, [sync_response_operation]))),
+      (nat_of_integer (39 : IntInf.int),
+        (Recorded_Result, (false, [sync_response_operation]))),
+      (nat_of_integer (40 : IntInf.int),
+        (Recorded_Result, (false, [sync_response_operation]))),
+      (nat_of_integer (41 : IntInf.int),
+        (Recorded_Result, (false, [sync_response_operation])))];
+
+fun response_fixed_descriptor number =
+  (if member equal_nat number
+        (sup_set equal_nat
+          (insert equal_nat one_nata
+            (insert equal_nat (nat_of_integer (2 : IntInf.int))
+              (insert equal_nat (nat_of_integer (3 : IntInf.int))
+                (insert equal_nat (nat_of_integer (4 : IntInf.int)) bot_set))))
+          (atLeastAtMost (equal_nat, interval_nat)
+            (nat_of_integer (30 : IntInf.int))
+            (nat_of_integer (38 : IntInf.int))))
+    then SOME (Recorded_Result, false)
+    else (if member equal_nat number
+               (atLeastAtMost (equal_nat, interval_nat)
+                 (nat_of_integer (10 : IntInf.int))
+                 (nat_of_integer (28 : IntInf.int)))
+           then SOME (Recorded_Result, true)
+           else (if member equal_nat number
+                      (atLeastAtMost (equal_nat, interval_nat)
+                        (nat_of_integer (50 : IntInf.int))
+                        (nat_of_integer (56 : IntInf.int)))
+                  then SOME (Delivery_Refusal, false)
+                  else (if member equal_nat number
+                             (atLeastAtMost (equal_nat, interval_nat)
+                               (nat_of_integer (70 : IntInf.int))
+                               (nat_of_integer (77 : IntInf.int)))
+                         then SOME (Validation_Refusal, false) else NONE))));
+
+fun response_fixed_words call_id result =
+  let
+    val (number, position) = result;
+  in
+    (case response_fixed_descriptor number of NONE => NONE
+      | SOME (kind, needs_commit) =>
+        (if not (equal_bool needs_commit (not (is_none position))) then NONE
+          else map_option (fn words => (kind, (number, (position, words))))
+                 (code_response_words (equal_nat, interval_nat) call_id kind
+                   number position)))
+  end;
+
+fun response_v061_words call result =
+  let
+    val (number, position) = result;
+  in
+    (case map_of equal_nat sync_response_allocations number
+      of NONE => response_fixed_words call result
+      | SOME (kind, (needs_commit, _)) =>
+        (if not (equal_bool needs_commit (not (is_none position))) then NONE
+          else SOME (kind,
+                      (number,
+                        (position,
+                          [fst call, snd call,
+                            reference_response_kind_number numeral_nat kind,
+                            number] @
+                            (case position of NONE => [zero_nata]
+                              | SOME revision => [one_nata, revision]))))))
+  end;
+
+fun response_client_max_nesting
+  (Response_fixed_client_boundary_ext
+    (response_client_scope, response_client_public_key,
+      response_client_max_nesting, more))
+  = response_client_max_nesting;
+
+fun response_client_public_key
+  (Response_fixed_client_boundary_ext
+    (response_client_scope, response_client_public_key,
+      response_client_max_nesting, more))
+  = response_client_public_key;
+
+fun response_client_scope
+  (Response_fixed_client_boundary_ext
+    (response_client_scope, response_client_public_key,
+      response_client_max_nesting, more))
+  = response_client_scope;
+
+fun response_channel_remote_key
+  (Response_fixed_channel_ext
+    (response_channel_profile, response_channel_deployment,
+      response_channel_local, response_channel_remote, response_channel_expires,
+      response_channel_local_key, response_channel_remote_key, more))
+  = response_channel_remote_key;
+
+fun response_channel_profile
+  (Response_fixed_channel_ext
+    (response_channel_profile, response_channel_deployment,
+      response_channel_local, response_channel_remote, response_channel_expires,
+      response_channel_local_key, response_channel_remote_key, more))
+  = response_channel_profile;
+
+fun response_channel_expires
+  (Response_fixed_channel_ext
+    (response_channel_profile, response_channel_deployment,
+      response_channel_local, response_channel_remote, response_channel_expires,
+      response_channel_local_key, response_channel_remote_key, more))
+  = response_channel_expires;
+
+fun boundary_profile_update boundary_profilea
   (Wire_boundary_ext
     (boundary_profile, boundary_deployment, boundary_source, boundary_target,
       boundary_principal, boundary_key, boundary_epoch, boundary_route_scope,
       boundary_now, boundary_asset_ttl_floor, boundary_future_skew,
       boundary_max_frame, boundary_version_floor, boundary_critical_allowed,
       boundary_threshold_supported, more))
-  = boundary_max_frame;
+  = Wire_boundary_ext
+      (boundary_profilea boundary_profile, boundary_deployment, boundary_source,
+        boundary_target, boundary_principal, boundary_key, boundary_epoch,
+        boundary_route_scope, boundary_now, boundary_asset_ttl_floor,
+        boundary_future_skew, boundary_max_frame, boundary_version_floor,
+        boundary_critical_allowed, boundary_threshold_supported, more);
 
-fun code_json_session_binding bytes =
-  bind (code_json_first_field
-         [Chara (false, false, false, false, true, true, true, false),
-           Chara (false, true, false, false, true, true, true, false),
-           Chara (true, false, false, true, false, true, true, false),
-           Chara (false, true, true, true, false, true, true, false),
-           Chara (true, true, false, false, false, true, true, false),
-           Chara (true, false, false, true, false, true, true, false),
-           Chara (false, false, false, false, true, true, true, false),
-           Chara (true, false, false, false, false, true, true, false),
-           Chara (false, false, true, true, false, true, true, false)]
-         code_json_u64 bytes)
-    (fn (principal, r0) =>
-      bind (code_json_next_field
-             [Chara (true, false, false, false, false, true, true, false),
-               Chara (true, false, true, false, true, true, true, false),
-               Chara (false, false, true, false, true, true, true, false),
-               Chara (false, false, false, true, false, true, true, false),
-               Chara (true, true, true, true, false, true, true, false),
-               Chara (false, true, false, false, true, true, true, false),
-               Chara (true, false, false, true, false, true, true, false),
-               Chara (false, false, true, false, true, true, true, false),
-               Chara (true, false, false, true, true, true, true, false),
-               Chara (true, true, true, true, true, false, true, false),
-               Chara (true, false, true, false, false, true, true, false),
-               Chara (false, false, false, false, true, true, true, false),
-               Chara (true, true, true, true, false, true, true, false),
-               Chara (true, true, false, false, false, true, true, false),
-               Chara (false, false, false, true, false, true, true, false)]
-             code_json_u64 r0)
-        (fn (epoch, r1) =>
-          map_option
-            (fn a => (Code_json_session_binding_ext (principal, epoch, ()), a))
-            (code_json_expect [nat_of_integer (125 : IntInf.int)] r1)));
+fun response_decoded_original_bytes
+  (Response_fixed_decoded_ext
+    (response_decoded_id, response_decoded_kind, response_decoded_number,
+      response_decoded_position, response_decoded_original_bytes,
+      response_decoded_original, more))
+  = response_decoded_original_bytes;
 
-fun code_json_session_entry x =
-  code_json_pair code_json_u64 code_json_session_binding x;
+fun response_decoded_position
+  (Response_fixed_decoded_ext
+    (response_decoded_id, response_decoded_kind, response_decoded_number,
+      response_decoded_position, response_decoded_original_bytes,
+      response_decoded_original, more))
+  = response_decoded_position;
+
+fun response_decoded_number
+  (Response_fixed_decoded_ext
+    (response_decoded_id, response_decoded_kind, response_decoded_number,
+      response_decoded_position, response_decoded_original_bytes,
+      response_decoded_original, more))
+  = response_decoded_number;
+
+fun response_decoded_kind
+  (Response_fixed_decoded_ext
+    (response_decoded_id, response_decoded_kind, response_decoded_number,
+      response_decoded_position, response_decoded_original_bytes,
+      response_decoded_original, more))
+  = response_decoded_kind;
+
+fun response_decoded_id
+  (Response_fixed_decoded_ext
+    (response_decoded_id, response_decoded_kind, response_decoded_number,
+      response_decoded_position, response_decoded_original_bytes,
+      response_decoded_original, more))
+  = response_decoded_id;
+
+fun response_v061_result_of_view view =
+  (response_decoded_id view,
+    (response_decoded_kind view,
+      (response_decoded_number view, response_decoded_position view)));
 
 fun code_decode_query_nonreceipt core =
   (if not (equal_wire_deadline (wire_deadline (wire_operation_body core))
             Deadline_Absent)
     then NONE else decode_wire_query_body core);
-
-fun equal_reference_response_kind Delivery_Refusal Validation_Refusal = false
-  | equal_reference_response_kind Validation_Refusal Delivery_Refusal = false
-  | equal_reference_response_kind Recorded_Result Validation_Refusal = false
-  | equal_reference_response_kind Validation_Refusal Recorded_Result = false
-  | equal_reference_response_kind Recorded_Result Delivery_Refusal = false
-  | equal_reference_response_kind Delivery_Refusal Recorded_Result = false
-  | equal_reference_response_kind Validation_Refusal Validation_Refusal = true
-  | equal_reference_response_kind Delivery_Refusal Delivery_Refusal = true
-  | equal_reference_response_kind Recorded_Result Recorded_Result = true;
 
 fun code_response_commit_matches position revision =
   (case position of NONE => true
@@ -3601,7 +4630,7 @@ fun code_response_tree_finish core nested decoded =
   (case response_result_words (wire_words (wire_operation_body core))
     of NONE => Code_Tree_Refused Invalid_Wire_Format
     | SOME (call_id, (kind, (_, position))) =>
-      (if not (equal_reference_response_kind kind Recorded_Result) andalso
+      (if not (equal_reference_response_kinda kind Recorded_Result) andalso
             not (is_none position)
         then Code_Tree_Refused Invalid_Wire_Format
         else (if not (equal_nata (wire_version nested)
@@ -3624,6 +4653,44 @@ fun code_response_tree_after_nested core nested result =
   (case result of Code_Tree_Refused a => Code_Tree_Refused a
     | Code_Tree_Ready a => code_response_tree_finish core nested a
     | Code_Tree_Pending => Code_Tree_Pending);
+
+fun code_json_session_binding bytes =
+  bind (code_json_first_field
+         [Chara (false, false, false, false, true, true, true, false),
+           Chara (false, true, false, false, true, true, true, false),
+           Chara (true, false, false, true, false, true, true, false),
+           Chara (false, true, true, true, false, true, true, false),
+           Chara (true, true, false, false, false, true, true, false),
+           Chara (true, false, false, true, false, true, true, false),
+           Chara (false, false, false, false, true, true, true, false),
+           Chara (true, false, false, false, false, true, true, false),
+           Chara (false, false, true, true, false, true, true, false)]
+         code_json_u64 bytes)
+    (fn (principal, r0) =>
+      bind (code_json_next_field
+             [Chara (true, false, false, false, false, true, true, false),
+               Chara (true, false, true, false, true, true, true, false),
+               Chara (false, false, true, false, true, true, true, false),
+               Chara (false, false, false, true, false, true, true, false),
+               Chara (true, true, true, true, false, true, true, false),
+               Chara (false, true, false, false, true, true, true, false),
+               Chara (true, false, false, true, false, true, true, false),
+               Chara (false, false, true, false, true, true, true, false),
+               Chara (true, false, false, true, true, true, true, false),
+               Chara (true, true, true, true, true, false, true, false),
+               Chara (true, false, true, false, false, true, true, false),
+               Chara (false, false, false, false, true, true, true, false),
+               Chara (true, true, true, true, false, true, true, false),
+               Chara (true, true, false, false, false, true, true, false),
+               Chara (false, false, false, true, false, true, true, false)]
+             code_json_u64 r0)
+        (fn (epoch, r1) =>
+          map_option
+            (fn a => (Code_json_session_binding_ext (principal, epoch, ()), a))
+            (code_json_expect [nat_of_integer (125 : IntInf.int)] r1)));
+
+fun code_json_session_entry x =
+  code_json_pair code_json_u64 code_json_session_binding x;
 
 fun code_json_session_bindings bytes =
   code_json_complete
@@ -3822,192 +4889,16 @@ fun code_decode_operand_tree fuel core =
                else Code_Tree_Refused Invalid_Wire_Format)))))))
          end);
 
-fun code_check_declared_version bytes max_frame =
-  (if less_nat max_frame (size_list bytes) then SOME Invalid_Wire_Format
-    else (case code_declared_version bytes of NONE => NONE
-           | SOME version =>
-             (if not (equal_nata version (nat_of_integer (6 : IntInf.int)))
-               then SOME Unsupported_Wire_Version else NONE)));
-
-fun code_full_lookup_verify x =
-  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
-    fn oip_full_signature =>
-    map_option (fn (_, (_, (_, oip_full_answer))) => oip_full_answer)
-      (find (fn (oip_full_record_key,
-                  (oip_full_record_message, (oip_full_record_signature, _)))
-               =>
-              equal_lista equal_nat oip_full_record_key oip_full_key andalso
-                (equal_lista equal_nat oip_full_record_message
-                   oip_full_message andalso
-                  equal_lista equal_nat oip_full_record_signature
-                    oip_full_signature))
-        oip_full_table))
-    x;
-
-fun code_full_verify x =
-  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
-    fn oip_full_signature =>
-    (case code_full_lookup_verify oip_full_table oip_full_key oip_full_message
-            oip_full_signature
-      of NONE =>
-        (raise Fail "OIP_PRIMITIVE_MISSING_ED25519_VERIFY") (fn _ => false)
-      | SOME oip_full_answer => oip_full_answer))
-    x;
-
-fun response_client_max_nesting
-  (Response_fixed_client_boundary_ext
-    (response_client_scope, response_client_public_key,
-      response_client_max_nesting, more))
-  = response_client_max_nesting;
-
-fun response_client_public_key
-  (Response_fixed_client_boundary_ext
-    (response_client_scope, response_client_public_key,
-      response_client_max_nesting, more))
-  = response_client_public_key;
-
-fun response_client_scope
-  (Response_fixed_client_boundary_ext
-    (response_client_scope, response_client_public_key,
-      response_client_max_nesting, more))
-  = response_client_scope;
-
-fun response_channel_remote_key
-  (Response_fixed_channel_ext
-    (response_channel_profile, response_channel_deployment,
-      response_channel_local, response_channel_remote, response_channel_expires,
-      response_channel_local_key, response_channel_remote_key, more))
-  = response_channel_remote_key;
-
-fun response_channel_profile
-  (Response_fixed_channel_ext
-    (response_channel_profile, response_channel_deployment,
-      response_channel_local, response_channel_remote, response_channel_expires,
-      response_channel_local_key, response_channel_remote_key, more))
-  = response_channel_profile;
-
-fun response_channel_expires
-  (Response_fixed_channel_ext
-    (response_channel_profile, response_channel_deployment,
-      response_channel_local, response_channel_remote, response_channel_expires,
-      response_channel_local_key, response_channel_remote_key, more))
-  = response_channel_expires;
-
-fun code_known_response_number (A1_, A2_) number =
-  member A1_ number
-    (sup_set A1_
-      (sup_set A1_
-        (sup_set A1_ (reference_result_codes (A1_, A2_) Recorded_Result true)
-          (reference_result_codes (A1_, A2_) Recorded_Result false))
-        (reference_result_codes (A1_, A2_) Delivery_Refusal false))
-      (reference_result_codes (A1_, A2_) Validation_Refusal false));
-
-fun code_decode_response_status kind number committed =
-  (if code_known_response_number (equal_nat, interval_nat) number
-    then (if member equal_nat number
-               (reference_result_codes (equal_nat, interval_nat) kind committed)
-           then SOME (Code_Known_Response (kind, number)) else NONE)
-    else (if not (equal_reference_response_kind kind Recorded_Result) andalso
-               committed
-           then NONE else SOME (Code_Unknown_Response (kind, number))));
-
-fun response_fixed_received_status result =
-  let
-    val (_, (kind, (number, position))) = result;
-  in
-    code_decode_response_status kind number (not (is_none position))
-  end;
-
-fun response_decoded_original_bytes
-  (Response_fixed_decoded_ext
-    (response_decoded_id, response_decoded_kind, response_decoded_number,
-      response_decoded_position, response_decoded_original_bytes,
-      response_decoded_original, more))
-  = response_decoded_original_bytes;
-
-fun response_decoded_position
-  (Response_fixed_decoded_ext
-    (response_decoded_id, response_decoded_kind, response_decoded_number,
-      response_decoded_position, response_decoded_original_bytes,
-      response_decoded_original, more))
-  = response_decoded_position;
-
-fun response_decoded_number
-  (Response_fixed_decoded_ext
-    (response_decoded_id, response_decoded_kind, response_decoded_number,
-      response_decoded_position, response_decoded_original_bytes,
-      response_decoded_original, more))
-  = response_decoded_number;
-
-fun response_decoded_kind
-  (Response_fixed_decoded_ext
-    (response_decoded_id, response_decoded_kind, response_decoded_number,
-      response_decoded_position, response_decoded_original_bytes,
-      response_decoded_original, more))
-  = response_decoded_kind;
-
-fun response_decoded_id
-  (Response_fixed_decoded_ext
-    (response_decoded_id, response_decoded_kind, response_decoded_number,
-      response_decoded_position, response_decoded_original_bytes,
-      response_decoded_original, more))
-  = response_decoded_id;
-
-fun response_fixed_caller_from_decoded (Code_Nested_Ordinary (native, command))
-  = Inr (native_id native)
-  | response_fixed_caller_from_decoded (Code_Nested_Legal call_id) = Inr call_id
-  | response_fixed_caller_from_decoded (Code_Nested_Spend call_id) = Inr call_id
-  | response_fixed_caller_from_decoded (Code_Nested_Receipt v) =
-    Inl Invalid_Wire_Format
-  | response_fixed_caller_from_decoded Code_Nested_Response =
-    Inl Invalid_Wire_Format
-  | response_fixed_caller_from_decoded Code_Nested_Other =
-    Inl Invalid_Wire_Format;
-
-fun response_fixed_parse_response fuel core =
-  (if not (equal_wire_familya (wire_message_family core) Wire_Ack) orelse
-        (not (equal_nata (wire_opcode (wire_operation_body core))
-               (nat_of_integer (2 : IntInf.int))) orelse
-          not (equal_wire_deadline (wire_deadline (wire_operation_body core))
-                Deadline_Absent))
-    then Inl Invalid_Wire_Format
-    else (case wire_blobs (wire_operation_body core)
-           of [] => Inl Invalid_Wire_Format
-           | [raw] =>
-             (case decode_wire_core raw of NONE => Inl Invalid_Wire_Format
-               | SOME nested =>
-                 (case code_decode_operand_tree fuel nested
-                   of Code_Tree_Refused a => Inl a
-                   | Code_Tree_Ready classified =>
-                     (case response_result_words
-                             (wire_words (wire_operation_body core))
-                       of NONE => Inl Invalid_Wire_Format
-                       | SOME (call_id, (kind, (number, position))) =>
-                         (if not (equal_reference_response_kind kind
-                                   Recorded_Result) andalso
-                               not (is_none position)
-                           then Inl Invalid_Wire_Format
-                           else (if not (equal_nata (wire_version nested)
-  (wire_version core)) orelse
-                                      (not
- (equal_nata (wire_deployment nested) (wire_deployment core)) orelse
-(not (equal_nata (wire_principal nested) (fst call_id)) orelse
-  (not (equal_nata (wire_source_domain nested) (wire_target_domain core)) orelse
-    not (equal_nata (wire_target_domain nested) (wire_source_domain core)))))
-                                  then Inl Invalid_Wire_Source
-                                  else (case
- code_check_nested_response nested classified call_id position
- of NONE =>
-   Inr (Response_fixed_decoded_ext
-         (call_id, kind, number, position, raw, nested, ()))
- | SOME a => Inl a))))
-                   | Code_Tree_Pending => Inl Invalid_Wire_Format))
-           | _ :: _ :: _ => Inl Invalid_Wire_Format));
-
 fun response_fixed_expected_decode core =
   (case code_decode_operand_tree one_nata core of Code_Tree_Refused a => Inl a
     | Code_Tree_Ready a => Inr a
     | Code_Tree_Pending => Inl Invalid_Wire_Format);
+
+fun sync_call
+  (Sync_request_ext
+    (sync_call, sync_message, sync_session, sync_signed_cut, sync_key,
+      sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
+  = sync_call;
 
 fun reference_result_targets code =
   (if equal_nata code (nat_of_integer (10 : IntInf.int))
@@ -4105,7 +4996,7 @@ fun reference_response_compatible family opcode kind code committed =
     (reference_result_codes (equal_nat, interval_nat) kind committed) andalso
     (member (equal_prod equal_wire_family equal_nat) (family, opcode)
        (reference_result_targets code) orelse
-      (not (equal_reference_response_kind kind Recorded_Result) orelse
+      (not (equal_reference_response_kinda kind Recorded_Result) orelse
         member equal_nat code
           (insert equal_nat one_nata
             (insert equal_nat (nat_of_integer (2 : IntInf.int))
@@ -4124,57 +5015,351 @@ fun reference_response_compatible family opcode kind code committed =
                 (atLeastAtMost (equal_nat, interval_nat) one_nata
                   (nat_of_integer (8 : IntInf.int))))));
 
-fun response_fixed_validate depth expected packet =
-  (if equal_nata depth zero_nata then Inl Invalid_Wire_Format
-    else (case response_fixed_parse_response (minus_nata depth one_nata)
-                 (packet_core packet)
-           of Inl a => Inl a
-           | Inr viewed =>
-             (case response_fixed_expected_decode expected of Inl a => Inl a
-               | Inr decoded_expected =>
-                 (if not (equal_lista equal_nat
-                           (response_decoded_original_bytes viewed)
-                           (encode_wire_core expected))
-                   then Inl Conflicting_Wire_Replay
-                   else (case response_fixed_caller_from_decoded
-                                decoded_expected
-                          of Inl a => Inl a
-                          | Inr original_id =>
-                            (if not (equal_proda equal_nat equal_nat
-                                      (response_decoded_id viewed) original_id)
-                              then Inl Conflicting_Wire_Replay
-                              else (case code_decode_response_status
-   (response_decoded_kind viewed) (response_decoded_number viewed)
-   (not (is_none (response_decoded_position viewed)))
-                                     of NONE => Inl Invalid_Wire_Format
-                                     | SOME _ =>
-                                       (if code_known_response_number
-     (equal_nat, interval_nat) (response_decoded_number viewed) andalso
-     not (reference_response_compatible (wire_message_family expected)
-           (wire_opcode (wire_operation_body expected))
-           (response_decoded_kind viewed) (response_decoded_number viewed)
-           (not (is_none (response_decoded_position viewed))))
- then Inl Invalid_Wire_Format
- else Inr (response_decoded_id viewed,
-            (response_decoded_kind viewed,
-              (response_decoded_number viewed,
-                response_decoded_position viewed)))))))))));
+fun code_known_response_number (A1_, A2_) number =
+  member A1_ number
+    (sup_set A1_
+      (sup_set A1_
+        (sup_set A1_ (reference_result_codes (A1_, A2_) Recorded_Result true)
+          (reference_result_codes (A1_, A2_) Recorded_Result false))
+        (reference_result_codes (A1_, A2_) Delivery_Refusal false))
+      (reference_result_codes (A1_, A2_) Validation_Refusal false));
 
-fun boundary_profile_update boundary_profilea
+fun code_decode_response_status kind number committed =
+  (if code_known_response_number (equal_nat, interval_nat) number
+    then (if member equal_nat number
+               (reference_result_codes (equal_nat, interval_nat) kind committed)
+           then SOME (Code_Known_Response (kind, number)) else NONE)
+    else (if not (equal_reference_response_kinda kind Recorded_Result) andalso
+               committed
+           then NONE else SOME (Code_Unknown_Response (kind, number))));
+
+fun code_response_call_shape (A1_, A2_) family operation =
+  equal_wire_familya family Wire_State_Sync andalso
+    member A1_ operation
+      (atLeastAtMost (A1_, A2_)
+        (one ((one_numeral o numeral_semiring_numeral o
+                semiring_numeral_semiring_1 o semiring_1_comm_semiring_1 o
+                comm_semiring_1_comm_semiring_1_cancel o
+                comm_semiring_1_cancel_interval)
+               A2_))
+        (numeral
+          ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+             semiring_1_comm_semiring_1 o
+             comm_semiring_1_comm_semiring_1_cancel o
+             comm_semiring_1_cancel_interval)
+            A2_)
+          (Bit0 (Bit1 One)))) orelse
+    (equal_wire_familya family Wire_Regulatory andalso
+       member A1_ operation
+         (atLeastAtMost (A1_, A2_)
+           (one ((one_numeral o numeral_semiring_numeral o
+                   semiring_numeral_semiring_1 o semiring_1_comm_semiring_1 o
+                   comm_semiring_1_comm_semiring_1_cancel o
+                   comm_semiring_1_cancel_interval)
+                  A2_))
+           (numeral
+             ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                semiring_1_comm_semiring_1 o
+                comm_semiring_1_comm_semiring_1_cancel o
+                comm_semiring_1_cancel_interval)
+               A2_)
+             (Bit1 One))) orelse
+      equal_wire_familya family Wire_Lock andalso
+        member A1_ operation
+          (atLeastAtMost (A1_, A2_)
+            (one ((one_numeral o numeral_semiring_numeral o
+                    semiring_numeral_semiring_1 o semiring_1_comm_semiring_1 o
+                    comm_semiring_1_comm_semiring_1_cancel o
+                    comm_semiring_1_cancel_interval)
+                   A2_))
+            (numeral
+              ((numeral_semiring_numeral o semiring_numeral_semiring_1 o
+                 semiring_1_comm_semiring_1 o
+                 comm_semiring_1_comm_semiring_1_cancel o
+                 comm_semiring_1_cancel_interval)
+                A2_)
+              (Bit0 (Bit0 (Bit0 One))))));
+
+fun code_response_compatible family operation kind number committed =
+  (if code_known_response_number (equal_nat, interval_nat) number
+    then reference_response_compatible family operation kind number committed
+    else code_response_call_shape (equal_nat, interval_nat) family
+           operation andalso
+           (equal_reference_response_kinda kind Recorded_Result orelse
+             not committed));
+
+fun response_extended_compatible allocations added_calls family operation kind
+  number committed =
+  (case map_of equal_nat allocations number
+    of NONE =>
+      code_response_compatible family operation kind number committed orelse
+        not (code_response_call_shape (equal_nat, interval_nat) family
+              operation) andalso
+          (membera (equal_prod equal_wire_family equal_nat) added_calls
+             (family, operation) andalso
+            (not (is_none
+                   (code_decode_response_status kind number committed)) andalso
+              (not (code_known_response_number (equal_nat, interval_nat)
+                     number) orelse
+                (not (equal_reference_response_kinda kind
+                       Recorded_Result) orelse
+                  member equal_nat number
+                    (insert equal_nat one_nata
+                      (insert equal_nat (nat_of_integer (2 : IntInf.int))
+                        (insert equal_nat (nat_of_integer (3 : IntInf.int))
+                          bot_set)))))))
+    | SOME (assigned_kind, (assigned_commit, targets)) =>
+      equal_reference_response_kinda kind assigned_kind andalso
+        (equal_bool committed assigned_commit andalso
+          membera (equal_prod equal_wire_family equal_nat) targets
+            (family, operation)));
+
+fun response_extended_status allocations kind number committed =
+  (case map_of equal_nat allocations number
+    of NONE => code_decode_response_status kind number committed
+    | SOME (assigned_kind, (assigned_commit, _)) =>
+      (if equal_reference_response_kinda kind assigned_kind andalso
+            equal_bool committed assigned_commit
+        then SOME (Code_Known_Response (kind, number)) else NONE));
+
+fun response_v061_status original kind number position =
+  let
+    val committed = not (is_none position);
+    val family = wire_message_family original;
+    val operation = wire_opcode (wire_operation_body original);
+  in
+    (if equal_proda equal_wire_family equal_nat (sync_operation original)
+          (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+      then (case response_extended_status sync_response_allocations kind number
+                   committed
+             of NONE => NONE
+             | SOME (Code_Known_Response (category, known)) =>
+               (if response_extended_compatible sync_response_allocations
+                     [sync_response_operation] family operation kind number
+                     committed
+                 then SOME (Code_Known_Response (category, known)) else NONE)
+             | SOME (Code_Unknown_Response (category, raw)) =>
+               SOME (Code_Unknown_Response (category, raw)))
+      else (if code_known_response_number (equal_nat, interval_nat)
+                 number andalso
+                 not (reference_response_compatible family operation kind number
+                       committed)
+             then NONE else code_decode_response_status kind number committed))
+  end;
+
+fun response_v061_check_enclosed check_status original decoded v061_caller kind
+  number position =
+  (case decoded
+    of Response_V061_Legacy_Operand legacy =>
+      code_check_nested_response original legacy v061_caller position
+    | Response_V061_Sync_Operand request =>
+      (if not (equal_proda equal_nat equal_nat v061_caller
+                (sync_call request)) orelse
+            check_status andalso
+              is_none (response_v061_status original kind number position)
+        then SOME Invalid_Wire_Format else NONE)
+    | Response_V061_Receipt _ => SOME Invalid_Wire_Format
+    | Response_V061_Current => SOME Invalid_Wire_Format);
+
+fun response_v061_is_sync_call (Response_V061_Sync_Operand request) = true
+  | response_v061_is_sync_call (Response_V061_Receipt original) =
+    equal_proda equal_wire_family equal_nat (sync_operation original)
+      (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+  | response_v061_is_sync_call (Response_V061_Legacy_Operand v) = false
+  | response_v061_is_sync_call Response_V061_Current = false;
+
+fun sync_link_response_header outer enclosed caller =
+  equal_nata (wire_version outer) (wire_version enclosed) andalso
+    (equal_nata (wire_deployment outer) (wire_deployment enclosed) andalso
+      (equal_nata (wire_principal enclosed) (fst caller) andalso
+        (equal_nata (wire_source_domain outer)
+           (wire_target_domain enclosed) andalso
+          equal_nata (wire_target_domain outer)
+            (wire_source_domain enclosed))));
+
+fun response_v061_finish_parse check_status descend outer exact nested decoded =
+  (case response_result_words (wire_words (wire_operation_body outer))
+    of NONE => Inl Invalid_Wire_Format
+    | SOME (v061_caller, (kind, (number, position))) =>
+      (if not (equal_reference_response_kinda kind Recorded_Result) andalso
+            not (is_none position) orelse
+            check_status andalso
+              (response_v061_is_sync_call decoded andalso
+                (sync_added_status number andalso
+                  (not (equal_reference_response_kinda kind
+                         Recorded_Result) orelse
+                    not (equal_bool (not (is_none position))
+                          (equal_nata number
+                            (nat_of_integer (29 : IntInf.int)))))))
+        then Inl Invalid_Wire_Format
+        else (if not (sync_link_response_header outer nested v061_caller)
+               then Inl Invalid_Wire_Source
+               else let
+                      val v061_check =
+                        (fn original => fn operand =>
+                          response_v061_check_enclosed check_status original
+                            operand v061_caller kind number position);
+                    in
+                      (case (case decoded
+                              of Response_V061_Legacy_Operand _ =>
+                                v061_check nested decoded
+                              | Response_V061_Sync_Operand _ =>
+                                v061_check nested decoded
+                              | Response_V061_Receipt original =>
+                                (if not (code_same_original nested original)
+                                  then SOME Invalid_Wire_Source
+                                  else (case descend original of Inl a => SOME a
+ | Inr a => v061_check original a))
+                              | Response_V061_Current =>
+                                v061_check nested decoded)
+                        of NONE =>
+                          Inr (Response_fixed_decoded_ext
+                                (v061_caller, kind, number, position, exact,
+                                  nested, ()))
+                        | SOME a => Inl a)
+                    end)));
+
+fun response_v061_parse_layer check_status descend outer =
+  let
+    val v061_body = wire_operation_body outer;
+  in
+    (if not (equal_proda equal_wire_family equal_nat (sync_operation outer)
+              (Wire_Ack, nat_of_integer (2 : IntInf.int))) orelse
+          not (equal_wire_deadline (wire_deadline v061_body) Deadline_Absent)
+      then Inl Invalid_Wire_Format
+      else (case wire_blobs v061_body of [] => Inl Invalid_Wire_Format
+             | [exact] =>
+               (case sync_decode_core exact of NONE => Inl Invalid_Wire_Format
+                 | SOME nested =>
+                   (case descend nested of Inl a => Inl a
+                     | Inr a =>
+                       response_v061_finish_parse check_status descend outer
+                         exact nested a))
+             | _ :: _ :: _ => Inl Invalid_Wire_Format))
+  end;
+
+fun response_fixed_caller_from_decoded (Code_Nested_Ordinary (native, command))
+  = Inr (native_id native)
+  | response_fixed_caller_from_decoded (Code_Nested_Legal call_id) = Inr call_id
+  | response_fixed_caller_from_decoded (Code_Nested_Spend call_id) = Inr call_id
+  | response_fixed_caller_from_decoded (Code_Nested_Receipt v) =
+    Inl Invalid_Wire_Format
+  | response_fixed_caller_from_decoded Code_Nested_Response =
+    Inl Invalid_Wire_Format
+  | response_fixed_caller_from_decoded Code_Nested_Other =
+    Inl Invalid_Wire_Format;
+
+fun response_v061_is_call operand =
+  (case operand
+    of Response_V061_Legacy_Operand decoded =>
+      (case response_fixed_caller_from_decoded decoded of Inl _ => false
+        | Inr _ => true)
+    | Response_V061_Sync_Operand _ => true | Response_V061_Receipt _ => false
+    | Response_V061_Current => false);
+
+fun response_v061_operand fuel core =
+  (if equal_nata fuel zero_nata then Inl Invalid_Wire_Format
+    else let
+           val v061_body = wire_operation_body core;
+           val operation = sync_operation core;
+         in
+           (if equal_proda equal_wire_family equal_nat operation
+                 (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+             then (case sync_read_operands core
+                    of NONE => Inl Invalid_Wire_Format
+                    | SOME request => Inr (Response_V061_Sync_Operand request))
+             else (if equal_proda equal_wire_family equal_nat operation
+                        (Wire_Query, nat_of_integer (9 : IntInf.int))
+                    then (case sync_read_query core
+                           of NONE => Inl Invalid_Wire_Format
+                           | SOME _ => Inr Response_V061_Current)
+                    else (if equal_proda equal_wire_family equal_nat operation
+                               (Wire_Query, nat_of_integer (8 : IntInf.int))
+                           then (if not (equal_wire_deadline
+  (wire_deadline v061_body) Deadline_Absent) orelse
+                                      equal_nata (minus_nata fuel one_nata)
+zero_nata
+                                  then Inl Invalid_Wire_Format
+                                  else (case
+ (wire_words v061_body, wire_blobs v061_body)
+ of ([], _) => Inl Invalid_Wire_Format | ([_], []) => Inl Invalid_Wire_Format
+ | ([_], [exact]) =>
+   (case sync_decode_core exact of NONE => Inl Invalid_Wire_Format
+     | SOME nested =>
+       (case response_v061_operand (minus_nata fuel one_nata) nested
+         of Inl a => Inl a
+         | Inr decoded =>
+           (if response_v061_is_call decoded
+             then Inr (Response_V061_Receipt nested)
+             else Inl Invalid_Wire_Format)))
+ | ([_], _ :: _ :: _) => Inl Invalid_Wire_Format
+ | (_ :: _ :: _, _) => Inl Invalid_Wire_Format))
+                           else (if equal_proda equal_wire_family equal_nat
+                                      operation
+                                      (Wire_Ack,
+nat_of_integer (2 : IntInf.int))
+                                  then (case
+ response_v061_parse_layer true
+   (response_v061_operand (minus_nata fuel one_nata)) core
+ of Inl a => Inl a
+ | Inr _ => Inr (Response_V061_Legacy_Operand Code_Nested_Response))
+                                  else map_sum id Response_V061_Legacy_Operand
+ (response_fixed_expected_decode core)))))
+         end);
+
+fun response_v061_caller (Response_V061_Sync_Operand request) =
+  Inr (sync_call request)
+  | response_v061_caller (Response_V061_Legacy_Operand decoded) =
+    response_fixed_caller_from_decoded decoded
+  | response_v061_caller (Response_V061_Receipt original) =
+    Inl Invalid_Wire_Format
+  | response_v061_caller Response_V061_Current = Inl Invalid_Wire_Format;
+
+fun response_v061_parse check_status v061_depth core =
+  (if equal_nata v061_depth zero_nata then Inl Invalid_Wire_Format
+    else response_v061_parse_layer check_status
+           (response_v061_operand (minus_nata v061_depth one_nata)) core);
+
+fun response_v061_validate v061_depth expected packet =
+  (case response_v061_parse false v061_depth (packet_core packet)
+    of Inl a => Inl a
+    | Inr view =>
+      (case response_v061_operand one_nata expected of Inl a => Inl a
+        | Inr decoded =>
+          (if not (equal_lista equal_nat (response_decoded_original_bytes view)
+                    (encode_wire_core expected))
+            then Inl Conflicting_Wire_Replay
+            else (case response_v061_caller decoded of Inl a => Inl a
+                   | Inr original_id =>
+                     (if not (equal_proda equal_nat equal_nat
+                               (response_decoded_id view) original_id)
+                       then Inl Conflicting_Wire_Replay
+                       else (case response_v061_status expected
+                                    (response_decoded_kind view)
+                                    (response_decoded_number view)
+                                    (response_decoded_position view)
+                              of NONE => Inl Invalid_Wire_Format
+                              | SOME status =>
+                                Inr (response_v061_result_of_view view,
+                                      SOME status)))))));
+
+fun code_check_declared_version bytes max_frame =
+  (if less_nat max_frame (size_list bytes) then SOME Invalid_Wire_Format
+    else (case code_declared_version bytes of NONE => NONE
+           | SOME version =>
+             (if not (equal_nata version (nat_of_integer (6 : IntInf.int)))
+               then SOME Unsupported_Wire_Version else NONE)));
+
+fun boundary_max_frame
   (Wire_boundary_ext
     (boundary_profile, boundary_deployment, boundary_source, boundary_target,
       boundary_principal, boundary_key, boundary_epoch, boundary_route_scope,
       boundary_now, boundary_asset_ttl_floor, boundary_future_skew,
       boundary_max_frame, boundary_version_floor, boundary_critical_allowed,
       boundary_threshold_supported, more))
-  = Wire_boundary_ext
-      (boundary_profilea boundary_profile, boundary_deployment, boundary_source,
-        boundary_target, boundary_principal, boundary_key, boundary_epoch,
-        boundary_route_scope, boundary_now, boundary_asset_ttl_floor,
-        boundary_future_skew, boundary_max_frame, boundary_version_floor,
-        boundary_critical_allowed, boundary_threshold_supported, more);
+  = boundary_max_frame;
 
-fun response_fixed_admit curve_verify channel current expected bytes =
+fun response_v061_admit curve_verify channel current expected bytes =
   let
     val scope = response_client_scope current;
   in
@@ -4191,7 +5376,7 @@ fun response_fixed_admit curve_verify channel current expected bytes =
       then Inl Invalid_Wire_Source
       else (case code_check_declared_version bytes (boundary_max_frame scope)
              of NONE =>
-               (case decode_wire_packet bytes of NONE => Inl Invalid_Wire_Format
+               (case sync_decode_packet bytes of NONE => Inl Invalid_Wire_Format
                  | SOME packet =>
                    (case code_admit_packet
                            (fn _ =>
@@ -4200,84 +5385,28 @@ fun response_fixed_admit curve_verify channel current expected bytes =
                            (boundary_profile_update
                              (fn _ => response_channel_profile channel) scope)
                      of NONE =>
-                       (case response_fixed_validate
-                               (response_client_max_nesting current)
-                               (packet_core expected) packet
-                         of Inl a => Inl a
-                         | Inr result =>
-                           Inr (result, response_fixed_received_status result))
+                       response_v061_validate
+                         (response_client_max_nesting current)
+                         (packet_core expected) packet
                      | SOME a => Inl a))
              | SOME a => Inl a))
   end;
 
-fun code_full_client x =
-  (fn oip_full_channel => fn oip_full_current => fn oip_full_expected =>
-    fn oip_full_received => fn oip_full_verifications =>
-    response_fixed_admit (code_full_verify oip_full_verifications)
-      oip_full_channel oip_full_current oip_full_expected oip_full_received)
-    x;
+fun response_v061_pack_rows rows =
+  ((0 : IntInf.int), map (map integer_of_nat) rows);
 
-fun response_fixed_descriptor number =
-  (if member equal_nat number
-        (sup_set equal_nat
-          (insert equal_nat one_nata
-            (insert equal_nat (nat_of_integer (2 : IntInf.int))
-              (insert equal_nat (nat_of_integer (3 : IntInf.int))
-                (insert equal_nat (nat_of_integer (4 : IntInf.int)) bot_set))))
-          (atLeastAtMost (equal_nat, interval_nat)
-            (nat_of_integer (30 : IntInf.int))
-            (nat_of_integer (38 : IntInf.int))))
-    then SOME (Recorded_Result, false)
-    else (if member equal_nat number
-               (atLeastAtMost (equal_nat, interval_nat)
-                 (nat_of_integer (10 : IntInf.int))
-                 (nat_of_integer (28 : IntInf.int)))
-           then SOME (Recorded_Result, true)
-           else (if member equal_nat number
-                      (atLeastAtMost (equal_nat, interval_nat)
-                        (nat_of_integer (50 : IntInf.int))
-                        (nat_of_integer (56 : IntInf.int)))
-                  then SOME (Delivery_Refusal, false)
-                  else (if member equal_nat number
-                             (atLeastAtMost (equal_nat, interval_nat)
-                               (nat_of_integer (70 : IntInf.int))
-                               (nat_of_integer (77 : IntInf.int)))
-                         then SOME (Validation_Refusal, false) else NONE))));
-
-fun response_fixed_words call_id result =
-  let
-    val (number, position) = result;
-  in
-    (case response_fixed_descriptor number of NONE => NONE
-      | SOME (kind, needs_commit) =>
-        (if not (equal_bool needs_commit (not (is_none position))) then NONE
-          else map_option (fn words => (kind, (number, (position, words))))
-                 (code_response_words (equal_nat, interval_nat) call_id kind
-                   number position)))
-  end;
-
-fun code_numeric_family_set numbers =
-  Set (maps (fn number =>
-              (case family_at_number number of NONE => []
-                | SOME family => [family]))
-        numbers);
-
-fun code_contract_boundary values version families atomicities schemes critical
-  = Wire_boundary_ext
-      (Negotiated_wire_profile_ext
-         (version, code_numeric_family_set families, Set atomicities,
-           Set schemes, ()),
-        nth values zero_nata, nth values one_nata,
-        nth values (nat_of_integer (2 : IntInf.int)),
-        nth values (nat_of_integer (3 : IntInf.int)),
-        nth values (nat_of_integer (4 : IntInf.int)),
-        nth values (nat_of_integer (5 : IntInf.int)),
-        nth values (nat_of_integer (6 : IntInf.int)),
-        nth values (nat_of_integer (7 : IntInf.int)),
-        nth values (nat_of_integer (8 : IntInf.int)),
-        nth values (nat_of_integer (9 : IntInf.int)),
-        nth values (nat_of_integer (10 : IntInf.int)),
-        nth values (nat_of_integer (11 : IntInf.int)), critical, false, ());
+fun response_v061_sync_result (Sync_Committed position) =
+  (nat_of_integer (29 : IntInf.int), SOME position)
+  | response_v061_sync_result (Sync_Uncommitted Sync_Busy) =
+    (nat_of_integer (2 : IntInf.int), NONE)
+  | response_v061_sync_result (Sync_Uncommitted Sync_Unavailable) =
+    (nat_of_integer (3 : IntInf.int), NONE)
+  | response_v061_sync_result (Sync_Uncommitted Sync_Mismatch) =
+    (nat_of_integer (39 : IntInf.int), NONE)
+  | response_v061_sync_result (Sync_Uncommitted Sync_Stale) =
+    (nat_of_integer (40 : IntInf.int), NONE)
+  | response_v061_sync_result (Sync_Uncommitted Sync_Proof_Rejected) =
+    (nat_of_integer (41 : IntInf.int), NONE);
 
 fun source_outcome_commit
   (Code_source_outcome_ext (source_outcome_reply, source_outcome_commit, more))
@@ -4914,7 +6043,7 @@ fun equal_code_source_outcome_ext A_
   (Code_source_outcome_ext (source_outcome_reply, source_outcome_commit, more))
   = equal_code_source_outcome_reply source_outcome_replya
       source_outcome_reply andalso
-      (equal_option equal_nat source_outcome_commita
+      (equal_optiona equal_nat source_outcome_commita
          source_outcome_commit andalso
         eq A_ morea more);
 
@@ -5302,538 +6431,84 @@ fun response_fixed_result (Response_Fixed_Received (reply, retained)) =
   | response_fixed_result (Response_Fixed_Error error) =
     code_source_error_result error;
 
+fun response_v061_result (Response_V061_Legacy prior) =
+  response_fixed_result prior
+  | response_v061_result (Response_V061_Sync (observed, retained)) =
+    (if equal_optiona equal_sync_outcome retained (SOME observed)
+      then response_v061_sync_result observed
+      else (nat_of_integer (50 : IntInf.int), NONE));
+
+fun full_response_frame_limit
+  (Code_response_full_context_ext
+    (full_response_config, full_response_channel, full_response_site,
+      full_parameters_clock, full_signing_clock, full_response_frame_limit,
+      more))
+  = full_response_frame_limit;
+
+fun full_response_channel
+  (Code_response_full_context_ext
+    (full_response_config, full_response_channel, full_response_site,
+      full_parameters_clock, full_signing_clock, full_response_frame_limit,
+      more))
+  = full_response_channel;
+
+fun full_parameters_clock
+  (Code_response_full_context_ext
+    (full_response_config, full_response_channel, full_response_site,
+      full_parameters_clock, full_signing_clock, full_response_frame_limit,
+      more))
+  = full_parameters_clock;
+
+fun full_response_config
+  (Code_response_full_context_ext
+    (full_response_config, full_response_channel, full_response_site,
+      full_parameters_clock, full_signing_clock, full_response_frame_limit,
+      more))
+  = full_response_config;
+
+fun response_channel_local_key
+  (Response_fixed_channel_ext
+    (response_channel_profile, response_channel_deployment,
+      response_channel_local, response_channel_remote, response_channel_expires,
+      response_channel_local_key, response_channel_remote_key, more))
+  = response_channel_local_key;
+
 fun response_fixed_be64 number =
   rev (put_le_octets (nat_of_integer (8 : IntInf.int)) number);
 
-fun equal_product_cut_ext A_
-  (Product_cut_ext (cut_authority_epocha, cut_revisiona, morea))
-  (Product_cut_ext (cut_authority_epoch, cut_revision, more)) =
-  equal_nata cut_authority_epocha cut_authority_epoch andalso
-    (equal_nata cut_revisiona cut_revision andalso eq A_ morea more);
+fun response_fixed_binding_preimage original atomicity words =
+  [nat_of_integer (111 : IntInf.int), nat_of_integer (105 : IntInf.int),
+    nat_of_integer (112 : IntInf.int), nat_of_integer (47 : IntInf.int),
+    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (102 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (110 : IntInf.int), nat_of_integer (99 : IntInf.int),
+    nat_of_integer (101 : IntInf.int), nat_of_integer (45 : IntInf.int),
+    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (115 : IntInf.int), nat_of_integer (112 : IntInf.int),
+    nat_of_integer (111 : IntInf.int), nat_of_integer (110 : IntInf.int),
+    nat_of_integer (115 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (45 : IntInf.int), nat_of_integer (98 : IntInf.int),
+    nat_of_integer (105 : IntInf.int), nat_of_integer (110 : IntInf.int),
+    nat_of_integer (100 : IntInf.int), nat_of_integer (105 : IntInf.int),
+    nat_of_integer (110 : IntInf.int), nat_of_integer (103 : IntInf.int),
+    nat_of_integer (47 : IntInf.int), nat_of_integer (118 : IntInf.int),
+    nat_of_integer (49 : IntInf.int), zero_nata] @
+    response_fixed_be64 (size_list original) @
+      original @
+        response_fixed_be64 atomicity @
+          response_fixed_be64 (size_list words) @
+            maps response_fixed_be64 words;
 
-fun equal_wire_native_call_ext A_
-  (Wire_native_call_ext
-    (native_referencea, native_ida, native_sessiona, native_cuta,
-      native_origin_epocha, native_origina, native_asseta,
-      native_funding_ownera, native_destinationa, native_recipienta,
-      native_amounta, native_tail_wordsa, native_proof_bytesa, morea))
-  (Wire_native_call_ext
-    (native_reference, native_id, native_session, native_cut,
-      native_origin_epoch, native_origin, native_asset, native_funding_owner,
-      native_destination, native_recipient, native_amount, native_tail_words,
-      native_proof_bytes, more))
-  = equal_nata native_referencea native_reference andalso
-      (equal_proda equal_nat equal_nat native_ida native_id andalso
-        (equal_nata native_sessiona native_session andalso
-          (equal_product_cut_ext equal_unit native_cuta native_cut andalso
-            (equal_nata native_origin_epocha native_origin_epoch andalso
-              (equal_proda equal_nat equal_nat native_origina
-                 native_origin andalso
-                (equal_nata native_asseta native_asset andalso
-                  (equal_nata native_funding_ownera native_funding_owner andalso
-                    (equal_nata native_destinationa native_destination andalso
-                      (equal_nata native_recipienta native_recipient andalso
-                        (equal_nata native_amounta native_amount andalso
-                          (equal_lista equal_nat native_tail_wordsa
-                             native_tail_words andalso
-                            (equal_lista (equal_list equal_nat)
-                               native_proof_bytesa native_proof_bytes andalso
-                              eq A_ morea more))))))))))));
-
-fun equal_ordinary_wire_command (Wire_Write (x121, x122)) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Write (x121, x122)) = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) Wire_Publish =
-    false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Reconcile (x111, x112)) =
-    false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
-    (Wire_Write (x121, x122)) = false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122))
-    (Wire_Reconcile (x111, x112)) = false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Refund (x101, x102)) = false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
-    (Wire_Write (x121, x122)) = false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122))
-    (Wire_Refund (x101, x102)) = false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
-    (Wire_Reconcile (x111, x112)) = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
-    (Wire_Refund (x101, x102)) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Deliver x9) =
-    false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Reconcile (x111, x112))
-    = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Deliver x9)
-    = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Deliver x9) =
-    false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82)) Wire_Publish =
-    false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Record_Terminal (x81, x82)) =
-    false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Write (x121, x122)) = false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122))
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Reconcile (x111, x112)) = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Refund (x101, x102)) = false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Timeout x7) =
-    false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Reconcile (x111, x112))
-    = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Timeout x7)
-    = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Timeout x7) =
-    false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Preempt x6) =
-    false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Reconcile (x111, x112))
-    = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Preempt x6)
-    = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Preempt x6) =
-    false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Fence x5) =
-    false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Reconcile (x111, x112)) =
-    false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Fence x5) =
-    false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Fence x5) =
-    false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Cancel x4) =
-    false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Reconcile (x111, x112)) =
-    false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Cancel x4) =
-    false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Cancel x4) =
-    false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Debit x3) =
-    false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Reconcile (x111, x112)) =
-    false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Debit x3) =
-    false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Debit x3) =
-    false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Dispatch x2) =
-    false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Reconcile (x111, x112))
-    = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Dispatch x2)
-    = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Dispatch x2) =
-    false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) Wire_Publish = false
-  | equal_ordinary_wire_command Wire_Publish (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Write (x121, x122)) =
-    false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122)) (Wire_Reserve x1) =
-    false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Reconcile (x111, x112))
-    = false
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112)) (Wire_Reserve x1)
-    = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Refund (x101, x102)) =
-    false
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102)) (Wire_Reserve x1) =
-    false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Deliver x9) = false
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1)
-    (Wire_Record_Terminal (x81, x82)) = false
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Timeout x7) = false
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Preempt x6) = false
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Fence x5) = false
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Cancel x4) = false
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Debit x3) = false
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Dispatch x2) = false
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Reserve x1) = false
-  | equal_ordinary_wire_command (Wire_Write (x121, x122))
-    (Wire_Write (y121, y122)) =
-    equal_nata x121 y121 andalso equal_nata x122 y122
-  | equal_ordinary_wire_command (Wire_Reconcile (x111, x112))
-    (Wire_Reconcile (y111, y112)) =
-    equal_nata x111 y111 andalso equal_nata x112 y112
-  | equal_ordinary_wire_command (Wire_Refund (x101, x102))
-    (Wire_Refund (y101, y102)) =
-    equal_nata x101 y101 andalso equal_nata x102 y102
-  | equal_ordinary_wire_command (Wire_Deliver x9) (Wire_Deliver y9) =
-    equal_nata x9 y9
-  | equal_ordinary_wire_command (Wire_Record_Terminal (x81, x82))
-    (Wire_Record_Terminal (y81, y82)) =
-    equal_nata x81 y81 andalso equal_nata x82 y82
-  | equal_ordinary_wire_command (Wire_Timeout x7) (Wire_Timeout y7) =
-    equal_nata x7 y7
-  | equal_ordinary_wire_command (Wire_Preempt x6) (Wire_Preempt y6) =
-    equal_nata x6 y6
-  | equal_ordinary_wire_command (Wire_Fence x5) (Wire_Fence y5) =
-    equal_nata x5 y5
-  | equal_ordinary_wire_command (Wire_Cancel x4) (Wire_Cancel y4) =
-    equal_nata x4 y4
-  | equal_ordinary_wire_command (Wire_Debit x3) (Wire_Debit y3) =
-    equal_nata x3 y3
-  | equal_ordinary_wire_command (Wire_Dispatch x2) (Wire_Dispatch y2) =
-    equal_nata x2 y2
-  | equal_ordinary_wire_command (Wire_Reserve x1) (Wire_Reserve y1) =
-    equal_nata x1 y1
-  | equal_ordinary_wire_command Wire_Publish Wire_Publish = true;
-
-fun equal_wire_body_ext A_
-  (Wire_body_ext
-    (wire_opcodea, wire_wordsa, wire_blobsa, wire_deadlinea, morea))
-  (Wire_body_ext (wire_opcode, wire_words, wire_blobs, wire_deadline, more)) =
-  equal_nata wire_opcodea wire_opcode andalso
-    (equal_lista equal_nat wire_wordsa wire_words andalso
-      (equal_lista (equal_list equal_nat) wire_blobsa wire_blobs andalso
-        (equal_wire_deadline wire_deadlinea wire_deadline andalso
-          eq A_ morea more)));
-
-fun equal_wire_core_ext A_
-  (Wire_core_ext
-    (wire_versiona, wire_purposea, wire_deploymenta, wire_source_domaina,
-      wire_target_domaina, wire_principala, wire_key_numbera,
-      wire_authority_epocha, wire_sent_secondsa, wire_ttl_secondsa, wire_uuida,
-      wire_message_familya, wire_primary_codea, wire_secondary_codea,
-      wire_signature_schemea, wire_operation_bodya, wire_atomicitya,
-      wire_prioritya, wire_route_scopea, morea))
-  (Wire_core_ext
-    (wire_version, wire_purpose, wire_deployment, wire_source_domain,
-      wire_target_domain, wire_principal, wire_key_number, wire_authority_epoch,
-      wire_sent_seconds, wire_ttl_seconds, wire_uuid, wire_message_family,
-      wire_primary_code, wire_secondary_code, wire_signature_scheme,
-      wire_operation_body, wire_atomicity, wire_priority, wire_route_scope,
-      more))
-  = equal_nata wire_versiona wire_version andalso
-      (equal_nata wire_purposea wire_purpose andalso
-        (equal_nata wire_deploymenta wire_deployment andalso
-          (equal_nata wire_source_domaina wire_source_domain andalso
-            (equal_nata wire_target_domaina wire_target_domain andalso
-              (equal_nata wire_principala wire_principal andalso
-                (equal_nata wire_key_numbera wire_key_number andalso
-                  (equal_nata wire_authority_epocha wire_authority_epoch andalso
-                    (equal_nata wire_sent_secondsa wire_sent_seconds andalso
-                      (equal_nata wire_ttl_secondsa wire_ttl_seconds andalso
-                        (equal_lista equal_nat wire_uuida wire_uuid andalso
-                          (equal_wire_familya wire_message_familya
-                             wire_message_family andalso
-                            (equal_nata wire_primary_codea
-                               wire_primary_code andalso
-                              (equal_option equal_nat wire_secondary_codea
-                                 wire_secondary_code andalso
-                                (equal_nata wire_signature_schemea
-                                   wire_signature_scheme andalso
-                                  (equal_wire_body_ext equal_unit
-                                     wire_operation_bodya
-                                     wire_operation_body andalso
-                                    (equal_nata wire_atomicitya
-                                       wire_atomicity andalso
-                                      (equal_nata wire_prioritya
- wire_priority andalso
-(equal_nata wire_route_scopea wire_route_scope andalso
-  eq A_ morea more))))))))))))))))));
-
-fun equal_code_nested_operand Code_Nested_Response Code_Nested_Other = false
-  | equal_code_nested_operand Code_Nested_Other Code_Nested_Response = false
-  | equal_code_nested_operand (Code_Nested_Receipt x4) Code_Nested_Other = false
-  | equal_code_nested_operand Code_Nested_Other (Code_Nested_Receipt x4) = false
-  | equal_code_nested_operand (Code_Nested_Receipt x4) Code_Nested_Response =
-    false
-  | equal_code_nested_operand Code_Nested_Response (Code_Nested_Receipt x4) =
-    false
-  | equal_code_nested_operand (Code_Nested_Spend x3) Code_Nested_Other = false
-  | equal_code_nested_operand Code_Nested_Other (Code_Nested_Spend x3) = false
-  | equal_code_nested_operand (Code_Nested_Spend x3) Code_Nested_Response =
-    false
-  | equal_code_nested_operand Code_Nested_Response (Code_Nested_Spend x3) =
-    false
-  | equal_code_nested_operand (Code_Nested_Spend x3) (Code_Nested_Receipt x4) =
-    false
-  | equal_code_nested_operand (Code_Nested_Receipt x4) (Code_Nested_Spend x3) =
-    false
-  | equal_code_nested_operand (Code_Nested_Legal x2) Code_Nested_Other = false
-  | equal_code_nested_operand Code_Nested_Other (Code_Nested_Legal x2) = false
-  | equal_code_nested_operand (Code_Nested_Legal x2) Code_Nested_Response =
-    false
-  | equal_code_nested_operand Code_Nested_Response (Code_Nested_Legal x2) =
-    false
-  | equal_code_nested_operand (Code_Nested_Legal x2) (Code_Nested_Receipt x4) =
-    false
-  | equal_code_nested_operand (Code_Nested_Receipt x4) (Code_Nested_Legal x2) =
-    false
-  | equal_code_nested_operand (Code_Nested_Legal x2) (Code_Nested_Spend x3) =
-    false
-  | equal_code_nested_operand (Code_Nested_Spend x3) (Code_Nested_Legal x2) =
-    false
-  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
-    Code_Nested_Other = false
-  | equal_code_nested_operand Code_Nested_Other
-    (Code_Nested_Ordinary (x11, x12)) = false
-  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
-    Code_Nested_Response = false
-  | equal_code_nested_operand Code_Nested_Response
-    (Code_Nested_Ordinary (x11, x12)) = false
-  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
-    (Code_Nested_Receipt x4) = false
-  | equal_code_nested_operand (Code_Nested_Receipt x4)
-    (Code_Nested_Ordinary (x11, x12)) = false
-  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
-    (Code_Nested_Spend x3) = false
-  | equal_code_nested_operand (Code_Nested_Spend x3)
-    (Code_Nested_Ordinary (x11, x12)) = false
-  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
-    (Code_Nested_Legal x2) = false
-  | equal_code_nested_operand (Code_Nested_Legal x2)
-    (Code_Nested_Ordinary (x11, x12)) = false
-  | equal_code_nested_operand (Code_Nested_Receipt x4) (Code_Nested_Receipt y4)
-    = equal_wire_core_ext equal_unit x4 y4
-  | equal_code_nested_operand (Code_Nested_Spend x3) (Code_Nested_Spend y3) =
-    equal_proda equal_nat equal_nat x3 y3
-  | equal_code_nested_operand (Code_Nested_Legal x2) (Code_Nested_Legal y2) =
-    equal_proda equal_nat equal_nat x2 y2
-  | equal_code_nested_operand (Code_Nested_Ordinary (x11, x12))
-    (Code_Nested_Ordinary (y11, y12)) =
-    equal_wire_native_call_ext equal_unit x11 y11 andalso
-      equal_ordinary_wire_command x12 y12
-  | equal_code_nested_operand Code_Nested_Other Code_Nested_Other = true
-  | equal_code_nested_operand Code_Nested_Response Code_Nested_Response = true;
-
-fun equal_wire_refusal Wire_TTL_Invalid Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Expired Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Wire_TTL_Expired = false
-  | equal_wire_refusal Wire_TTL_Expired Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Invalid Wire_TTL_Expired = false
-  | equal_wire_refusal Invalid_Wire_Threshold Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Threshold Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Invalid Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Threshold Wire_TTL_Expired = false
-  | equal_wire_refusal Wire_TTL_Expired Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Signature Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Signature Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Invalid Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Signature Wire_TTL_Expired = false
-  | equal_wire_refusal Wire_TTL_Expired Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Signature Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Threshold Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Source Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Invalid_Wire_Source = false
-  | equal_wire_refusal Invalid_Wire_Source Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Invalid Invalid_Wire_Source = false
-  | equal_wire_refusal Invalid_Wire_Source Wire_TTL_Expired = false
-  | equal_wire_refusal Wire_TTL_Expired Invalid_Wire_Source = false
-  | equal_wire_refusal Invalid_Wire_Source Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Threshold Invalid_Wire_Source = false
-  | equal_wire_refusal Invalid_Wire_Source Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Signature Invalid_Wire_Source = false
-  | equal_wire_refusal Unsupported_Wire_Version Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Unsupported_Wire_Version = false
-  | equal_wire_refusal Unsupported_Wire_Version Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Invalid Unsupported_Wire_Version = false
-  | equal_wire_refusal Unsupported_Wire_Version Wire_TTL_Expired = false
-  | equal_wire_refusal Wire_TTL_Expired Unsupported_Wire_Version = false
-  | equal_wire_refusal Unsupported_Wire_Version Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Threshold Unsupported_Wire_Version = false
-  | equal_wire_refusal Unsupported_Wire_Version Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Signature Unsupported_Wire_Version = false
-  | equal_wire_refusal Unsupported_Wire_Version Invalid_Wire_Source = false
-  | equal_wire_refusal Invalid_Wire_Source Unsupported_Wire_Version = false
-  | equal_wire_refusal Invalid_Wire_Format Conflicting_Wire_Replay = false
-  | equal_wire_refusal Conflicting_Wire_Replay Invalid_Wire_Format = false
-  | equal_wire_refusal Invalid_Wire_Format Wire_TTL_Invalid = false
-  | equal_wire_refusal Wire_TTL_Invalid Invalid_Wire_Format = false
-  | equal_wire_refusal Invalid_Wire_Format Wire_TTL_Expired = false
-  | equal_wire_refusal Wire_TTL_Expired Invalid_Wire_Format = false
-  | equal_wire_refusal Invalid_Wire_Format Invalid_Wire_Threshold = false
-  | equal_wire_refusal Invalid_Wire_Threshold Invalid_Wire_Format = false
-  | equal_wire_refusal Invalid_Wire_Format Invalid_Wire_Signature = false
-  | equal_wire_refusal Invalid_Wire_Signature Invalid_Wire_Format = false
-  | equal_wire_refusal Invalid_Wire_Format Invalid_Wire_Source = false
-  | equal_wire_refusal Invalid_Wire_Source Invalid_Wire_Format = false
-  | equal_wire_refusal Invalid_Wire_Format Unsupported_Wire_Version = false
-  | equal_wire_refusal Unsupported_Wire_Version Invalid_Wire_Format = false
-  | equal_wire_refusal Conflicting_Wire_Replay Conflicting_Wire_Replay = true
-  | equal_wire_refusal Wire_TTL_Invalid Wire_TTL_Invalid = true
-  | equal_wire_refusal Wire_TTL_Expired Wire_TTL_Expired = true
-  | equal_wire_refusal Invalid_Wire_Threshold Invalid_Wire_Threshold = true
-  | equal_wire_refusal Invalid_Wire_Signature Invalid_Wire_Signature = true
-  | equal_wire_refusal Invalid_Wire_Source Invalid_Wire_Source = true
-  | equal_wire_refusal Unsupported_Wire_Version Unsupported_Wire_Version = true
-  | equal_wire_refusal Invalid_Wire_Format Invalid_Wire_Format = true;
-
-fun equal_code_operand_tree_result (Code_Tree_Ready x2) Code_Tree_Pending =
-  false
-  | equal_code_operand_tree_result Code_Tree_Pending (Code_Tree_Ready x2) =
-    false
-  | equal_code_operand_tree_result (Code_Tree_Refused x1) Code_Tree_Pending =
-    false
-  | equal_code_operand_tree_result Code_Tree_Pending (Code_Tree_Refused x1) =
-    false
-  | equal_code_operand_tree_result (Code_Tree_Refused x1) (Code_Tree_Ready x2) =
-    false
-  | equal_code_operand_tree_result (Code_Tree_Ready x2) (Code_Tree_Refused x1) =
-    false
-  | equal_code_operand_tree_result (Code_Tree_Ready x2) (Code_Tree_Ready y2) =
-    equal_code_nested_operand x2 y2
-  | equal_code_operand_tree_result (Code_Tree_Refused x1) (Code_Tree_Refused y1)
-    = equal_wire_refusal x1 y1
-  | equal_code_operand_tree_result Code_Tree_Pending Code_Tree_Pending = true;
-
-fun response_config_local_endpoints
-  (Response_fixed_config_ext
-    (response_config_deployment, response_config_local_endpoints,
-      response_config_peers, response_config_principal, response_config_key,
-      response_config_epoch, response_config_route, response_config_ttl,
-      response_config_max_nesting, response_config_public_key,
-      response_config_policy_binding, more))
-  = response_config_local_endpoints;
-
-fun response_config_max_nesting
-  (Response_fixed_config_ext
-    (response_config_deployment, response_config_local_endpoints,
-      response_config_peers, response_config_principal, response_config_key,
-      response_config_epoch, response_config_route, response_config_ttl,
-      response_config_max_nesting, response_config_public_key,
-      response_config_policy_binding, more))
-  = response_config_max_nesting;
-
-fun response_config_deployment
-  (Response_fixed_config_ext
-    (response_config_deployment, response_config_local_endpoints,
-      response_config_peers, response_config_principal, response_config_key,
-      response_config_epoch, response_config_route, response_config_ttl,
-      response_config_max_nesting, response_config_public_key,
-      response_config_policy_binding, more))
-  = response_config_deployment;
+fun response_fixed_post_boundary channel parameters frame_limit =
+  Wire_boundary_ext
+    (response_channel_profile channel, response_channel_deployment channel,
+      response_channel_local channel, response_channel_remote channel,
+      response_parameter_principal parameters,
+      response_parameter_key parameters, response_parameter_epoch parameters,
+      response_parameter_route parameters, response_parameter_issued parameters,
+      zero_nata, zero_nata, frame_limit, nat_of_integer (6 : IntInf.int), false,
+      false, ());
 
 fun response_config_principal
   (Response_fixed_config_ext
@@ -5852,15 +6527,6 @@ fun response_config_route
       response_config_max_nesting, response_config_public_key,
       response_config_policy_binding, more))
   = response_config_route;
-
-fun response_config_peers
-  (Response_fixed_config_ext
-    (response_config_deployment, response_config_local_endpoints,
-      response_config_peers, response_config_principal, response_config_key,
-      response_config_epoch, response_config_route, response_config_ttl,
-      response_config_max_nesting, response_config_public_key,
-      response_config_policy_binding, more))
-  = response_config_peers;
 
 fun response_config_epoch
   (Response_fixed_config_ext
@@ -5889,40 +6555,122 @@ fun response_config_key
       response_config_policy_binding, more))
   = response_config_key;
 
-fun response_fixed_signable config now core =
-  less_eq_nat (wire_sent_seconds core) now andalso
-    (less_nat (plus_nata (wire_sent_seconds core) (response_config_ttl config))
-       (power power_nat (nat_of_integer (2 : IntInf.int))
-         (nat_of_integer (64 : IntInf.int))) andalso
-      (less_eq_nat now
-         (plus_nata (wire_sent_seconds core)
-           (response_config_ttl config)) andalso
-        (equal_nata (wire_version core)
-           (nat_of_integer (6 : IntInf.int)) andalso
-          (equal_nata (wire_purpose core) one_nata andalso
-            (equal_nata (wire_deployment core)
-               (response_config_deployment config) andalso
-              (member equal_nat (wire_source_domain core)
-                 (response_config_local_endpoints config) andalso
-                (member equal_nat (wire_target_domain core)
-                   (image fst (response_config_peers config)) andalso
-                  (equal_nata (wire_principal core)
-                     (response_config_principal config) andalso
-                    (equal_nata (wire_key_number core)
-                       (response_config_key config) andalso
-                      (equal_nata (wire_authority_epoch core)
-                         (response_config_epoch config) andalso
-                        (equal_nata (wire_route_scope core)
-                           (response_config_route config) andalso
-                          (equal_nata (wire_ttl_seconds core)
-                             (response_config_ttl config) andalso
-                            (equal_nata (wire_signature_scheme core)
-                               one_nata andalso
-                              equal_code_operand_tree_result
-                                (code_decode_operand_tree
-                                  (response_config_max_nesting config) core)
-                                (Code_Tree_Ready
-                                  Code_Nested_Response))))))))))))));
+fun response_config_local_endpoints
+  (Response_fixed_config_ext
+    (response_config_deployment, response_config_local_endpoints,
+      response_config_peers, response_config_principal, response_config_key,
+      response_config_epoch, response_config_route, response_config_ttl,
+      response_config_max_nesting, response_config_public_key,
+      response_config_policy_binding, more))
+  = response_config_local_endpoints;
+
+fun response_config_public_key
+  (Response_fixed_config_ext
+    (response_config_deployment, response_config_local_endpoints,
+      response_config_peers, response_config_principal, response_config_key,
+      response_config_epoch, response_config_route, response_config_ttl,
+      response_config_max_nesting, response_config_public_key,
+      response_config_policy_binding, more))
+  = response_config_public_key;
+
+fun response_config_deployment
+  (Response_fixed_config_ext
+    (response_config_deployment, response_config_local_endpoints,
+      response_config_peers, response_config_principal, response_config_key,
+      response_config_epoch, response_config_route, response_config_ttl,
+      response_config_max_nesting, response_config_public_key,
+      response_config_policy_binding, more))
+  = response_config_deployment;
+
+fun response_config_peers
+  (Response_fixed_config_ext
+    (response_config_deployment, response_config_local_endpoints,
+      response_config_peers, response_config_principal, response_config_key,
+      response_config_epoch, response_config_route, response_config_ttl,
+      response_config_max_nesting, response_config_public_key,
+      response_config_policy_binding, more))
+  = response_config_peers;
+
+fun response_fixed_channel_current config channel =
+  equal_nata (negotiated_version (response_channel_profile channel))
+    (nat_of_integer (6 : IntInf.int)) andalso
+    (equal_nata (response_channel_deployment channel)
+       (response_config_deployment config) andalso
+      (member equal_nat (response_channel_local channel)
+         (response_config_local_endpoints config) andalso
+        (equal_lista equal_nat (response_channel_local_key channel)
+           (response_config_public_key config) andalso
+          member (equal_prod equal_nat (equal_list equal_nat))
+            (response_channel_remote channel,
+              response_channel_remote_key channel)
+            (response_config_peers config))));
+
+fun response_config_policy_binding
+  (Response_fixed_config_ext
+    (response_config_deployment, response_config_local_endpoints,
+      response_config_peers, response_config_principal, response_config_key,
+      response_config_epoch, response_config_route, response_config_ttl,
+      response_config_max_nesting, response_config_public_key,
+      response_config_policy_binding, more))
+  = response_config_policy_binding;
+
+fun response_fixed_uuid_preimage config response_binding issued =
+  [nat_of_integer (111 : IntInf.int), nat_of_integer (105 : IntInf.int),
+    nat_of_integer (112 : IntInf.int), nat_of_integer (47 : IntInf.int),
+    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (102 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (110 : IntInf.int), nat_of_integer (99 : IntInf.int),
+    nat_of_integer (101 : IntInf.int), nat_of_integer (45 : IntInf.int),
+    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (115 : IntInf.int), nat_of_integer (112 : IntInf.int),
+    nat_of_integer (111 : IntInf.int), nat_of_integer (110 : IntInf.int),
+    nat_of_integer (115 : IntInf.int), nat_of_integer (101 : IntInf.int),
+    nat_of_integer (45 : IntInf.int), nat_of_integer (117 : IntInf.int),
+    nat_of_integer (117 : IntInf.int), nat_of_integer (105 : IntInf.int),
+    nat_of_integer (100 : IntInf.int), nat_of_integer (47 : IntInf.int),
+    nat_of_integer (118 : IntInf.int), nat_of_integer (49 : IntInf.int),
+    zero_nata] @
+    response_config_policy_binding config @
+      response_binding @ response_fixed_be64 issued;
+
+fun response_fixed_uuid (A1_, A2_) digest =
+  list_update
+    (list_update (take (nat_of_integer (16 : IntInf.int)) digest)
+      (nat_of_integer (6 : IntInf.int))
+      (plus ((plus_semigroup_add o semigroup_add_numeral) A1_)
+        (modulo A2_ (nth digest (nat_of_integer (6 : IntInf.int)))
+          (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 One))))))
+        (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 One)))))))))
+    (nat_of_integer (8 : IntInf.int))
+    (plus ((plus_semigroup_add o semigroup_add_numeral) A1_)
+      (modulo A2_ (nth digest (nat_of_integer (8 : IntInf.int)))
+        (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 One))))))))
+      (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 One)))))))));
+
+fun response_fixed_parameters_from hash config channel clock response_binding =
+  (if not (response_fixed_channel_current config channel) then NONE
+    else map_option
+           (fn issued =>
+             Response_fixed_parameters_ext
+               (response_config_principal config, response_config_key config,
+                 response_config_epoch config, issued,
+                 response_config_ttl config,
+                 response_fixed_uuid (numeral_nat, modulo_nat)
+                   (hash (response_fixed_uuid_preimage config response_binding
+                           issued)),
+                 response_config_route config, ()))
+           clock);
+
+fun response_v061_encoding_refused reason =
+  Inl (Response_Fixed_Encoding_Refused reason);
+
+fun full_signing_clock
+  (Code_response_full_context_ext
+    (full_response_config, full_response_channel, full_response_site,
+      full_parameters_clock, full_signing_clock, full_response_frame_limit,
+      more))
+  = full_signing_clock;
 
 fun response_fixed_unframe preimage =
   (if less_nat (size_list preimage) (nat_of_integer (17 : IntInf.int)) orelse
@@ -5951,27 +6699,199 @@ fun response_fixed_unframe preimage =
              else decode_wire_core bytes)
          end);
 
-fun response_fixed_sign curve_sign signing_key config clock preimage =
-  (case response_fixed_unframe preimage of NONE => NONE
-    | SOME core =>
-      (case clock of NONE => NONE
-        | SOME now =>
-          (if response_fixed_signable config now core
-            then SOME (curve_sign signing_key preimage) else NONE)));
+fun response_config_max_nesting
+  (Response_fixed_config_ext
+    (response_config_deployment, response_config_local_endpoints,
+      response_config_peers, response_config_principal, response_config_key,
+      response_config_epoch, response_config_route, response_config_ttl,
+      response_config_max_nesting, response_config_public_key,
+      response_config_policy_binding, more))
+  = response_config_max_nesting;
 
-fun response_fixed_uuid (A1_, A2_) digest =
-  list_update
-    (list_update (take (nat_of_integer (16 : IntInf.int)) digest)
-      (nat_of_integer (6 : IntInf.int))
-      (plus ((plus_semigroup_add o semigroup_add_numeral) A1_)
-        (modulo A2_ (nth digest (nat_of_integer (6 : IntInf.int)))
-          (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 One))))))
-        (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 One)))))))))
-    (nat_of_integer (8 : IntInf.int))
-    (plus ((plus_semigroup_add o semigroup_add_numeral) A1_)
-      (modulo A2_ (nth digest (nat_of_integer (8 : IntInf.int)))
-        (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 One))))))))
-      (numeral A1_ (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 (Bit0 One)))))))));
+fun response_v061_signing_scope core =
+  (case response_result_words (wire_words (wire_operation_body core))
+    of NONE => false
+    | SOME (_, (_, (number, _))) =>
+      not (sync_added_status number) orelse
+        (case sync_single_original core of NONE => false
+          | SOME original =>
+            (if equal_proda equal_wire_family equal_nat
+                  (sync_operation original)
+                  (Wire_Query, nat_of_integer (8 : IntInf.int))
+              then (case sync_single_original original of NONE => false
+                     | SOME call =>
+                       equal_proda equal_wire_family equal_nat
+                         (sync_operation call)
+                         (Wire_State_Sync, nat_of_integer (7 : IntInf.int)))
+              else equal_proda equal_wire_family equal_nat
+                     (sync_operation original)
+                     (Wire_State_Sync, nat_of_integer (7 : IntInf.int)))));
+
+fun response_v061_signable config v061_now core =
+  less_eq_nat (wire_sent_seconds core) v061_now andalso
+    (less_nat (plus_nata (wire_sent_seconds core) (response_config_ttl config))
+       (power power_nat (nat_of_integer (2 : IntInf.int))
+         (nat_of_integer (64 : IntInf.int))) andalso
+      (less_eq_nat v061_now
+         (plus_nata (wire_sent_seconds core)
+           (response_config_ttl config)) andalso
+        (equal_nata (wire_version core)
+           (nat_of_integer (6 : IntInf.int)) andalso
+          (equal_nata (wire_purpose core) one_nata andalso
+            (equal_nata (wire_deployment core)
+               (response_config_deployment config) andalso
+              (member equal_nat (wire_source_domain core)
+                 (response_config_local_endpoints config) andalso
+                (member equal_nat (wire_target_domain core)
+                   (image fst (response_config_peers config)) andalso
+                  (equal_nata (wire_principal core)
+                     (response_config_principal config) andalso
+                    (equal_nata (wire_key_number core)
+                       (response_config_key config) andalso
+                      (equal_nata (wire_authority_epoch core)
+                         (response_config_epoch config) andalso
+                        (equal_nata (wire_route_scope core)
+                           (response_config_route config) andalso
+                          (equal_nata (wire_ttl_seconds core)
+                             (response_config_ttl config) andalso
+                            (equal_nata (wire_signature_scheme core)
+                               one_nata andalso
+                              (equal_sum equal_wire_refusal
+                                 equal_response_v061_nested
+                                 (response_v061_operand
+                                   (response_config_max_nesting config) core)
+                                 (Inr (Response_V061_Legacy_Operand
+Code_Nested_Response)) andalso
+                                response_v061_signing_scope core))))))))))))));
+
+fun response_v061_sign_guard context preimage =
+  (case response_fixed_unframe preimage of NONE => false
+    | SOME core =>
+      (case full_signing_clock context of NONE => false
+        | SOME v061_now =>
+          response_v061_signable (full_response_config context) v061_now core));
+
+fun response_v061_encode hash curve_sign curve_verify context selected_mode
+  original call result =
+  let
+    val channel = full_response_channel context;
+    val config = full_response_config context;
+    val frame_limit = full_response_frame_limit context;
+    val exact = encode_wire_core original;
+  in
+    (case response_v061_words call result
+      of NONE => response_v061_encoding_refused Invalid_Wire_Format
+      | SOME (kind, (number, (position, words))) =>
+        (case selected_mode
+          of NONE => response_v061_encoding_refused Unsupported_Wire_Version
+          | SOME atomicity =>
+            let
+              val binding_message =
+                response_fixed_binding_preimage exact atomicity words;
+            in
+              (case response_fixed_parameters_from hash config channel
+                      (full_parameters_clock context) (hash binding_message)
+                of NONE => response_v061_encoding_refused Invalid_Wire_Source
+                | SOME parameters =>
+                  (if less_nat (response_channel_expires channel)
+                        (response_parameter_issued parameters)
+                    then response_v061_encoding_refused Invalid_Wire_Source
+                    else let
+                           val core =
+                             response_fixed_core channel parameters atomicity
+                               words exact;
+                         in
+                           (case code_typed_encode_core core
+                             of NONE =>
+                               response_v061_encoding_refused
+                                 Invalid_Wire_Format
+                             | SOME core_bytes =>
+                               (if less_eq_nat
+                                     (power power_nat
+                                       (nat_of_integer (2 : IntInf.int))
+                                       (nat_of_integer (32 : IntInf.int)))
+                                     (size_list core_bytes)
+                                 then response_v061_encoding_refused
+Invalid_Wire_Format
+                                 else let
+val preimage = envelope_signing_bytes core;
+                                      in
+(if not (response_v061_sign_guard context preimage)
+  then Inl Response_Fixed_Signature_Unavailable
+  else let
+         val packet =
+           Wire_packet_ext
+             (core, curve_sign (response_channel_local_key channel) preimage,
+               ());
+       in
+         (case code_encode_packet packet
+           of NONE => response_v061_encoding_refused Invalid_Wire_Format
+           | SOME encoded =>
+             (if less_nat frame_limit (size_list encoded)
+               then response_v061_encoding_refused Invalid_Wire_Format
+               else (case sync_decode_packet encoded
+                      of NONE =>
+                        response_v061_encoding_refused Invalid_Wire_Format
+                      | SOME parsed =>
+                        (case code_admit_packet
+                                (fn _ =>
+                                  curve_verify
+                                    (response_channel_local_key channel))
+                                parsed
+                                (response_fixed_post_boundary channel parameters
+                                  frame_limit)
+                          of NONE =>
+                            (case response_v061_validate
+                                    (nat_of_integer (2 : IntInf.int)) original
+                                    parsed
+                              of Inl a => response_v061_encoding_refused a
+                              | Inr (verified, status) =>
+                                (if not (equal_optiona
+  equal_code_response_status status (SOME (Code_Known_Response (kind, number))))
+                                  then response_v061_encoding_refused
+ Invalid_Wire_Format
+                                  else Inr
+ (Response_fixed_emission_ext
+   (encoded, parsed, original, (call, (kind, (number, position))), verified,
+     parameters, binding_message, preimage, ()))))
+                          | SOME a => response_v061_encoding_refused a))))
+       end)
+                                      end))
+                         end))
+            end))
+  end;
+
+fun code_numeric_family_set numbers =
+  Set (maps (fn number =>
+              (case family_at_number number of NONE => []
+                | SOME family => [family]))
+        numbers);
+
+fun code_contract_boundary values version families atomicities schemes critical
+  = Wire_boundary_ext
+      (Negotiated_wire_profile_ext
+         (version, code_numeric_family_set families, Set atomicities,
+           Set schemes, ()),
+        nth values zero_nata, nth values one_nata,
+        nth values (nat_of_integer (2 : IntInf.int)),
+        nth values (nat_of_integer (3 : IntInf.int)),
+        nth values (nat_of_integer (4 : IntInf.int)),
+        nth values (nat_of_integer (5 : IntInf.int)),
+        nth values (nat_of_integer (6 : IntInf.int)),
+        nth values (nat_of_integer (7 : IntInf.int)),
+        nth values (nat_of_integer (8 : IntInf.int)),
+        nth values (nat_of_integer (9 : IntInf.int)),
+        nth values (nat_of_integer (10 : IntInf.int)),
+        nth values (nat_of_integer (11 : IntInf.int)), critical, false, ());
+
+fun response_v061_accepts accept_sync accept_current family operation =
+  reference_accepts_write family operation orelse
+    (accept_sync andalso
+       equal_proda equal_wire_family equal_nat (family, operation)
+         (Wire_State_Sync, nat_of_integer (7 : IntInf.int)) orelse
+      accept_current andalso
+        equal_proda equal_wire_family equal_nat (family, operation)
+          (Wire_Query, nat_of_integer (9 : IntInf.int)));
 
 fun code_integer_u64_values values =
   list_all
@@ -6062,20 +6982,6 @@ fun code_response_core_length count original_length =
       body
   end;
 
-fun full_parameters_clock
-  (Code_response_full_context_ext
-    (full_response_config, full_response_channel, full_response_site,
-      full_parameters_clock, full_signing_clock, full_response_frame_limit,
-      more))
-  = full_parameters_clock;
-
-fun full_signing_clock
-  (Code_response_full_context_ext
-    (full_response_config, full_response_channel, full_response_site,
-      full_parameters_clock, full_signing_clock, full_response_frame_limit,
-      more))
-  = full_signing_clock;
-
 fun code_full_clock_row x =
   (fn oip_full_context =>
     (case full_parameters_clock oip_full_context
@@ -6086,6 +6992,59 @@ fun code_full_clock_row x =
         | SOME oip_full_now => [one_nata, oip_full_now]))
     x;
 
+fun code_full_parse_verify_rows [] = SOME []
+  | code_full_parse_verify_rows
+    (oip_full_key ::
+      oip_full_message ::
+        oip_full_signature :: oip_full_answer :: oip_full_rest)
+    = (if not (equal_nata (size_list oip_full_key)
+                (nat_of_integer (32 : IntInf.int))) orelse
+            (not (list_all (wire_octets (numeral_nat, ord_nat))
+                   [oip_full_key, oip_full_message, oip_full_signature]) orelse
+              not (equal_lista equal_nat oip_full_answer [zero_nata]) andalso
+                not (equal_lista equal_nat oip_full_answer [one_nata]))
+        then NONE
+        else map_option
+               (fn a =>
+                 (oip_full_key,
+                   (oip_full_message,
+                     (oip_full_signature,
+                       equal_lista equal_nat oip_full_answer [one_nata]))) ::
+                   a)
+               (code_full_parse_verify_rows oip_full_rest))
+  | code_full_parse_verify_rows [uu] = NONE
+  | code_full_parse_verify_rows [uv, uw] = NONE
+  | code_full_parse_verify_rows [ux, uy, uz] = NONE;
+
+fun code_full_parse_sign_rows [] = SOME []
+  | code_full_parse_sign_rows
+    (oip_full_key :: oip_full_message :: oip_full_signature :: oip_full_rest) =
+    (if not (equal_nata (size_list oip_full_key)
+              (nat_of_integer (32 : IntInf.int))) orelse
+          (not (equal_nata (size_list oip_full_signature)
+                 (nat_of_integer (64 : IntInf.int))) orelse
+            not (list_all (wire_octets (numeral_nat, ord_nat))
+                  [oip_full_key, oip_full_message, oip_full_signature]))
+      then NONE
+      else map_option
+             (fn a =>
+               (oip_full_key, (oip_full_message, oip_full_signature)) :: a)
+             (code_full_parse_sign_rows oip_full_rest))
+  | code_full_parse_sign_rows [uu] = NONE
+  | code_full_parse_sign_rows [uv, uw] = NONE;
+
+fun code_full_parse_hash_rows [] = SOME []
+  | code_full_parse_hash_rows
+    (oip_full_message :: oip_full_digest :: oip_full_rest) =
+    (if not (equal_nata (size_list oip_full_digest)
+              (nat_of_integer (32 : IntInf.int))) orelse
+          not (list_all (wire_octets (numeral_nat, ord_nat))
+                [oip_full_message, oip_full_digest])
+      then NONE
+      else map_option (fn a => (oip_full_message, oip_full_digest) :: a)
+             (code_full_parse_hash_rows oip_full_rest))
+  | code_full_parse_hash_rows [uu] = NONE;
+
 fun code_integer_octet_values values =
   list_all
     (fn value =>
@@ -6093,549 +7052,284 @@ fun code_integer_octet_values values =
         IntInf.< (value, (256 : IntInf.int)))
     values;
 
-fun code_rbound_error oip_binder_values =
-  (case oip_binder_values of [] => NONE
-    | [oip_binder_tag] =>
-      let
-        val oip_binder_variants =
-          [Code_Source_Wire_Validation Invalid_Wire_Format,
-            Code_Source_Wire_Validation Unsupported_Wire_Version,
-            Code_Source_Wire_Validation Invalid_Wire_Source,
-            Code_Source_Wire_Validation Invalid_Wire_Signature,
-            Code_Source_Wire_Validation Invalid_Wire_Threshold,
-            Code_Source_Wire_Validation Wire_TTL_Expired,
-            Code_Source_Wire_Validation Wire_TTL_Invalid,
-            Code_Source_Wire_Validation Conflicting_Wire_Replay,
-            Code_Source_Wire_Product_Rejected, Code_Source_Wire_Cancelled,
-            Code_Source_Wire_Deadline, Code_Source_Wire_Response_Lost,
-            Code_Source_Wire_Unresolved,
-            Code_Source_Wire_Recovery Code_Source_Recovery_Endpoint_Rejected,
-            Code_Source_Wire_Recovery Code_Source_Recovery_Endpoint_Unavailable,
-            Code_Source_Wire_Recovery Code_Source_Recovery_Hold];
-      in
-        (if less_nat oip_binder_tag (size_list oip_binder_variants)
-          then SOME (nth oip_binder_variants oip_binder_tag) else NONE)
-      end
-    | _ :: _ :: _ => NONE);
-
-fun code_rbound_legal oip_binder_values =
-  (case oip_binder_values of [] => NONE | [_] => NONE
-    | [oip_binder_tag, oip_binder_value] =>
-      (if equal_nata oip_binder_tag zero_nata
-        then SOME (Code_Source_Legal_Emitted oip_binder_value)
-        else (if equal_nata oip_binder_tag one_nata
-               then SOME (Code_Source_Legal_Applied oip_binder_value)
-               else (if equal_nata oip_binder_tag
-                          (nat_of_integer (2 : IntInf.int))
-                      then let
-                             val oip_binder_refusals =
-                               [Invalid_Legal_Authority, Invalid_Legal_State,
-                                 Invalid_Legal_Binding, Missing_Prior_Freeze,
-                                 Missing_Prior_Seizure, Appeal_Still_Open,
-                                 Appeal_Deadline_Mismatch,
-                                 Missing_Confiscation_Destination,
-                                 Conflicting_Legal_Order];
-                           in
-                             (if less_nat oip_binder_value
-                                   (size_list oip_binder_refusals)
-                               then SOME (Code_Source_Legal_Blocked
-   (nth oip_binder_refusals oip_binder_value))
-                               else (if equal_nata oip_binder_value
-  (nat_of_integer (9 : IntInf.int))
-                                      then SOME Code_Source_Legal_Busy
-                                      else (if equal_nata oip_binder_value
-         (nat_of_integer (10 : IntInf.int))
-     then SOME Code_Source_Legal_Unavailable else NONE)))
-                           end
-                      else NONE)))
-    | _ :: _ :: _ :: _ => NONE);
-
-fun code_rbound_spend oip_binder_values =
-  (case oip_binder_values of [] => NONE
-    | [oip_binder_tag] =>
-      (if equal_nata oip_binder_tag one_nata
-        then SOME (NONE, Code_Source_Spend_Rejected)
-        else (if equal_nata oip_binder_tag (nat_of_integer (2 : IntInf.int))
-               then SOME (NONE, Code_Source_Spend_Busy)
-               else (if equal_nata oip_binder_tag
-                          (nat_of_integer (3 : IntInf.int))
-                      then SOME (NONE, Code_Source_Spend_Unavailable)
-                      else NONE)))
-    | [_, _] => NONE | [_, _, _] => NONE
-    | [oip_binder_tag, oip_binder_domain, oip_binder_event, oip_binder_position]
-      => (if equal_nata oip_binder_tag zero_nata
-           then SOME (SOME (oip_binder_domain, oip_binder_event),
-                       Code_Source_Spend_Executed oip_binder_position)
-           else NONE)
-    | _ :: _ :: _ :: _ :: _ :: _ => NONE);
-
-fun full_response_config
-  (Code_response_full_context_ext
-    (full_response_config, full_response_channel, full_response_site,
-      full_parameters_clock, full_signing_clock, full_response_frame_limit,
-      more))
-  = full_response_config;
-
-fun code_full_sign_guard x =
-  (fn oip_full_context => fn oip_full_message =>
-    (case response_fixed_unframe oip_full_message of NONE => false
-      | SOME oip_full_core =>
-        (case full_signing_clock oip_full_context of NONE => false
-          | SOME oip_full_now =>
-            response_fixed_signable (full_response_config oip_full_context)
-              oip_full_now oip_full_core)))
+fun code_full_tables_from_integer x =
+  (fn oip_full_hash_rows => fn oip_full_sign_rows => fn oip_full_verify_rows =>
+    (if not (code_integer_octet_values
+              (concat
+                (oip_full_hash_rows @
+                  oip_full_sign_rows @ oip_full_verify_rows)))
+      then NONE
+      else bind (code_full_parse_hash_rows
+                  (map (map nat_of_integer) oip_full_hash_rows))
+             (fn oip_full_hashes =>
+               bind (code_full_parse_sign_rows
+                      (map (map nat_of_integer) oip_full_sign_rows))
+                 (fn oip_full_signatures =>
+                   bind (code_full_parse_verify_rows
+                          (map (map nat_of_integer) oip_full_verify_rows))
+                     (fn oip_full_verifications =>
+                       (if distinct (equal_list equal_nat)
+                             (map fst oip_full_hashes) andalso
+                             (distinct
+                                (equal_prod (equal_list equal_nat)
+                                  (equal_list equal_nat))
+                                (map (fn (oip_full_key, (oip_full_message, _))
+=>
+                                       (oip_full_key, oip_full_message))
+                                  oip_full_signatures) andalso
+                               distinct
+                                 (equal_prod (equal_list equal_nat)
+                                   (equal_prod (equal_list equal_nat)
+                                     (equal_list equal_nat)))
+                                 (map (fn
+ (oip_full_key, (oip_full_message, (oip_full_signature, _))) =>
+(oip_full_key, (oip_full_message, oip_full_signature)))
+                                   oip_full_verifications))
+                         then SOME (oip_full_hashes,
+                                     (oip_full_signatures,
+                                       oip_full_verifications))
+                         else NONE))))))
     x;
 
-fun code_full_kind_number x =
+fun code_full_build_client x =
+  (fn oip_full_rows =>
+    (code_full_channel oip_full_rows,
+      Response_fixed_client_boundary_ext
+        (code_contract_boundary
+           (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+           (nth (nth oip_full_rows zero_nata) zero_nata)
+           (nth oip_full_rows one_nata)
+           (nth oip_full_rows (nat_of_integer (2 : IntInf.int)))
+           (nth oip_full_rows (nat_of_integer (3 : IntInf.int)))
+           (equal_nata
+             (nth (nth oip_full_rows (nat_of_integer (7 : IntInf.int)))
+               zero_nata)
+             one_nata),
+          nth oip_full_rows (nat_of_integer (8 : IntInf.int)),
+          nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+            (nat_of_integer (12 : IntInf.int)),
+          ())))
+    x;
+
+fun code_full_client_from_integer x =
+  (fn oip_full_rows =>
+    (if not (equal_nata (size_list oip_full_rows)
+              (nat_of_integer (9 : IntInf.int))) orelse
+          not (code_integer_u64_values (concat oip_full_rows))
+      then NONE
+      else let
+             val oip_full_natural = map (map nat_of_integer) oip_full_rows;
+           in
+             (if not (equal_nata (size_list (nth oip_full_natural zero_nata))
+                       (nat_of_integer (5 : IntInf.int))) orelse
+                   (not (equal_nata
+                          (size_list
+                            (nth oip_full_natural
+                              (nat_of_integer (6 : IntInf.int))))
+                          (nat_of_integer (13 : IntInf.int))) orelse
+                     not (equal_nata
+                           (size_list
+                             (nth oip_full_natural
+                               (nat_of_integer (7 : IntInf.int))))
+                           one_nata))
+               then NONE
+               else (if not (member equal_nat
+                              (nth (nth oip_full_natural
+                                     (nat_of_integer (7 : IntInf.int)))
+                                zero_nata)
+                              (insert equal_nat zero_nata
+                                (insert equal_nat one_nata bot_set))) orelse
+                          not (list_all
+                                (fn oip_full_key =>
+                                  equal_nata (size_list oip_full_key)
+                                    (nat_of_integer (32 : IntInf.int)) andalso
+                                    wire_octets (numeral_nat, ord_nat)
+                                      oip_full_key)
+                                [nth oip_full_natural
+                                   (nat_of_integer (4 : IntInf.int)),
+                                  nth oip_full_natural
+                                    (nat_of_integer (5 : IntInf.int)),
+                                  nth oip_full_natural
+                                    (nat_of_integer (8 : IntInf.int))])
+                      then NONE
+                      else SOME (code_full_build_client oip_full_natural)))
+           end))
+    x;
+
+fun response_v061_client_input rows expected received verify_rows =
+  (if not (code_integer_octet_values (expected @ received)) then NONE
+    else bind (code_full_client_from_integer rows)
+           (fn (channel, current) =>
+             bind (sync_decode_packet (map nat_of_integer expected))
+               (fn original =>
+                 map_option
+                   (fn (_, (_, verifications)) =>
+                     (channel,
+                       (current,
+                         (original,
+                           (map nat_of_integer received, verifications)))))
+                   (code_full_tables_from_integer [] [] verify_rows))));
+
+fun code_response_list_atomicity x =
   (fn a =>
-    (case a of Recorded_Result => one_nata
-      | Delivery_Refusal => nat_of_integer (2 : IntInf.int)
-      | Validation_Refusal => nat_of_integer (3 : IntInf.int)))
+    (case a of [] => NONE
+      | oip_exec_first :: oip_exec_rest =>
+        SOME (fold (min ord_nat) oip_exec_rest oip_exec_first)))
     x;
 
-fun code_full_result_row x =
-  (fn (oip_full_call, (oip_full_kind, (oip_full_number, oip_full_position))) =>
-    [fst oip_full_call, snd oip_full_call, code_full_kind_number oip_full_kind,
-      oip_full_number,
-      (if is_none oip_full_position then zero_nata else one_nata),
-      (case oip_full_position of NONE => zero_nata
-        | SOME oip_full_optional_position => oip_full_optional_position)])
+fun code_full_build_context x =
+  (fn oip_full_rows => fn oip_full_parameters_time =>
+    fn oip_full_signing_time =>
+    Code_response_full_context_ext
+      (Response_fixed_config_ext
+         (nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int))) zero_nata,
+           Set (nth oip_full_rows (nat_of_integer (7 : IntInf.int))),
+           Set (zip (nth oip_full_rows (nat_of_integer (8 : IntInf.int)))
+                 (drop (nat_of_integer (14 : IntInf.int)) oip_full_rows)),
+           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int))) one_nata,
+           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+             (nat_of_integer (2 : IntInf.int)),
+           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+             (nat_of_integer (3 : IntInf.int)),
+           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+             (nat_of_integer (4 : IntInf.int)),
+           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+             (nat_of_integer (5 : IntInf.int)),
+           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
+             (nat_of_integer (6 : IntInf.int)),
+           nth oip_full_rows (nat_of_integer (9 : IntInf.int)),
+           nth oip_full_rows (nat_of_integer (10 : IntInf.int)), ()),
+        code_full_channel oip_full_rows,
+        Response_fixed_site_ext
+          ((nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
+              zero_nata,
+             (nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
+                one_nata,
+               nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
+                 (nat_of_integer (2 : IntInf.int)))),
+            (if equal_nata
+                  (nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
+                    (nat_of_integer (3 : IntInf.int)))
+                  one_nata
+              then SOME () else NONE),
+            (if equal_nata
+                  (nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
+                    (nat_of_integer (4 : IntInf.int)))
+                  one_nata
+              then SOME (nth (nth oip_full_rows
+                               (nat_of_integer (11 : IntInf.int)))
+                           (nat_of_integer (5 : IntInf.int)),
+                          (nth (nth oip_full_rows
+                                 (nat_of_integer (11 : IntInf.int)))
+                             (nat_of_integer (6 : IntInf.int)),
+                            nth (nth oip_full_rows
+                                  (nat_of_integer (11 : IntInf.int)))
+                              (nat_of_integer (7 : IntInf.int))))
+              else NONE),
+            ()),
+        oip_full_parameters_time, oip_full_signing_time,
+        nth (nth oip_full_rows (nat_of_integer (13 : IntInf.int))) zero_nata,
+        ()))
     x;
 
-fun full_response_frame_limit
-  (Code_response_full_context_ext
-    (full_response_config, full_response_channel, full_response_site,
-      full_parameters_clock, full_signing_clock, full_response_frame_limit,
-      more))
-  = full_response_frame_limit;
+fun code_rbound_position oip_binder_present oip_binder_position =
+  (if equal_nata oip_binder_present zero_nata
+    then (if equal_nata oip_binder_position zero_nata then SOME NONE else NONE)
+    else (if equal_nata oip_binder_present one_nata
+           then SOME (SOME oip_binder_position) else NONE));
 
-fun full_response_channel
-  (Code_response_full_context_ext
-    (full_response_config, full_response_channel, full_response_site,
-      full_parameters_clock, full_signing_clock, full_response_frame_limit,
-      more))
-  = full_response_channel;
-
-fun full_response_site
-  (Code_response_full_context_ext
-    (full_response_config, full_response_channel, full_response_site,
-      full_parameters_clock, full_signing_clock, full_response_frame_limit,
-      more))
-  = full_response_site;
-
-fun response_channel_local_key
-  (Response_fixed_channel_ext
-    (response_channel_profile, response_channel_deployment,
-      response_channel_local, response_channel_remote, response_channel_expires,
-      response_channel_local_key, response_channel_remote_key, more))
-  = response_channel_local_key;
-
-fun response_site_security_ordered_profile
-  (Response_fixed_site_ext
-    (response_site_profile, response_site_ordered_control,
-      response_site_security_ordered_profile, more))
-  = response_site_security_ordered_profile;
-
-fun response_site_ordered_control
-  (Response_fixed_site_ext
-    (response_site_profile, response_site_ordered_control,
-      response_site_security_ordered_profile, more))
-  = response_site_ordered_control;
-
-fun response_site_profile
-  (Response_fixed_site_ext
-    (response_site_profile, response_site_ordered_control,
-      response_site_security_ordered_profile, more))
-  = response_site_profile;
-
-fun guard_channel_deployment
-  (Code_channel_guard_ext
-    (guard_channel_version, guard_channel_deployment, guard_channel_local,
-      guard_channel_remote, guard_channel_expires, guard_channel_peer_key,
-      guard_channel_current, more))
-  = guard_channel_deployment;
-
-fun guard_channel_current
-  (Code_channel_guard_ext
-    (guard_channel_version, guard_channel_deployment, guard_channel_local,
-      guard_channel_remote, guard_channel_expires, guard_channel_peer_key,
-      guard_channel_current, more))
-  = guard_channel_current;
-
-fun guard_channel_remote
-  (Code_channel_guard_ext
-    (guard_channel_version, guard_channel_deployment, guard_channel_local,
-      guard_channel_remote, guard_channel_expires, guard_channel_peer_key,
-      guard_channel_current, more))
-  = guard_channel_remote;
-
-fun code_original_signature_refusal profile verify_peer packet =
-  let
-    val core = packet_core packet;
-  in
-    (if equal_nata (wire_signature_scheme core)
-          (nat_of_integer (2 : IntInf.int))
-      then SOME Invalid_Wire_Threshold
-      else (if not (member equal_nat (wire_signature_scheme core)
-                     (negotiated_schemes profile)) orelse
-                 not (verify_peer core (envelope_signing_bytes core)
-                       (packet_signature packet))
-             then SOME Invalid_Wire_Signature else NONE))
-  end;
-
-fun guard_channel_local
-  (Code_channel_guard_ext
-    (guard_channel_version, guard_channel_deployment, guard_channel_local,
-      guard_channel_remote, guard_channel_expires, guard_channel_peer_key,
-      guard_channel_current, more))
-  = guard_channel_local;
-
-fun code_response_packet_length count original_length =
-  let
-    val core = code_response_core_length count original_length;
-  in
-    plus_nata
-      (plus_nata (nat_of_integer (67 : IntInf.int))
-        (size_list (put_wire_varint core)))
-      core
-  end;
-
-fun code_response_measurement selected_atomicity original_length =
-  (case selected_atomicity of NONE => Inl Unsupported_Wire_Version
-    | SOME mode =>
-      (if not (member equal_nat mode
-                (atLeastAtMost (equal_nat, interval_nat) one_nata
-                  (nat_of_integer (3 : IntInf.int)))) orelse
-            less_eq_nat
-              (power power_nat (nat_of_integer (2 : IntInf.int))
-                (nat_of_integer (32 : IntInf.int)))
-              (code_response_core_length (nat_of_integer (6 : IntInf.int))
-                original_length)
-        then Inl Invalid_Wire_Format
-        else Inr (code_response_packet_length (nat_of_integer (6 : IntInf.int))
-                   original_length)));
-
-fun code_original_response_preflight profile channel ordered_available
-  revocation_matches registered_deployment frame_limit selected_atomicity
-  verify_peer bytes =
-  (if not (equal_nata (negotiated_version profile)
-            (nat_of_integer (6 : IntInf.int))) orelse
-        not (code_profile_allows profile Wire_Ack
-              (nat_of_integer (2 : IntInf.int)))
-    then Inl Unsupported_Wire_Version
-    else (if not ordered_available orelse
-               (not revocation_matches orelse
-                 (not (guard_channel_current channel) orelse
-                   not (equal_nata (guard_channel_deployment channel)
-                         registered_deployment)))
-           then Inl Invalid_Wire_Source
-           else (case code_check_declared_version bytes frame_limit
-                  of NONE =>
-                    (case decode_wire_packet bytes
-                      of NONE => Inl Invalid_Wire_Format
-                      | SOME packet =>
-                        let
-                          val core = packet_core packet;
-                        in
-                          (if not (is_none
-                                    (code_check_operation code_reference_accepts
-                                      core))
-                            then Inl Unsupported_Wire_Version
-                            else (if not (equal_nata (wire_version core)
-   (negotiated_version profile)) orelse
-                                       (not
-  (equal_nata (wire_deployment core) (guard_channel_deployment channel)) orelse
- (not (equal_nata (wire_source_domain core)
-        (guard_channel_remote channel)) orelse
-   not (equal_nata (wire_target_domain core) (guard_channel_local channel))))
-                                   then Inl Invalid_Wire_Source
-                                   else (case code_response_caller core
-  of Inl a => Inl a
-  | Inr call_id =>
-    (case code_response_measurement selected_atomicity
-            (size_list (encode_wire_core core))
-      of Inl a => Inl a
-      | Inr measured =>
-        (if less_nat frame_limit measured then Inl Invalid_Wire_Format
-          else (case code_original_signature_refusal profile verify_peer packet
-                 of NONE => Inr (packet, call_id) | SOME a => Inl a))))))
-                        end)
-                  | SOME a => Inl a)));
-
-fun response_config_public_key
-  (Response_fixed_config_ext
-    (response_config_deployment, response_config_local_endpoints,
-      response_config_peers, response_config_principal, response_config_key,
-      response_config_epoch, response_config_route, response_config_ttl,
-      response_config_max_nesting, response_config_public_key,
-      response_config_policy_binding, more))
-  = response_config_public_key;
-
-fun response_fixed_channel_current config channel =
-  equal_nata (negotiated_version (response_channel_profile channel))
-    (nat_of_integer (6 : IntInf.int)) andalso
-    (equal_nata (response_channel_deployment channel)
-       (response_config_deployment config) andalso
-      (member equal_nat (response_channel_local channel)
-         (response_config_local_endpoints config) andalso
-        (equal_lista equal_nat (response_channel_local_key channel)
-           (response_config_public_key config) andalso
-          member (equal_prod equal_nat (equal_list equal_nat))
-            (response_channel_remote channel,
-              response_channel_remote_key channel)
-            (response_config_peers config))));
-
-fun response_fixed_channel_guard config channel =
-  Code_channel_guard_ext
-    (negotiated_version (response_channel_profile channel),
-      response_channel_deployment channel, response_channel_local channel,
-      response_channel_remote channel, response_channel_expires channel,
-      response_channel_remote_key channel,
-      response_fixed_channel_current config channel, ());
-
-fun code_exec_original_preflight x =
-  (fn oip_exec_selected_mode => fn oip_exec_low_config =>
-    fn oip_exec_low_channel => fn oip_exec_low_site =>
-    fn oip_exec_low_curve_verify => fn oip_exec_low_frame_limit =>
-    code_original_response_preflight
-      (response_channel_profile oip_exec_low_channel)
-      (response_fixed_channel_guard oip_exec_low_config oip_exec_low_channel)
-      (not (is_none (response_site_ordered_control oip_exec_low_site)))
-      (equal_option (equal_prod equal_nat (equal_prod equal_nat equal_nat))
-        (response_site_security_ordered_profile oip_exec_low_site)
-        (SOME (response_site_profile oip_exec_low_site)))
-      (fst (response_site_profile oip_exec_low_site)) oip_exec_low_frame_limit
-      oip_exec_selected_mode
-      (fn _ =>
-        oip_exec_low_curve_verify
-          (response_channel_remote_key oip_exec_low_channel)))
+fun code_full_parse_context x =
+  (fn oip_full_rows =>
+    (if less_nat (size_list oip_full_rows) (nat_of_integer (14 : IntInf.int))
+      then NONE
+      else (if not (equal_nata (size_list (nth oip_full_rows zero_nata))
+                     (nat_of_integer (5 : IntInf.int))) orelse
+                 (not (equal_nata
+                        (size_list
+                          (nth oip_full_rows (nat_of_integer (6 : IntInf.int))))
+                        (nat_of_integer (7 : IntInf.int))) orelse
+                   (not (equal_nata
+                          (size_list
+                            (nth oip_full_rows
+                              (nat_of_integer (11 : IntInf.int))))
+                          (nat_of_integer (8 : IntInf.int))) orelse
+                     (not (equal_nata
+                            (size_list
+                              (nth oip_full_rows
+                                (nat_of_integer (12 : IntInf.int))))
+                            (nat_of_integer (4 : IntInf.int))) orelse
+                       (not (equal_nata
+                              (size_list
+                                (nth oip_full_rows
+                                  (nat_of_integer (13 : IntInf.int))))
+                              one_nata) orelse
+                         (not (equal_nata
+                                (size_list
+                                  (nth oip_full_rows
+                                    (nat_of_integer (8 : IntInf.int))))
+                                (size_list
+                                  (drop (nat_of_integer (14 : IntInf.int))
+                                    oip_full_rows))) orelse
+                           (not (list_all
+                                  (fn oip_full_key =>
+                                    equal_nata (size_list oip_full_key)
+                                      (nat_of_integer (32 : IntInf.int)))
+                                  ([nth oip_full_rows
+                                      (nat_of_integer (4 : IntInf.int)),
+                                     nth oip_full_rows
+                                       (nat_of_integer (5 : IntInf.int)),
+                                     nth oip_full_rows
+                                       (nat_of_integer (9 : IntInf.int)),
+                                     nth oip_full_rows
+                                       (nat_of_integer (10 : IntInf.int))] @
+                                    drop (nat_of_integer (14 : IntInf.int))
+                                      oip_full_rows)) orelse
+                             (not (member equal_nat
+                                    (nth (nth oip_full_rows
+   (nat_of_integer (11 : IntInf.int)))
+                                      (nat_of_integer (3 : IntInf.int)))
+                                    (insert equal_nat zero_nata
+                                      (insert equal_nat one_nata
+bot_set))) orelse
+                               (not (member equal_nat
+                                      (nth
+(nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
+(nat_of_integer (4 : IntInf.int)))
+                                      (insert equal_nat zero_nata
+(insert equal_nat one_nata bot_set))) orelse
+                                 not (list_all
+                                       (wire_octets (numeral_nat, ord_nat))
+                                       ([nth oip_full_rows
+   (nat_of_integer (4 : IntInf.int)),
+  nth oip_full_rows (nat_of_integer (5 : IntInf.int)),
+  nth oip_full_rows (nat_of_integer (9 : IntInf.int)),
+  nth oip_full_rows (nat_of_integer (10 : IntInf.int))] @
+ drop (nat_of_integer (14 : IntInf.int)) oip_full_rows))))))))))
+             then NONE
+             else bind (code_rbound_position
+                         (nth (nth oip_full_rows
+                                (nat_of_integer (12 : IntInf.int)))
+                           zero_nata)
+                         (nth (nth oip_full_rows
+                                (nat_of_integer (12 : IntInf.int)))
+                           one_nata))
+                    (fn oip_full_parameters_time =>
+                      map_option
+                        (code_full_build_context oip_full_rows
+                          oip_full_parameters_time)
+                        (code_rbound_position
+                          (nth (nth oip_full_rows
+                                 (nat_of_integer (12 : IntInf.int)))
+                            (nat_of_integer (2 : IntInf.int)))
+                          (nth (nth oip_full_rows
+                                 (nat_of_integer (12 : IntInf.int)))
+                            (nat_of_integer (3 : IntInf.int))))))))
     x;
 
-fun response_fixed_binding_preimage original atomicity words =
-  [nat_of_integer (111 : IntInf.int), nat_of_integer (105 : IntInf.int),
-    nat_of_integer (112 : IntInf.int), nat_of_integer (47 : IntInf.int),
-    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (102 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (110 : IntInf.int), nat_of_integer (99 : IntInf.int),
-    nat_of_integer (101 : IntInf.int), nat_of_integer (45 : IntInf.int),
-    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (115 : IntInf.int), nat_of_integer (112 : IntInf.int),
-    nat_of_integer (111 : IntInf.int), nat_of_integer (110 : IntInf.int),
-    nat_of_integer (115 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (45 : IntInf.int), nat_of_integer (98 : IntInf.int),
-    nat_of_integer (105 : IntInf.int), nat_of_integer (110 : IntInf.int),
-    nat_of_integer (100 : IntInf.int), nat_of_integer (105 : IntInf.int),
-    nat_of_integer (110 : IntInf.int), nat_of_integer (103 : IntInf.int),
-    nat_of_integer (47 : IntInf.int), nat_of_integer (118 : IntInf.int),
-    nat_of_integer (49 : IntInf.int), zero_nata] @
-    response_fixed_be64 (size_list original) @
-      original @
-        response_fixed_be64 atomicity @
-          response_fixed_be64 (size_list words) @
-            maps response_fixed_be64 words;
-
-fun response_fixed_post_boundary channel parameters frame_limit =
-  Wire_boundary_ext
-    (response_channel_profile channel, response_channel_deployment channel,
-      response_channel_local channel, response_channel_remote channel,
-      response_parameter_principal parameters,
-      response_parameter_key parameters, response_parameter_epoch parameters,
-      response_parameter_route parameters, response_parameter_issued parameters,
-      zero_nata, zero_nata, frame_limit, nat_of_integer (6 : IntInf.int), false,
-      false, ());
-
-fun response_config_policy_binding
-  (Response_fixed_config_ext
-    (response_config_deployment, response_config_local_endpoints,
-      response_config_peers, response_config_principal, response_config_key,
-      response_config_epoch, response_config_route, response_config_ttl,
-      response_config_max_nesting, response_config_public_key,
-      response_config_policy_binding, more))
-  = response_config_policy_binding;
-
-fun response_fixed_uuid_preimage config response_binding issued =
-  [nat_of_integer (111 : IntInf.int), nat_of_integer (105 : IntInf.int),
-    nat_of_integer (112 : IntInf.int), nat_of_integer (47 : IntInf.int),
-    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (102 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (110 : IntInf.int), nat_of_integer (99 : IntInf.int),
-    nat_of_integer (101 : IntInf.int), nat_of_integer (45 : IntInf.int),
-    nat_of_integer (114 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (115 : IntInf.int), nat_of_integer (112 : IntInf.int),
-    nat_of_integer (111 : IntInf.int), nat_of_integer (110 : IntInf.int),
-    nat_of_integer (115 : IntInf.int), nat_of_integer (101 : IntInf.int),
-    nat_of_integer (45 : IntInf.int), nat_of_integer (117 : IntInf.int),
-    nat_of_integer (117 : IntInf.int), nat_of_integer (105 : IntInf.int),
-    nat_of_integer (100 : IntInf.int), nat_of_integer (47 : IntInf.int),
-    nat_of_integer (118 : IntInf.int), nat_of_integer (49 : IntInf.int),
-    zero_nata] @
-    response_config_policy_binding config @
-      response_binding @ response_fixed_be64 issued;
-
-fun response_fixed_parameters_from hash config channel clock response_binding =
-  (if not (response_fixed_channel_current config channel) then NONE
-    else map_option
-           (fn issued =>
-             Response_fixed_parameters_ext
-               (response_config_principal config, response_config_key config,
-                 response_config_epoch config, issued,
-                 response_config_ttl config,
-                 response_fixed_uuid (numeral_nat, modulo_nat)
-                   (hash (response_fixed_uuid_preimage config response_binding
-                           issued)),
-                 response_config_route config, ()))
-           clock);
-
-fun code_exec_fixed_encode x =
-  (fn oip_exec_selected_mode => fn oip_exec_low_hash =>
-    fn oip_exec_low_curve_sign => fn oip_exec_low_signing_key =>
-    fn oip_exec_low_curve_verify => fn oip_exec_low_config =>
-    fn oip_exec_low_channel => fn oip_exec_low_parameters_clock =>
-    fn oip_exec_low_signing_clock => fn oip_exec_low_original =>
-    fn oip_exec_low_call_id => fn oip_exec_low_observation =>
-    fn oip_exec_low_frame_limit =>
-    (case response_fixed_words oip_exec_low_call_id
-            (response_fixed_result oip_exec_low_observation)
-      of NONE => Inl (Response_Fixed_Encoding_Refused Invalid_Wire_Format)
-      | SOME (oip_exec_low_kind,
-               (oip_exec_low_number,
-                 (oip_exec_low_position, oip_exec_low_words)))
-        => (case oip_exec_selected_mode
-             of NONE =>
-               Inl (Response_Fixed_Encoding_Refused Unsupported_Wire_Version)
-             | SOME oip_exec_low_atomicity =>
-               let
-                 val oip_exec_low_binding_preimage =
-                   response_fixed_binding_preimage
-                     (encode_wire_core oip_exec_low_original)
-                     oip_exec_low_atomicity oip_exec_low_words;
-               in
-                 (case response_fixed_parameters_from oip_exec_low_hash
-                         oip_exec_low_config oip_exec_low_channel
-                         oip_exec_low_parameters_clock
-                         (oip_exec_low_hash oip_exec_low_binding_preimage)
-                   of NONE =>
-                     Inl (Response_Fixed_Encoding_Refused Invalid_Wire_Source)
-                   | SOME oip_exec_low_parameters =>
-                     (if less_nat
-                           (response_channel_expires oip_exec_low_channel)
-                           (response_parameter_issued oip_exec_low_parameters)
-                       then Inl (Response_Fixed_Encoding_Refused
-                                  Invalid_Wire_Source)
-                       else let
-                              val oip_exec_low_core =
-                                response_fixed_core oip_exec_low_channel
-                                  oip_exec_low_parameters oip_exec_low_atomicity
-                                  oip_exec_low_words
-                                  (encode_wire_core oip_exec_low_original);
-                            in
-                              (case code_typed_encode_core oip_exec_low_core
-                                of NONE =>
-                                  Inl (Response_Fixed_Encoding_Refused
-Invalid_Wire_Format)
-                                | SOME oip_exec_low_core_bytes =>
-                                  (if less_eq_nat
-(power power_nat (nat_of_integer (2 : IntInf.int))
-  (nat_of_integer (32 : IntInf.int)))
-(size_list oip_exec_low_core_bytes)
-                                    then Inl
-   (Response_Fixed_Encoding_Refused Invalid_Wire_Format)
-                                    else let
-   val oip_exec_low_signing_preimage = envelope_signing_bytes oip_exec_low_core;
- in
-   (case response_fixed_sign oip_exec_low_curve_sign oip_exec_low_signing_key
-           oip_exec_low_config oip_exec_low_signing_clock
-           oip_exec_low_signing_preimage
-     of NONE => Inl Response_Fixed_Signature_Unavailable
-     | SOME oip_exec_low_signature =>
-       let
-         val oip_exec_low_packet =
-           Wire_packet_ext (oip_exec_low_core, oip_exec_low_signature, ());
-       in
-         (case code_encode_packet oip_exec_low_packet
-           of NONE => Inl (Response_Fixed_Encoding_Refused Invalid_Wire_Format)
-           | SOME oip_exec_low_encoded =>
-             (if less_nat oip_exec_low_frame_limit
-                   (size_list oip_exec_low_encoded)
-               then Inl (Response_Fixed_Encoding_Refused Invalid_Wire_Format)
-               else (case decode_wire_packet oip_exec_low_encoded
-                      of NONE =>
-                        Inl (Response_Fixed_Encoding_Refused
-                              Invalid_Wire_Format)
-                      | SOME oip_exec_low_parsed =>
-                        (case code_admit_packet
-                                (fn _ =>
-                                  oip_exec_low_curve_verify
-                                    (response_channel_local_key
-                                      oip_exec_low_channel))
-                                oip_exec_low_parsed
-                                (response_fixed_post_boundary
-                                  oip_exec_low_channel oip_exec_low_parameters
-                                  oip_exec_low_frame_limit)
-                          of NONE =>
-                            (case response_fixed_validate
-                                    (nat_of_integer (2 : IntInf.int))
-                                    oip_exec_low_original oip_exec_low_parsed
-                              of Inl oip_exec_low_reason =>
-                                Inl (Response_Fixed_Encoding_Refused
-                                      oip_exec_low_reason)
-                              | Inr oip_exec_low_verified =>
-                                Inr (Response_fixed_emission_ext
-                                      (oip_exec_low_encoded,
-oip_exec_low_parsed, oip_exec_low_original,
-(oip_exec_low_call_id,
-  (oip_exec_low_kind, (oip_exec_low_number, oip_exec_low_position))),
-oip_exec_low_verified, oip_exec_low_parameters, oip_exec_low_binding_preimage,
-oip_exec_low_signing_preimage, ())))
-                          | SOME oip_exec_low_reason =>
-                            Inl (Response_Fixed_Encoding_Refused
-                                  oip_exec_low_reason)))))
-       end)
- end))
-                            end))
-               end)))
-    x;
-
-fun code_exec_received_encode x =
-  (fn oip_exec_selected_mode => fn oip_exec_low_hash =>
-    fn oip_exec_low_curve_sign => fn oip_exec_low_signing_key =>
-    fn oip_exec_low_curve_verify => fn oip_exec_low_config =>
-    fn oip_exec_low_channel => fn oip_exec_low_site =>
-    fn oip_exec_low_parameters_clock => fn oip_exec_low_signing_clock =>
-    fn oip_exec_low_original_bytes => fn oip_exec_low_observation =>
-    fn oip_exec_low_frame_limit =>
-    (case code_exec_original_preflight oip_exec_selected_mode
-            oip_exec_low_config oip_exec_low_channel oip_exec_low_site
-            oip_exec_low_curve_verify oip_exec_low_frame_limit
-            oip_exec_low_original_bytes
-      of Inl oip_exec_low_reason =>
-        Inl (Response_Fixed_Encoding_Refused oip_exec_low_reason)
-      | Inr (oip_exec_low_original, oip_exec_low_call_id) =>
-        code_exec_fixed_encode oip_exec_selected_mode oip_exec_low_hash
-          oip_exec_low_curve_sign oip_exec_low_signing_key
-          oip_exec_low_curve_verify oip_exec_low_config oip_exec_low_channel
-          oip_exec_low_parameters_clock oip_exec_low_signing_clock
-          (packet_core oip_exec_low_original) oip_exec_low_call_id
-          oip_exec_low_observation oip_exec_low_frame_limit))
-    x;
-
-fun code_exec_sender x =
-  (fn oip_exec_selected_mode => fn oip_full_context =>
-    fn oip_full_observation => fn oip_full_original => fn oip_full_hashes =>
-    fn oip_full_signatures => fn oip_full_verifications =>
-    code_exec_received_encode oip_exec_selected_mode
-      (code_full_hash oip_full_hashes)
-      (code_full_sign oip_full_signatures
-        (response_channel_local_key (full_response_channel oip_full_context)))
-      () (code_full_verify oip_full_verifications)
-      (full_response_config oip_full_context)
-      (full_response_channel oip_full_context)
-      (full_response_site oip_full_context)
-      (full_parameters_clock oip_full_context)
-      (full_signing_clock oip_full_context) oip_full_original
-      oip_full_observation (full_response_frame_limit oip_full_context))
+fun code_full_context_from_integer x =
+  (fn oip_full_rows =>
+    (if not (code_integer_u64_values (concat oip_full_rows)) then NONE
+      else code_full_parse_context (map (map nat_of_integer) oip_full_rows)))
     x;
 
 fun code_rbound_accepted_reply oip_binder_tag =
@@ -6653,12 +7347,6 @@ fun code_rbound_accepted_reply oip_binder_tag =
     (if less_nat oip_binder_tag (size_list oip_binder_variants)
       then SOME (nth oip_binder_variants oip_binder_tag) else NONE)
   end;
-
-fun code_rbound_position oip_binder_present oip_binder_position =
-  (if equal_nata oip_binder_present zero_nata
-    then (if equal_nata oip_binder_position zero_nata then SOME NONE else NONE)
-    else (if equal_nata oip_binder_present one_nata
-           then SOME (SOME oip_binder_position) else NONE));
 
 fun code_rbound_outcome oip_binder_values =
   (case oip_binder_values of [] => NONE | [_] => NONE | [_, _] => NONE
@@ -6719,6 +7407,94 @@ fun code_rbound_collection oip_binder_values =
                              then SOME Code_Source_Collection_Rejected
                              else NONE)))));
 
+fun code_rbound_spend oip_binder_values =
+  (case oip_binder_values of [] => NONE
+    | [oip_binder_tag] =>
+      (if equal_nata oip_binder_tag one_nata
+        then SOME (NONE, Code_Source_Spend_Rejected)
+        else (if equal_nata oip_binder_tag (nat_of_integer (2 : IntInf.int))
+               then SOME (NONE, Code_Source_Spend_Busy)
+               else (if equal_nata oip_binder_tag
+                          (nat_of_integer (3 : IntInf.int))
+                      then SOME (NONE, Code_Source_Spend_Unavailable)
+                      else NONE)))
+    | [_, _] => NONE | [_, _, _] => NONE
+    | [oip_binder_tag, oip_binder_domain, oip_binder_event, oip_binder_position]
+      => (if equal_nata oip_binder_tag zero_nata
+           then SOME (SOME (oip_binder_domain, oip_binder_event),
+                       Code_Source_Spend_Executed oip_binder_position)
+           else NONE)
+    | _ :: _ :: _ :: _ :: _ :: _ => NONE);
+
+fun code_rbound_legal oip_binder_values =
+  (case oip_binder_values of [] => NONE | [_] => NONE
+    | [oip_binder_tag, oip_binder_value] =>
+      (if equal_nata oip_binder_tag zero_nata
+        then SOME (Code_Source_Legal_Emitted oip_binder_value)
+        else (if equal_nata oip_binder_tag one_nata
+               then SOME (Code_Source_Legal_Applied oip_binder_value)
+               else (if equal_nata oip_binder_tag
+                          (nat_of_integer (2 : IntInf.int))
+                      then let
+                             val oip_binder_refusals =
+                               [Invalid_Legal_Authority, Invalid_Legal_State,
+                                 Invalid_Legal_Binding, Missing_Prior_Freeze,
+                                 Missing_Prior_Seizure, Appeal_Still_Open,
+                                 Appeal_Deadline_Mismatch,
+                                 Missing_Confiscation_Destination,
+                                 Conflicting_Legal_Order];
+                           in
+                             (if less_nat oip_binder_value
+                                   (size_list oip_binder_refusals)
+                               then SOME (Code_Source_Legal_Blocked
+   (nth oip_binder_refusals oip_binder_value))
+                               else (if equal_nata oip_binder_value
+  (nat_of_integer (9 : IntInf.int))
+                                      then SOME Code_Source_Legal_Busy
+                                      else (if equal_nata oip_binder_value
+         (nat_of_integer (10 : IntInf.int))
+     then SOME Code_Source_Legal_Unavailable else NONE)))
+                           end
+                      else NONE)))
+    | _ :: _ :: _ :: _ => NONE);
+
+fun code_rbound_receipt oip_binder_values =
+  (case oip_binder_values of [] => NONE
+    | oip_binder_tag :: oip_binder_rest =>
+      (if equal_nata oip_binder_tag zero_nata
+        then map_option
+               (fn oip_binder_reply =>
+                 (NONE, Code_Source_Ordinary_Receipt oip_binder_reply))
+               (code_rbound_collection oip_binder_rest)
+        else (if equal_nata oip_binder_tag one_nata
+               then map_option
+                      (fn oip_binder_reply =>
+                        (NONE, Code_Source_Legal_Receipt oip_binder_reply))
+                      (code_rbound_legal oip_binder_rest)
+               else (if equal_nata oip_binder_tag
+                          (nat_of_integer (2 : IntInf.int))
+                      then map_option
+                             (fn (oip_binder_root, oip_binder_reply) =>
+                               (oip_binder_root,
+                                 Code_Source_Spend_Receipt oip_binder_reply))
+                             (code_rbound_spend oip_binder_rest)
+                      else NONE))));
+
+fun code_rbound_resolution oip_binder_values =
+  (case oip_binder_values of [] => NONE
+    | oip_binder_tag :: oip_binder_rest =>
+      (if equal_nata oip_binder_tag zero_nata andalso null oip_binder_rest
+        then SOME Code_Source_Resolution_Rejected
+        else (if equal_nata oip_binder_tag
+                   (nat_of_integer (2 : IntInf.int)) andalso
+                   null oip_binder_rest
+               then SOME Code_Source_Resolution_Unresolved
+               else (if equal_nata oip_binder_tag one_nata
+                      then map_option
+                             (fn (_, a) => Code_Source_Resolution_Published a)
+                             (code_rbound_receipt oip_binder_rest)
+                      else NONE))));
+
 fun code_rbound_action oip_binder_values =
   (case oip_binder_values of [] => NONE
     | oip_binder_tag :: oip_binder_rest =>
@@ -6762,6 +7538,586 @@ else (if equal_nata oip_binder_checked (nat_of_integer (3 : IntInf.int))
                                  null oip_binder_rest
                              then SOME (NONE, Code_Source_Other_Action)
                              else NONE)))));
+
+fun code_rbound_error oip_binder_values =
+  (case oip_binder_values of [] => NONE
+    | [oip_binder_tag] =>
+      let
+        val oip_binder_variants =
+          [Code_Source_Wire_Validation Invalid_Wire_Format,
+            Code_Source_Wire_Validation Unsupported_Wire_Version,
+            Code_Source_Wire_Validation Invalid_Wire_Source,
+            Code_Source_Wire_Validation Invalid_Wire_Signature,
+            Code_Source_Wire_Validation Invalid_Wire_Threshold,
+            Code_Source_Wire_Validation Wire_TTL_Expired,
+            Code_Source_Wire_Validation Wire_TTL_Invalid,
+            Code_Source_Wire_Validation Conflicting_Wire_Replay,
+            Code_Source_Wire_Product_Rejected, Code_Source_Wire_Cancelled,
+            Code_Source_Wire_Deadline, Code_Source_Wire_Response_Lost,
+            Code_Source_Wire_Unresolved,
+            Code_Source_Wire_Recovery Code_Source_Recovery_Endpoint_Rejected,
+            Code_Source_Wire_Recovery Code_Source_Recovery_Endpoint_Unavailable,
+            Code_Source_Wire_Recovery Code_Source_Recovery_Hold];
+      in
+        (if less_nat oip_binder_tag (size_list oip_binder_variants)
+          then SOME (nth oip_binder_variants oip_binder_tag) else NONE)
+      end
+    | _ :: _ :: _ => NONE);
+
+fun code_rbound_observation oip_binder_mode oip_binder_values
+  oip_binder_retained_present oip_binder_retained =
+  (if equal_nata oip_binder_mode zero_nata
+    then bind (code_rbound_action oip_binder_values)
+           (fn (oip_binder_root, oip_binder_reply) =>
+             (if not oip_binder_retained_present
+               then (if null oip_binder_retained
+                      then SOME (Response_Fixed_Received
+                                  (oip_binder_reply, NONE))
+                      else NONE)
+               else bind (code_rbound_receipt oip_binder_retained)
+                      (fn (oip_binder_stored_root, oip_binder_receipt) =>
+                        let
+                          val oip_binder_full_root_matches =
+                            (case oip_binder_reply
+                              of Code_Source_Ordinary_Collected _ => true
+                              | Code_Source_Ordinary_Waiting => true
+                              | Code_Source_Ordinary_Busy => true
+                              | Code_Source_Ordinary_Unavailable => true
+                              | Code_Source_Ordinary_Rejected => true
+                              | Code_Source_Legal_Action _ => true
+                              | Code_Source_Spend_Action
+                                  (Code_Source_Spend_Executed _)
+                                => equal_optiona
+                                     (equal_prod equal_nat equal_nat)
+                                     oip_binder_root oip_binder_stored_root
+                              | Code_Source_Spend_Action
+                                  Code_Source_Spend_Rejected
+                                => true
+                              | Code_Source_Spend_Action Code_Source_Spend_Busy
+                                => true
+                              | Code_Source_Spend_Action
+                                  Code_Source_Spend_Unavailable
+                                => true
+                              | Code_Source_Other_Action => true);
+                        in
+                          SOME (Response_Fixed_Received
+                                 (oip_binder_reply,
+                                   (if oip_binder_full_root_matches
+                                     then SOME oip_binder_receipt else NONE)))
+                        end)))
+    else (if oip_binder_retained_present orelse not (null oip_binder_retained)
+           then NONE
+           else (if equal_nata oip_binder_mode one_nata
+                  then map_option Response_Fixed_Resolved
+                         (code_rbound_resolution oip_binder_values)
+                  else (if equal_nata oip_binder_mode
+                             (nat_of_integer (2 : IntInf.int))
+                         then map_option Response_Fixed_Error
+                                (code_rbound_error oip_binder_values)
+                         else NONE))));
+
+fun response_v061_decode_sync row =
+  (case row of [] => NONE | [_] => NONE
+    | [tag, branch] =>
+      (if not (equal_nata tag (nat_of_integer (3 : IntInf.int))) then NONE
+        else (if equal_nata branch one_nata
+               then SOME (Sync_Uncommitted Sync_Busy)
+               else (if equal_nata branch (nat_of_integer (2 : IntInf.int))
+                      then SOME (Sync_Uncommitted Sync_Unavailable)
+                      else (if equal_nata branch
+                                 (nat_of_integer (3 : IntInf.int))
+                             then SOME (Sync_Uncommitted Sync_Mismatch)
+                             else (if equal_nata branch
+(nat_of_integer (4 : IntInf.int))
+                                    then SOME (Sync_Uncommitted Sync_Stale)
+                                    else (if equal_nata branch
+       (nat_of_integer (5 : IntInf.int))
+   then SOME (Sync_Uncommitted Sync_Proof_Rejected) else NONE))))))
+    | [tag, branch, position] =>
+      (if equal_nata tag (nat_of_integer (3 : IntInf.int)) andalso
+            equal_nata branch zero_nata
+        then SOME (Sync_Committed position) else NONE)
+    | _ :: _ :: _ :: _ :: _ => NONE);
+
+fun response_v061_decode_observation mode reply v061_present retained =
+  (if equal_nata mode zero_nata andalso
+        (not (null reply) andalso
+          (equal_nata (hd reply) (nat_of_integer (3 : IntInf.int)) andalso
+            not (equal_lista equal_nat reply
+                  [nat_of_integer (3 : IntInf.int)])))
+    then bind (response_v061_decode_sync reply)
+           (fn observed =>
+             (if not v061_present
+               then (if null retained
+                      then SOME (Response_V061_Sync (observed, NONE)) else NONE)
+               else (case response_v061_decode_sync retained
+                      of NONE =>
+                        map_option (fn _ => Response_V061_Sync (observed, NONE))
+                          (code_rbound_receipt retained)
+                      | SOME saved =>
+                        SOME (Response_V061_Sync (observed, SOME saved)))))
+    else (if equal_nata mode zero_nata andalso
+               (v061_present andalso
+                 (not (null retained) andalso
+                   equal_nata (hd retained) (nat_of_integer (3 : IntInf.int))))
+           then bind (response_v061_decode_sync retained)
+                  (fn _ =>
+                    map_option Response_V061_Legacy
+                      (code_rbound_observation mode reply false []))
+           else (if equal_nata mode one_nata andalso
+                      (equal_lista equal_nat
+                         (take (nat_of_integer (2 : IntInf.int)) reply)
+                         [one_nata, nat_of_integer (3 : IntInf.int)] andalso
+                        (not v061_present andalso null retained))
+                  then map_option
+                         (fn _ =>
+                           Response_V061_Legacy
+                             (Response_Fixed_Resolved
+                               Code_Source_Resolution_Unresolved))
+                         (response_v061_decode_sync (tl reply))
+                  else map_option Response_V061_Legacy
+                         (code_rbound_observation mode reply v061_present
+                           retained))));
+
+fun response_v061_sender_input rows mode reply v061_present retained raw
+  hash_rows sign_rows verify_rows =
+  (if less_nat (size_list rows) (nat_of_integer (14 : IntInf.int)) orelse
+        (not (equal_nata
+               (size_list (nth rows (nat_of_integer (6 : IntInf.int))))
+               (nat_of_integer (9 : IntInf.int))) orelse
+          (not (member equal_integer
+                 (nth (nth rows (nat_of_integer (6 : IntInf.int)))
+                   (nat_of_integer (7 : IntInf.int)))
+                 (insert equal_integer (0 : IntInf.int)
+                   (insert equal_integer (1 : IntInf.int) bot_set))) orelse
+            (not (member equal_integer
+                   (nth (nth rows (nat_of_integer (6 : IntInf.int)))
+                     (nat_of_integer (8 : IntInf.int)))
+                   (insert equal_integer (0 : IntInf.int)
+                     (insert equal_integer (1 : IntInf.int) bot_set))) orelse
+              (not (code_integer_u64_values (mode :: reply @ retained)) orelse
+                not (code_integer_octet_values raw)))))
+    then NONE
+    else bind (code_full_context_from_integer
+                (list_update rows (nat_of_integer (6 : IntInf.int))
+                  (take (nat_of_integer (7 : IntInf.int))
+                    (nth rows (nat_of_integer (6 : IntInf.int))))))
+           (fn context =>
+             bind (if ((mode : IntInf.int) = (3 : IntInf.int))
+                    then (if null reply andalso
+                               (not v061_present andalso null retained)
+                           then SOME NONE else NONE)
+                    else map_option SOME
+                           (response_v061_decode_observation
+                             (nat_of_integer mode) (map nat_of_integer reply)
+                             v061_present (map nat_of_integer retained)))
+               (fn observed =>
+                 map_option
+                   (fn (hashes, (signatures, verifications)) =>
+                     (context,
+                       ((((nth (nth rows (nat_of_integer (6 : IntInf.int)))
+                            (nat_of_integer
+                              (7 : IntInf.int))) : IntInf.int) = (1 : IntInf.int)),
+                         ((((nth (nth rows (nat_of_integer (6 : IntInf.int)))
+                              (nat_of_integer
+                                (8 : IntInf.int))) : IntInf.int) = (1 : IntInf.int)),
+                           (code_response_list_atomicity
+                              (map nat_of_integer
+                                (nth rows (nat_of_integer (2 : IntInf.int)))),
+                             (observed,
+                               (map nat_of_integer raw,
+                                 (hashes, (signatures, verifications)))))))))
+                   (code_full_tables_from_integer hash_rows sign_rows
+                     verify_rows))));
+
+fun code_full_lookup_verify x =
+  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
+    fn oip_full_signature =>
+    map_option (fn (_, (_, (_, oip_full_answer))) => oip_full_answer)
+      (find (fn (oip_full_record_key,
+                  (oip_full_record_message, (oip_full_record_signature, _)))
+               =>
+              equal_lista equal_nat oip_full_record_key oip_full_key andalso
+                (equal_lista equal_nat oip_full_record_message
+                   oip_full_message andalso
+                  equal_lista equal_nat oip_full_record_signature
+                    oip_full_signature))
+        oip_full_table))
+    x;
+
+fun code_full_verify x =
+  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
+    fn oip_full_signature =>
+    (case code_full_lookup_verify oip_full_table oip_full_key oip_full_message
+            oip_full_signature
+      of NONE =>
+        (raise Fail "OIP_PRIMITIVE_MISSING_ED25519_VERIFY") (fn _ => false)
+      | SOME oip_full_answer => oip_full_answer))
+    x;
+
+fun code_full_kind_number x =
+  (fn a =>
+    (case a of Recorded_Result => one_nata
+      | Delivery_Refusal => nat_of_integer (2 : IntInf.int)
+      | Validation_Refusal => nat_of_integer (3 : IntInf.int)))
+    x;
+
+fun code_full_result_row x =
+  (fn (oip_full_call, (oip_full_kind, (oip_full_number, oip_full_position))) =>
+    [fst oip_full_call, snd oip_full_call, code_full_kind_number oip_full_kind,
+      oip_full_number,
+      (if is_none oip_full_position then zero_nata else one_nata),
+      (case oip_full_position of NONE => zero_nata
+        | SOME oip_full_optional_position => oip_full_optional_position)])
+    x;
+
+fun code_response_packet_length count original_length =
+  let
+    val core = code_response_core_length count original_length;
+  in
+    plus_nata
+      (plus_nata (nat_of_integer (67 : IntInf.int))
+        (size_list (put_wire_varint core)))
+      core
+  end;
+
+fun code_full_query_blob x =
+  (fn oip_full_bytes => size_list oip_full_bytes :: oip_full_bytes) x;
+
+fun code_full_verify_query x =
+  (fn oip_full_key => fn oip_full_message => fn oip_full_signature =>
+    nat_of_integer (2 : IntInf.int) ::
+      code_full_query_blob oip_full_key @
+        code_full_query_blob oip_full_message @
+          code_full_query_blob oip_full_signature)
+    x;
+
+fun code_full_need_verify x =
+  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
+    fn oip_full_signature =>
+    (if is_none
+          (code_full_lookup_verify oip_full_table oip_full_key oip_full_message
+            oip_full_signature)
+      then [code_full_verify_query oip_full_key oip_full_message
+              oip_full_signature]
+      else []))
+    x;
+
+fun response_v061_missing_original_verification context raw verifications =
+  (case sync_decode_packet raw of NONE => []
+    | SOME packet =>
+      let
+        val channel = full_response_channel context;
+        val core = packet_core packet;
+      in
+        (if equal_nata (wire_signature_scheme core)
+              (nat_of_integer (2 : IntInf.int)) orelse
+              not (member equal_nat (wire_signature_scheme core)
+                    (negotiated_schemes (response_channel_profile channel)))
+          then []
+          else code_full_need_verify verifications
+                 (response_channel_remote_key channel)
+                 (envelope_signing_bytes core) (packet_signature packet))
+      end);
+
+fun code_full_probe_verify x =
+  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
+    fn oip_full_signature =>
+    (case code_full_lookup_verify oip_full_table oip_full_key oip_full_message
+            oip_full_signature
+      of NONE => false | SOME oip_full_probe_answer => oip_full_probe_answer))
+    x;
+
+fun response_site_security_ordered_profile
+  (Response_fixed_site_ext
+    (response_site_profile, response_site_ordered_control,
+      response_site_security_ordered_profile, more))
+  = response_site_security_ordered_profile;
+
+fun response_site_ordered_control
+  (Response_fixed_site_ext
+    (response_site_profile, response_site_ordered_control,
+      response_site_security_ordered_profile, more))
+  = response_site_ordered_control;
+
+fun full_response_site
+  (Code_response_full_context_ext
+    (full_response_config, full_response_channel, full_response_site,
+      full_parameters_clock, full_signing_clock, full_response_frame_limit,
+      more))
+  = full_response_site;
+
+fun response_site_profile
+  (Response_fixed_site_ext
+    (response_site_profile, response_site_ordered_control,
+      response_site_security_ordered_profile, more))
+  = response_site_profile;
+
+fun code_original_signature_refusal profile verify_peer packet =
+  let
+    val core = packet_core packet;
+  in
+    (if equal_nata (wire_signature_scheme core)
+          (nat_of_integer (2 : IntInf.int))
+      then SOME Invalid_Wire_Threshold
+      else (if not (member equal_nat (wire_signature_scheme core)
+                     (negotiated_schemes profile)) orelse
+                 not (verify_peer core (envelope_signing_bytes core)
+                       (packet_signature packet))
+             then SOME Invalid_Wire_Signature else NONE))
+  end;
+
+fun response_fixed_original_signature curve_verify channel original =
+  code_original_signature_refusal (response_channel_profile channel)
+    (fn _ => curve_verify (response_channel_remote_key channel)) original;
+
+fun response_v061_original_caller core =
+  (case response_v061_operand one_nata core of Inl a => Inl a
+    | Inr a => response_v061_caller a);
+
+fun code_response_measurement selected_atomicity original_length =
+  (case selected_atomicity of NONE => Inl Unsupported_Wire_Version
+    | SOME mode =>
+      (if not (member equal_nat mode
+                (atLeastAtMost (equal_nat, interval_nat) one_nata
+                  (nat_of_integer (3 : IntInf.int)))) orelse
+            less_eq_nat
+              (power power_nat (nat_of_integer (2 : IntInf.int))
+                (nat_of_integer (32 : IntInf.int)))
+              (code_response_core_length (nat_of_integer (6 : IntInf.int))
+                original_length)
+        then Inl Invalid_Wire_Format
+        else Inr (code_response_packet_length (nat_of_integer (6 : IntInf.int))
+                   original_length)));
+
+fun response_v061_original_preflight context accept_sync accept_current
+  selected_mode verify raw =
+  let
+    val channel = full_response_channel context;
+    val profile = response_channel_profile channel;
+    val config = full_response_config context;
+    val site = full_response_site context;
+    val frame_limit = full_response_frame_limit context;
+  in
+    (if not (equal_nata (negotiated_version profile)
+              (nat_of_integer (6 : IntInf.int))) orelse
+          not (code_profile_allows profile Wire_Ack
+                (nat_of_integer (2 : IntInf.int)))
+      then Inl Unsupported_Wire_Version
+      else (if is_none (response_site_ordered_control site) orelse
+                 (not (equal_optiona
+                        (equal_prod equal_nat (equal_prod equal_nat equal_nat))
+                        (response_site_security_ordered_profile site)
+                        (SOME (response_site_profile site))) orelse
+                   (not (response_fixed_channel_current config channel) orelse
+                     not (equal_nata (response_channel_deployment channel)
+                           (fst (response_site_profile site)))))
+             then Inl Invalid_Wire_Source
+             else (case code_check_declared_version raw frame_limit
+                    of NONE =>
+                      (case sync_decode_packet raw
+                        of NONE => Inl Invalid_Wire_Format
+                        | SOME packet =>
+                          let
+                            val core = packet_core packet;
+                          in
+                            (if not (is_none
+                                      (code_check_operation
+(response_v061_accepts accept_sync accept_current) core))
+                              then Inl Unsupported_Wire_Version
+                              else (if not
+ (equal_nata (wire_version core) (negotiated_version profile)) orelse
+ (not (equal_nata (wire_deployment core)
+        (response_channel_deployment channel)) orelse
+   (not (equal_nata (wire_source_domain core)
+          (response_channel_remote channel)) orelse
+     not (equal_nata (wire_target_domain core)
+           (response_channel_local channel))))
+                                     then Inl Invalid_Wire_Source
+                                     else (case
+    response_v061_original_caller core of Inl a => Inl a
+    | Inr call =>
+      (case code_response_measurement selected_mode
+              (size_list (encode_wire_core core))
+        of Inl a => Inl a
+        | Inr measured =>
+          (if less_nat frame_limit measured then Inl Invalid_Wire_Format
+            else (case response_fixed_original_signature verify channel packet
+                   of NONE => Inr (packet, call) | SOME a => Inl a))))))
+                          end)
+                    | SOME a => Inl a)))
+  end;
+
+fun response_v061_packet_caller raw =
+  (case sync_decode_packet raw of NONE => Inl Invalid_Wire_Format
+    | SOME packet =>
+      map_sum id (fn a => (packet, a))
+        (response_v061_original_caller (packet_core packet)));
+
+fun response_v061_selected_original include_original context accept_sync
+  accept_current selected_mode verify raw =
+  (if include_original
+    then response_v061_original_preflight context accept_sync accept_current
+           selected_mode verify raw
+    else response_v061_packet_caller raw);
+
+fun response_v061_original_plan include_original context accept_sync
+  accept_current selected_mode raw verifications =
+  let
+    val selected =
+      response_v061_selected_original include_original context accept_sync
+        accept_current selected_mode (code_full_probe_verify verifications) raw;
+  in
+    (selected,
+      (if include_original andalso
+            equal_sum equal_wire_refusal
+              (equal_prod (equal_wire_packet_ext equal_unit)
+                (equal_prod equal_nat equal_nat))
+              selected (Inl Invalid_Wire_Signature)
+        then response_v061_missing_original_verification context raw
+               verifications
+        else []))
+  end;
+
+fun code_full_hash_query x =
+  (fn oip_full_message => zero_nata :: code_full_query_blob oip_full_message) x;
+
+fun code_full_sign_query x =
+  (fn oip_full_key => fn oip_full_message =>
+    one_nata ::
+      code_full_query_blob oip_full_key @ code_full_query_blob oip_full_message)
+    x;
+
+fun response_v061_plan_after_uuid context original atomicity words binding
+  hashes signatures verifications rows =
+  let
+    val config = full_response_config context;
+    val channel = full_response_channel context;
+  in
+    (case response_fixed_parameters_from (code_full_hash hashes) config channel
+            (full_parameters_clock context) binding
+      of NONE => ([], rows)
+      | SOME parameters =>
+        let
+          val with_parameters =
+            list_update
+              (list_update rows (nat_of_integer (8 : IntInf.int))
+                (response_parameter_uuid parameters))
+              (nat_of_integer (9 : IntInf.int))
+              [response_parameter_principal parameters,
+                response_parameter_key parameters,
+                response_parameter_epoch parameters,
+                response_parameter_issued parameters,
+                response_parameter_ttl parameters,
+                response_parameter_route parameters];
+          val core =
+            response_fixed_core channel parameters atomicity words original;
+        in
+          (if less_nat (response_channel_expires channel)
+                (response_parameter_issued parameters)
+            then ([], with_parameters)
+            else (case code_typed_encode_core core
+                   of NONE => ([], with_parameters)
+                   | SOME core_bytes =>
+                     (if less_eq_nat
+                           (power power_nat (nat_of_integer (2 : IntInf.int))
+                             (nat_of_integer (32 : IntInf.int)))
+                           (size_list core_bytes)
+                       then ([], with_parameters)
+                       else let
+                              val preimage = envelope_signing_bytes core;
+                              val allowed =
+                                response_v061_sign_guard context preimage;
+                              val attempted =
+                                list_update
+                                  (list_update
+                                    (list_update with_parameters
+                                      (nat_of_integer (10 : IntInf.int))
+                                      core_bytes)
+                                    (nat_of_integer (11 : IntInf.int)) preimage)
+                                  (nat_of_integer (12 : IntInf.int))
+                                  [(if allowed then one_nata else zero_nata)];
+                              val v061_key = response_channel_local_key channel;
+                            in
+                              (if not allowed then ([], attempted)
+                                else (case code_full_lookup_sign signatures
+     v061_key preimage
+                                       of NONE =>
+ ([code_full_sign_query v061_key preimage], attempted)
+                                       | SOME signaturea =>
+ (code_full_need_verify verifications v061_key preimage signaturea,
+   list_update attempted (nat_of_integer (13 : IntInf.int)) signaturea)))
+                            end)))
+        end)
+  end;
+
+fun response_v061_plan_after_binding context original atomicity words binding
+  hashes signatures verifications rows =
+  let
+    val config = full_response_config context;
+    val channel = full_response_channel context;
+  in
+    (if not (response_fixed_channel_current config channel) then ([], rows)
+      else (case full_parameters_clock context of NONE => ([], rows)
+             | SOME issued =>
+               let
+                 val uuid_message =
+                   response_fixed_uuid_preimage config binding issued;
+                 val with_uuid_message =
+                   list_update rows (nat_of_integer (6 : IntInf.int))
+                     uuid_message;
+               in
+                 (case code_full_lookup_hash hashes uuid_message
+                   of NONE =>
+                     ([code_full_hash_query uuid_message], with_uuid_message)
+                   | SOME digest =>
+                     response_v061_plan_after_uuid context original atomicity
+                       words binding hashes signatures verifications
+                       (list_update with_uuid_message
+                         (nat_of_integer (7 : IntInf.int)) digest))
+               end))
+  end;
+
+fun response_v061_plan_selected context selected_mode packet call result hashes
+  signatures verifications =
+  let
+    val exact = encode_wire_core (packet_core packet);
+    val (number, position) = result;
+    val offset =
+      (case position of NONE => zero_nata | SOME revision => revision);
+    val base =
+      list_update
+        (list_update (replicate (nat_of_integer (14 : IntInf.int)) []) zero_nata
+          [number, (if is_none position then zero_nata else one_nata), offset])
+        (nat_of_integer (3 : IntInf.int)) exact;
+  in
+    (case response_v061_words call result of NONE => ([], base)
+      | SOME (_, (_, (_, words))) =>
+        let
+          val with_words = list_update base one_nata words;
+        in
+          (case selected_mode of NONE => ([], with_words)
+            | SOME atomicity =>
+              let
+                val binding_message =
+                  response_fixed_binding_preimage exact atomicity words;
+                val with_binding =
+                  list_update
+                    (list_update with_words (nat_of_integer (2 : IntInf.int))
+                      [atomicity])
+                    (nat_of_integer (4 : IntInf.int)) binding_message;
+              in
+                (case code_full_lookup_hash hashes binding_message
+                  of NONE =>
+                    ([code_full_hash_query binding_message], with_binding)
+                  | SOME binding =>
+                    response_v061_plan_after_binding context exact atomicity
+                      words binding hashes signatures verifications
+                      (list_update with_binding
+                        (nat_of_integer (5 : IntInf.int)) binding))
+              end)
+        end)
+  end;
 
 fun code_full_pack_client x =
   (fn a =>
@@ -6904,1044 +8260,363 @@ fun code_full_pack_sender x =
               oip_full_emission))))
     x;
 
-fun code_rbound_receipt oip_binder_values =
-  (case oip_binder_values of [] => NONE
-    | oip_binder_tag :: oip_binder_rest =>
-      (if equal_nata oip_binder_tag zero_nata
-        then map_option
-               (fn oip_binder_reply =>
-                 (NONE, Code_Source_Ordinary_Receipt oip_binder_reply))
-               (code_rbound_collection oip_binder_rest)
-        else (if equal_nata oip_binder_tag one_nata
-               then map_option
-                      (fn oip_binder_reply =>
-                        (NONE, Code_Source_Legal_Receipt oip_binder_reply))
-                      (code_rbound_legal oip_binder_rest)
-               else (if equal_nata oip_binder_tag
-                          (nat_of_integer (2 : IntInf.int))
-                      then map_option
-                             (fn (oip_binder_root, oip_binder_reply) =>
-                               (oip_binder_root,
-                                 Code_Source_Spend_Receipt oip_binder_reply))
-                             (code_rbound_spend oip_binder_rest)
-                      else NONE))));
+fun response_v061_client_queries channel current expected raw verifications =
+  (if not (equal_sum equal_wire_refusal
+            (equal_prod
+              (equal_prod (equal_prod equal_nat equal_nat)
+                (equal_prod equal_reference_response_kind
+                  (equal_prod equal_nat (equal_option equal_nat))))
+              (equal_option equal_code_response_status))
+            (response_v061_admit (code_full_probe_verify verifications) channel
+              current expected raw)
+            (Inl Invalid_Wire_Signature))
+    then []
+    else (case sync_decode_packet raw of NONE => []
+           | SOME packet =>
+             let
+               val core = packet_core packet;
+             in
+               (if equal_nata (wire_signature_scheme core)
+                     (nat_of_integer (2 : IntInf.int)) orelse
+                     not (member equal_nat (wire_signature_scheme core)
+                           (negotiated_schemes
+                             (response_channel_profile channel)))
+                 then []
+                 else code_full_need_verify verifications
+                        (response_client_public_key current)
+                        (envelope_signing_bytes core) (packet_signature packet))
+             end));
 
-fun code_full_parse_verify_rows [] = SOME []
-  | code_full_parse_verify_rows
-    (oip_full_key ::
-      oip_full_message ::
-        oip_full_signature :: oip_full_answer :: oip_full_rest)
-    = (if not (equal_nata (size_list oip_full_key)
-                (nat_of_integer (32 : IntInf.int))) orelse
-            (not (list_all (wire_octets (numeral_nat, ord_nat))
-                   [oip_full_key, oip_full_message, oip_full_signature]) orelse
-              not (equal_lista equal_nat oip_full_answer [zero_nata]) andalso
-                not (equal_lista equal_nat oip_full_answer [one_nata]))
-        then NONE
-        else map_option
-               (fn a =>
-                 (oip_full_key,
-                   (oip_full_message,
-                     (oip_full_signature,
-                       equal_lista equal_nat oip_full_answer [one_nata]))) ::
-                   a)
-               (code_full_parse_verify_rows oip_full_rest))
-  | code_full_parse_verify_rows [uu] = NONE
-  | code_full_parse_verify_rows [uv, uw] = NONE
-  | code_full_parse_verify_rows [ux, uy, uz] = NONE;
+fun response_v061_execute_sender v061_stage include_original context accept_sync
+  accept_current selected_mode observed raw hashes signatures verifications =
+  (if is_none observed andalso not include_original then ((~1 : IntInf.int), [])
+    else (case response_v061_original_plan include_original context accept_sync
+                 accept_current selected_mode raw verifications
+           of (Inl _, original_queries) =>
+             (case v061_stage
+               of Response_V061_Plan => response_v061_pack_rows original_queries
+               | Response_V061_Prefix =>
+                 (if null original_queries then ((0 : IntInf.int), [])
+                   else ((~2 : IntInf.int), []))
+               | Response_V061_Emit =>
+                 (if not (null original_queries) then ((~2 : IntInf.int), [])
+                   else (case response_v061_selected_original include_original
+                                context accept_sync accept_current selected_mode
+                                (code_full_verify verifications) raw
+                          of Inl strict_reason =>
+                            (integer_of_nat
+                               (code_transport_refusal_number strict_reason),
+                              [])
+                          | Inr _ => ((~1 : IntInf.int), []))))
+           | (Inr (packet, call), _) =>
+             (case observed of NONE => ((~1 : IntInf.int), [])
+               | SOME observation =>
+                 let
+                   val result = response_v061_result observation;
+                   val (queries, prefix) =
+                     response_v061_plan_selected context selected_mode packet
+                       call result hashes signatures verifications;
+                 in
+                   (case v061_stage
+                     of Response_V061_Plan => response_v061_pack_rows queries
+                     | Response_V061_Prefix =>
+                       (if null queries then response_v061_pack_rows prefix
+                         else ((~2 : IntInf.int), []))
+                     | Response_V061_Emit =>
+                       (if not (null queries) then ((~2 : IntInf.int), [])
+                         else (case response_v061_selected_original
+                                      include_original context accept_sync
+                                      accept_current selected_mode
+                                      (code_full_verify verifications) raw
+                                of Inl reason =>
+                                  (integer_of_nat
+                                     (code_transport_refusal_number reason),
+                                    [])
+                                | Inr (actual, actual_call) =>
+                                  code_full_pack_sender context hashes
+                                    (response_v061_encode
+                                      (code_full_hash hashes)
+                                      (fn v061_key =>
+code_full_sign signatures v061_key ())
+                                      (code_full_verify verifications) context
+                                      selected_mode (packet_core actual)
+                                      actual_call result))))
+                 end)));
 
-fun code_full_parse_sign_rows [] = SOME []
-  | code_full_parse_sign_rows
-    (oip_full_key :: oip_full_message :: oip_full_signature :: oip_full_rest) =
-    (if not (equal_nata (size_list oip_full_key)
-              (nat_of_integer (32 : IntInf.int))) orelse
-          (not (equal_nata (size_list oip_full_signature)
-                 (nat_of_integer (64 : IntInf.int))) orelse
-            not (list_all (wire_octets (numeral_nat, ord_nat))
-                  [oip_full_key, oip_full_message, oip_full_signature]))
-      then NONE
-      else map_option
-             (fn a =>
-               (oip_full_key, (oip_full_message, oip_full_signature)) :: a)
-             (code_full_parse_sign_rows oip_full_rest))
-  | code_full_parse_sign_rows [uu] = NONE
-  | code_full_parse_sign_rows [uv, uw] = NONE;
+fun response_v061_sender_integer v061_stage include_original rows mode reply
+  v061_present retained raw hash_rows sign_rows verify_rows =
+  (case response_v061_sender_input rows mode reply v061_present retained raw
+          hash_rows sign_rows verify_rows
+    of NONE => ((~1 : IntInf.int), [])
+    | SOME (context,
+             (accept_sync,
+               (accept_current,
+                 (selected_mode, (observed, (original, (hashes, (a, b))))))))
+      => response_v061_execute_sender v061_stage include_original context
+           accept_sync accept_current selected_mode observed original hashes a
+           b);
 
-fun code_full_parse_hash_rows [] = SOME []
-  | code_full_parse_hash_rows
-    (oip_full_message :: oip_full_digest :: oip_full_rest) =
-    (if not (equal_nata (size_list oip_full_digest)
-              (nat_of_integer (32 : IntInf.int))) orelse
-          not (list_all (wire_octets (numeral_nat, ord_nat))
-                [oip_full_message, oip_full_digest])
-      then NONE
-      else map_option (fn a => (oip_full_message, oip_full_digest) :: a)
-             (code_full_parse_hash_rows oip_full_rest))
-  | code_full_parse_hash_rows [uu] = NONE;
+fun response_v061_identity_fields fingerprint =
+  map (map integer_of_nat o code_json_ascii)
+    [[Chara (true, false, false, false, true, true, false, false)],
+      [Chara (true, false, false, true, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (false, false, true, false, true, true, true, false),
+        Chara (true, false, false, true, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (false, true, true, false, false, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (false, false, false, false, true, true, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (false, true, true, false, false, true, true, false),
+        Chara (true, false, true, false, true, true, true, false),
+        Chara (false, false, true, true, false, true, true, false),
+        Chara (false, false, true, true, false, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (false, true, true, false, true, true, true, false),
+        Chara (false, true, false, false, true, true, false, false)],
+      [Chara (true, true, true, false, true, true, true, false),
+        Chara (true, false, false, true, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (false, false, false, false, true, true, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (false, false, true, false, false, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (true, true, false, false, false, true, true, false),
+        Chara (false, false, true, true, false, true, true, false),
+        Chara (true, false, false, true, false, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (false, false, true, false, true, true, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (false, true, true, false, true, true, true, false),
+        Chara (false, true, false, false, true, true, false, false)],
+      [Chara (true, true, true, true, false, false, true, false),
+        Chara (true, false, false, true, false, false, true, false),
+        Chara (false, false, false, false, true, false, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (true, true, true, false, true, false, true, false),
+        Chara (true, false, false, true, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (false, true, false, false, true, false, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (false, false, false, false, true, true, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (false, true, false, false, false, false, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (true, false, true, false, true, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (false, false, true, false, false, true, true, false),
+        Chara (true, false, false, false, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, false, true, true, true, true, false),
+        Chara (false, true, true, true, false, true, false, false),
+        Chara (true, true, false, false, false, true, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, false, true, false, false, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (false, false, false, false, true, true, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, true, true, true, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, true, false, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, true, false, false, true, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (false, true, true, false, false, true, true, false),
+        Chara (false, false, true, true, false, true, true, false),
+        Chara (true, false, false, false, false, true, true, false),
+        Chara (false, false, true, false, true, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, false, false, false, true, true, false),
+        Chara (true, true, false, false, false, true, true, false),
+        Chara (false, false, true, true, false, true, true, false),
+        Chara (true, false, true, false, false, true, true, false)],
+      [Chara (false, false, false, true, false, false, true, false),
+        Chara (true, true, true, true, false, false, true, false),
+        Chara (false, false, true, true, false, false, true, false),
+        Chara (true, false, true, true, false, true, false, false),
+        Chara (false, false, true, true, false, false, true, false),
+        Chara (true, false, false, true, false, true, true, false),
+        Chara (false, true, false, false, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, false, false, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, false, false, true, true, true, true, false),
+        Chara (false, true, true, true, false, true, false, false),
+        Chara (true, true, false, false, false, false, true, false),
+        Chara (true, true, true, true, false, true, true, false),
+        Chara (false, false, true, false, false, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (false, false, true, false, true, false, true, false),
+        Chara (true, false, false, false, false, true, true, false),
+        Chara (false, true, false, false, true, true, true, false),
+        Chara (true, true, true, false, false, true, true, false),
+        Chara (true, false, true, false, false, true, true, false),
+        Chara (false, false, true, false, true, true, true, false),
+        Chara (true, true, true, true, true, false, true, false),
+        Chara (false, true, true, true, false, false, true, false),
+        Chara (true, false, false, false, false, true, true, false),
+        Chara (false, false, true, false, true, true, true, false)],
+      fingerprint];
 
-fun code_full_tables_from_integer x =
-  (fn oip_full_hash_rows => fn oip_full_sign_rows => fn oip_full_verify_rows =>
-    (if not (code_integer_octet_values
-              (concat
-                (oip_full_hash_rows @
-                  oip_full_sign_rows @ oip_full_verify_rows)))
-      then NONE
-      else bind (code_full_parse_hash_rows
-                  (map (map nat_of_integer) oip_full_hash_rows))
-             (fn oip_full_hashes =>
-               bind (code_full_parse_sign_rows
-                      (map (map nat_of_integer) oip_full_sign_rows))
-                 (fn oip_full_signatures =>
-                   bind (code_full_parse_verify_rows
-                          (map (map nat_of_integer) oip_full_verify_rows))
-                     (fn oip_full_verifications =>
-                       (if distinct (equal_list equal_nat)
-                             (map fst oip_full_hashes) andalso
-                             (distinct
-                                (equal_prod (equal_list equal_nat)
-                                  (equal_list equal_nat))
-                                (map (fn (oip_full_key, (oip_full_message, _))
-=>
-                                       (oip_full_key, oip_full_message))
-                                  oip_full_signatures) andalso
-                               distinct
-                                 (equal_prod (equal_list equal_nat)
-                                   (equal_prod (equal_list equal_nat)
-                                     (equal_list equal_nat)))
-                                 (map (fn
- (oip_full_key, (oip_full_message, (oip_full_signature, _))) =>
-(oip_full_key, (oip_full_message, oip_full_signature)))
-                                   oip_full_verifications))
-                         then SOME (oip_full_hashes,
-                                     (oip_full_signatures,
-                                       oip_full_verifications))
-                         else NONE))))))
-    x;
+fun code_response_admit_flat_oracle rows expected received verify_rows =
+  (case response_v061_client_input rows expected received verify_rows
+    of NONE => ((~1 : IntInf.int), [])
+    | SOME (channel, (current, (original, (raw, verifications)))) =>
+      (if not (null (response_v061_client_queries channel current original raw
+                      verifications))
+        then ((~2 : IntInf.int), [])
+        else code_full_pack_client
+               (response_v061_admit (code_full_verify verifications) channel
+                 current original raw)));
 
-fun code_full_build_client x =
-  (fn oip_full_rows =>
-    (code_full_channel oip_full_rows,
-      Response_fixed_client_boundary_ext
-        (code_contract_boundary
-           (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-           (nth (nth oip_full_rows zero_nata) zero_nata)
-           (nth oip_full_rows one_nata)
-           (nth oip_full_rows (nat_of_integer (2 : IntInf.int)))
-           (nth oip_full_rows (nat_of_integer (3 : IntInf.int)))
-           (equal_nata
-             (nth (nth oip_full_rows (nat_of_integer (7 : IntInf.int)))
-               zero_nata)
-             one_nata),
-          nth oip_full_rows (nat_of_integer (8 : IntInf.int)),
-          nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-            (nat_of_integer (12 : IntInf.int)),
-          ())))
-    x;
+fun code_response_full_model_identity ignored =
+  response_v061_identity_fields
+    [Chara (false, true, false, false, false, true, true, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, true, true, false, true, true, false, false),
+      Chara (false, true, true, false, false, true, true, false),
+      Chara (true, false, true, false, false, true, true, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (false, true, true, false, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (false, true, false, false, true, true, false, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (true, false, true, false, true, true, false, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (false, true, false, false, true, true, false, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (true, false, true, false, true, true, false, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (true, true, false, false, false, true, true, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, false, true, false, false, true, true, false),
+      Chara (false, true, true, false, true, true, false, false),
+      Chara (true, false, true, false, true, true, false, false),
+      Chara (true, true, true, false, true, true, false, false),
+      Chara (false, true, false, false, true, true, false, false),
+      Chara (false, true, true, false, false, true, true, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (true, true, true, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, true, false, false, false, true, true, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, true, true, false, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false)];
 
-fun code_full_client_from_integer x =
-  (fn oip_full_rows =>
-    (if not (equal_nata (size_list oip_full_rows)
-              (nat_of_integer (9 : IntInf.int))) orelse
-          not (code_integer_u64_values (concat oip_full_rows))
-      then NONE
-      else let
-             val oip_full_natural = map (map nat_of_integer) oip_full_rows;
-           in
-             (if not (equal_nata (size_list (nth oip_full_natural zero_nata))
-                       (nat_of_integer (5 : IntInf.int))) orelse
-                   (not (equal_nata
-                          (size_list
-                            (nth oip_full_natural
-                              (nat_of_integer (6 : IntInf.int))))
-                          (nat_of_integer (13 : IntInf.int))) orelse
-                     not (equal_nata
-                           (size_list
-                             (nth oip_full_natural
-                               (nat_of_integer (7 : IntInf.int))))
-                           one_nata))
-               then NONE
-               else (if not (member equal_nat
-                              (nth (nth oip_full_natural
-                                     (nat_of_integer (7 : IntInf.int)))
-                                zero_nata)
-                              (insert equal_nat zero_nata
-                                (insert equal_nat one_nata bot_set))) orelse
-                          not (list_all
-                                (fn oip_full_key =>
-                                  equal_nata (size_list oip_full_key)
-                                    (nat_of_integer (32 : IntInf.int)) andalso
-                                    wire_octets (numeral_nat, ord_nat)
-                                      oip_full_key)
-                                [nth oip_full_natural
-                                   (nat_of_integer (4 : IntInf.int)),
-                                  nth oip_full_natural
-                                    (nat_of_integer (5 : IntInf.int)),
-                                  nth oip_full_natural
-                                    (nat_of_integer (8 : IntInf.int))])
-                      then NONE
-                      else SOME (code_full_build_client oip_full_natural)))
-           end))
-    x;
+fun code_response_admit_queries_flat rows expected received verify_rows =
+  (case response_v061_client_input rows expected received verify_rows
+    of NONE => ((~1 : IntInf.int), [])
+    | SOME (channel, (current, (original, (raw, verifications)))) =>
+      response_v061_pack_rows
+        (response_v061_client_queries channel current original raw
+          verifications));
 
-fun code_full_client_input x =
-  (fn oip_full_rows => fn oip_full_expected_bytes =>
-    fn oip_full_received_bytes => fn oip_full_verify_rows =>
-    (if not (code_integer_octet_values
-              (oip_full_expected_bytes @ oip_full_received_bytes))
-      then NONE
-      else bind (code_full_client_from_integer oip_full_rows)
-             (fn (oip_full_channel, oip_full_current) =>
-               bind (decode_wire_packet
-                      (map nat_of_integer oip_full_expected_bytes))
-                 (fn oip_full_expected =>
-                   map_option
-                     (fn (_, (_, oip_full_verifications)) =>
-                       (oip_full_channel,
-                         (oip_full_current,
-                           (oip_full_expected,
-                             (map nat_of_integer oip_full_received_bytes,
-                               oip_full_verifications)))))
-                     (code_full_tables_from_integer [] []
-                       oip_full_verify_rows)))))
-    x;
+fun code_response_egress_flat_oracle x =
+  response_v061_sender_integer Response_V061_Emit true x;
 
-fun code_full_build_context x =
-  (fn oip_full_rows => fn oip_full_parameters_time =>
-    fn oip_full_signing_time =>
-    Code_response_full_context_ext
-      (Response_fixed_config_ext
-         (nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int))) zero_nata,
-           Set (nth oip_full_rows (nat_of_integer (7 : IntInf.int))),
-           Set (zip (nth oip_full_rows (nat_of_integer (8 : IntInf.int)))
-                 (drop (nat_of_integer (14 : IntInf.int)) oip_full_rows)),
-           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int))) one_nata,
-           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-             (nat_of_integer (2 : IntInf.int)),
-           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-             (nat_of_integer (3 : IntInf.int)),
-           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-             (nat_of_integer (4 : IntInf.int)),
-           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-             (nat_of_integer (5 : IntInf.int)),
-           nth (nth oip_full_rows (nat_of_integer (6 : IntInf.int)))
-             (nat_of_integer (6 : IntInf.int)),
-           nth oip_full_rows (nat_of_integer (9 : IntInf.int)),
-           nth oip_full_rows (nat_of_integer (10 : IntInf.int)), ()),
-        code_full_channel oip_full_rows,
-        Response_fixed_site_ext
-          ((nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
-              zero_nata,
-             (nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
-                one_nata,
-               nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
-                 (nat_of_integer (2 : IntInf.int)))),
-            (if equal_nata
-                  (nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
-                    (nat_of_integer (3 : IntInf.int)))
-                  one_nata
-              then SOME () else NONE),
-            (if equal_nata
-                  (nth (nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
-                    (nat_of_integer (4 : IntInf.int)))
-                  one_nata
-              then SOME (nth (nth oip_full_rows
-                               (nat_of_integer (11 : IntInf.int)))
-                           (nat_of_integer (5 : IntInf.int)),
-                          (nth (nth oip_full_rows
-                                 (nat_of_integer (11 : IntInf.int)))
-                             (nat_of_integer (6 : IntInf.int)),
-                            nth (nth oip_full_rows
-                                  (nat_of_integer (11 : IntInf.int)))
-                              (nat_of_integer (7 : IntInf.int))))
-              else NONE),
-            ()),
-        oip_full_parameters_time, oip_full_signing_time,
-        nth (nth oip_full_rows (nat_of_integer (13 : IntInf.int))) zero_nata,
-        ()))
-    x;
+fun code_response_egress_prefix_flat x =
+  response_v061_sender_integer Response_V061_Prefix true x;
 
-fun code_full_parse_context x =
-  (fn oip_full_rows =>
-    (if less_nat (size_list oip_full_rows) (nat_of_integer (14 : IntInf.int))
-      then NONE
-      else (if not (equal_nata (size_list (nth oip_full_rows zero_nata))
-                     (nat_of_integer (5 : IntInf.int))) orelse
-                 (not (equal_nata
-                        (size_list
-                          (nth oip_full_rows (nat_of_integer (6 : IntInf.int))))
-                        (nat_of_integer (7 : IntInf.int))) orelse
-                   (not (equal_nata
-                          (size_list
-                            (nth oip_full_rows
-                              (nat_of_integer (11 : IntInf.int))))
-                          (nat_of_integer (8 : IntInf.int))) orelse
-                     (not (equal_nata
-                            (size_list
-                              (nth oip_full_rows
-                                (nat_of_integer (12 : IntInf.int))))
-                            (nat_of_integer (4 : IntInf.int))) orelse
-                       (not (equal_nata
-                              (size_list
-                                (nth oip_full_rows
-                                  (nat_of_integer (13 : IntInf.int))))
-                              one_nata) orelse
-                         (not (equal_nata
-                                (size_list
-                                  (nth oip_full_rows
-                                    (nat_of_integer (8 : IntInf.int))))
-                                (size_list
-                                  (drop (nat_of_integer (14 : IntInf.int))
-                                    oip_full_rows))) orelse
-                           (not (list_all
-                                  (fn oip_full_key =>
-                                    equal_nata (size_list oip_full_key)
-                                      (nat_of_integer (32 : IntInf.int)))
-                                  ([nth oip_full_rows
-                                      (nat_of_integer (4 : IntInf.int)),
-                                     nth oip_full_rows
-                                       (nat_of_integer (5 : IntInf.int)),
-                                     nth oip_full_rows
-                                       (nat_of_integer (9 : IntInf.int)),
-                                     nth oip_full_rows
-                                       (nat_of_integer (10 : IntInf.int))] @
-                                    drop (nat_of_integer (14 : IntInf.int))
-                                      oip_full_rows)) orelse
-                             (not (member equal_nat
-                                    (nth (nth oip_full_rows
-   (nat_of_integer (11 : IntInf.int)))
-                                      (nat_of_integer (3 : IntInf.int)))
-                                    (insert equal_nat zero_nata
-                                      (insert equal_nat one_nata
-bot_set))) orelse
-                               (not (member equal_nat
-                                      (nth
-(nth oip_full_rows (nat_of_integer (11 : IntInf.int)))
-(nat_of_integer (4 : IntInf.int)))
-                                      (insert equal_nat zero_nata
-(insert equal_nat one_nata bot_set))) orelse
-                                 not (list_all
-                                       (wire_octets (numeral_nat, ord_nat))
-                                       ([nth oip_full_rows
-   (nat_of_integer (4 : IntInf.int)),
-  nth oip_full_rows (nat_of_integer (5 : IntInf.int)),
-  nth oip_full_rows (nat_of_integer (9 : IntInf.int)),
-  nth oip_full_rows (nat_of_integer (10 : IntInf.int))] @
- drop (nat_of_integer (14 : IntInf.int)) oip_full_rows))))))))))
-             then NONE
-             else bind (code_rbound_position
-                         (nth (nth oip_full_rows
-                                (nat_of_integer (12 : IntInf.int)))
-                           zero_nata)
-                         (nth (nth oip_full_rows
-                                (nat_of_integer (12 : IntInf.int)))
-                           one_nata))
-                    (fn oip_full_parameters_time =>
-                      map_option
-                        (code_full_build_context oip_full_rows
-                          oip_full_parameters_time)
-                        (code_rbound_position
-                          (nth (nth oip_full_rows
-                                 (nat_of_integer (12 : IntInf.int)))
-                            (nat_of_integer (2 : IntInf.int)))
-                          (nth (nth oip_full_rows
-                                 (nat_of_integer (12 : IntInf.int)))
-                            (nat_of_integer (3 : IntInf.int))))))))
-    x;
-
-fun code_full_context_from_integer x =
-  (fn oip_full_rows =>
-    (if not (code_integer_u64_values (concat oip_full_rows)) then NONE
-      else code_full_parse_context (map (map nat_of_integer) oip_full_rows)))
-    x;
-
-fun code_rbound_resolution oip_binder_values =
-  (case oip_binder_values of [] => NONE
-    | oip_binder_tag :: oip_binder_rest =>
-      (if equal_nata oip_binder_tag zero_nata andalso null oip_binder_rest
-        then SOME Code_Source_Resolution_Rejected
-        else (if equal_nata oip_binder_tag
-                   (nat_of_integer (2 : IntInf.int)) andalso
-                   null oip_binder_rest
-               then SOME Code_Source_Resolution_Unresolved
-               else (if equal_nata oip_binder_tag one_nata
-                      then map_option
-                             (fn (_, a) => Code_Source_Resolution_Published a)
-                             (code_rbound_receipt oip_binder_rest)
-                      else NONE))));
-
-fun code_rbound_observation oip_binder_mode oip_binder_values
-  oip_binder_retained_present oip_binder_retained =
-  (if equal_nata oip_binder_mode zero_nata
-    then bind (code_rbound_action oip_binder_values)
-           (fn (oip_binder_root, oip_binder_reply) =>
-             (if not oip_binder_retained_present
-               then (if null oip_binder_retained
-                      then SOME (Response_Fixed_Received
-                                  (oip_binder_reply, NONE))
-                      else NONE)
-               else bind (code_rbound_receipt oip_binder_retained)
-                      (fn (oip_binder_stored_root, oip_binder_receipt) =>
-                        let
-                          val oip_binder_full_root_matches =
-                            (case oip_binder_reply
-                              of Code_Source_Ordinary_Collected _ => true
-                              | Code_Source_Ordinary_Waiting => true
-                              | Code_Source_Ordinary_Busy => true
-                              | Code_Source_Ordinary_Unavailable => true
-                              | Code_Source_Ordinary_Rejected => true
-                              | Code_Source_Legal_Action _ => true
-                              | Code_Source_Spend_Action
-                                  (Code_Source_Spend_Executed _)
-                                => equal_option (equal_prod equal_nat equal_nat)
-                                     oip_binder_root oip_binder_stored_root
-                              | Code_Source_Spend_Action
-                                  Code_Source_Spend_Rejected
-                                => true
-                              | Code_Source_Spend_Action Code_Source_Spend_Busy
-                                => true
-                              | Code_Source_Spend_Action
-                                  Code_Source_Spend_Unavailable
-                                => true
-                              | Code_Source_Other_Action => true);
-                        in
-                          SOME (Response_Fixed_Received
-                                 (oip_binder_reply,
-                                   (if oip_binder_full_root_matches
-                                     then SOME oip_binder_receipt else NONE)))
-                        end)))
-    else (if oip_binder_retained_present orelse not (null oip_binder_retained)
-           then NONE
-           else (if equal_nata oip_binder_mode one_nata
-                  then map_option Response_Fixed_Resolved
-                         (code_rbound_resolution oip_binder_values)
-                  else (if equal_nata oip_binder_mode
-                             (nat_of_integer (2 : IntInf.int))
-                         then map_option Response_Fixed_Error
-                                (code_rbound_error oip_binder_values)
-                         else NONE))));
-
-fun code_full_sender_input x =
-  (fn oip_full_rows => fn oip_full_mode => fn oip_full_reply =>
-    fn oip_full_retained_present => fn oip_full_retained =>
-    fn oip_full_original => fn oip_full_hash_rows => fn oip_full_sign_rows =>
-    fn oip_full_verify_rows =>
-    (if not (code_integer_u64_values
-              (oip_full_mode :: oip_full_reply @ oip_full_retained)) orelse
-          not (code_integer_octet_values oip_full_original)
-      then NONE
-      else bind (code_full_context_from_integer oip_full_rows)
-             (fn oip_full_context =>
-               bind (if ((oip_full_mode : IntInf.int) = (3 : IntInf.int))
-                      then (if null oip_full_reply andalso
-                                 (not oip_full_retained_present andalso
-                                   null oip_full_retained)
-                             then SOME NONE else NONE)
-                      else map_option SOME
-                             (code_rbound_observation
-                               (nat_of_integer oip_full_mode)
-                               (map nat_of_integer oip_full_reply)
-                               oip_full_retained_present
-                               (map nat_of_integer oip_full_retained)))
-                 (fn oip_full_observation =>
-                   map_option
-                     (fn (oip_full_hashes,
-                           (oip_full_signatures, oip_full_verifications))
-                        =>
-                       (oip_full_context,
-                         (oip_full_observation,
-                           (map nat_of_integer oip_full_original,
-                             (oip_full_hashes,
-                               (oip_full_signatures,
-                                 oip_full_verifications))))))
-                     (code_full_tables_from_integer oip_full_hash_rows
-                       oip_full_sign_rows oip_full_verify_rows)))))
-    x;
-
-fun code_full_probe_verify x =
-  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
-    fn oip_full_signature =>
-    (case code_full_lookup_verify oip_full_table oip_full_key oip_full_message
-            oip_full_signature
-      of NONE => false | SOME oip_full_probe_answer => oip_full_probe_answer))
-    x;
-
-fun code_full_query_blob x =
-  (fn oip_full_bytes => size_list oip_full_bytes :: oip_full_bytes) x;
-
-fun code_full_verify_query x =
-  (fn oip_full_key => fn oip_full_message => fn oip_full_signature =>
-    nat_of_integer (2 : IntInf.int) ::
-      code_full_query_blob oip_full_key @
-        code_full_query_blob oip_full_message @
-          code_full_query_blob oip_full_signature)
-    x;
-
-fun code_full_need_verify x =
-  (fn oip_full_table => fn oip_full_key => fn oip_full_message =>
-    fn oip_full_signature =>
-    (if is_none
-          (code_full_lookup_verify oip_full_table oip_full_key oip_full_message
-            oip_full_signature)
-      then [code_full_verify_query oip_full_key oip_full_message
-              oip_full_signature]
-      else []))
-    x;
-
-fun code_full_client_queries x =
-  (fn oip_full_channel => fn oip_full_current => fn oip_full_expected =>
-    fn oip_full_received => fn oip_full_verifications =>
-    (case response_fixed_admit (code_full_probe_verify oip_full_verifications)
-            oip_full_channel oip_full_current oip_full_expected
-            oip_full_received
-      of Inl oip_full_reason =>
-        (if not (equal_wire_refusal oip_full_reason Invalid_Wire_Signature)
-          then []
-          else (case decode_wire_packet oip_full_received of NONE => []
-                 | SOME oip_full_packet =>
-                   (if equal_nata
-                         (wire_signature_scheme (packet_core oip_full_packet))
-                         (nat_of_integer (2 : IntInf.int)) orelse
-                         not (member equal_nat
-                               (wire_signature_scheme
-                                 (packet_core oip_full_packet))
-                               (negotiated_schemes
-                                 (response_channel_profile oip_full_channel)))
-                     then []
-                     else code_full_need_verify oip_full_verifications
-                            (response_client_public_key oip_full_current)
-                            (envelope_signing_bytes
-                              (packet_core oip_full_packet))
-                            (packet_signature oip_full_packet))))
-      | Inr _ => []))
-    x;
-
-fun code_full_hash_query x =
-  (fn oip_full_message => zero_nata :: code_full_query_blob oip_full_message) x;
-
-fun code_full_sign_query x =
-  (fn oip_full_key => fn oip_full_message =>
-    one_nata ::
-      code_full_query_blob oip_full_key @ code_full_query_blob oip_full_message)
-    x;
+fun code_response_result_flat_oracle mode reply v061_present retained =
+  (if not (code_integer_u64_values (mode :: reply @ retained))
+    then (false, ((~1 : IntInf.int), (false, (0 : IntInf.int))))
+    else (case response_v061_decode_observation (nat_of_integer mode)
+                 (map nat_of_integer reply) v061_present
+                 (map nat_of_integer retained)
+           of NONE => (false, ((~1 : IntInf.int), (false, (0 : IntInf.int))))
+           | SOME observation =>
+             let
+               val (number, position) = response_v061_result observation;
+             in
+               (true,
+                 (integer_of_nat number,
+                   (not (is_none position),
+                     integer_of_nat
+                       (case position of NONE => zero_nata
+                         | SOME revision => revision))))
+             end));
 
 fun code_rbound_atomicity oip_binder_numbers =
   (if null oip_binder_numbers then NONE
     else SOME (mina linorder_nat (Set oip_binder_numbers)));
 
-fun code_full_signing_queries x =
-  (fn oip_full_context => fn oip_full_parameters => fn oip_full_atomicity =>
-    fn oip_full_words => fn oip_full_original => fn oip_full_signatures =>
-    fn oip_full_verifications =>
-    let
-      val oip_full_channel = full_response_channel oip_full_context;
-      val oip_full_config = full_response_config oip_full_context;
-      val oip_full_core =
-        response_fixed_core oip_full_channel oip_full_parameters
-          oip_full_atomicity oip_full_words
-          (encode_wire_core oip_full_original);
-      val oip_full_message = envelope_signing_bytes oip_full_core;
-      val oip_full_key = response_channel_local_key oip_full_channel;
-    in
-      (if less_nat (response_channel_expires oip_full_channel)
-            (response_parameter_issued oip_full_parameters)
-        then []
-        else (case code_typed_encode_core oip_full_core of NONE => []
-               | SOME oip_full_core_bytes =>
-                 (if less_eq_nat
-                       (power power_nat (nat_of_integer (2 : IntInf.int))
-                         (nat_of_integer (32 : IntInf.int)))
-                       (size_list oip_full_core_bytes)
-                   then []
-                   else (case response_fixed_unframe oip_full_message
-                          of NONE => []
-                          | SOME oip_full_framed_core =>
-                            (case full_signing_clock oip_full_context
-                              of NONE => []
-                              | SOME oip_full_now =>
-                                (if not (response_fixed_signable oip_full_config
-  oip_full_now oip_full_framed_core)
-                                  then []
-                                  else (case
- code_full_lookup_sign oip_full_signatures oip_full_key oip_full_message
- of NONE => [code_full_sign_query oip_full_key oip_full_message]
- | SOME a =>
-   code_full_need_verify oip_full_verifications oip_full_key oip_full_message
-     a)))))))
-    end)
-    x;
-
-fun code_exec_original_selection x =
-  (fn oip_exec_selected_mode => fn oip_full_context => fn oip_full_bytes =>
-    fn oip_full_verifications =>
-    let
-      val oip_full_channel = full_response_channel oip_full_context;
-    in
-      (case code_exec_original_preflight oip_exec_selected_mode
-              (full_response_config oip_full_context) oip_full_channel
-              (full_response_site oip_full_context)
-              (code_full_probe_verify oip_full_verifications)
-              (full_response_frame_limit oip_full_context) oip_full_bytes
-        of Inl oip_full_reason =>
-          (if not (equal_wire_refusal oip_full_reason Invalid_Wire_Signature)
-            then (NONE, [])
-            else (case decode_wire_packet oip_full_bytes of NONE => (NONE, [])
-                   | SOME oip_full_original =>
-                     (if equal_nata
-                           (wire_signature_scheme
-                             (packet_core oip_full_original))
-                           (nat_of_integer (2 : IntInf.int)) orelse
-                           not (member equal_nat
-                                 (wire_signature_scheme
-                                   (packet_core oip_full_original))
-                                 (negotiated_schemes
-                                   (response_channel_profile oip_full_channel)))
-                       then (NONE, [])
-                       else (NONE,
-                              code_full_need_verify oip_full_verifications
-                                (response_channel_remote_key oip_full_channel)
-                                (envelope_signing_bytes
-                                  (packet_core oip_full_original))
-                                (packet_signature oip_full_original)))))
-        | Inr oip_full_selected => (SOME oip_full_selected, []))
-    end)
-    x;
-
-fun code_response_list_atomicity x =
-  (fn a =>
-    (case a of [] => NONE
-      | oip_exec_first :: oip_exec_rest =>
-        SOME (fold (min ord_nat) oip_exec_rest oip_exec_first)))
-    x;
-
-fun code_full_after_binding_queries x =
-  (fn oip_full_context => fn oip_full_original => fn oip_full_atomicity =>
-    fn oip_full_words => fn oip_full_binding => fn oip_full_hashes =>
-    fn oip_full_signatures => fn oip_full_verifications =>
-    let
-      val oip_full_config = full_response_config oip_full_context;
-      val oip_full_channel = full_response_channel oip_full_context;
-    in
-      (if not (response_fixed_channel_current oip_full_config oip_full_channel)
-        then []
-        else (case full_parameters_clock oip_full_context of NONE => []
-               | SOME oip_full_issued =>
-                 let
-                   val oip_full_uuid_message =
-                     response_fixed_uuid_preimage oip_full_config
-                       oip_full_binding oip_full_issued;
-                 in
-                   (case code_full_lookup_hash oip_full_hashes
-                           oip_full_uuid_message
-                     of NONE => [code_full_hash_query oip_full_uuid_message]
-                     | SOME _ =>
-                       (case response_fixed_parameters_from
-                               (code_full_hash oip_full_hashes) oip_full_config
-                               oip_full_channel
-                               (full_parameters_clock oip_full_context)
-                               oip_full_binding
-                         of NONE => []
-                         | SOME oip_full_parameters =>
-                           code_full_signing_queries oip_full_context
-                             oip_full_parameters oip_full_atomicity
-                             oip_full_words oip_full_original
-                             oip_full_signatures oip_full_verifications))
-                 end))
-    end)
-    x;
-
-fun code_exec_selected_sender_queries x =
-  (fn oip_exec_selected_mode => fn oip_full_context =>
-    fn oip_full_observation => fn oip_full_original => fn oip_full_call =>
-    fn oip_full_hashes => fn oip_full_signatures => fn oip_full_verifications =>
-    (case response_fixed_words oip_full_call
-            (response_fixed_result oip_full_observation)
-      of NONE => []
-      | SOME (_, (_, (_, oip_full_words))) =>
-        (case oip_exec_selected_mode of NONE => []
-          | SOME oip_full_atomicity =>
-            let
-              val oip_full_binding_message =
-                response_fixed_binding_preimage
-                  (encode_wire_core (packet_core oip_full_original))
-                  oip_full_atomicity oip_full_words;
-            in
-              (case code_full_lookup_hash oip_full_hashes
-                      oip_full_binding_message
-                of NONE => [code_full_hash_query oip_full_binding_message]
-                | SOME oip_full_binding =>
-                  code_full_after_binding_queries oip_full_context
-                    (packet_core oip_full_original) oip_full_atomicity
-                    oip_full_words oip_full_binding oip_full_hashes
-                    oip_full_signatures oip_full_verifications)
-            end)))
-    x;
-
-fun code_exec_sender_queries x =
-  (fn oip_exec_selected_mode => fn oip_full_include_original =>
-    fn oip_full_context => fn oip_full_observation => fn oip_full_bytes =>
-    fn oip_full_hashes => fn oip_full_signatures => fn oip_full_verifications =>
-    (if oip_full_include_original
-      then (case code_exec_original_selection oip_exec_selected_mode
-                   oip_full_context oip_full_bytes oip_full_verifications
-             of (NONE, oip_full_queries) => oip_full_queries
-             | (SOME (oip_full_original, oip_full_call), _) =>
-               code_exec_selected_sender_queries oip_exec_selected_mode
-                 oip_full_context oip_full_observation oip_full_original
-                 oip_full_call oip_full_hashes oip_full_signatures
-                 oip_full_verifications)
-      else (case decode_wire_packet oip_full_bytes of NONE => []
-             | SOME oip_full_original =>
-               (case code_response_caller (packet_core oip_full_original)
-                 of Inl _ => []
-                 | Inr oip_full_call =>
-                   code_exec_selected_sender_queries oip_exec_selected_mode
-                     oip_full_context oip_full_observation oip_full_original
-                     oip_full_call oip_full_hashes oip_full_signatures
-                     oip_full_verifications))))
-    x;
-
-fun code_full_prefix_after_uuid x =
-  (fn oip_full_context => fn oip_full_original => fn oip_full_atomicity =>
-    fn oip_full_words => fn oip_full_binding => fn oip_full_hashes =>
-    fn oip_full_signatures => fn oip_full_rows =>
-    (case response_fixed_parameters_from (code_full_hash oip_full_hashes)
-            (full_response_config oip_full_context)
-            (full_response_channel oip_full_context)
-            (full_parameters_clock oip_full_context) oip_full_binding
-      of NONE => oip_full_rows
-      | SOME oip_full_parameters =>
-        let
-          val oip_full_with_parameters =
-            list_update
-              (list_update oip_full_rows (nat_of_integer (8 : IntInf.int))
-                (response_parameter_uuid oip_full_parameters))
-              (nat_of_integer (9 : IntInf.int))
-              [response_parameter_principal oip_full_parameters,
-                response_parameter_key oip_full_parameters,
-                response_parameter_epoch oip_full_parameters,
-                response_parameter_issued oip_full_parameters,
-                response_parameter_ttl oip_full_parameters,
-                response_parameter_route oip_full_parameters];
-          val oip_full_core =
-            response_fixed_core (full_response_channel oip_full_context)
-              oip_full_parameters oip_full_atomicity oip_full_words
-              (encode_wire_core oip_full_original);
-        in
-          (if less_nat
-                (response_channel_expires
-                  (full_response_channel oip_full_context))
-                (response_parameter_issued oip_full_parameters)
-            then oip_full_with_parameters
-            else (case code_typed_encode_core oip_full_core
-                   of NONE => oip_full_with_parameters
-                   | SOME oip_full_core_bytes =>
-                     (if less_eq_nat
-                           (power power_nat (nat_of_integer (2 : IntInf.int))
-                             (nat_of_integer (32 : IntInf.int)))
-                           (size_list oip_full_core_bytes)
-                       then oip_full_with_parameters
-                       else let
-                              val oip_full_message =
-                                envelope_signing_bytes oip_full_core;
-                              val oip_full_allowed =
-                                code_full_sign_guard oip_full_context
-                                  oip_full_message;
-                              val oip_full_attempt =
-                                list_update
-                                  (list_update
-                                    (list_update oip_full_with_parameters
-                                      (nat_of_integer (10 : IntInf.int))
-                                      oip_full_core_bytes)
-                                    (nat_of_integer (11 : IntInf.int))
-                                    oip_full_message)
-                                  (nat_of_integer (12 : IntInf.int))
-                                  [(if oip_full_allowed then one_nata
-                                     else zero_nata)];
-                            in
-                              (if not oip_full_allowed then oip_full_attempt
-                                else (case code_full_lookup_sign
-     oip_full_signatures
-     (response_channel_local_key (full_response_channel oip_full_context))
-     oip_full_message
-                                       of NONE => oip_full_attempt
-                                       | SOME a =>
- list_update oip_full_attempt (nat_of_integer (13 : IntInf.int)) a))
-                            end)))
-        end))
-    x;
-
-fun code_exec_prefix_selected x =
-  (fn oip_exec_selected_mode => fn oip_full_context =>
-    fn oip_full_observation => fn oip_full_original => fn oip_full_call =>
-    fn oip_full_hashes => fn oip_full_signatures =>
-    let
-      val (oip_full_number, oip_full_position) =
-        response_fixed_result oip_full_observation;
-      val oip_full_base =
-        list_update
-          (list_update (replicate (nat_of_integer (14 : IntInf.int)) [])
-            zero_nata
-            [oip_full_number,
-              (if is_none oip_full_position then zero_nata else one_nata),
-              (case oip_full_position of NONE => zero_nata
-                | SOME oip_full_optional_position =>
-                  oip_full_optional_position)])
-          (nat_of_integer (3 : IntInf.int))
-          (encode_wire_core (packet_core oip_full_original));
-    in
-      (case response_fixed_words oip_full_call
-              (response_fixed_result oip_full_observation)
-        of NONE => oip_full_base
-        | SOME (_, (_, (_, oip_full_words))) =>
-          let
-            val oip_full_with_words =
-              list_update oip_full_base one_nata oip_full_words;
-          in
-            (case oip_exec_selected_mode of NONE => oip_full_with_words
-              | SOME oip_full_atomicity =>
-                let
-                  val oip_full_binding_message =
-                    response_fixed_binding_preimage
-                      (encode_wire_core (packet_core oip_full_original))
-                      oip_full_atomicity oip_full_words;
-                  val oip_full_with_binding =
-                    list_update
-                      (list_update oip_full_with_words
-                        (nat_of_integer (2 : IntInf.int)) [oip_full_atomicity])
-                      (nat_of_integer (4 : IntInf.int))
-                      oip_full_binding_message;
-                in
-                  (case code_full_lookup_hash oip_full_hashes
-                          oip_full_binding_message
-                    of NONE => oip_full_with_binding
-                    | SOME oip_full_binding =>
-                      let
-                        val oip_full_with_digest =
-                          list_update oip_full_with_binding
-                            (nat_of_integer (5 : IntInf.int)) oip_full_binding;
-                      in
-                        (if not (response_fixed_channel_current
-                                  (full_response_config oip_full_context)
-                                  (full_response_channel oip_full_context))
-                          then oip_full_with_digest
-                          else (case full_parameters_clock oip_full_context
-                                 of NONE => oip_full_with_digest
-                                 | SOME oip_full_issued =>
-                                   let
-                                     val oip_full_uuid_message =
-                                       response_fixed_uuid_preimage
- (full_response_config oip_full_context) oip_full_binding oip_full_issued;
-                                     val oip_full_with_uuid_message =
-                                       list_update oip_full_with_digest
- (nat_of_integer (6 : IntInf.int)) oip_full_uuid_message;
-                                   in
-                                     (case code_full_lookup_hash oip_full_hashes
-     oip_full_uuid_message
-                                       of NONE => oip_full_with_uuid_message
-                                       | SOME oip_full_uuid_digest =>
- code_full_prefix_after_uuid oip_full_context (packet_core oip_full_original)
-   oip_full_atomicity oip_full_words oip_full_binding oip_full_hashes
-   oip_full_signatures
-   (list_update oip_full_with_uuid_message (nat_of_integer (7 : IntInf.int))
-     oip_full_uuid_digest))
-                                   end))
-                      end)
-                end)
-          end)
-    end)
-    x;
-
-fun code_exec_without_result x =
-  (fn oip_exec_selected_mode => fn oip_full_context => fn oip_full_bytes =>
-    fn oip_full_verifications =>
-    let
-      val (_, oip_full_queries) =
-        code_exec_original_selection oip_exec_selected_mode oip_full_context
-          oip_full_bytes oip_full_verifications;
-    in
-      (if not (null oip_full_queries) then ((~2 : IntInf.int), [])
-        else (case code_exec_original_preflight oip_exec_selected_mode
-                     (full_response_config oip_full_context)
-                     (full_response_channel oip_full_context)
-                     (full_response_site oip_full_context)
-                     (code_full_verify oip_full_verifications)
-                     (full_response_frame_limit oip_full_context) oip_full_bytes
-               of Inl oip_full_reason =>
-                 (integer_of_nat
-                    (code_transport_refusal_number oip_full_reason),
-                   [])
-               | Inr _ => ((~1 : IntInf.int), [])))
-    end)
-    x;
-
-fun code_exec_prefix_integer x =
-  (fn oip_full_include_original => fn oip_full_rows => fn oip_full_mode =>
-    fn oip_full_reply => fn oip_full_retained_present => fn oip_full_retained =>
-    fn oip_full_original => fn oip_full_hash_rows => fn oip_full_sign_rows =>
-    fn oip_full_verify_rows =>
-    (case code_full_sender_input oip_full_rows oip_full_mode oip_full_reply
-            oip_full_retained_present oip_full_retained oip_full_original
-            oip_full_hash_rows oip_full_sign_rows oip_full_verify_rows
-      of NONE => ((~1 : IntInf.int), [])
-      | SOME (oip_full_context,
-               (oip_full_observation,
-                 (oip_full_bytes,
-                   (oip_full_hashes,
-                     (oip_full_signatures, oip_full_verifications)))))
-        => let
-             val oip_exec_mode_value =
-               code_response_list_atomicity
-                 (nth (map (map nat_of_integer) oip_full_rows)
-                   (nat_of_integer (2 : IntInf.int)));
-           in
-             (case oip_full_observation
-               of NONE =>
-                 (if not oip_full_include_original then ((~1 : IntInf.int), [])
-                   else let
-                          val (oip_full_status, _) =
-                            code_exec_without_result oip_exec_mode_value
-                              oip_full_context oip_full_bytes
-                              oip_full_verifications;
-                        in
-                          (if ((oip_full_status : IntInf.int) = (~1 : IntInf.int)) orelse
-                                ((oip_full_status : IntInf.int) = (~2 : IntInf.int))
-                            then (oip_full_status, [])
-                            else ((0 : IntInf.int), []))
-                        end)
-               | SOME oip_full_actual =>
-                 (if not (null (code_exec_sender_queries oip_exec_mode_value
-                                 oip_full_include_original oip_full_context
-                                 oip_full_actual oip_full_bytes oip_full_hashes
-                                 oip_full_signatures oip_full_verifications))
-                   then ((~2 : IntInf.int), [])
-                   else (case (if oip_full_include_original
-                                then fst (code_exec_original_selection
-   oip_exec_mode_value oip_full_context oip_full_bytes oip_full_verifications)
-                                else (case decode_wire_packet oip_full_bytes
-                                       of NONE => NONE
-                                       | SOME oip_full_packet =>
- (case code_response_caller (packet_core oip_full_packet) of Inl _ => NONE
-   | Inr oip_full_call => SOME (oip_full_packet, oip_full_call))))
-                          of NONE => ((0 : IntInf.int), [])
-                          | SOME (oip_full_packet, oip_full_call) =>
-                            ((0 : IntInf.int),
-                              map (map integer_of_nat)
-                                (code_exec_prefix_selected oip_exec_mode_value
-                                  oip_full_context oip_full_actual
-                                  oip_full_packet oip_full_call oip_full_hashes
-                                  oip_full_signatures)))))
-           end))
-    x;
-
-fun code_exec_boundary_sender x =
-  (fn oip_exec_selected_mode => fn oip_full_context =>
-    fn oip_full_observation => fn oip_full_bytes => fn oip_full_hashes =>
-    fn oip_full_signatures => fn oip_full_verifications =>
-    (case decode_wire_packet oip_full_bytes
-      of NONE => Inl (Response_Fixed_Encoding_Refused Invalid_Wire_Format)
-      | SOME oip_full_original =>
-        (case code_response_caller (packet_core oip_full_original)
-          of Inl oip_full_reason =>
-            Inl (Response_Fixed_Encoding_Refused oip_full_reason)
-          | Inr oip_full_call =>
-            code_exec_fixed_encode oip_exec_selected_mode
-              (code_full_hash oip_full_hashes)
-              (code_full_sign oip_full_signatures
-                (response_channel_local_key
-                  (full_response_channel oip_full_context)))
-              () (code_full_verify oip_full_verifications)
-              (full_response_config oip_full_context)
-              (full_response_channel oip_full_context)
-              (full_parameters_clock oip_full_context)
-              (full_signing_clock oip_full_context)
-              (packet_core oip_full_original) oip_full_call oip_full_observation
-              (full_response_frame_limit oip_full_context))))
-    x;
-
-fun code_exec_sender_integer x =
-  (fn oip_full_include_original => fn oip_full_rows => fn oip_full_mode =>
-    fn oip_full_reply => fn oip_full_retained_present => fn oip_full_retained =>
-    fn oip_full_original => fn oip_full_hash_rows => fn oip_full_sign_rows =>
-    fn oip_full_verify_rows =>
-    (case code_full_sender_input oip_full_rows oip_full_mode oip_full_reply
-            oip_full_retained_present oip_full_retained oip_full_original
-            oip_full_hash_rows oip_full_sign_rows oip_full_verify_rows
-      of NONE => ((~1 : IntInf.int), [])
-      | SOME (oip_full_context,
-               (oip_full_observation,
-                 (oip_full_bytes,
-                   (oip_full_hashes,
-                     (oip_full_signatures, oip_full_verifications)))))
-        => let
-             val oip_exec_mode_value =
-               code_response_list_atomicity
-                 (nth (map (map nat_of_integer) oip_full_rows)
-                   (nat_of_integer (2 : IntInf.int)));
-           in
-             (case oip_full_observation
-               of NONE =>
-                 (if oip_full_include_original
-                   then code_exec_without_result oip_exec_mode_value
-                          oip_full_context oip_full_bytes oip_full_verifications
-                   else ((~1 : IntInf.int), []))
-               | SOME oip_full_actual =>
-                 (if not (null (code_exec_sender_queries oip_exec_mode_value
-                                 oip_full_include_original oip_full_context
-                                 oip_full_actual oip_full_bytes oip_full_hashes
-                                 oip_full_signatures oip_full_verifications))
-                   then ((~2 : IntInf.int), [])
-                   else code_full_pack_sender oip_full_context oip_full_hashes
-                          (if oip_full_include_original
-                            then code_exec_sender oip_exec_mode_value
-                                   oip_full_context oip_full_actual
-                                   oip_full_bytes oip_full_hashes
-                                   oip_full_signatures oip_full_verifications
-                            else code_exec_boundary_sender oip_exec_mode_value
-                                   oip_full_context oip_full_actual
-                                   oip_full_bytes oip_full_hashes
-                                   oip_full_signatures oip_full_verifications)))
-           end))
-    x;
-
-fun code_exec_queries_integer x =
-  (fn oip_full_include_original => fn oip_full_rows => fn oip_full_mode =>
-    fn oip_full_reply => fn oip_full_retained_present => fn oip_full_retained =>
-    fn oip_full_original => fn oip_full_hash_rows => fn oip_full_sign_rows =>
-    fn oip_full_verify_rows =>
-    (case code_full_sender_input oip_full_rows oip_full_mode oip_full_reply
-            oip_full_retained_present oip_full_retained oip_full_original
-            oip_full_hash_rows oip_full_sign_rows oip_full_verify_rows
-      of NONE => ((~1 : IntInf.int), [])
-      | SOME (oip_full_context,
-               (oip_full_observation,
-                 (oip_full_bytes,
-                   (oip_full_hashes,
-                     (oip_full_signatures, oip_full_verifications)))))
-        => let
-             val oip_exec_mode_value =
-               code_response_list_atomicity
-                 (nth (map (map nat_of_integer) oip_full_rows)
-                   (nat_of_integer (2 : IntInf.int)));
-           in
-             (case oip_full_observation
-               of NONE =>
-                 (if not oip_full_include_original then ((~1 : IntInf.int), [])
-                   else (case code_exec_original_selection oip_exec_mode_value
-                                oip_full_context oip_full_bytes
-                                oip_full_verifications
-                          of (NONE, oip_full_queries) =>
-                            ((0 : IntInf.int),
-                              map (map integer_of_nat) oip_full_queries)
-                          | (SOME _, _) => ((~1 : IntInf.int), [])))
-               | SOME oip_full_actual =>
-                 ((0 : IntInf.int),
-                   map (map integer_of_nat)
-                     (code_exec_sender_queries oip_exec_mode_value
-                       oip_full_include_original oip_full_context
-                       oip_full_actual oip_full_bytes oip_full_hashes
-                       oip_full_signatures oip_full_verifications)))
-           end))
-    x;
+fun code_response_egress_queries_flat x =
+  response_v061_sender_integer Response_V061_Plan true x;
 
 fun code_rbound_binding_stage oip_binder_observation oip_binder_original
   oip_binder_numbers =
@@ -7988,70 +8663,34 @@ fun code_rbound_uuid_preimage oip_binder_policy_binding
     oip_binder_policy_binding @
       oip_binder_response_binding @ response_fixed_be64 oip_binder_issued;
 
-fun code_response_egress_flat_oracle x = code_exec_sender_integer true x;
+fun code_response_encode_boundary_flat_oracle x =
+  response_v061_sender_integer Response_V061_Emit false x;
 
-fun code_response_egress_prefix_flat x = code_exec_prefix_integer true x;
+fun code_response_encode_boundary_prefix_flat x =
+  response_v061_sender_integer Response_V061_Prefix false x;
 
-fun code_response_admit_flat_oracle x =
-  (fn oip_full_rows => fn oip_full_expected_bytes =>
-    fn oip_full_received_bytes => fn oip_full_verify_rows =>
-    (case code_full_client_input oip_full_rows oip_full_expected_bytes
-            oip_full_received_bytes oip_full_verify_rows
-      of NONE => ((~1 : IntInf.int), [])
-      | SOME (oip_full_channel,
-               (oip_full_current,
-                 (oip_full_expected,
-                   (oip_full_received, oip_full_verifications))))
-        => (if not (null (code_full_client_queries oip_full_channel
-                           oip_full_current oip_full_expected oip_full_received
-                           oip_full_verifications))
-             then ((~2 : IntInf.int), [])
-             else code_full_pack_client
-                    (code_full_client oip_full_channel oip_full_current
-                      oip_full_expected oip_full_received
-                      oip_full_verifications))))
-    x;
+fun code_response_egress_and_admit_flat_oracle rows mode reply v061_present
+  retained original hash_rows sign_rows verify_rows client_rows
+  client_verify_rows =
+  let
+    val (status, output) =
+      code_response_egress_flat_oracle rows mode reply v061_present retained
+        original hash_rows sign_rows verify_rows;
+  in
+    (if not ((status : IntInf.int) = (0 : IntInf.int))
+      then (status, (output, ((~3 : IntInf.int), [])))
+      else let
+             val (client_status, client_output) =
+               code_response_admit_flat_oracle client_rows original
+                 (nth output (nat_of_integer (12 : IntInf.int)))
+                 client_verify_rows;
+           in
+             (status, (output, (client_status, client_output)))
+           end)
+  end;
 
-fun code_response_egress_queries_flat x = code_exec_queries_integer true x;
-
-fun code_response_admit_queries_flat x =
-  (fn oip_full_rows => fn oip_full_expected_bytes =>
-    fn oip_full_received_bytes => fn oip_full_verify_rows =>
-    (case code_full_client_input oip_full_rows oip_full_expected_bytes
-            oip_full_received_bytes oip_full_verify_rows
-      of NONE => ((~1 : IntInf.int), [])
-      | SOME (oip_full_channel,
-               (oip_full_current,
-                 (oip_full_expected,
-                   (oip_full_received, oip_full_verifications))))
-        => ((0 : IntInf.int),
-             map (map integer_of_nat)
-               (code_full_client_queries oip_full_channel oip_full_current
-                 oip_full_expected oip_full_received oip_full_verifications))))
-    x;
-
-fun code_response_result_flat_oracle oip_binder_mode oip_binder_values
-  oip_binder_retained_present oip_binder_retained =
-  (if not (code_integer_u64_values
-            (oip_binder_mode :: oip_binder_values @ oip_binder_retained))
-    then (false, ((~1 : IntInf.int), (false, (0 : IntInf.int))))
-    else (case code_rbound_observation (nat_of_integer oip_binder_mode)
-                 (map nat_of_integer oip_binder_values)
-                 oip_binder_retained_present
-                 (map nat_of_integer oip_binder_retained)
-           of NONE => (false, ((~1 : IntInf.int), (false, (0 : IntInf.int))))
-           | SOME oip_binder_observation =>
-             let
-               val (oip_binder_number, oip_binder_position) =
-                 response_fixed_result oip_binder_observation;
-             in
-               (true,
-                 (integer_of_nat oip_binder_number,
-                   (not (is_none oip_binder_position),
-                     integer_of_nat
-                       (case oip_binder_position of NONE => zero_nata
-                         | SOME oip_option_value => oip_option_value))))
-             end));
+fun code_response_encode_boundary_queries_flat x =
+  response_v061_sender_integer Response_V061_Plan false x;
 
 fun code_response_binding_flat_oracle oip_binder_mode oip_binder_values
   oip_binder_retained_present oip_binder_retained oip_binder_original_bytes
@@ -8116,254 +8755,6 @@ fun code_response_binding_flat_oracle oip_binder_mode oip_binder_values
                                     (map integer_of_nat oip_binder_words,
                                       (map integer_of_nat oip_binder_core,
 map integer_of_nat oip_binder_preimage))))))))))));
-
-fun code_response_full_model_identity x =
-  (fn _ =>
-    map (map integer_of_nat o code_json_ascii)
-      [[Chara (true, false, false, false, true, true, false, false)],
-        [Chara (true, false, false, true, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, true, true, true, false),
-          Chara (true, false, false, true, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (false, false, false, false, true, true, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, true, false),
-          Chara (false, false, true, true, false, true, true, false),
-          Chara (false, false, true, true, false, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (false, true, true, false, true, true, true, false),
-          Chara (true, false, false, false, true, true, false, false)],
-        [Chara (true, true, true, false, true, true, true, false),
-          Chara (true, false, false, true, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (false, false, false, false, true, true, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (false, false, true, true, false, true, true, false),
-          Chara (true, false, false, true, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, true, true, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (false, true, true, false, true, true, true, false),
-          Chara (true, false, false, false, true, true, false, false)],
-        [Chara (true, true, true, true, false, false, true, false),
-          Chara (true, false, false, true, false, false, true, false),
-          Chara (false, false, false, false, true, false, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (true, true, true, false, true, false, true, false),
-          Chara (true, false, false, true, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (false, true, false, false, true, false, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (false, false, false, false, true, true, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (false, true, false, false, false, false, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (true, false, true, false, true, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, false, true, true, true, true, false),
-          Chara (false, true, true, true, false, true, false, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (false, false, false, false, true, true, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, true, true, true, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, true, false, false, true, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (false, false, true, true, false, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, false, true, false, true, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (false, false, true, true, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false)],
-        [Chara (false, false, false, true, false, false, true, false),
-          Chara (true, true, true, true, false, false, true, false),
-          Chara (false, false, true, true, false, false, true, false),
-          Chara (true, false, true, true, false, true, false, false),
-          Chara (false, false, true, true, false, false, true, false),
-          Chara (true, false, false, true, false, true, true, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, false, false, true, true, true, true, false),
-          Chara (false, true, true, true, false, true, false, false),
-          Chara (true, true, false, false, false, false, true, false),
-          Chara (true, true, true, true, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (false, false, true, false, true, false, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, true, false),
-          Chara (true, true, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, false, true, false, true, true, true, false),
-          Chara (true, true, true, true, true, false, true, false),
-          Chara (false, true, true, true, false, false, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, false, true, false, true, true, true, false)],
-        [Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (false, false, true, false, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (false, false, true, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false)]])
-    x;
-
-fun code_response_encode_boundary_flat_oracle x =
-  code_exec_sender_integer false x;
-
-fun code_response_encode_boundary_prefix_flat x =
-  code_exec_prefix_integer false x;
-
-fun code_response_egress_and_admit_flat_oracle x =
-  (fn oip_full_sender_rows => fn oip_full_mode => fn oip_full_reply =>
-    fn oip_full_retained_present => fn oip_full_retained =>
-    fn oip_full_original => fn oip_full_hash_rows => fn oip_full_sign_rows =>
-    fn oip_full_verify_rows => fn oip_full_client_rows =>
-    fn oip_full_client_verify_rows =>
-    let
-      val (oip_full_sender_status, oip_full_output) =
-        code_response_egress_flat_oracle oip_full_sender_rows oip_full_mode
-          oip_full_reply oip_full_retained_present oip_full_retained
-          oip_full_original oip_full_hash_rows oip_full_sign_rows
-          oip_full_verify_rows;
-    in
-      (if not ((oip_full_sender_status : IntInf.int) = (0 : IntInf.int))
-        then (oip_full_sender_status,
-               (oip_full_output, ((~3 : IntInf.int), [])))
-        else let
-               val (oip_full_client_status, oip_full_client_output) =
-                 code_response_admit_flat_oracle oip_full_client_rows
-                   oip_full_original
-                   (nth oip_full_output (nat_of_integer (12 : IntInf.int)))
-                   oip_full_client_verify_rows;
-             in
-               (oip_full_sender_status,
-                 (oip_full_output,
-                   (oip_full_client_status, oip_full_client_output)))
-             end)
-    end)
-    x;
-
-fun code_response_encode_boundary_queries_flat x =
-  code_exec_queries_integer false x;
 
 fun code_response_uuid_preimage_flat_oracle oip_binder_policy_binding
   oip_binder_response_binding oip_binder_issued =

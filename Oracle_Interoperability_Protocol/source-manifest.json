@@ -593,6 +593,276 @@
       "sha256": "56f54f98676712e2b30c4f834ac24972e0b69aacd658173f46ffa504bbea3859"
     },
     {
+      "path": "Extensions/V061/Base/Checks/OrderedMaintenanceCore/Ordered_Maintenance_G0.thy",
+      "bytes": 19029,
+      "sha256": "0b2bae42525577f1fd36a62d719d86e6f541c82de8af936c0e4cfb6892ee0ae1"
+    },
+    {
+      "path": "Extensions/V061/Base/Checks/OrderedMaintenanceCore/Ordered_Maintenance_Source_Input.thy",
+      "bytes": 905,
+      "sha256": "7306c790d31e32102f13b9ccc3aeb97b81bbe6fcb56bcb7fa2715851ebf9f8ac"
+    },
+    {
+      "path": "Extensions/V061/Base/ResponseExtension/Allocation/Response_Code_Allocation.thy",
+      "bytes": 13489,
+      "sha256": "b9e576dd71117159884d8afc86f19dce9652bad1b15dd63a7fcf3fd60d65093a"
+    },
+    {
+      "path": "Extensions/V061/Base/ResponseExtension/Allocation/Response_Code_Extension_Input.thy",
+      "bytes": 532,
+      "sha256": "7f3ea38e16be284c1579b4827dd3e18401ebd3eb4e6e0d51f19447dad9c005fa"
+    },
+    {
+      "path": "Extensions/V061/Base/ResponseExtension/Export/Response_Code_Export.thy",
+      "bytes": 5021,
+      "sha256": "01fdd12e8a0ee5e65089925a890ab4d3841e9c13d9f885f7640aa8a93a7a406c"
+    },
+    {
+      "path": "Extensions/V061/Base/ResponseExtension/Rules/Response_Code_Extension.thy",
+      "bytes": 11775,
+      "sha256": "859dc6b6921e99b75523799aba88d73ff0f2f369fe0e56b3f78303bc6c922456"
+    },
+    {
+      "path": "Extensions/V061/Product/CurrentRead/Export/Current_Read_Vector_Export.thy",
+      "bytes": 3728,
+      "sha256": "91429f02518fda52ca432a5d36eafe1a02de19a46bf03733ce13227bad7767c8"
+    },
+    {
+      "path": "Extensions/V061/Product/CurrentRead/Fixed/Current_Read_G0.thy",
+      "bytes": 14317,
+      "sha256": "0dc6ec4ab640dd416c565248ecb03368810d9a02954ea775e103daa6c3bae06d"
+    },
+    {
+      "path": "Extensions/V061/Product/CurrentRead/Source/Current_Read_G0_Source.thy",
+      "bytes": 6892,
+      "sha256": "a7a207a43534b306d85b27dbeb3f7b592ab3c4ef0a8a3fdc5ceaf962b2d6e6a8"
+    },
+    {
+      "path": "Extensions/V061/Product/OrderedMaintenanceEntry/Ordered_Maintenance_Entry.thy",
+      "bytes": 5638,
+      "sha256": "040aa9917acfb2040cde2a5ed6a5bc8b0147d182113fa840094b36cfa3183ca4"
+    },
+    {
+      "path": "Extensions/V061/Product/OrderedMaintenanceEntry/Ordered_Maintenance_Entry_Inputs.thy",
+      "bytes": 574,
+      "sha256": "836b94845321f3035c5454a94f1f68cd7b8a2e5693a2e8eb3090f3a58b5e97d7"
+    },
+    {
+      "path": "Extensions/V061/Product/ResponseEgress/CurrentArtifact/Response_Egress_V061_Export.thy",
+      "bytes": 1622,
+      "sha256": "b48c388adccb4fde27ba8ee332bd75f489fbf6a385f67a9044b97e3695e29877"
+    },
+    {
+      "path": "Extensions/V061/Product/ResponseEgress/Operands/Response_Egress_V061_Operands.thy",
+      "bytes": 15969,
+      "sha256": "5d5143b0fcfe748bb0282ac1b6ce46510b9a973f423f18d045e5cdc67d84bd1e"
+    },
+    {
+      "path": "Extensions/V061/Product/ResponseEgress/Packet/Response_Egress_V061_Fields.thy",
+      "bytes": 9424,
+      "sha256": "3bcd79da2048bbd0874ccac718bd8eddc10d051534129a06a5bf4767f8f19825"
+    },
+    {
+      "path": "Extensions/V061/Product/ResponseEgress/Packet/Response_Egress_V061_Packet.thy",
+      "bytes": 18327,
+      "sha256": "a1efd049e49727efd00cfe87f302b2b9981bd7bdd9608842529238fb009e5fd2"
+    },
+    {
+      "path": "Extensions/V061/Product/ResponseEgress/Preservation/Response_Egress_V061_Preservation.thy",
+      "bytes": 24124,
+      "sha256": "4ba66d2299662d76ead14fbd1448ef225b9da083480dbaafe774ce8d3f1985ab"
+    },
+    {
+      "path": "Extensions/V061/Product/ResponseEgress/Runtime/Response_Egress_V061_ABI.thy",
+      "bytes": 18446,
+      "sha256": "97568483cfffaa259a16178ea20374bdbe0cce352ab39f0664bcab2a5e5689f3"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Ack/Sync_V061_Ack_Link_Draft.thy",
+      "bytes": 10293,
+      "sha256": "c1f0e56fed601cfd678b299c3e72ce08865680e7f7feba05274aafcdbaf02fbc"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/AckABI/Sync_V061_Ack_ABI.thy",
+      "bytes": 4763,
+      "sha256": "16dd7f9742b5c75b3b1419eca93d47c6325f4ca01fbbeccb55ae3bf36653290f"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Boundary/Sync_V061_Reference_Boundary.thy",
+      "bytes": 7157,
+      "sha256": "d8af9468fedaa06cb3c0fc5b9a73651821660f09793eaf0e8b7a24f9dffc8b25"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ConcreteSupplierV2/Sync_V061_Concrete_Supplier.thy",
+      "bytes": 12146,
+      "sha256": "3a57d2686a07122a6a965ec1754817ba00add1268c869814ee30335ee2798cef"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ConcreteSupplierV2/Sync_V061_Supplier_Readback.thy",
+      "bytes": 13690,
+      "sha256": "8bece7206625f869c37ef26f05af2ca9c25ca9ff626008f61bb9416f12457e17"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ConfiguredProfile/Sync_V061_Configured_Profile_ABI.thy",
+      "bytes": 4564,
+      "sha256": "e1f6173bed0734a48f7da13b7949efb36643941dda58437cebb38dffac968710"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/CurrentArtifact/Sync_V061_Typed_Identity.thy",
+      "bytes": 1340,
+      "sha256": "7526857390d128b144f223b7323b7b5d0ebaf9152116f29834a37bab4987f433"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Definitions/Sync_V061_Attestation_Model.thy",
+      "bytes": 6238,
+      "sha256": "6ec72de69fddd9cde3f2798e1701a8e4e66616e782b040fb23d301ba2376e6ae"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Definitions/Sync_V061_Product.thy",
+      "bytes": 8387,
+      "sha256": "850357f848548c10dc02e48f8c5edfd76249933b8d2d6f7a1f05269209a2c237"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/DirectIR/Sync_V061_Direct_IR.thy",
+      "bytes": 4535,
+      "sha256": "b2fac4f31a2d671004d2c08d1fcf092ddadfb8d2ef996fdf96b64fbf81e1a66c"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/IDGuardABI/Sync_V061_ID_Guard_ABI.thy",
+      "bytes": 7688,
+      "sha256": "3ead2c89caf600a219897287cc16d9a663603c15fa61b2f93ec0c8db68a573bd"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ImageBindingABI/Sync_V061_Image_Binding_ABI.thy",
+      "bytes": 4807,
+      "sha256": "8ecd3c6379b02f1d09bf31b865eb9988b1534278471442587757df053c955b87"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ImageLink/Sync_V061_Image_Link.thy",
+      "bytes": 14184,
+      "sha256": "eb1f7718d37ba8bd7abab8814bbd9db196453d48f469856caa94da9f46980e5f"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ModeProductABI/Sync_V061_Mode_Product_ABI.thy",
+      "bytes": 6969,
+      "sha256": "aea6a89255cf7cb3100b38d79c4ada6403c73be99de988ec5c469655691e40be"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/NestedIR/Sync_V061_Nested_IR.thy",
+      "bytes": 7771,
+      "sha256": "4106e2153d4c719a3ea7b6d888b6cbeff22a3d8bccb4832ee05610fe011321db"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Originals/Sync_V061_Originals.thy",
+      "bytes": 10243,
+      "sha256": "1fda1868463dc8835b460abea2488761c104684f94bb439494aa3bfcdf7d9af1"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/ProductABI/Sync_V061_Product_ABI.thy",
+      "bytes": 16037,
+      "sha256": "f61a2a032e240793c1c77371b76de1c2c161ccd6584af28f39fa559f564458ea"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Proofs/Sync_V061_Attestation.thy",
+      "bytes": 3597,
+      "sha256": "eca293cef9d43825ad6d54b41c07c9ca5cc7d7fdecd5ebf86c49ac746f132a43"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Proofs/Sync_V061_Product_Proofs.thy",
+      "bytes": 12085,
+      "sha256": "a2f634be249260e88d40fd40071694cd9cc3bbb7e18a11e05d981823806ff43d"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Provider/Sync_V061_Provider.thy",
+      "bytes": 9548,
+      "sha256": "a37b17bad86ea9cce1760417fd249c26dbdcb35061737c3a2bd6b2a309123d92"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Seeds/Sync_V061_Structure_Seeds.thy",
+      "bytes": 3996,
+      "sha256": "50f5e1f8e24dae64e9815151a65dfea61202a0c0ceb51214baa037da6de1e1a1"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Selection/Sync_V061_Selection.thy",
+      "bytes": 6163,
+      "sha256": "b8d5f7cce2ccdb5671a57c40eb1027ce2e7004b4d19ab34d8783dc4b44792033"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/StrictProof/Sync_V061_Strict_Proof_Link.thy",
+      "bytes": 4205,
+      "sha256": "e0827b3ddaca5a9156145b079c04719e7cb06ec60bdbfe9c783a6164e04733c3"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Structure/Sync_V061_Observation_Export.thy",
+      "bytes": 5309,
+      "sha256": "96f5128db75f52c2c1b60ddac87f9003c67de7fdd8b3b30ad47a7cea898d3b55"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/SupplierABI/Sync_V061_Supplier_ABI.thy",
+      "bytes": 7928,
+      "sha256": "8a589aa8e9a2c70738b269859a14855b48bff1377c3d40a14668f6f9294b0df2"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Transport/Sync_V061_Transport_IR.thy",
+      "bytes": 6004,
+      "sha256": "88fb2b73a39b8d8780ac9bd0ad926f840b0002aa6d20bc0cf6d873c3767c2691"
+    },
+    {
+      "path": "Extensions/V061/Product/SyncCommitment/Wire/Sync_V061_Wire.thy",
+      "bytes": 9429,
+      "sha256": "e89cde4986cdc0d8643bb8199328342012f4f59709dd4c30b911ef82355e3449"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Authority/Reference_Write_Authority.thy",
+      "bytes": 35285,
+      "sha256": "435b9d7938b20b384910a90ebc7137e6f487d0c1f18e4b5c7d10ae62e1914e64"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Canary/Write_Canary_Base.thy",
+      "bytes": 11754,
+      "sha256": "3e79b0b479ba98aec834e7e117511118298aa84d1bdbfab078c4aa0861beddd6"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Capacity/Reference_Write_Capacity.thy",
+      "bytes": 14920,
+      "sha256": "5afe763c758ec99260d54e377756b17298fb1da467cf510c28bb64d61d914142"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Checks/Reference_Write_Checks.thy",
+      "bytes": 18224,
+      "sha256": "6d683271ac9146fcdc6b5203d0e27900a8f0a7c5cb8b5d31a7f994a020d8b2b1"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/CoreSeed/Reference_Write_Core_Seed.thy",
+      "bytes": 1968,
+      "sha256": "678a495fbbd185612cb23d41a94000a9905db4d341b9647b0f5ed547ae9ff1bb"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Durable/Write_Canary_DurableV6.thy",
+      "bytes": 5843,
+      "sha256": "111f28952eb0a411a861677713a4372b93e7b684f5e253791564fa3387809845"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Profile/Reference_Write_Profile.thy",
+      "bytes": 5529,
+      "sha256": "1c19563e1a385b4ccae100cf67a32519da6566b45fbc1f0c871d1aa1b10b234f"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/RawAckSeed/Reference_Write_Raw_Ack_Seed.thy",
+      "bytes": 1804,
+      "sha256": "a326c593eef184492316a857ee7dd065291ad2d2d68806d51be9f1bd30ac868b"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/Removal/Write_Canary_Removal.thy",
+      "bytes": 2442,
+      "sha256": "7862733df58ccfb078108d3eab85504e034c65b53e431d3b0fe5b97e66e03848"
+    },
+    {
+      "path": "Extensions/V061/Product/Write/VectorExport/Reference_Write_Vector_Export.thy",
+      "bytes": 782,
+      "sha256": "bd0aea6597fc94cfc30043f008f44afbc6e65e4cbb9cbdd56cd19ab4fb91c68a"
+    },
+    {
       "path": "Message_Code/Wire_Code_Admission.thy",
       "bytes": 9017,
       "sha256": "ab325306e8433894833d1624e72bc82523720297eb9d088c0a2fe1715e32a35e"
@@ -1519,8 +1789,8 @@
     },
     {
       "path": "ROOT",
-      "bytes": 12238,
-      "sha256": "3c2faa94af7f0c0172009e243da280707b048da81cb15d4ac466ea15d511965e"
+      "bytes": 21784,
+      "sha256": "f79ab1c2d2ea32f4e70a2c21df3e1dd92eabdc06b5af663d6679dec90d02563d"
     },
     {
       "path": "Recovery/Pilot_Storage.thy",

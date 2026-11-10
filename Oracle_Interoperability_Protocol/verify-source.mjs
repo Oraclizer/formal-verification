@@ -13,12 +13,12 @@ const COMMON_LOCK = ["lock_version", "binding_status", "artifact_transport", "re
 const ORIGIN_KEYS = ["origin_version", "kernel_inputs_sha256", "wire_schema", "abi", "scope", "entrypoint", "natural_refinement", "runtime_source_hash", "public_namespace", "identity_function", "model_sha256", "driver_sha256", "diagnostics_sha256"];
 const PROFILES = {
   typed: {
-    lock: "model-artifact.lock.json", abi: "intinf-wire-values-v2", scope: "wire-v6-general-31-values",
-    entrypoint: "OIP_Wire_Oracle.code_typed_transport_flat_oracle", identity: "OIP_Wire_Oracle.code_typed_model_identity",
+    lock: "model-artifact.lock.json", abi: "intinf-wire-values-v2", scope: "wire-v6-general-33-values",
+    entrypoint: "OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat", identity: "OIP_Wire_Oracle_V061.sync_v061_typed_model_identity",
     names: { model: "oip_wire_oracle.ML", driver: "mirror-driver.ML", origin: "export-origin.json", diagnostics: "compiler-diagnostics.json" },
   },
   full: {
-    lock: "wire-response-artifact.lock.json", abi: "intinf-response-full-v1", scope: "wire-response-sender-client-v1",
+    lock: "wire-response-artifact.lock.json", abi: "intinf-response-full-v2", scope: "wire-response-sender-client-v2",
     entrypoint: "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle", identity: "OIP_Wire_Response_Boundary.code_response_full_model_identity",
     names: { model: "oip_wire_response_full.ML", driver: "response-full-driver.ML", origin: "response-full-origin.json", diagnostics: "response-full-diagnostics.json" },
   },
@@ -92,7 +92,7 @@ export function verifySource(namespaceRoot) {
     const bad = lines.findIndex((line) => UNTRUSTED_LINE.test(line));
     need(bad === -1, "PROOF_SOURCE_FORM", `untrusted proof source form: ${name}:${bad + 1}`);
   }
-  need(Array.isArray(inventory.files) && inventory.files.length === 345 && actualTheories.length === 344, "SOURCE_INVENTORY", "ROOT plus exactly 344 theory inputs required");
+  need(Array.isArray(inventory.files) && inventory.files.length === 399 && actualTheories.length === 398, "SOURCE_INVENTORY", "ROOT plus exactly 398 theory inputs required");
   sameSet(inventory.files.map((row) => row.path), ["ROOT", ...actualTheories], "SOURCE_INVENTORY", "exact compiler inventory");
   for (const row of inventory.files) {
     exact(row, ["path", "bytes", "sha256"], "SOURCE_INVENTORY", "compiler input");
@@ -102,7 +102,7 @@ export function verifySource(namespaceRoot) {
     need(raw.length === row.bytes && sha256(raw) === row.sha256, "SOURCE_INVENTORY", `compiler bytes/SHA256 differ: ${row.path}`);
   }
 
-  // This separate metadata does not alter the 345-file compiler inventory or
+  // This separate metadata does not alter the 399-file compiler inventory or
   // any model identity. Its ten rows include both lock files themselves.
   const artifacts = json(read(root, "artifact-manifest.json", "ARTIFACT_INVENTORY"), "ARTIFACT_INVENTORY", "artifact-manifest.json");
   exact(artifacts, ["format", "namespace", "files"], "ARTIFACT_INVENTORY", "artifact inventory");
@@ -131,7 +131,7 @@ export function verifySource(namespaceRoot) {
     if (bundle === "typed") {
       exact(lock.corpus, ["path", "rows", "sha256"], "ARTIFACT_SCHEMA", "typed corpus");
       equal(lock.corpus.path, "tests/vectors/wire-operations.jsonl", "ARTIFACT_SCHEMA", "typed corpus path");
-      equal(lock.corpus.rows, 673, "ARTIFACT_SCHEMA", "typed corpus rows");
+      equal(lock.corpus.rows, 692, "ARTIFACT_SCHEMA", "typed corpus rows");
       digest(lock.corpus.sha256, 64, "ARTIFACT_SCHEMA", "typed corpus hash");
     } else {
       equal(lock.input_schema, "tests/response-full-abi.json", "ARTIFACT_SCHEMA", "Full input schema");
@@ -172,7 +172,18 @@ export function verifySource(namespaceRoot) {
   }
   equal(locks[0].runtime_source_hash, locks[1].runtime_source_hash, "ARTIFACT_LINK", "two current source epochs");
   equal(origins[0].kernel_inputs_sha256, origins[1].kernel_inputs_sha256, "ARTIFACT_LINK", "two common kernel input seals");
-  return { compiler_files: 345, theory_files: 344, public_artifact_files: 10, runtime_source_hash: locks[0].runtime_source_hash, proof_or_model_execution: false };
+  const sealRaw = read(root, "Validation/V061/kernel-input-seal.json", "ARTIFACT_LINK");
+  const seal = json(sealRaw, "ARTIFACT_LINK", "v0.6.1 compiler input seal");
+  equal(seal.format, "oip-v061-compiler-input-seal-v1", "ARTIFACT_LINK", "kernel seal format");
+  equal(seal.namespace, NAMESPACE, "ARTIFACT_LINK", "kernel seal namespace");
+  equal(sha256(sealRaw), origins[0].kernel_inputs_sha256, "ARTIFACT_LINK", "checked common compiler seal");
+  equal(seal.source_manifest_sha256, sha256(read(root, "source-manifest.json", "SOURCE_INVENTORY")),
+    "ARTIFACT_LINK", "seal compiler source manifest");
+  equal(seal.root_sha256, sha256(read(root, "ROOT", "SOURCE_INVENTORY")), "ARTIFACT_LINK", "seal ROOT");
+  equal(seal.compiler_inputs, inventory.files.length, "ARTIFACT_LINK", "seal compiler input count");
+  need(Array.isArray(seal.targets) && ["OIP_Sync_V061_Typed_Artifact", "OIP_Response_Egress_V061_Export"]
+    .every((name) => seal.targets.includes(name)), "ARTIFACT_LINK", "both checked export targets are required");
+  return { compiler_files: 399, theory_files: 398, public_artifact_files: 10, runtime_source_hash: locks[0].runtime_source_hash, proof_or_model_execution: false };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

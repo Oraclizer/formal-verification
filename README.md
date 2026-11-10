@@ -144,7 +144,7 @@ or a production Witness/storage deployment.
 <div align="center">
   <picture>
     <source media="(max-width: 900px)" srcset="docs/assets/session-architecture-mobile.svg">
-    <img src="docs/assets/session-architecture.svg" alt="Sixteen registered artifact sessions: the CDSP to Evidence Binding Composition chain and independent Protected Behavior Obstructions companion, plus nine OIP prototype sessions branching from Evidence Atomic Binding into product, profile/execution, record reopening, recovery boundary and message/response layers. CDSP also depends on HOL-Library, HOL-Eisbach and AFP ADS_Functor. Arrows describe HOL source dependencies." width="900">
+    <img src="docs/assets/session-architecture.svg" alt="The base Isabelle session graph and the OIP extension catalog with each session's direct dependencies." width="900">
   </picture>
 </div>
 
@@ -292,7 +292,7 @@ document uses `pdflatex` and `bibtex`:
 node Evidence_Binding_Composition/build-document.mjs output/Evidence_Binding_Composition
 ```
 
-For the nine OIP prototype sessions, exact source-manifest bytes, logical-session
+For the OIP prototype sessions, exact source-manifest bytes, logical-session
 exports and the bounded wire consumers, use
 [OIP reproduction](Oracle_Interoperability_Protocol/REPRODUCING.md).
 

@@ -7,7 +7,7 @@ export function repositorySessionInventory(repositoryRoot, repositoryPaths) {
   const graph = assertProofCoverage(repositoryRoot);
   const paths = repositoryPaths.map((path) => path.replaceAll("\\", "/"));
   const proofInputs = paths.filter((path) => /\.(?:thy|ML)$/.test(path) || /(?:^|\/)ROOT$/.test(path));
-  // Reuse the selector's unknown-input check and its exact four artifact paths.
+  // Reuse the selector's unknown-input check and exact external ML data paths.
   selectProofSessions(repositoryRoot, proofInputs);
   const sessionEdges = new Set();
   for (const name of graph.registeredNames) {

@@ -10,6 +10,17 @@ const MODEL_ARTIFACT_INPUTS = new Set([
   "Oracle_Interoperability_Protocol/artifacts/typed/mirror-driver.ML",
   "Oracle_Interoperability_Protocol/artifacts/full/oip_wire_response_full.ML",
   "Oracle_Interoperability_Protocol/artifacts/full/response-full-driver.ML",
+  // Standalone Poly/ML drivers and synthetic input files listed in Validation/V061/input-manifest.json.
+  "Oracle_Interoperability_Protocol/Validation/V061/drivers/id-guards.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/drivers/trace.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/response/ack-input.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/supplier/driver.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/supplier/input.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/sync/configured-profile-input.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/sync/fresh-modes-input.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/sync/id-guards-input.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/sync/image-binding-input.ML",
+  "Oracle_Interoperability_Protocol/Validation/V061/sync/product-input.ML",
 ]);
 
 function posix(path) {

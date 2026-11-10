@@ -1,0 +1,41 @@
+{
+  "fixture": "local-synthetic-ed25519",
+  "public_key_hex": "fec1428673f6afe89264b3807344ae8b269d125a503855202687db5a7128579f",
+  "negotiation_key_seed_bytes": {
+    "local": 116,
+    "remote": 115
+  },
+  "channel": {
+    "version": 6,
+    "deployment": 10,
+    "local": 31,
+    "remote": 70,
+    "expires": 100,
+    "families": [
+      1,
+      4,
+      5
+    ],
+    "atomicities": [
+      1
+    ],
+    "schemes": [
+      1
+    ]
+  },
+  "response_boundary": {
+    "deployment": 10,
+    "source": 70,
+    "target": 31,
+    "principal": 71,
+    "key_id": 13,
+    "epoch": 2,
+    "now": 80,
+    "route_scope": 55,
+    "asset_ttl_floor": 0,
+    "future_skew": 0,
+    "max_frame": 1048576,
+    "version_floor": 6,
+    "critical_allowed": false
+  }
+}

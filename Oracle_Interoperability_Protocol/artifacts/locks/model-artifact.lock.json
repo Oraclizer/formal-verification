@@ -5,46 +5,46 @@
   "repository": "Oraclizer/formal-verification",
   "wire_schema": 1,
   "abi": "intinf-wire-values-v2",
-  "scope": "wire-v6-general-31-values",
-  "entrypoint": "OIP_Wire_Oracle.code_typed_transport_flat_oracle",
+  "scope": "wire-v6-general-33-values",
+  "entrypoint": "OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat",
   "natural_refinement": "HOL-Library.Code_Target_Nat",
-  "runtime_source_hash": "28500a91beb9478d3de97ed0d9a2913bf7ea3202a5b546627e02df53b998b207",
-  "verified_export_sha256": "192e2bb8e1ae655fb27db68bbcb99cd538509d131ec6b6b29f670cd05a9d129b",
+  "runtime_source_hash": "b1a7fed18699409a20b8b4854bbb21db0115d104cdae6572fa9078aacadd4a79",
+  "verified_export_sha256": "7c543ae1086757ca12fff402b69614b6ac5e8f5b0f6b1eaeb04a50e56f299cda",
   "corpus": {
     "path": "tests/vectors/wire-operations.jsonl",
-    "rows": 673,
-    "sha256": "7191613236625c876f41976c44cc98cf1047876e319ee7c03abfe6bb0a1e8588"
+    "rows": 692,
+    "sha256": "c922ebc8b0d150e6aae17e8962f4a1bf9f232aa8e5a01b21b3b4b0eac6f6889b"
   },
   "files": [
     {
       "role": "model",
       "name": "oip_wire_oracle.ML",
-      "git_blob_sha1": "72fee1bd9d3d35814b44cea890c37a38f40cd3cc",
-      "sha256": "192e2bb8e1ae655fb27db68bbcb99cd538509d131ec6b6b29f670cd05a9d129b",
-      "bytes": 209891
+      "git_blob_sha1": "57f01591d32612a2ddab0be9b4832fcbaf633ed8",
+      "sha256": "7c543ae1086757ca12fff402b69614b6ac5e8f5b0f6b1eaeb04a50e56f299cda",
+      "bytes": 255870
     },
     {
       "role": "driver",
       "name": "mirror-driver.ML",
-      "git_blob_sha1": "c7f7913898d658ae0741493b6f3efc5bacb13043",
-      "sha256": "a1c8f5be6a637a59610010efcc489c965e82d9e0a59b72481731adf45d385bdc",
-      "bytes": 2460
+      "git_blob_sha1": "a0a13831f0211e85306b8c45d1d61343ccb930ed",
+      "sha256": "c9ed19c6c27c6eed5aa0bc07b0e2c899fb83fa92e7f5f861dc1da64ab6b356bc",
+      "bytes": 2474
     },
     {
       "role": "origin",
       "name": "export-origin.json",
-      "git_blob_sha1": "074690d7a4811b39ff822cb8c319508acfbb246c",
-      "sha256": "ca5d83f4b2554542751f6e8412de52923876a3f2ff9641adf15becabd3530009",
-      "bytes": 821
+      "git_blob_sha1": "9f26487339ba8a541bdd6cf40ad30a70e991fb06",
+      "sha256": "0abe7ebddc36f7cf63aa2d67d0735e8459b8bfdf342e1bf554f6893dee859b7a",
+      "bytes": 835
     },
     {
       "role": "diagnostics",
       "name": "compiler-diagnostics.json",
-      "git_blob_sha1": "309a95eca95eb6b3ca3d8d20d84fef57ddce31f0",
-      "sha256": "164f2793fda6817596c3c547f9549c9eb5d45b2a131ff2267b6d8d7e7d840118",
-      "bytes": 758
+      "git_blob_sha1": "93031e030fd686289fe6e02b884137a47e83dd01",
+      "sha256": "eec85da066a5be8af0d188cd74efe9144d2c9bcd502c274a5c4dd4f3c359fde4",
+      "bytes": 1666
     }
   ],
   "public_namespace": "Oracle_Interoperability_Protocol",
-  "identity_function": "OIP_Wire_Oracle.code_typed_model_identity"
+  "identity_function": "OIP_Wire_Oracle_V061.sync_v061_typed_model_identity"
 }

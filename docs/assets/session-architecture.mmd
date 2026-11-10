@@ -1,5 +1,4 @@
-%% Sixteen ROOTS-registered sessions; OIP inset has nine HOL source-dependency sessions. Original seven artifact meanings are preserved. Six form the CDSP to Evidence Binding Composition parent chain. Protected Behavior Obstructions independently extends HOL. Additional direct CDSP session dependencies are HOL-Library, HOL-Eisbach, and AFP ADS_Functor. Auxiliary audit sessions are not separate artifact entries.
-%% Arrows run from dependency to importer; this graph is not deployment or full implementation assurance.
+%% Generated from the registered session graph. Arrows run from dependency to importer.
 flowchart TB
     ADS_Functor["ADS_Functor"]
     Cross_Chain_Message_Integrity["Cross_Chain_Message_Integrity"]
@@ -9,37 +8,136 @@ flowchart TB
     HOL["HOL"]
     HOL_Eisbach["HOL-Eisbach"]
     HOL_Library["HOL-Library"]
+    OIP_Current_Read_G0_Source["OIP_Current_Read_G0_Source"]
+    OIP_Current_Read_G0_V9["OIP_Current_Read_G0_V9"]
+    OIP_Current_Read_Vector_Export["OIP_Current_Read_Vector_Export"]
+    OIP_Message_Code["OIP_Message_Code"]
+    OIP_Message_Egress["OIP_Message_Egress"]
+    OIP_Message_Response["OIP_Message_Response"]
+    OIP_Ordered_Maintenance_Entry["OIP_Ordered_Maintenance_Entry"]
+    OIP_Ordered_Maintenance_G0_Core["OIP_Ordered_Maintenance_G0_Core"]
+    OIP_Product["OIP_Product"]
+    OIP_Product_Base["OIP_Product_Base"]
+    OIP_Record_Reopening["OIP_Record_Reopening"]
+    OIP_Recovery_Boundary["OIP_Recovery_Boundary"]
+    OIP_Reference_Execution["OIP_Reference_Execution"]
+    OIP_Reference_Profile["OIP_Reference_Profile"]
+    OIP_Reference_Write_AuthorityV4["OIP_Reference_Write_AuthorityV4"]
+    OIP_Reference_Write_Capacity["OIP_Reference_Write_Capacity"]
+    OIP_Reference_Write_ChecksV9["OIP_Reference_Write_ChecksV9"]
+    OIP_Reference_Write_Core_Seed["OIP_Reference_Write_Core_Seed"]
+    OIP_Reference_Write_Profile["OIP_Reference_Write_Profile"]
+    OIP_Reference_Write_Raw_Ack_Seed["OIP_Reference_Write_Raw_Ack_Seed"]
+    OIP_Reference_Write_Vector_Export["OIP_Reference_Write_Vector_Export"]
+    OIP_Response_Code_Allocation["OIP_Response_Code_Allocation"]
+    OIP_Response_Code_Extension["OIP_Response_Code_Extension"]
+    OIP_Response_Code_IntInf_Runtime["OIP_Response_Code_IntInf_Runtime"]
+    OIP_Response_Egress_V061_Export["OIP_Response_Egress_V061_Export"]
+    OIP_Response_Egress_V061_Operands["OIP_Response_Egress_V061_Operands"]
+    OIP_Response_Egress_V061_Preservation_V7["OIP_Response_Egress_V061_Preservation_V7"]
+    OIP_Response_Egress_V061_Runtime_V7["OIP_Response_Egress_V061_Runtime_V7"]
+    OIP_Response_Egress_V061_V5["OIP_Response_Egress_V061_V5"]
+    OIP_Sync_V061_Ack_ABI["OIP_Sync_V061_Ack_ABI"]
+    OIP_Sync_V061_Concrete_Supplier_V2["OIP_Sync_V061_Concrete_Supplier_V2"]
+    OIP_Sync_V061_Configured_Profile_ABI["OIP_Sync_V061_Configured_Profile_ABI"]
+    OIP_Sync_V061_Extraction_V1["OIP_Sync_V061_Extraction_V1"]
+    OIP_Sync_V061_ID_Guard_ABI_V2["OIP_Sync_V061_ID_Guard_ABI_V2"]
+    OIP_Sync_V061_Image_Binding_ABI["OIP_Sync_V061_Image_Binding_ABI"]
+    OIP_Sync_V061_Image_Link["OIP_Sync_V061_Image_Link"]
+    OIP_Sync_V061_Mode_Product_ABI["OIP_Sync_V061_Mode_Product_ABI"]
+    OIP_Sync_V061_Position_Ack["OIP_Sync_V061_Position_Ack"]
+    OIP_Sync_V061_Position_Boundary["OIP_Sync_V061_Position_Boundary"]
+    OIP_Sync_V061_Position_Definitions["OIP_Sync_V061_Position_Definitions"]
+    OIP_Sync_V061_Position_Direct_IR["OIP_Sync_V061_Position_Direct_IR"]
+    OIP_Sync_V061_Position_Nested_IR["OIP_Sync_V061_Position_Nested_IR"]
+    OIP_Sync_V061_Position_Originals["OIP_Sync_V061_Position_Originals"]
+    OIP_Sync_V061_Position_Proofs["OIP_Sync_V061_Position_Proofs"]
+    OIP_Sync_V061_Position_Provider["OIP_Sync_V061_Position_Provider"]
+    OIP_Sync_V061_Position_Selection["OIP_Sync_V061_Position_Selection"]
+    OIP_Sync_V061_Position_Transport["OIP_Sync_V061_Position_Transport"]
+    OIP_Sync_V061_Product_ABI["OIP_Sync_V061_Product_ABI"]
+    OIP_Sync_V061_Seeds_V1["OIP_Sync_V061_Seeds_V1"]
+    OIP_Sync_V061_Strict_Proof_Link_V1["OIP_Sync_V061_Strict_Proof_Link_V1"]
+    OIP_Sync_V061_Supplier_ABI["OIP_Sync_V061_Supplier_ABI"]
+    OIP_Sync_V061_Typed_Artifact["OIP_Sync_V061_Typed_Artifact"]
+    OIP_Sync_V061_Wire_V4["OIP_Sync_V061_Wire_V4"]
+    OIP_Write_Canary_Base["OIP_Write_Canary_Base"]
+    OIP_Write_Canary_DurableV6["OIP_Write_Canary_DurableV6"]
+    OIP_Write_Canary_Removal["OIP_Write_Canary_Removal"]
     Preemptive_Lock_Correctness["Preemptive_Lock_Correctness"]
     Protected_Behavior_Obstructions["Protected_Behavior_Obstructions"]
     Regulatory_Action_Composition["Regulatory_Action_Composition"]
-    ADS_Functor --> Cross_Domain_State_Preservation
-    Cross_Chain_Message_Integrity --> Preemptive_Lock_Correctness
-    Cross_Domain_State_Preservation --> Regulatory_Action_Composition
-    Evidence_Atomic_Binding --> Evidence_Binding_Composition
-    HOL --> Protected_Behavior_Obstructions
-    HOL_Eisbach --> Cross_Domain_State_Preservation
     HOL_Library --> Cross_Domain_State_Preservation
-    Preemptive_Lock_Correctness --> Evidence_Atomic_Binding
+    HOL_Eisbach --> Cross_Domain_State_Preservation
+    ADS_Functor --> Cross_Domain_State_Preservation
+    HOL --> Protected_Behavior_Obstructions
+    Cross_Domain_State_Preservation --> Regulatory_Action_Composition
     Regulatory_Action_Composition --> Cross_Chain_Message_Integrity
-
-    subgraph OIPNamespace["OIP namespace · HOL source dependencies"]
-        direction TB
-        OIP_Product_Base["Base model<br/>OIP_Product_Base"]
-        OIP_Product["Product model<br/>OIP_Product"]
-        OIP_Reference_Profile["Reference profile<br/>OIP_Reference_Profile"]
-        OIP_Reference_Execution["Reference execution<br/>OIP_Reference_Execution"]
-        OIP_Record_Reopening["Record reopening<br/>OIP_Record_Reopening"]
-        OIP_Recovery_Boundary["Recovery boundary<br/>OIP_Recovery_Boundary"]
-        OIP_Message_Code["Message code<br/>OIP_Message_Code"]
-        OIP_Message_Response["Response model<br/>OIP_Message_Response"]
-        OIP_Message_Egress["Response egress<br/>OIP_Message_Egress"]
-    end
+    Cross_Chain_Message_Integrity --> Preemptive_Lock_Correctness
+    Preemptive_Lock_Correctness --> Evidence_Atomic_Binding
+    Evidence_Atomic_Binding --> Evidence_Binding_Composition
     Evidence_Atomic_Binding --> OIP_Product_Base
+    OIP_Product_Base --> OIP_Product
+    OIP_Product --> OIP_Reference_Profile
+    OIP_Reference_Profile --> OIP_Reference_Execution
+    OIP_Product --> OIP_Record_Reopening
+    OIP_Reference_Profile --> OIP_Recovery_Boundary
+    OIP_Reference_Execution --> OIP_Message_Code
     OIP_Message_Code --> OIP_Message_Response
     OIP_Message_Response --> OIP_Message_Egress
-    OIP_Product --> OIP_Record_Reopening
-    OIP_Product --> OIP_Reference_Profile
-    OIP_Product_Base --> OIP_Product
-    OIP_Reference_Execution --> OIP_Message_Code
-    OIP_Reference_Profile --> OIP_Recovery_Boundary
-    OIP_Reference_Profile --> OIP_Reference_Execution
+    OIP_Reference_Profile --> OIP_Ordered_Maintenance_G0_Core
+    OIP_Ordered_Maintenance_G0_Core --> OIP_Ordered_Maintenance_Entry
+    OIP_Reference_Profile --> OIP_Write_Canary_Base
+    OIP_Write_Canary_Base --> OIP_Write_Canary_Removal
+    OIP_Reference_Profile --> OIP_Write_Canary_DurableV6
+    OIP_Message_Code --> OIP_Reference_Write_Profile
+    OIP_Reference_Write_Profile --> OIP_Reference_Write_AuthorityV4
+    OIP_Reference_Write_AuthorityV4 --> OIP_Reference_Write_ChecksV9
+    OIP_Write_Canary_Base --> OIP_Reference_Write_ChecksV9
+    OIP_Write_Canary_Removal --> OIP_Reference_Write_ChecksV9
+    OIP_Write_Canary_DurableV6 --> OIP_Reference_Write_ChecksV9
+    OIP_Reference_Write_ChecksV9 --> OIP_Reference_Write_Vector_Export
+    OIP_Reference_Write_Vector_Export --> OIP_Reference_Write_Core_Seed
+    OIP_Message_Code --> OIP_Sync_V061_Wire_V4
+    OIP_Sync_V061_Wire_V4 --> OIP_Sync_V061_Position_Definitions
+    OIP_Sync_V061_Position_Definitions --> OIP_Sync_V061_Position_Proofs
+    OIP_Sync_V061_Position_Proofs --> OIP_Sync_V061_Position_Originals
+    OIP_Sync_V061_Position_Originals --> OIP_Sync_V061_Position_Boundary
+    OIP_Sync_V061_Position_Proofs --> OIP_Sync_V061_Position_Selection
+    OIP_Sync_V061_Position_Selection --> OIP_Sync_V061_Position_Provider
+    OIP_Sync_V061_Position_Provider --> OIP_Sync_V061_Concrete_Supplier_V2
+    OIP_Sync_V061_Position_Definitions --> OIP_Sync_V061_Position_Direct_IR
+    OIP_Sync_V061_Position_Direct_IR --> OIP_Sync_V061_Position_Transport
+    OIP_Sync_V061_Position_Originals --> OIP_Sync_V061_Position_Ack
+    OIP_Message_Response --> OIP_Sync_V061_Position_Ack
+    OIP_Sync_V061_Position_Transport --> OIP_Sync_V061_Position_Nested_IR
+    OIP_Sync_V061_Position_Ack --> OIP_Sync_V061_Position_Nested_IR
+    OIP_Sync_V061_Position_Boundary --> OIP_Sync_V061_Product_ABI
+    OIP_Sync_V061_Position_Ack --> OIP_Sync_V061_Ack_ABI
+    OIP_Sync_V061_Position_Definitions --> OIP_Sync_V061_Extraction_V1
+    OIP_Sync_V061_Extraction_V1 --> OIP_Sync_V061_Seeds_V1
+    OIP_Sync_V061_Extraction_V1 --> OIP_Sync_V061_Strict_Proof_Link_V1
+    OIP_Response_Code_Extension --> OIP_Response_Code_IntInf_Runtime
+    OIP_Message_Code --> OIP_Response_Code_Allocation
+    OIP_Response_Code_Allocation --> OIP_Response_Code_Extension
+    OIP_Sync_V061_Product_ABI --> OIP_Sync_V061_Mode_Product_ABI
+    OIP_Current_Read_G0_Source --> OIP_Current_Read_G0_V9
+    OIP_Current_Read_G0_V9 --> OIP_Current_Read_Vector_Export
+    OIP_Reference_Write_Core_Seed --> OIP_Reference_Write_Raw_Ack_Seed
+    OIP_Response_Egress_V061_V5 --> OIP_Response_Egress_V061_Runtime_V7
+    OIP_Response_Egress_V061_V5 --> OIP_Response_Egress_V061_Preservation_V7
+    OIP_Sync_V061_Position_Nested_IR --> OIP_Sync_V061_Typed_Artifact
+    OIP_Message_Code --> OIP_Current_Read_G0_Source
+    OIP_Message_Egress --> OIP_Response_Egress_V061_Operands
+    OIP_Sync_V061_Position_Nested_IR --> OIP_Response_Egress_V061_Operands
+    OIP_Response_Code_Extension --> OIP_Response_Egress_V061_Operands
+    OIP_Response_Egress_V061_Operands --> OIP_Response_Egress_V061_V5
+    OIP_Sync_V061_Position_Boundary --> OIP_Response_Egress_V061_V5
+    OIP_Reference_Write_Profile --> OIP_Response_Egress_V061_V5
+    OIP_Response_Egress_V061_Runtime_V7 --> OIP_Response_Egress_V061_Export
+    OIP_Sync_V061_Wire_V4 --> OIP_Sync_V061_Configured_Profile_ABI
+    OIP_Sync_V061_Concrete_Supplier_V2 --> OIP_Sync_V061_Supplier_ABI
+    OIP_Sync_V061_Position_Selection --> OIP_Sync_V061_Image_Link
+    OIP_Sync_V061_Product_ABI --> OIP_Sync_V061_ID_Guard_ABI_V2
+    OIP_Reference_Write_Core_Seed --> OIP_Reference_Write_Capacity
+    OIP_Sync_V061_Image_Link --> OIP_Sync_V061_Image_Binding_ABI
