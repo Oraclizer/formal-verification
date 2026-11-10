@@ -5,6 +5,13 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Split the README banner into phone, medium and desktop versions chosen by
+  the width of the README column, so tablets and unfolded phones no longer
+  show the tall phone banner. The banner lettering is drawn as outlines of
+  Inter (SIL Open Font License 1.1), so every device shows the same type. The
+  repository health check requires the three versions, their canvases and the
+  outlined lettering. Formal sources, proofs and claims are unchanged.
+
 - Changed pull-request proof CI from unconditional whole-repository builds to
   source-derived affected-session closure checks. Every changed Isabelle
   session and local downstream consumer is selected, proof-control changes
