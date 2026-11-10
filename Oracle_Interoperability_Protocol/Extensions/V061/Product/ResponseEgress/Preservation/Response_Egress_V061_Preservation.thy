@@ -21,16 +21,152 @@ proof -
     by (auto simp: wire_packet_wellformed_def wire_core_wellformed_def)
 qed
 
-lemma response_v061_legacy_status_preserves_the_old_known_and_unknown_value:
-  assumes "\<not> sync_added_status number" "sync_operation original \<noteq> (Wire_State_Sync,7)"
-  shows "response_v061_status original kind number position =
+lemma response_v061_validate_preserves_direct_legacy_status:
+  assumes outer: "sync_operation (packet_core packet) = (Wire_Ack,2)"
+    and blob: "wire_blobs (wire_operation_body (packet_core packet)) = [original_raw]"
+    and original: "decode_wire_core original_raw = Some nested"
+    and leaf: "sync_operation nested \<notin> {(Wire_State_Sync,7),(Wire_Query,9),(Wire_Query,8),(Wire_Ack,2)}"
+    and expected: "sync_operation expected \<notin> {(Wire_State_Sync,7),(Wire_Query,9),(Wire_Query,8),(Wire_Ack,2)}"
+  shows "response_v061_validate (Suc fuel) expected packet =
+    map_sum id (\<lambda>result. (result,response_fixed_received_status result)) (response_fixed_validate (Suc fuel) expected packet)"
+proof -
+  have parse: "response_v061_parse False (Suc fuel) (packet_core packet) =
+      response_fixed_parse_response fuel (packet_core packet)"
+    by (rule response_v061_parse_preserves_direct_legacy_original[OF outer blob original leaf])
+  have decode: "response_v061_operand 1 expected = map_sum id Response_V061_Legacy_Operand (response_fixed_expected_decode expected)"
+    using expected by (simp add: Let_def One_nat_def)
+  have status: "\<And>kind number position. response_v061_status expected kind number position =
     (if code_known_response_number number \<and>
-        \<not> reference_response_compatible (wire_message_family original) (wire_opcode (wire_operation_body original))
+        \<not> reference_response_compatible (wire_message_family expected) (wire_opcode (wire_operation_body expected))
           kind number (position \<noteq> None)
      then None else code_decode_response_status kind number (position \<noteq> None))"
-  using assms by (auto simp: response_v061_status_def Let_def sync_added_status_def sync_operation_def
-    response_extended_status_def response_extended_compatible_def sync_response_lookup_is_exact sync_response_operation_def
-    code_response_compatible_def code_decode_response_status_def split: if_splits)
+    by (rule response_v061_legacy_status_preserves_the_old_known_and_unknown_value) (use expected in auto)
+  let ?attach = "\<lambda>result. (result,response_fixed_received_status result)"
+  show ?thesis
+  proof (cases "response_fixed_parse_response fuel (packet_core packet)")
+    case (Inl refusal)
+    have parsed: "response_v061_parse False (Suc fuel) (packet_core packet) = Inl refusal"
+      by (rule trans[OF parse Inl])
+    show ?thesis
+      by (simp only: response_v061_validate_def response_fixed_validate_def parsed Inl
+        nat.case sum.case map_sum.simps id_apply)
+  next
+    case (Inr view)
+    note viewed = Inr
+    have parsed: "response_v061_parse False (Suc fuel) (packet_core packet) = Inr view"
+      by (rule trans[OF parse viewed])
+    let ?kind = "response_decoded_kind view"
+    let ?number = "response_decoded_number view"
+    let ?position = "response_decoded_position view"
+    let ?result = "(response_decoded_id view,?kind,?number,?position)"
+    let ?previous = "code_decode_response_status ?kind ?number (?position \<noteq> None)"
+    let ?incompatible = "code_known_response_number ?number \<and>
+      \<not> reference_response_compatible (wire_message_family expected) (wire_opcode (wire_operation_body expected))
+        ?kind ?number (?position \<noteq> None)"
+    have packed: "response_fixed_received_status ?result = ?previous"
+      by (simp add: response_fixed_received_status_def)
+    have scoped: "response_v061_status expected ?kind ?number ?position =
+        (if ?incompatible then None else ?previous)"
+      by (rule status)
+    have result: "response_v061_result_of_view view = ?result"
+      by (simp add: response_v061_result_of_view_def)
+    have classification:
+      "(case response_v061_status expected ?kind ?number ?position of None \<Rightarrow> Inl Invalid_Wire_Format
+        | Some classification \<Rightarrow> Inr (response_v061_result_of_view view,Some classification)) =
+       map_sum id ?attach (case ?previous of None \<Rightarrow> Inl Invalid_Wire_Format
+        | Some classification \<Rightarrow> if ?incompatible then Inl Invalid_Wire_Format else Inr ?result)"
+      unfolding scoped result
+      by (cases ?incompatible; cases ?previous) (simp_all add: packed)
+    show ?thesis
+    proof (cases "response_fixed_expected_decode expected")
+      case (Inl refusal)
+      have decoded_new: "response_v061_operand 1 expected = Inl refusal"
+        by (simp only: decode Inl map_sum.simps id_apply)
+      show ?thesis
+        by (simp only: response_v061_validate_def response_fixed_validate_def parsed viewed decoded_new Inl
+          nat.case sum.case map_sum.simps id_apply)
+    next
+      case (Inr decoded)
+      note expected_decoded = Inr
+      have decoded_new: "response_v061_operand 1 expected = Inr (Response_V061_Legacy_Operand decoded)"
+        by (simp only: decode expected_decoded map_sum.simps)
+      show ?thesis
+      proof (cases "response_decoded_original_bytes view = encode_wire_core expected")
+        case False
+        show ?thesis
+          by (simp only: response_v061_validate_def response_fixed_validate_def parsed viewed
+            decoded_new expected_decoded nat.case sum.case if_P[OF False] map_sum.simps id_apply)
+      next
+        case True
+        have same_bytes: "\<not> (response_decoded_original_bytes view \<noteq> encode_wire_core expected)"
+          using True by simp
+        show ?thesis
+        proof (cases "response_fixed_caller_from_decoded decoded")
+          case (Inl refusal)
+          show ?thesis
+            by (simp only: response_v061_validate_def response_fixed_validate_def parsed viewed
+              decoded_new expected_decoded response_v061_caller.simps Inl nat.case sum.case
+              if_not_P[OF same_bytes] map_sum.simps id_apply)
+        next
+          case (Inr caller)
+          note caller_decoded = Inr
+          show ?thesis
+          proof (cases "response_decoded_id view = caller")
+            case False
+            show ?thesis
+              by (simp only: response_v061_validate_def response_fixed_validate_def parsed viewed
+                decoded_new expected_decoded response_v061_caller.simps caller_decoded nat.case sum.case
+                if_not_P[OF same_bytes] if_P[OF False] map_sum.simps id_apply)
+          next
+            case True
+            have same_id: "\<not> (response_decoded_id view \<noteq> caller)"
+              using True by simp
+            show ?thesis
+              by (simp only: response_v061_validate_def response_fixed_validate_def parsed viewed
+                decoded_new expected_decoded response_v061_caller.simps caller_decoded nat.case sum.case
+                if_not_P[OF same_bytes] if_not_P[OF same_id] classification)
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+theorem response_v061_signed_admission_preserves_direct_legacy_status:
+  assumes received: "decode_wire_packet raw = Some packet"
+    and outer: "sync_operation (packet_core packet) = (Wire_Ack,2)"
+    and blob: "wire_blobs (wire_operation_body (packet_core packet)) = [original_raw]"
+    and original: "decode_wire_core original_raw = Some nested"
+    and leaf: "sync_operation nested \<notin> {(Wire_State_Sync,7),(Wire_Query,9),(Wire_Query,8),(Wire_Ack,2)}"
+    and retained: "sync_operation (packet_core expected) \<notin> {(Wire_State_Sync,7),(Wire_Query,9),(Wire_Query,8),(Wire_Ack,2)}"
+  shows "response_v061_admit verify channel current expected raw = response_fixed_admit verify channel current expected raw"
+proof -
+  have decoded: "sync_decode_packet raw = Some packet"
+    by (rule sync_preserves_every_decoded_legacy_packet[OF received])
+  let ?depth = "response_client_max_nesting current"
+  let ?before = "response_fixed_validate ?depth (packet_core expected) packet"
+  have validated: "response_v061_validate ?depth (packet_core expected) packet =
+    (case ?before of Inl reason \<Rightarrow> Inl reason
+     | Inr result \<Rightarrow> Inr (result,response_fixed_received_status result))"
+  proof (cases ?depth)
+    case 0
+    have parse0: "response_v061_parse False 0 (packet_core packet) = Inl Invalid_Wire_Format"
+      by (simp only: response_v061_parse_def nat.case)
+    show ?thesis
+      by (simp only: 0 response_v061_validate_def response_fixed_validate_def parse0 nat.case sum.case)
+  next
+    case (Suc fuel)
+    have equal: "response_v061_validate (Suc fuel) (packet_core expected) packet =
+        map_sum id (\<lambda>result. (result,response_fixed_received_status result))
+          (response_fixed_validate (Suc fuel) (packet_core expected) packet)"
+      by (rule response_v061_validate_preserves_direct_legacy_status[OF outer blob original leaf retained])
+    show ?thesis
+      unfolding Suc equal by (cases "response_fixed_validate (Suc fuel) (packet_core expected) packet") simp_all
+  qed
+  show ?thesis
+    by (simp only: response_v061_admit_def response_fixed_admit_def Let_def decoded received option.case validated
+      cong: if_cong option.case_cong)
+qed
 
 lemma response_v061_query_eight_and_ack_two_are_not_original_callers:
   assumes "sync_operation core \<in> {(Wire_Query,8),(Wire_Ack,2)}"
@@ -221,6 +357,7 @@ ML_val \<open>
   if null (Thm_Deps.all_oracles @{thms response_v061_config_flags_are_independent
     response_v061_legacy_canonical_packet_preserves_opcode_and_bytes
     response_v061_legacy_status_preserves_the_old_known_and_unknown_value
+    response_v061_validate_preserves_direct_legacy_status response_v061_signed_admission_preserves_direct_legacy_status
     response_v061_original_preflight_keeps_all_other_legacy_originals
     response_v061_success_preserves_legacy_signed_bytes
     response_v061_sync_signed_correlation_uses_the_exact_direct_original

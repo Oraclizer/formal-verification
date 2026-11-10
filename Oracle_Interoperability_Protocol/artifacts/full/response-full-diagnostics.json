@@ -1,6 +1,6 @@
 {
   "schema": "oip-compiler-diagnostics-v1",
-  "model_sha256": "682fabfbaabda89c5fb97e71f46ca7930486c0d8d799817845d8025b2ea38dee",
+  "model_sha256": "1a4122f1b3c7d7a52b8062689ba257cdc2d6494d2fe34da7ac9597335f6a1ca9",
   "driver_sha256": "c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703",
   "allowed": [
     {
@@ -39,7 +39,7 @@
     {
       "stream": "stdout",
       "lines": [
-        "{model_path}:3434: warning: Pattern 3 is redundant.",
+        "{model_path}:3433: warning: Pattern 3 is redundant.",
         "Found near",
         "  fun",
         "     equal_bool false p = not p |",
@@ -52,7 +52,7 @@
     {
       "stream": "stdout",
       "lines": [
-        "{model_path}:3435: warning: Pattern 4 is redundant.",
+        "{model_path}:3434: warning: Pattern 4 is redundant.",
         "Found near",
         "  fun",
         "     equal_bool false p = not p |",

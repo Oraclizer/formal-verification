@@ -8,8 +8,8 @@
   "scope": "wire-v6-general-33-values",
   "entrypoint": "OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat",
   "natural_refinement": "HOL-Library.Code_Target_Nat",
-  "runtime_source_hash": "081861a0122d120ac7ff90b5aa363d9072e3824296b0f2687c78c515eeee7610",
-  "verified_export_sha256": "d20dd4fbfa811427c7fa8ce72be1b15ad8c877102e08480134a23ffb33158084",
+  "runtime_source_hash": "6cd8be10d45407a4ec699c38364a68d09e1df186119562cfed08527ba34d6b87",
+  "verified_export_sha256": "643d5aebaa580134d4049a0eaed7e324544b13a61f4820466d3fd0819b9959d7",
   "corpus": {
     "path": "tests/vectors/wire-operations.jsonl",
     "rows": 692,
@@ -19,9 +19,9 @@
     {
       "role": "model",
       "name": "oip_wire_oracle.ML",
-      "git_blob_sha1": "3be404192acd3e1ad3c5b21d1038bc0468d18ee6",
-      "sha256": "d20dd4fbfa811427c7fa8ce72be1b15ad8c877102e08480134a23ffb33158084",
-      "bytes": 258100
+      "git_blob_sha1": "1e45abe110af6e307ccf1dd049eddd8f90790511",
+      "sha256": "643d5aebaa580134d4049a0eaed7e324544b13a61f4820466d3fd0819b9959d7",
+      "bytes": 255860
     },
     {
       "role": "driver",
@@ -33,15 +33,15 @@
     {
       "role": "origin",
       "name": "export-origin.json",
-      "git_blob_sha1": "8f609b7308833222f286522d9c0ded22e2f48abb",
-      "sha256": "75cc82bcb113647f649e7045f5c02c58ec419031c6e89889ecb0648baa3465f5",
+      "git_blob_sha1": "18bc4d8395f962fa82548e419f38697244fb75f2",
+      "sha256": "bddc3edd835b273b571f6eb389556821e05403f3ae2b64251d38d956975bffc4",
       "bytes": 835
     },
     {
       "role": "diagnostics",
       "name": "compiler-diagnostics.json",
-      "git_blob_sha1": "357e9626e44d4c666d32913bf9a3002b21824fee",
-      "sha256": "dd6cf523f6ae1ce0daee32625973a5f8fbb56852897f2d985098bf375428c122",
+      "git_blob_sha1": "c1884ab5cbc96e51ef532b0053c3d6c2f48b4185",
+      "sha256": "10afc5b75a341540d4a3e8bbafb880fcae0511483428aff0e936ebdb20c90860",
       "bytes": 1666
     }
   ],

@@ -2989,13 +2989,12 @@ fun code_encode_packet packet =
                          (packet_signature packet))
                then NONE else SOME (code_packet_bytes packet))));
 
-fun sync_added_status (A1_, A2_) number =
-  member A1_ number
-    (insert A1_ (numeral A2_ (Bit1 (Bit0 (Bit1 (Bit1 One)))))
-      (insert A1_ (numeral A2_ (Bit1 (Bit1 (Bit1 (Bit0 (Bit0 One))))))
-        (insert A1_ (numeral A2_ (Bit0 (Bit0 (Bit0 (Bit1 (Bit0 One))))))
-          (insert A1_ (numeral A2_ (Bit1 (Bit0 (Bit0 (Bit1 (Bit0 One))))))
-            bot_set))));
+fun sync_added_status number =
+  member equal_nat number
+    (insert equal_nat (nat_of_integer (29 : IntInf.int))
+      (insert equal_nat (nat_of_integer (39 : IntInf.int))
+        (insert equal_nat (nat_of_integer (40 : IntInf.int))
+          (insert equal_nat (nat_of_integer (41 : IntInf.int)) bot_set))));
 
 fun negotiated_schemes
   (Negotiated_wire_profile_ext
@@ -3631,6 +3630,10 @@ fun sync_mode_at tag =
            then SOME Sync_Incremental
            else (if equal_nata tag (nat_of_integer (3 : IntInf.int))
                   then SOME Sync_Full else NONE)));
+
+fun sync_single_original core =
+  (case wire_blobs (wire_operation_body core) of [] => NONE
+    | [raw] => sync_decode_core raw | _ :: _ :: _ => NONE);
 
 fun code_json_lex3 first second =
   let
@@ -4897,24 +4900,6 @@ fun sync_call
       sync_requested, sync_mode, sync_claimed_prior, sync_attestation, more))
   = sync_call;
 
-fun code_known_response_number (A1_, A2_) number =
-  member A1_ number
-    (sup_set A1_
-      (sup_set A1_
-        (sup_set A1_ (reference_result_codes (A1_, A2_) Recorded_Result true)
-          (reference_result_codes (A1_, A2_) Recorded_Result false))
-        (reference_result_codes (A1_, A2_) Delivery_Refusal false))
-      (reference_result_codes (A1_, A2_) Validation_Refusal false));
-
-fun code_decode_response_status kind number committed =
-  (if code_known_response_number (equal_nat, interval_nat) number
-    then (if member equal_nat number
-               (reference_result_codes (equal_nat, interval_nat) kind committed)
-           then SOME (Code_Known_Response (kind, number)) else NONE)
-    else (if not (equal_reference_response_kinda kind Recorded_Result) andalso
-               committed
-           then NONE else SOME (Code_Unknown_Response (kind, number))));
-
 fun reference_result_targets code =
   (if equal_nata code (nat_of_integer (10 : IntInf.int))
     then insert (equal_prod equal_wire_family equal_nat) (Wire_Lock, one_nata)
@@ -5030,6 +5015,24 @@ fun reference_response_compatible family opcode kind code committed =
                 (atLeastAtMost (equal_nat, interval_nat) one_nata
                   (nat_of_integer (8 : IntInf.int))))));
 
+fun code_known_response_number (A1_, A2_) number =
+  member A1_ number
+    (sup_set A1_
+      (sup_set A1_
+        (sup_set A1_ (reference_result_codes (A1_, A2_) Recorded_Result true)
+          (reference_result_codes (A1_, A2_) Recorded_Result false))
+        (reference_result_codes (A1_, A2_) Delivery_Refusal false))
+      (reference_result_codes (A1_, A2_) Validation_Refusal false));
+
+fun code_decode_response_status kind number committed =
+  (if code_known_response_number (equal_nat, interval_nat) number
+    then (if member equal_nat number
+               (reference_result_codes (equal_nat, interval_nat) kind committed)
+           then SOME (Code_Known_Response (kind, number)) else NONE)
+    else (if not (equal_reference_response_kinda kind Recorded_Result) andalso
+               committed
+           then NONE else SOME (Code_Unknown_Response (kind, number))));
+
 fun code_response_call_shape (A1_, A2_) family operation =
   equal_wire_familya family Wire_State_Sync andalso
     member A1_ operation
@@ -5122,29 +5125,33 @@ fun response_extended_status allocations kind number committed =
 fun response_v061_status original kind number position =
   let
     val committed = not (is_none position);
+    val family = wire_message_family original;
+    val operation = wire_opcode (wire_operation_body original);
   in
-    (case response_extended_status sync_response_allocations kind number
-            committed
-      of NONE => NONE
-      | SOME (Code_Known_Response (category, known)) =>
-        (if response_extended_compatible sync_response_allocations
-              [sync_response_operation] (wire_message_family original)
-              (wire_opcode (wire_operation_body original)) kind number committed
-          then SOME (Code_Known_Response (category, known)) else NONE)
-      | SOME (Code_Unknown_Response (category, raw)) =>
-        SOME (Code_Unknown_Response (category, raw)))
+    (if equal_proda equal_wire_family equal_nat (sync_operation original)
+          (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+      then (case response_extended_status sync_response_allocations kind number
+                   committed
+             of NONE => NONE
+             | SOME (Code_Known_Response (category, known)) =>
+               (if response_extended_compatible sync_response_allocations
+                     [sync_response_operation] family operation kind number
+                     committed
+                 then SOME (Code_Known_Response (category, known)) else NONE)
+             | SOME (Code_Unknown_Response (category, raw)) =>
+               SOME (Code_Unknown_Response (category, raw)))
+      else (if code_known_response_number (equal_nat, interval_nat)
+                 number andalso
+                 not (reference_response_compatible family operation kind number
+                       committed)
+             then NONE else code_decode_response_status kind number committed))
   end;
 
 fun response_v061_check_enclosed check_status original decoded v061_caller kind
   number position =
   (case decoded
     of Response_V061_Legacy_Operand legacy =>
-      (case code_check_nested_response original legacy v061_caller position
-        of NONE =>
-          (if check_status andalso
-                sync_added_status (equal_nat, numeral_nat) number
-            then SOME Invalid_Wire_Format else NONE)
-        | SOME a => SOME a)
+      code_check_nested_response original legacy v061_caller position
     | Response_V061_Sync_Operand request =>
       (if not (equal_proda equal_nat equal_nat v061_caller
                 (sync_call request)) orelse
@@ -5153,6 +5160,13 @@ fun response_v061_check_enclosed check_status original decoded v061_caller kind
         then SOME Invalid_Wire_Format else NONE)
     | Response_V061_Receipt _ => SOME Invalid_Wire_Format
     | Response_V061_Current => SOME Invalid_Wire_Format);
+
+fun response_v061_is_sync_call (Response_V061_Sync_Operand request) = true
+  | response_v061_is_sync_call (Response_V061_Receipt original) =
+    equal_proda equal_wire_family equal_nat (sync_operation original)
+      (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+  | response_v061_is_sync_call (Response_V061_Legacy_Operand v) = false
+  | response_v061_is_sync_call Response_V061_Current = false;
 
 fun sync_link_response_header outer enclosed caller =
   equal_nata (wire_version outer) (wire_version enclosed) andalso
@@ -5170,12 +5184,13 @@ fun response_v061_finish_parse check_status descend outer exact nested decoded =
       (if not (equal_reference_response_kinda kind Recorded_Result) andalso
             not (is_none position) orelse
             check_status andalso
-              (sync_added_status (equal_nat, numeral_nat) number andalso
-                (not (equal_reference_response_kinda kind
-                       Recorded_Result) orelse
-                  not (equal_bool (not (is_none position))
-                        (equal_nata number
-                          (nat_of_integer (29 : IntInf.int))))))
+              (response_v061_is_sync_call decoded andalso
+                (sync_added_status number andalso
+                  (not (equal_reference_response_kinda kind
+                         Recorded_Result) orelse
+                    not (equal_bool (not (is_none position))
+                          (equal_nata number
+                            (nat_of_integer (29 : IntInf.int)))))))
         then Inl Invalid_Wire_Format
         else (if not (sync_link_response_header outer nested v061_caller)
                then Inl Invalid_Wire_Source
@@ -6693,6 +6708,25 @@ fun response_config_max_nesting
       response_config_policy_binding, more))
   = response_config_max_nesting;
 
+fun response_v061_signing_scope core =
+  (case response_result_words (wire_words (wire_operation_body core))
+    of NONE => false
+    | SOME (_, (_, (number, _))) =>
+      not (sync_added_status number) orelse
+        (case sync_single_original core of NONE => false
+          | SOME original =>
+            (if equal_proda equal_wire_family equal_nat
+                  (sync_operation original)
+                  (Wire_Query, nat_of_integer (8 : IntInf.int))
+              then (case sync_single_original original of NONE => false
+                     | SOME call =>
+                       equal_proda equal_wire_family equal_nat
+                         (sync_operation call)
+                         (Wire_State_Sync, nat_of_integer (7 : IntInf.int)))
+              else equal_proda equal_wire_family equal_nat
+                     (sync_operation original)
+                     (Wire_State_Sync, nat_of_integer (7 : IntInf.int)))));
+
 fun response_v061_signable config v061_now core =
   less_eq_nat (wire_sent_seconds core) v061_now andalso
     (less_nat (plus_nata (wire_sent_seconds core) (response_config_ttl config))
@@ -6722,12 +6756,13 @@ fun response_v061_signable config v061_now core =
                              (response_config_ttl config) andalso
                             (equal_nata (wire_signature_scheme core)
                                one_nata andalso
-                              equal_sum equal_wire_refusal
-                                equal_response_v061_nested
-                                (response_v061_operand
-                                  (response_config_max_nesting config) core)
-                                (Inr (Response_V061_Legacy_Operand
-                                       Code_Nested_Response)))))))))))))));
+                              (equal_sum equal_wire_refusal
+                                 equal_response_v061_nested
+                                 (response_v061_operand
+                                   (response_config_max_nesting config) core)
+                                 (Inr (Response_V061_Legacy_Operand
+Code_Nested_Response)) andalso
+                                response_v061_signing_scope core))))))))))))));
 
 fun response_v061_sign_guard context preimage =
   (case response_fixed_unframe preimage of NONE => false
@@ -6810,11 +6845,15 @@ val preimage = envelope_signing_bytes core;
                                     (nat_of_integer (2 : IntInf.int)) original
                                     parsed
                               of Inl a => response_v061_encoding_refused a
-                              | Inr (verified, _) =>
-                                Inr (Response_fixed_emission_ext
-                                      (encoded, parsed, original,
-(call, (kind, (number, position))), verified, parameters, binding_message,
-preimage, ())))
+                              | Inr (verified, status) =>
+                                (if not (equal_optiona
+  equal_code_response_status status (SOME (Code_Known_Response (kind, number))))
+                                  then response_v061_encoding_refused
+ Invalid_Wire_Format
+                                  else Inr
+ (Response_fixed_emission_ext
+   (encoded, parsed, original, (call, (kind, (number, position))), verified,
+     parameters, binding_message, preimage, ()))))
                           | SOME a => response_v061_encoding_refused a))))
        end)
                                       end))
@@ -8474,70 +8513,70 @@ fun code_response_admit_flat_oracle rows expected received verify_rows =
 
 fun code_response_full_model_identity ignored =
   response_v061_identity_fields
-    [Chara (false, false, false, false, true, true, false, false),
-      Chara (false, false, false, true, true, true, false, false),
-      Chara (true, false, false, false, true, true, false, false),
-      Chara (false, false, false, true, true, true, false, false),
-      Chara (false, true, true, false, true, true, false, false),
-      Chara (true, false, false, false, true, true, false, false),
-      Chara (true, false, false, false, false, true, true, false),
-      Chara (false, false, false, false, true, true, false, false),
-      Chara (true, false, false, false, true, true, false, false),
-      Chara (false, true, false, false, true, true, false, false),
-      Chara (false, true, false, false, true, true, false, false),
-      Chara (false, false, true, false, false, true, true, false),
-      Chara (true, false, false, false, true, true, false, false),
-      Chara (false, true, false, false, true, true, false, false),
-      Chara (false, false, false, false, true, true, false, false),
-      Chara (true, false, false, false, false, true, true, false),
+    [Chara (false, true, true, false, true, true, false, false),
       Chara (true, true, false, false, false, true, true, false),
-      Chara (true, true, true, false, true, true, false, false),
-      Chara (false, true, true, false, false, true, true, false),
-      Chara (false, true, true, false, false, true, true, false),
-      Chara (true, false, false, true, true, true, false, false),
-      Chara (false, false, false, false, true, true, false, false),
-      Chara (false, true, false, false, false, true, true, false),
-      Chara (true, false, true, false, true, true, false, false),
-      Chara (true, false, false, false, false, true, true, false),
-      Chara (true, false, false, false, false, true, true, false),
-      Chara (true, true, false, false, true, true, false, false),
-      Chara (false, true, true, false, true, true, false, false),
-      Chara (true, true, false, false, true, true, false, false),
       Chara (false, false, true, false, false, true, true, false),
-      Chara (true, false, false, true, true, true, false, false),
-      Chara (false, false, false, false, true, true, false, false),
-      Chara (true, true, true, false, true, true, false, false),
-      Chara (false, true, false, false, true, true, false, false),
-      Chara (true, false, true, false, false, true, true, false),
-      Chara (true, true, false, false, true, true, false, false),
       Chara (false, false, false, true, true, true, false, false),
-      Chara (false, true, false, false, true, true, false, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (true, false, true, false, false, true, true, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (false, false, true, false, false, true, true, false),
       Chara (false, false, true, false, true, true, false, false),
-      Chara (false, true, false, false, true, true, false, false),
+      Chara (true, false, true, false, true, true, false, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (true, true, true, false, true, true, false, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (true, false, true, false, false, true, true, false),
+      Chara (true, true, false, false, false, true, true, false),
+      Chara (false, true, true, false, true, true, false, false),
       Chara (true, false, false, true, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (true, true, false, false, false, true, true, false),
+      Chara (true, true, false, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (true, true, false, false, true, true, false, false),
+      Chara (false, true, true, false, true, true, false, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (false, true, true, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (true, false, true, false, false, true, true, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (false, true, true, false, false, true, true, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (false, true, true, false, true, true, false, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (true, false, false, false, true, true, false, false),
+      Chara (true, false, false, true, true, true, false, false),
+      Chara (true, false, true, false, true, true, false, false),
+      Chara (false, true, true, false, true, true, false, false),
+      Chara (false, true, false, false, true, true, false, false),
+      Chara (true, true, false, false, false, true, true, false),
+      Chara (false, true, true, false, false, true, true, false),
+      Chara (true, false, true, false, false, true, true, false),
+      Chara (false, false, true, false, false, true, true, false),
+      Chara (false, false, false, false, true, true, false, false),
+      Chara (false, false, false, true, true, true, false, false),
+      Chara (true, false, true, false, true, true, false, false),
+      Chara (false, true, false, false, true, true, false, false),
+      Chara (true, true, true, false, true, true, false, false),
+      Chara (false, true, false, false, false, true, true, false),
+      Chara (true, false, false, false, false, true, true, false),
+      Chara (true, true, false, false, true, true, false, false),
+      Chara (false, false, true, false, true, true, false, false),
+      Chara (false, false, true, false, false, true, true, false),
       Chara (false, true, true, false, true, true, false, false),
       Chara (false, true, false, false, false, true, true, false),
-      Chara (false, false, false, false, true, true, false, false),
-      Chara (false, true, true, false, false, true, true, false),
-      Chara (false, true, false, false, true, true, false, false),
-      Chara (false, true, true, false, true, true, false, false),
       Chara (false, false, false, true, true, true, false, false),
-      Chara (true, true, true, false, true, true, false, false),
-      Chara (true, true, false, false, false, true, true, false),
-      Chara (true, true, true, false, true, true, false, false),
-      Chara (false, false, false, true, true, true, false, false),
-      Chara (true, true, false, false, false, true, true, false),
-      Chara (true, false, true, false, true, true, false, false),
-      Chara (true, false, false, false, true, true, false, false),
-      Chara (true, false, true, false, true, true, false, false),
-      Chara (true, false, true, false, false, true, true, false),
-      Chara (true, false, true, false, false, true, true, false),
-      Chara (true, false, true, false, false, true, true, false),
-      Chara (true, false, true, false, false, true, true, false),
-      Chara (true, true, true, false, true, true, false, false),
-      Chara (false, true, true, false, true, true, false, false),
-      Chara (true, false, false, false, true, true, false, false),
-      Chara (false, false, false, false, true, true, false, false)];
+      Chara (true, true, true, false, true, true, false, false)];
 
 fun code_response_admit_queries_flat rows expected received verify_rows =
   (case response_v061_client_input rows expected received verify_rows

@@ -2419,24 +2419,21 @@ fun equal_bool false p = not p
   | equal_bool p false = not p
   | equal_bool p true = p;
 
-fun sync_added_status (A1_, A2_) number =
-  member A1_ number
-    (insert A1_ (numeral A2_ (Bit1 (Bit0 (Bit1 (Bit1 One)))))
-      (insert A1_ (numeral A2_ (Bit1 (Bit1 (Bit1 (Bit0 (Bit0 One))))))
-        (insert A1_ (numeral A2_ (Bit0 (Bit0 (Bit0 (Bit1 (Bit0 One))))))
-          (insert A1_ (numeral A2_ (Bit1 (Bit0 (Bit0 (Bit1 (Bit0 One))))))
-            bot_set))));
+fun sync_added_status number =
+  member equal_nat number
+    (insert equal_nat (nat_of_integer (29 : IntInf.int))
+      (insert equal_nat (nat_of_integer (39 : IntInf.int))
+        (insert equal_nat (nat_of_integer (40 : IntInf.int))
+          (insert equal_nat (nat_of_integer (41 : IntInf.int)) bot_set))));
 
 fun sync_known_response_compatible original kind number committed =
-  (if sync_added_status (equal_nat, numeral_nat) number
-    then equal_proda equal_wire_family equal_nat (sync_operation original)
-           (Wire_State_Sync, nat_of_integer (7 : IntInf.int)) andalso
-           (equal_reference_response_kind kind Recorded_Result andalso
-             equal_bool committed
-               (equal_nata number (nat_of_integer (29 : IntInf.int))))
-    else (if equal_proda equal_wire_family equal_nat (sync_operation original)
-               (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
-           then (if code_known_response_number (equal_nat, interval_nat) number
+  (if equal_proda equal_wire_family equal_nat (sync_operation original)
+        (Wire_State_Sync, nat_of_integer (7 : IntInf.int))
+    then (if sync_added_status number
+           then equal_reference_response_kind kind Recorded_Result andalso
+                  equal_bool committed
+                    (equal_nata number (nat_of_integer (29 : IntInf.int)))
+           else (if code_known_response_number (equal_nat, interval_nat) number
                   then member equal_nat number
                          (reference_result_codes (equal_nat, interval_nat) kind
                            committed) andalso
@@ -2449,22 +2446,22 @@ fun sync_known_response_compatible original kind number committed =
                                  (insert equal_nat
                                    (nat_of_integer (3 : IntInf.int)) bot_set))))
                   else equal_reference_response_kind kind Recorded_Result orelse
-                         not committed)
-           else code_response_compatible (wire_message_family original)
-                  (wire_opcode (wire_operation_body original)) kind number
-                  committed));
+                         not committed))
+    else code_response_compatible (wire_message_family original)
+           (wire_opcode (wire_operation_body original)) kind number committed);
 
 fun sync_link_response_status view =
   let
+    val original = sync_link_call_core (sync_link_original_view view);
     val kind = sync_link_kind view;
     val code = sync_link_code view;
     val committed = not (is_none (sync_link_commit view));
   in
-    (if not (sync_known_response_compatible
-              (sync_link_call_core (sync_link_original_view view)) kind code
-              committed)
+    (if not (sync_known_response_compatible original kind code committed)
       then NONE
-      else (if sync_added_status (equal_nat, numeral_nat) code
+      else (if equal_proda equal_wire_family equal_nat (sync_operation original)
+                 (Wire_State_Sync, nat_of_integer (7 : IntInf.int)) andalso
+                 sync_added_status code
              then SOME (Code_Known_Response (kind, code))
              else code_decode_response_status kind code committed))
   end;
@@ -2500,10 +2497,14 @@ fun sync_link_finish_parse raw_status outer raw original caller kind code commit
       (if not (equal_reference_response_kind kind Recorded_Result) andalso
             committed orelse
             raw_status andalso
-              (sync_added_status (equal_nat, numeral_nat) code andalso
-                (not (equal_reference_response_kind kind Recorded_Result) orelse
-                  not (equal_bool committed
-                        (equal_nata code (nat_of_integer (29 : IntInf.int))))))
+              (equal_proda equal_wire_family equal_nat (sync_operation inner)
+                 (Wire_State_Sync, nat_of_integer (7 : IntInf.int)) andalso
+                (sync_added_status code andalso
+                  (not (equal_reference_response_kind kind
+                         Recorded_Result) orelse
+                    not (equal_bool committed
+                          (equal_nata code
+                            (nat_of_integer (29 : IntInf.int)))))))
         then Inl Invalid_Wire_Format
         else (if not (sync_link_response_header outer enclosed caller)
                then Inl Invalid_Wire_Source
@@ -5241,49 +5242,10 @@ fun code_integer_reply (Code_Transport_First, binding) =
   | code_integer_reply (Code_Transport_Pending, binding) =
     ((~1 : IntInf.int), map_option (map integer_of_nat) binding);
 
-fun sync_ack_uses_added_number core =
-  (case response_result_words (wire_words (wire_operation_body core))
-    of NONE => false
-    | SOME (_, (_, (code, _))) =>
-      sync_added_status (equal_nat, numeral_nat) code);
-
 fun sync_v061_full_operand_ir depth core =
   (case sync_selected_nested_ir depth core
-    of NONE =>
-      (if equal_proda equal_wire_family equal_nat (sync_operation core)
-            (Wire_Ack, nat_of_integer (2 : IntInf.int)) andalso
-            sync_ack_uses_added_number core
-        then NONE else sync_v061_operand_ir depth core)
-    | SOME (Inl _) => NONE | SOME (Inr a) => SOME a);
-
-fun sync_legacy_ack_new_number depth core =
-  (if less_eq_nat depth one_nata orelse
-        not (equal_wire_deadline (wire_deadline (wire_operation_body core))
-              Deadline_Absent)
-    then Code_Operand_Refuse Invalid_Wire_Format
-    else (case sync_single_original core
-           of NONE => Code_Operand_Refuse Invalid_Wire_Format
-           | SOME original =>
-             (case code_decode_operand_tree (minus_nata depth one_nata) original
-               of Code_Tree_Refused a => Code_Operand_Refuse a
-               | Code_Tree_Ready decoded =>
-                 (case response_result_words
-                         (wire_words (wire_operation_body core))
-                   of NONE => Code_Operand_Refuse Invalid_Wire_Format
-                   | SOME (_, (kind, (code, position))) =>
-                     (if not (equal_reference_response_kind kind
-                               Recorded_Result) orelse
-                           not (equal_bool (not (is_none position))
-                                 (equal_nata code
-                                   (nat_of_integer (29 : IntInf.int))))
-                       then Code_Operand_Refuse Invalid_Wire_Format
-                       else (case code_response_tree_finish core original
-                                    decoded
-                              of Code_Tree_Refused a => Code_Operand_Refuse a
-                              | Code_Tree_Ready _ =>
-                                Code_Operand_Refuse Invalid_Wire_Format
-                              | Code_Tree_Pending => Code_Operand_Pending)))
-               | Code_Tree_Pending => Code_Operand_Pending)));
+    of NONE => sync_v061_operand_ir depth core | SOME (Inl _) => NONE
+    | SOME (Inr a) => SOME a);
 
 fun code_transport_operand_verdict core max_nesting =
   (case code_decode_operand_tree max_nesting core
@@ -5420,12 +5382,7 @@ fun sync_transport_flat_values operand_check typed_check bytes values version
 
 fun sync_v061_full_operand_verdict core depth =
   (case sync_selected_nested_ir depth core
-    of NONE =>
-      (if equal_proda equal_wire_family equal_nat (sync_operation core)
-            (Wire_Ack, nat_of_integer (2 : IntInf.int)) andalso
-            sync_ack_uses_added_number core
-        then sync_legacy_ack_new_number depth core
-        else sync_v061_operand_verdict core depth)
+    of NONE => sync_v061_operand_verdict core depth
     | SOME (Inl a) => Code_Operand_Refuse a
     | SOME (Inr _) => Code_Operand_Accept);
 
@@ -5562,70 +5519,70 @@ fun sync_v061_typed_model_identity x =
           Chara (false, true, true, true, false, false, true, false),
           Chara (true, false, false, false, false, true, true, false),
           Chara (false, false, true, false, true, true, true, false)],
-        [Chara (false, false, false, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
+        [Chara (false, true, true, false, true, true, false, false),
           Chara (true, true, false, false, false, true, true, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, true, false, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, false, false, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (true, true, false, false, true, true, false, false),
           Chara (false, false, true, false, false, true, true, false),
-          Chara (true, false, false, true, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, false, false, true, true, false, false),
           Chara (false, false, false, true, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
+          Chara (false, true, false, false, false, true, true, false),
+          Chara (true, false, true, false, false, true, true, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (false, false, true, false, false, true, true, false),
           Chara (false, false, true, false, true, true, false, false),
-          Chara (false, true, false, false, true, true, false, false),
+          Chara (true, false, true, false, true, true, false, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (true, true, true, false, true, true, false, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (true, false, true, false, false, true, true, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (false, true, true, false, true, true, false, false),
           Chara (true, false, false, true, true, true, false, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (true, true, false, false, true, true, false, false),
+          Chara (false, false, false, true, true, true, false, false),
+          Chara (true, true, false, false, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (false, false, false, true, true, true, false, false),
+          Chara (false, false, true, false, false, true, true, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (true, false, true, false, false, true, true, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (false, false, true, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (false, false, false, true, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (true, false, false, false, true, true, false, false),
+          Chara (true, false, false, true, true, true, false, false),
+          Chara (true, false, true, false, true, true, false, false),
+          Chara (false, true, true, false, true, true, false, false),
+          Chara (false, true, false, false, true, true, false, false),
+          Chara (true, true, false, false, false, true, true, false),
+          Chara (false, true, true, false, false, true, true, false),
+          Chara (true, false, true, false, false, true, true, false),
+          Chara (false, false, true, false, false, true, true, false),
+          Chara (false, false, false, false, true, true, false, false),
+          Chara (false, false, false, true, true, true, false, false),
+          Chara (true, false, true, false, true, true, false, false),
+          Chara (false, true, false, false, true, true, false, false),
+          Chara (true, true, true, false, true, true, false, false),
+          Chara (false, true, false, false, false, true, true, false),
+          Chara (true, false, false, false, false, true, true, false),
+          Chara (true, true, false, false, true, true, false, false),
+          Chara (false, false, true, false, true, true, false, false),
+          Chara (false, false, true, false, false, true, true, false),
           Chara (false, true, true, false, true, true, false, false),
           Chara (false, true, false, false, false, true, true, false),
-          Chara (false, false, false, false, true, true, false, false),
-          Chara (false, true, true, false, false, true, true, false),
-          Chara (false, true, false, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
           Chara (false, false, false, true, true, true, false, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (false, false, false, true, true, true, false, false),
-          Chara (true, true, false, false, false, true, true, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (true, false, true, false, true, true, false, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, false, true, false, false, true, true, false),
-          Chara (true, true, true, false, true, true, false, false),
-          Chara (false, true, true, false, true, true, false, false),
-          Chara (true, false, false, false, true, true, false, false),
-          Chara (false, false, false, false, true, true, false, false)]])
+          Chara (true, true, true, false, true, true, false, false)]])
     x;
 
 end; (*struct OIP_Wire_Oracle_V061*)

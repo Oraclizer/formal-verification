@@ -62,6 +62,27 @@ lemma response_v061_preflight_verifies_the_exact_original_before_signing:
   by (auto simp: response_v061_original_preflight_def response_fixed_original_signature_def
       code_original_signature_refusal_def Let_def split: if_splits option.splits sum.splits)
 
+definition response_v061_signing_scope where
+  "response_v061_signing_scope core \<longleftrightarrow>
+    (case response_result_words (wire_words (wire_operation_body core)) of None \<Rightarrow> False
+     | Some (caller,kind,number,position) \<Rightarrow> \<not> sync_added_status number \<or>
+       (case sync_single_original core of None \<Rightarrow> False | Some original \<Rightarrow>
+          if sync_operation original = (Wire_Query,8) then
+            (case sync_single_original original of None \<Rightarrow> False | Some call \<Rightarrow>
+              sync_operation call = (Wire_State_Sync,7))
+          else sync_operation original = (Wire_State_Sync,7)))"
+
+lemma response_v061_signer_scope_uses_the_decoded_call:
+  assumes words: "response_result_words (wire_words (wire_operation_body core)) = Some (caller,kind,number,position)"
+    and original: "sync_single_original core = Some enclosed"
+  shows "\<not> sync_added_status number \<Longrightarrow> response_v061_signing_scope core"
+    "sync_added_status number \<Longrightarrow> sync_operation enclosed \<noteq> (Wire_Query,8) \<Longrightarrow>
+      response_v061_signing_scope core = (sync_operation enclosed = (Wire_State_Sync,7))"
+    "sync_added_status number \<Longrightarrow> sync_operation enclosed = (Wire_Query,8) \<Longrightarrow>
+      sync_single_original enclosed = Some inner \<Longrightarrow>
+      response_v061_signing_scope core = (sync_operation inner = (Wire_State_Sync,7))"
+  using words original by (simp_all add: response_v061_signing_scope_def)
+
 definition response_v061_signable where
   "response_v061_signable config v061_now core \<longleftrightarrow>
     wire_sent_seconds core \<le> v061_now \<and> wire_sent_seconds core + response_config_ttl config < 2^64 \<and>
@@ -73,7 +94,8 @@ definition response_v061_signable where
     wire_authority_epoch core = response_config_epoch config \<and> wire_route_scope core = response_config_route config \<and>
     wire_ttl_seconds core = response_config_ttl config \<and> wire_signature_scheme core = 1 \<and>
     response_v061_operand (response_config_max_nesting config) core =
-      Inr (Response_V061_Legacy_Operand Code_Nested_Response)"
+      Inr (Response_V061_Legacy_Operand Code_Nested_Response) \<and>
+    response_v061_signing_scope core"
 
 definition response_v061_sign_guard where
   "response_v061_sign_guard context preimage =
@@ -84,7 +106,8 @@ definition response_v061_sign_guard where
 lemma response_v061_signable_keeps_all_existing_getter_checks:
   assumes "(response_v061_operand (response_config_max_nesting config) core = Inr (Response_V061_Legacy_Operand Code_Nested_Response)) =
     (code_decode_operand_tree (response_config_max_nesting config) core = Code_Tree_Ready Code_Nested_Response)"
-  shows "response_v061_signable config v061_now core = response_fixed_signable config v061_now core"
+  shows "response_v061_signable config v061_now core =
+    (response_fixed_signable config v061_now core \<and> response_v061_signing_scope core)"
   using assms by (simp add: response_v061_signable_def response_fixed_signable_def)
 
 definition response_v061_encoding_refused where
@@ -117,7 +140,9 @@ definition response_v061_encode where
                            parsed (response_fixed_post_boundary channel parameters frame_limit) of
                           Some reason \<Rightarrow> response_v061_encoding_refused reason
                         | None \<Rightarrow> case response_v061_validate 2 original parsed of Inl reason \<Rightarrow> response_v061_encoding_refused reason
-                          | Inr (verified,status) \<Rightarrow> Inr \<lparr>response_emission_bytes = encoded,response_emission_packet = parsed,
+                          | Inr (verified,status) \<Rightarrow>
+                            if status \<noteq> Some (Code_Known_Response kind number) then response_v061_encoding_refused Invalid_Wire_Format
+                            else Inr \<lparr>response_emission_bytes = encoded,response_emission_packet = parsed,
                               response_emission_original = original,response_emission_converted = (call,kind,number,position),
                               response_emission_verified = verified,response_emission_parameters = parameters,
                               response_emission_binding_preimage = binding_message,response_emission_signing_preimage = preimage\<rparr>))"
@@ -140,8 +165,40 @@ lemma response_v061_encoding_projects_the_exact_preimages_and_packet:
         (response_emission_signing_preimage emission)\<rparr> = Some (response_emission_bytes emission)"
     "sync_decode_packet (response_emission_bytes emission) = Some (response_emission_packet emission)"
     "response_v061_validate 2 original (response_emission_packet emission) = Inr (response_emission_verified emission,status)"
+    "status = Some (Code_Known_Response kind number)"
   using assms by (auto simp: response_v061_encode_def response_v061_encoding_refused_def Let_def
     split: option.splits sum.splits prod.splits if_splits)
+
+lemma response_v061_sender_keeps_sync_codes_in_their_assigned_scope:
+  assumes encoded: "response_v061_encode hash v061_sign verify context selected_mode original call result = Inr emission"
+    and emitted: "response_emission_converted emission = (call,kind,number,position)"
+    and assigned: "sync_added_status number"
+  shows "sync_operation original = (Wire_State_Sync,7)"
+proof (rule ccontr)
+  assume outside: "\<not> sync_operation original = (Wire_State_Sync,7)"
+  obtain out_kind out_number out_position status where
+    converted: "response_emission_converted emission = (call,out_kind,out_number,out_position)"
+    and validated: "response_v061_validate 2 original (response_emission_packet emission) =
+      Inr (response_emission_verified emission,status)"
+    and status: "status = Some (Code_Known_Response out_kind out_number)"
+    by (rule response_v061_encoding_projects_the_exact_preimages_and_packet[OF encoded]) blast
+  have known: "status = Some (Code_Known_Response kind number)"
+    using emitted converted status by simp
+  obtain view decoded where
+    "response_v061_parse False 2 (packet_core (response_emission_packet emission)) = Inr view"
+    "response_v061_operand 1 original = Inr decoded"
+    "response_decoded_original_bytes view = encode_wire_core original"
+    "response_v061_caller decoded = Inr (response_decoded_id view)"
+    "response_emission_verified emission = response_v061_result_of_view view"
+    and projection: "response_v061_status original (response_decoded_kind view)
+      (response_decoded_number view) (response_decoded_position view) = status"
+    by (rule response_v061_validated_result_keeps_exact_bytes_and_status[OF validated]) blast
+  have "code_known_response_number number"
+    using projection known
+    by (auto simp: response_v061_legacy_status_preserves_the_old_known_and_unknown_value[OF outside]
+      code_decode_response_status_def split: if_splits)
+  with sync_added_status_is_legacy_unknown[OF assigned] show False by contradiction
+qed
 
 definition response_v061_admit where
   "response_v061_admit curve_verify channel current expected bytes =
@@ -168,8 +225,10 @@ lemma response_v061_admission_uses_the_current_client_verifier_and_exact_packet:
 
 ML_val \<open>
   if null (Thm_Deps.all_oracles @{thms response_v061_original_preflight_keeps_old_configured_operations
-    response_v061_preflight_verifies_the_exact_original_before_signing response_v061_signable_keeps_all_existing_getter_checks
+    response_v061_preflight_verifies_the_exact_original_before_signing response_v061_signer_scope_uses_the_decoded_call
+    response_v061_signable_keeps_all_existing_getter_checks
     response_v061_encoding_projects_the_exact_preimages_and_packet
+    response_v061_sender_keeps_sync_codes_in_their_assigned_scope
     response_v061_admission_uses_the_current_client_verifier_and_exact_packet})
   then () else error "Unexpected oracle in the v0.6.1 signed packet boundary"
 \<close>

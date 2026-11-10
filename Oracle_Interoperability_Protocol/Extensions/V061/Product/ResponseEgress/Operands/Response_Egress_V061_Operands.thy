@@ -23,16 +23,27 @@ fun response_v061_caller where
 | "response_v061_caller (Response_V061_Receipt original) = Inl Invalid_Wire_Format"
 | "response_v061_caller Response_V061_Current = Inl Invalid_Wire_Format"
 
+fun response_v061_is_sync_call :: "response_v061_nested \<Rightarrow> bool" where
+  "response_v061_is_sync_call (Response_V061_Sync_Operand request) = True"
+| "response_v061_is_sync_call (Response_V061_Receipt original) = (sync_operation original = (Wire_State_Sync,7))"
+| "response_v061_is_sync_call _ = False"
+
 definition response_v061_status where
   "response_v061_status original kind number position =
-    (let committed = (position \<noteq> None) in
-     case response_extended_status sync_response_allocations kind number committed of
-       None \<Rightarrow> None
-     | Some (Code_Unknown_Response category raw) \<Rightarrow> Some (Code_Unknown_Response category raw)
-     | Some (Code_Known_Response category known) \<Rightarrow>
-         if response_extended_compatible sync_response_allocations [sync_response_operation]
-             (wire_message_family original) (wire_opcode (wire_operation_body original)) kind number committed
-         then Some (Code_Known_Response category known) else None)"
+    (let committed = (position \<noteq> None);
+         family = wire_message_family original;
+         operation = wire_opcode (wire_operation_body original)
+     in if sync_operation original = (Wire_State_Sync,7) then
+       (case response_extended_status sync_response_allocations kind number committed of
+          None \<Rightarrow> None
+        | Some (Code_Unknown_Response category raw) \<Rightarrow> Some (Code_Unknown_Response category raw)
+        | Some (Code_Known_Response category known) \<Rightarrow>
+            if response_extended_compatible sync_response_allocations [sync_response_operation]
+                family operation kind number committed
+            then Some (Code_Known_Response category known) else None)
+     else if code_known_response_number number \<and>
+         \<not> reference_response_compatible family operation kind number committed
+     then None else code_decode_response_status kind number committed)"
 
 definition response_v061_check_enclosed where
   "response_v061_check_enclosed check_status original decoded v061_caller kind number position =
@@ -40,9 +51,7 @@ definition response_v061_check_enclosed where
        Response_V061_Sync_Operand request \<Rightarrow>
          if v061_caller \<noteq> sync_call request \<or> (check_status \<and> response_v061_status original kind number position = None)
          then Some Invalid_Wire_Format else None
-     | Response_V061_Legacy_Operand legacy \<Rightarrow>
-         (case code_check_nested_response original legacy v061_caller position of Some refusal \<Rightarrow> Some refusal
-          | None \<Rightarrow> if check_status \<and> sync_added_status number then Some Invalid_Wire_Format else None)
+     | Response_V061_Legacy_Operand legacy \<Rightarrow> code_check_nested_response original legacy v061_caller position
      | _ \<Rightarrow> Some Invalid_Wire_Format)"
 
 definition response_v061_finish_parse where
@@ -50,7 +59,7 @@ definition response_v061_finish_parse where
     (case response_result_words (wire_words (wire_operation_body outer)) of None \<Rightarrow> Inl Invalid_Wire_Format
      | Some (v061_caller,kind,number,position) \<Rightarrow>
        if (kind \<noteq> Recorded_Result \<and> position \<noteq> None) \<or>
-          (check_status \<and> sync_added_status number \<and>
+          (check_status \<and> response_v061_is_sync_call decoded \<and> sync_added_status number \<and>
             (kind \<noteq> Recorded_Result \<or> (position \<noteq> None) \<noteq> (number = 29)))
        then Inl Invalid_Wire_Format
        else if \<not> sync_link_response_header outer nested v061_caller then Inl Invalid_Wire_Source
@@ -121,14 +130,79 @@ definition response_v061_validate where
            | Some status \<Rightarrow> Inr (response_v061_result_of_view view,Some status))))"
 
 lemma response_v061_status_uses_the_checked_sync_allocation:
-  assumes "sync_added_status number"
+  assumes "sync_operation original = (Wire_State_Sync,7)" "sync_added_status number"
   shows "response_v061_status original kind number position =
-    (if sync_operation original = (Wire_State_Sync,7) \<and> kind = Recorded_Result \<and>
-       (position \<noteq> None) = (number = 29)
+    (if kind = Recorded_Result \<and> (position \<noteq> None) = (number = 29)
      then Some (Code_Known_Response Recorded_Result number) else None)"
   using assms by (simp add: response_v061_status_def Let_def sync_added_status_def sync_operation_def
     response_extended_status_def response_extended_compatible_def sync_response_lookup_is_exact
     sync_response_operation_def)
+
+lemma response_v061_legacy_status_preserves_the_old_known_and_unknown_value:
+  assumes "sync_operation original \<noteq> (Wire_State_Sync,7)"
+  shows "response_v061_status original kind number position =
+    (if code_known_response_number number \<and>
+        \<not> reference_response_compatible (wire_message_family original) (wire_opcode (wire_operation_body original))
+          kind number (position \<noteq> None)
+     then None else code_decode_response_status kind number (position \<noteq> None))"
+  using assms by (simp add: response_v061_status_def Let_def)
+
+lemma response_v061_the_new_numbers_are_unknown_for_legacy_calls:
+  assumes "sync_operation original \<noteq> (Wire_State_Sync,7)" "sync_added_status number"
+  shows "response_v061_status original kind number position =
+    (if kind = Recorded_Result \<or> position = None
+     then Some (Code_Unknown_Response kind number) else None)"
+proof -
+  have unknown: "\<not> code_known_response_number number"
+    by (rule sync_added_status_is_legacy_unknown[OF assms(2)])
+  have legacy: "response_v061_status original kind number position =
+      code_decode_response_status kind number (position \<noteq> None)"
+    using unknown
+    by (simp add: response_v061_legacy_status_preserves_the_old_known_and_unknown_value[OF assms(1)])
+  have decoded: "code_decode_response_status kind number (position \<noteq> None) =
+      (if kind = Recorded_Result \<or> position = None
+       then Some (Code_Unknown_Response kind number) else None)"
+    by (simp add: sync_raw_legacy_status_classification_remains_available[OF assms(2)])
+  show ?thesis by (rule trans[OF legacy decoded])
+qed
+
+lemma response_v061_legacy_leaf_uses_the_old_operand_tree:
+  assumes "sync_operation core \<notin> {(Wire_State_Sync,7),(Wire_Query,9),(Wire_Query,8),(Wire_Ack,2)}"
+  shows "response_v061_operand fuel core =
+    (case code_decode_operand_tree fuel core of Code_Tree_Refused reason \<Rightarrow> Inl reason
+     | Code_Tree_Pending \<Rightarrow> Inl Invalid_Wire_Format
+     | Code_Tree_Ready decoded \<Rightarrow> Inr (Response_V061_Legacy_Operand decoded))"
+proof (cases fuel)
+  case 0
+  then show ?thesis by simp
+next
+  case (Suc depth)
+  have stable: "code_decode_operand_tree (Suc depth) core = code_decode_operand_tree 1 core"
+    using assms by (cases "wire_message_family core") (simp_all add: Let_def One_nat_def sync_operation_def)
+  have legacy: "response_v061_operand (Suc depth) core =
+      map_sum id Response_V061_Legacy_Operand (response_fixed_expected_decode core)"
+    using assms by (simp add: Let_def)
+  show ?thesis
+    unfolding Suc legacy stable response_fixed_expected_decode_def
+    by (cases "code_decode_operand_tree 1 core") simp_all
+qed
+
+lemma response_v061_parse_preserves_direct_legacy_original:
+  assumes outer: "sync_operation core = (Wire_Ack,2)"
+    and blob: "wire_blobs (wire_operation_body core) = [raw]"
+    and original: "decode_wire_core raw = Some nested"
+    and leaf: "sync_operation nested \<notin> {(Wire_State_Sync,7),(Wire_Query,9),(Wire_Query,8),(Wire_Ack,2)}"
+  shows "response_v061_parse check_status (Suc fuel) core = response_fixed_parse_response fuel core"
+proof -
+  have decoded: "sync_decode_core raw = Some nested"
+    by (rule sync_preserves_every_decoded_legacy_core[OF original])
+  show ?thesis
+    using outer by (cases "code_decode_operand_tree fuel nested")
+      (auto simp: response_v061_parse_def response_v061_parse_layer_def response_fixed_parse_response_def
+        response_v061_finish_parse_def response_v061_check_enclosed_def sync_link_response_header_def
+        response_v061_legacy_leaf_uses_the_old_operand_tree[OF leaf] decoded original blob sync_operation_def
+        Let_def split: option.splits prod.splits if_splits)
+qed
 
 lemma response_v061_sync_caller_comes_from_the_original:
   assumes "sync_operation core = (Wire_State_Sync,7)"
@@ -168,6 +242,9 @@ lemma response_v061_validated_result_keeps_exact_bytes_and_status:
 
 ML_val \<open>
   if null (Thm_Deps.all_oracles @{thms response_v061_status_uses_the_checked_sync_allocation
+      response_v061_legacy_status_preserves_the_old_known_and_unknown_value
+      response_v061_the_new_numbers_are_unknown_for_legacy_calls
+      response_v061_legacy_leaf_uses_the_old_operand_tree response_v061_parse_preserves_direct_legacy_original
       response_v061_sync_caller_comes_from_the_original response_v061_leaf_keeps_its_decoded_legacy_caller
       response_v061_exact_bytes_precede_status response_v061_validated_result_keeps_exact_bytes_and_status})
   then () else error "Unexpected oracle in the v0.6.1 response operand boundary"

@@ -38,10 +38,12 @@ definition sync_link_response_header where
 
 definition sync_link_response_status where
   "sync_link_response_status view =
-    (let kind = sync_link_kind view; code = sync_link_code view; committed = (sync_link_commit view \<noteq> None)
-     in if \<not> sync_known_response_compatible (sync_link_call_core (sync_link_original_view view)) kind code committed
+    (let original = sync_link_call_core (sync_link_original_view view);
+         kind = sync_link_kind view; code = sync_link_code view; committed = (sync_link_commit view \<noteq> None)
+     in if \<not> sync_known_response_compatible original kind code committed
         then None
-        else if sync_added_status code then Some (Code_Known_Response kind code)
+        else if sync_operation original = (Wire_State_Sync,7) \<and> sync_added_status code
+        then Some (Code_Known_Response kind code)
         else code_decode_response_status kind code committed)"
 
 definition sync_link_finish_parse where
@@ -51,7 +53,8 @@ definition sync_link_finish_parse where
          view = \<lparr>sync_link_exact_original = raw, sync_link_original_view = original, sync_link_id = caller,
            sync_link_kind = kind, sync_link_code = code, sync_link_commit = commit\<rparr>
      in if (kind \<noteq> Recorded_Result \<and> committed) \<or>
-           (raw_status \<and> sync_added_status code \<and> (kind \<noteq> Recorded_Result \<or> committed \<noteq> (code = 29)))
+           (raw_status \<and> sync_operation inner = (Wire_State_Sync,7) \<and> sync_added_status code \<and>
+             (kind \<noteq> Recorded_Result \<or> committed \<noteq> (code = 29)))
         then Inl Invalid_Wire_Format
         else if \<not> sync_link_response_header outer enclosed caller then Inl Invalid_Wire_Source
         else if enclosed \<noteq> inner \<and> \<not> code_same_original enclosed inner then Inl Invalid_Wire_Source
@@ -97,6 +100,38 @@ definition sync_link_admit_signed where
             packet (scope\<lparr>boundary_profile := response_channel_profile channel\<rparr>) of Some reason \<Rightarrow> Inl reason
           | None \<Rightarrow> sync_link_validate_signed (response_client_max_nesting current) expected (packet_core packet)))"
 
+lemma sync_link_original_at_uses_the_effective_sync_operation:
+  assumes "sync_link_original_at fuel enclosed = Some original"
+  shows "sync_operation (sync_link_call_core original) = (Wire_State_Sync,7)"
+proof -
+  have read_sync: "\<And>core request. sync_read_operands core = Some request \<Longrightarrow>
+      sync_operation core = (Wire_State_Sync,7)"
+    by (auto simp: sync_read_operands_def sync_operation_def Let_def split: if_splits)
+  show ?thesis using assms
+  proof (cases "sync_read_operands enclosed")
+    case None
+    with assms obtain receipt where "sync_parse_query_eight (fuel - 1) enclosed = Some receipt"
+      "sync_link_call_core original = sync_receipt_inner receipt"
+      by (auto simp: sync_link_original_at_def split: if_splits option.splits)
+    then show ?thesis
+      using sync_query_eight_keeps_one_canonical_inner_call(4) read_sync by metis
+  next
+    case (Some request)
+    with assms show ?thesis
+      by (auto simp: sync_link_original_at_def split: if_splits dest: read_sync)
+  qed
+qed
+
+lemma sync_link_uses_the_fixed_status_for_the_decoded_sync_call:
+  assumes "sync_link_original_at fuel enclosed = Some (sync_link_original_view view)"
+    "sync_added_status (sync_link_code view)"
+  shows "sync_link_response_status view =
+    (if sync_link_kind view = Recorded_Result \<and>
+       (sync_link_commit view \<noteq> None) = (sync_link_code view = 29)
+     then Some (Code_Known_Response Recorded_Result (sync_link_code view)) else None)"
+  using assms(2) sync_link_original_at_uses_the_effective_sync_operation[OF assms(1)]
+  by (simp add: sync_link_response_status_def sync_known_response_compatible_def Let_def)
+
 lemma sync_link_raw_status_uses_the_effective_call:
   assumes "sync_link_finish_parse True outer raw original caller kind code commit = Inr view"
   shows "sync_link_response_status view \<noteq> None"
@@ -127,7 +162,8 @@ lemma sync_link_signed_matching_original_reaches_status:
   using assms by (simp add: sync_link_validate_signed_def)
 
 ML_val \<open>
-  if null (Thm_Deps.all_oracles @{thms sync_link_raw_status_uses_the_effective_call
+  if null (Thm_Deps.all_oracles @{thms sync_link_original_at_uses_the_effective_sync_operation
+    sync_link_uses_the_fixed_status_for_the_decoded_sync_call sync_link_raw_status_uses_the_effective_call
     sync_link_signed_conflict_precedes_status sync_link_signed_expected_decode_precedes_exact_bytes
     sync_link_signed_matching_original_reaches_status})
   then () else error "Unexpected oracle in the Sync ACK comparison"

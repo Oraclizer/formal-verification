@@ -51,29 +51,6 @@ definition sync_ack_wire_ir where
     (case sync_link_parse_ack True depth core of Inl refusal \<Rightarrow> Inl refusal
      | Inr view \<Rightarrow> Inr (sync_ack_operand_ir view))"
 
-definition sync_legacy_ack_new_number where
-  "sync_legacy_ack_new_number depth core =
-    (if depth \<le> 1 \<or> wire_deadline (wire_operation_body core) \<noteq> Deadline_Absent
-     then Code_Operand_Refuse Invalid_Wire_Format
-     else case sync_single_original core of None \<Rightarrow> Code_Operand_Refuse Invalid_Wire_Format
-      | Some original \<Rightarrow> (case code_decode_operand_tree (depth - 1) original of
-          Code_Tree_Refused refusal \<Rightarrow> Code_Operand_Refuse refusal
-        | Code_Tree_Pending \<Rightarrow> Code_Operand_Pending
-        | Code_Tree_Ready decoded \<Rightarrow>
-            (case response_result_words (wire_words (wire_operation_body core)) of None \<Rightarrow> Code_Operand_Refuse Invalid_Wire_Format
-             | Some (caller,kind,code,position) \<Rightarrow>
-               if kind \<noteq> Recorded_Result \<or> (position \<noteq> None) \<noteq> (code = 29)
-               then Code_Operand_Refuse Invalid_Wire_Format
-               else case code_response_tree_finish core original decoded of
-                 Code_Tree_Refused refusal \<Rightarrow> Code_Operand_Refuse refusal
-               | Code_Tree_Pending \<Rightarrow> Code_Operand_Pending
-               | Code_Tree_Ready value \<Rightarrow> Code_Operand_Refuse Invalid_Wire_Format)))"
-
-definition sync_ack_uses_added_number where
-  "sync_ack_uses_added_number core \<longleftrightarrow>
-    (case response_result_words (wire_words (wire_operation_body core)) of
-      Some (caller,kind,code,position) \<Rightarrow> sync_added_status code | None \<Rightarrow> False)"
-
 definition sync_selected_nested_ir where
   "sync_selected_nested_ir depth core =
     (if sync_operation core = (Wire_Query,8) \<and> sync_direct_added_original core
@@ -87,18 +64,13 @@ definition sync_v061_full_operand_verdict where
     (case sync_selected_nested_ir depth core of
        Some (Inl refusal) \<Rightarrow> Code_Operand_Refuse refusal
      | Some (Inr typed) \<Rightarrow> Code_Operand_Accept
-     | None \<Rightarrow>
-        if sync_operation core = (Wire_Ack,2) \<and> sync_ack_uses_added_number core
-        then sync_legacy_ack_new_number depth core
-        else sync_v061_operand_verdict core depth)"
+     | None \<Rightarrow> sync_v061_operand_verdict core depth)"
 
 definition sync_v061_full_operand_ir where
   "sync_v061_full_operand_ir depth core =
     (case sync_selected_nested_ir depth core of Some (Inl refusal) \<Rightarrow> None
      | Some (Inr typed) \<Rightarrow> Some typed
-     | None \<Rightarrow>
-        if sync_operation core = (Wire_Ack,2) \<and> sync_ack_uses_added_number core then None
-        else sync_v061_operand_ir depth core)"
+     | None \<Rightarrow> sync_v061_operand_ir depth core)"
 
 lemma sync_nested_typed_success_is_from_the_same_wire_parse:
   assumes "sync_selected_nested_ir depth core = Some (Inr typed)"
@@ -112,10 +84,57 @@ lemma sync_nested_typed_refusal_has_no_value:
     "sync_v061_full_operand_verdict core depth = Code_Operand_Refuse refusal"
   using assms by (simp_all add: sync_v061_full_operand_ir_def sync_v061_full_operand_verdict_def)
 
-lemma sync_legacy_ack_cannot_borrow_an_added_sync_status:
-  "sync_legacy_ack_new_number depth core \<noteq> Code_Operand_Accept"
-  by (auto simp: sync_legacy_ack_new_number_def
-      split: option.splits prod.splits code_operand_tree_result.splits if_splits)
+lemma sync_a_legacy_decoded_core_is_not_an_added_operation:
+  assumes "decode_wire_core raw = Some core"
+  shows "\<not> sync_added_operation core"
+proof
+  assume added: "sync_added_operation core"
+  have "wire_core_wellformed core"
+    using accepted_core_bytes_preserve_all_original_fields[OF assms] by blast
+  with sync_added_operation_is_outside_the_previous_family[OF added] show False
+    by (simp add: wire_core_wellformed_def)
+qed
+
+lemma sync_typed_ack_preserves_legacy_originals:
+  assumes ack: "sync_operation core = (Wire_Ack,2)"
+    and enclosed: "wire_blobs (wire_operation_body core) = [raw]"
+      "decode_wire_core raw = Some original"
+    and receipt: "sync_operation original = (Wire_Query,8) \<Longrightarrow>
+       \<exists>inner_raw inner. wire_blobs (wire_operation_body original) = [inner_raw] \<and>
+         decode_wire_core inner_raw = Some inner"
+  shows "sync_v061_full_operand_verdict core depth = code_transport_operand_verdict core depth"
+    "sync_v061_full_operand_ir depth core = code_typed_operand_ir depth core"
+proof -
+  have original: "sync_single_original core = Some original"
+    using enclosed sync_preserves_every_decoded_legacy_core[OF enclosed(2)]
+    by (simp add: sync_single_original_def)
+  have non_sync: "\<not> sync_ack_has_added_original core"
+  proof (cases "sync_operation original = (Wire_Query,8)")
+    case True
+    from receipt[OF True] obtain inner_raw inner where inner:
+      "wire_blobs (wire_operation_body original) = [inner_raw]"
+      "decode_wire_core inner_raw = Some inner" by blast
+    have decoded: "sync_single_original original = Some inner"
+      using inner sync_preserves_every_decoded_legacy_core[OF inner(2)]
+      by (simp add: sync_single_original_def)
+    show ?thesis
+      using original True sync_a_legacy_decoded_core_is_not_an_added_operation[OF enclosed(2)]
+        sync_a_legacy_decoded_core_is_not_an_added_operation[OF inner(2)]
+      by (simp add: sync_ack_has_added_original_def sync_direct_added_original_def decoded)
+  next
+    case False
+    with original sync_a_legacy_decoded_core_is_not_an_added_operation[OF enclosed(2)]
+    show ?thesis by (simp add: sync_ack_has_added_original_def)
+  qed
+  have selected: "sync_selected_nested_ir depth core = None"
+    using ack non_sync by (simp add: sync_selected_nested_ir_def)
+  show "sync_v061_full_operand_verdict core depth = code_transport_operand_verdict core depth"
+    using ack by (simp add: sync_v061_full_operand_verdict_def sync_v061_operand_verdict_def
+      sync_added_operation_def selected)
+  show "sync_v061_full_operand_ir depth core = code_typed_operand_ir depth core"
+    using ack by (simp add: sync_v061_full_operand_ir_def sync_v061_operand_ir_def
+      sync_added_operation_def selected)
+qed
 
 definition sync_v061_nested_transport_flat where
   "sync_v061_nested_transport_flat =
@@ -123,7 +142,8 @@ definition sync_v061_nested_transport_flat where
 
 ML_val \<open>
   if null (Thm_Deps.all_oracles @{thms sync_nested_typed_success_is_from_the_same_wire_parse
-      sync_nested_typed_refusal_has_no_value sync_legacy_ack_cannot_borrow_an_added_sync_status})
+      sync_nested_typed_refusal_has_no_value sync_a_legacy_decoded_core_is_not_an_added_operation
+      sync_typed_ack_preserves_legacy_originals})
   then () else error "Unexpected oracle in the synchronization nested typed projection"
 \<close>
 
