@@ -650,7 +650,7 @@
     {
       "path": "Extensions/V061/Product/ResponseEgress/CurrentArtifact/Response_Egress_V061_Export.thy",
       "bytes": 1622,
-      "sha256": "af26e37f1e15592e0945ecf777133b68b0712a51924d83606db7df5d491ff6ea"
+      "sha256": "b48c388adccb4fde27ba8ee332bd75f489fbf6a385f67a9044b97e3695e29877"
     },
     {
       "path": "Extensions/V061/Product/ResponseEgress/Operands/Response_Egress_V061_Operands.thy",
@@ -710,7 +710,7 @@
     {
       "path": "Extensions/V061/Product/SyncCommitment/CurrentArtifact/Sync_V061_Typed_Identity.thy",
       "bytes": 1340,
-      "sha256": "b18219eb5a23ac06da3d63fde3a508c99897e9cca81f5820027ed4652d34c844"
+      "sha256": "7526857390d128b144f223b7323b7b5d0ebaf9152116f29834a37bab4987f433"
     },
     {
       "path": "Extensions/V061/Product/SyncCommitment/Definitions/Sync_V061_Attestation_Model.thy",
