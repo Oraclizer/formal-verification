@@ -463,7 +463,7 @@ if (!banner.test(readme)) {
 for (const [path, viewBox] of [
   ["docs/assets/formal-verification-banner.svg", "0 0 1200 300"],
   ["docs/assets/formal-verification-banner-medium.svg", "0 0 960 244"],
-  ["docs/assets/formal-verification-banner-mobile.svg", "0 0 640 232"],
+  ["docs/assets/formal-verification-banner-mobile.svg", "0 0 640 256"],
 ]) {
   let text;
   try {
