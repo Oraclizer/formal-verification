@@ -70,6 +70,8 @@ const required = [
   "Protected_Behavior_Obstructions/Protected_Stochastic_Morphism.thy",
   "Protected_Behavior_Obstructions/Protected_Obstruction_Examples.thy",
   "docs/assets/formal-verification-banner.svg",
+  "docs/assets/formal-verification-banner-medium.svg",
+  "docs/assets/formal-verification-banner-mobile.svg",
   "docs/assets/theory-architecture.svg",
   ".github/PULL_REQUEST_TEMPLATE.md",
   ".github/dependabot.yml",
@@ -442,6 +444,40 @@ for (const marker of [
   "## License and disclaimer",
 ]) {
   if (!readme.includes(marker)) failures.push(`README missing required marker: ${marker}`);
+}
+
+// The README banner comes in three widths, chosen by the width of the README
+// column that GitHub gives the image (the window width minus the page frame):
+// the phone banner below a 440px column, the medium banner below 680px and the
+// desktop banner above. The media queries write those column bands as window
+// widths. Measured on GitHub on 2026-11-10, the column is 66px narrower than
+// the window below 544px, 98px narrower from 544px to 767px, 362px narrower
+// from 768px to 1011px, 442px narrower from 1012px to 1279px, and 838px wide
+// from 1280px. The first matching source wins, so the medium query only needs
+// its upper bound.
+const banner =
+  /<picture>\s*<source media="\(max-width: 505px\), \(min-width: 768px\) and \(max-width: 801px\)" srcset="docs\/assets\/formal-verification-banner-mobile\.svg">\s*<source media="\(max-width: 1121px\)" srcset="docs\/assets\/formal-verification-banner-medium\.svg">\s*<img src="docs\/assets\/formal-verification-banner\.svg" alt="[^"]+" width="\d+">\s*<\/picture>/;
+if (!banner.test(readme)) {
+  failures.push("README banner must be a <picture> with the phone and medium sources for 440px and 680px README columns and the desktop image");
+}
+for (const [path, viewBox] of [
+  ["docs/assets/formal-verification-banner.svg", "0 0 1200 300"],
+  ["docs/assets/formal-verification-banner-medium.svg", "0 0 960 244"],
+  ["docs/assets/formal-verification-banner-mobile.svg", "0 0 640 232"],
+]) {
+  let text;
+  try {
+    text = readFileSync(resolve(root, path), "utf8");
+  } catch {
+    continue; // reported above as a missing required file
+  }
+  if (!text.includes(`viewBox="${viewBox}"`)) failures.push(`banner canvas must be ${viewBox}: ${path}`);
+  for (const [name, pattern] of [["title", /<title[\s>]/], ["desc", /<desc[\s>]/], ['role="img"', /\brole="img"/]]) {
+    if (!pattern.test(text)) failures.push(`banner SVG missing ${name}: ${path}`);
+  }
+  // Banner letters are drawn as outlines, so every device shows the same type
+  // instead of a fallback font.
+  if (/<text[\s>]/.test(text)) failures.push(`banner text must be drawn as outlines: ${path}`);
 }
 
 for (const [path, marker] of [

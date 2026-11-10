@@ -1,6 +1,7 @@
 <div align="center">
   <picture>
-    <source media="(max-width: 900px)" srcset="docs/assets/formal-verification-banner-mobile.svg">
+    <source media="(max-width: 505px), (min-width: 768px) and (max-width: 801px)" srcset="docs/assets/formal-verification-banner-mobile.svg">
+    <source media="(max-width: 1121px)" srcset="docs/assets/formal-verification-banner-medium.svg">
     <img src="docs/assets/formal-verification-banner.svg" alt="Oraclizer Formal Verification artifacts in Isabelle/HOL" width="860">
   </picture>
 
