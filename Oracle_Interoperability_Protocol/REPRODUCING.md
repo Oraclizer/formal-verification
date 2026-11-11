@@ -71,10 +71,11 @@ dependency instructions as the repository proof lane.
 "$ISABELLE" build -b -j 1 -o threads=1 -o parallel_proofs=0 \
   -o document=false -o quick_and_dirty=false -o skip_proofs=false -o timeout_build=false \
   -d "$AFP_ENTRY" -d . \
-  OIP_Record_Reopening OIP_Recovery_Boundary OIP_Sync_V061_Typed_Artifact OIP_Response_Egress_V061_Export
+  OIP_Record_Reopening OIP_Recovery_Boundary OIP_Sync_V061_Typed_Artifact OIP_Response_Egress_V061_Export \
+  OIP_Threshold_Raw_Identity
 ```
 
-The four targets build the two recovery boundaries, the two export sessions
+The five targets build the two recovery boundaries, the three export sessions
 and their dependencies from ROOT. `build -n` prints the build plan. The
 repository Proofs workflow selects the affected sessions and their downstream
 consumers and checks each selected result.
@@ -97,19 +98,25 @@ grep -Fx 'OIP_Sync_V061_Typed_Artifact.Sync_V061_Typed_Identity:code/oip_wire_va
 grep -Fx 'OIP_Response_Egress_V061_Export.Response_Egress_V061_Export:code/oip_wire_response_full_v061.ML' "$OUT/full-exports.txt"
 "$ISABELLE" export -n -d "$AFP_ENTRY" -d . -O "$OUT/full" -p 1 \
   -x 'OIP_Response_Egress_V061_Export.Response_Egress_V061_Export:code/oip_wire_response_full_v061.ML' OIP_Response_Egress_V061_Export
+
+"$ISABELLE" export -n -l -d "$AFP_ENTRY" -d . OIP_Threshold_Raw_Identity > "$OUT/threshold-exports.txt"
+grep -Fx 'OIP_Threshold_Raw_Identity.Threshold_Raw_Identity:code/oip_threshold_raw_abi.ML' "$OUT/threshold-exports.txt"
+"$ISABELLE" export -n -d "$AFP_ENTRY" -d . -O "$OUT/threshold" -p 1 \
+  -x 'OIP_Threshold_Raw_Identity.Threshold_Raw_Identity:code/oip_threshold_raw_abi.ML' OIP_Threshold_Raw_Identity
 ```
 
-The extracted files are `typed/code/oip_wire_values_v061_current.ML` and
-`full/code/oip_wire_response_full_v061.ML` beneath `OUT`. Record their actual
+The extracted files are `typed/code/oip_wire_values_v061_current.ML`,
+`full/code/oip_wire_response_full_v061.ML` and
+`threshold/code/oip_threshold_raw_abi.ML` beneath `OUT`. Record their actual
 bytes/hashes and the session database identity independently. The external
 runtime artifact names may differ; a packaging copy must preserve model bytes.
 
 ## External ABI and six-field identities
 
 Use genuine Ubuntu 24.04/amd64 and the OIP repository's
-[locked Poly/ML 5.7.1-5build1 packages](https://github.com/Oraclizer/oip-spec/blob/main/tools/polyml-noble-amd64.lock.json).
+[locked Poly/ML 5.7.1-5build1 packages](https://github.com/Oraclizer/oip-spec/blob/v0.6.2/tools/polyml-noble-amd64.lock.json).
 From the exact OIP source checkout, the
-[userspace recipe](https://github.com/Oraclizer/oip-spec/blob/main/scripts/prepare-polyml-userspace.py)
+[userspace recipe](https://github.com/Oraclizer/oip-spec/blob/v0.6.2/scripts/prepare-polyml-userspace.py)
 extracts those byte-pinned packages into a fresh local target directory:
 
 ```bash
@@ -123,6 +130,7 @@ Run the unchanged production drivers from that same checkout:
 | --- | --- |
 | `tests/wire-values-driver.ML` | `c9ed19c6c27c6eed5aa0bc07b0e2c899fb83fa92e7f5f861dc1da64ab6b356bc` |
 | `tests/response-full-driver.ML` | `c9d865ba0257bed26f24b8d9cfca64add77dc03ab4357fdea1943c11f61a0703` |
+| `tests/threshold-raw-driver.ML` | `74466579c744b02c0337c0a60b647e2950c07c94ae2fcca2868409d62e5ec2b9` |
 
 ```bash
 printf '' | env OIP_WIRE_MODEL="$OUT/typed/code/oip_wire_values_v061_current.ML" \
@@ -131,20 +139,26 @@ printf '' | env OIP_WIRE_RESPONSE_MODEL="$OUT/full/code/oip_wire_response_full_v
   "$POLYML" -q --error-exit --script tests/response-full-driver.ML
 ```
 
-`OIP_Wire_Oracle_V061.sync_v061_typed_model_identity ()` and
-`OIP_Wire_Response_Boundary.code_response_full_model_identity ()` each return
-six ASCII fields. The last field must match the `runtime_source_hash` in the
-[typed lock](artifacts/locks/model-artifact.lock.json) or
-[full response lock](artifacts/locks/wire-response-artifact.lock.json), respectively.
+`OIP_Wire_Oracle_V061.sync_v061_typed_model_identity ()`,
+`OIP_Wire_Response_Boundary.code_response_full_model_identity ()` and
+`OIP_Threshold_Raw_ABI.threshold_raw_model_identity ()` each return six ASCII
+fields. The last field must match the `runtime_source_hash` in the
+[typed lock](artifacts/locks/model-artifact.lock.json),
+[full response lock](artifacts/locks/wire-response-artifact.lock.json) or
+[THRESHOLD lock](artifacts/locks/threshold-raw-artifact.lock.json), respectively.
 
-| Field | Typed transport | Full sender/client |
-| --- | --- | --- |
-| Schema | `1` | `1` |
-| ABI | `intinf-wire-values-v2` | `intinf-response-full-v2` |
-| Scope | `wire-v6-general-33-values` | `wire-response-sender-client-v2` |
-| Entrypoint | `OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat` | `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` |
-| Natural refinement | `HOL-Library.Code_Target_Nat` | `HOL-Library.Code_Target_Nat` |
-| Runtime source fingerprint | `model-artifact.lock.json` | `wire-response-artifact.lock.json` |
+| Field | Typed transport | Full sender/client | THRESHOLD raw packet |
+| --- | --- | --- | --- |
+| Schema | `1` | `1` | `1` |
+| ABI | `intinf-wire-values-v2` | `intinf-response-full-v2` | `intinf-threshold-raw-v1` |
+| Scope | `wire-v6-general-33-values` | `wire-response-sender-client-v2` | `wire-v6-threshold-raw-observed-primitives` |
+| Entrypoint | `OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat` | `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` | `OIP_Threshold_Raw_ABI.threshold_raw_packet` |
+| Natural refinement | `HOL-Library.Code_Target_Nat` | `HOL-Library.Code_Target_Nat` | `HOL-Library.Code_Target_Nat` |
+| Runtime source fingerprint | `model-artifact.lock.json` | `wire-response-artifact.lock.json` | `threshold-raw-artifact.lock.json` |
+
+The THRESHOLD driver also reads the model inputs that
+`scripts/check-threshold-raw.py` writes from the raw vectors, so it runs
+through that consumer.
 
 A private namespace export, four-field interface, caller-supplied fingerprint
 or edited model is not interchangeable with these interfaces. ABI loading
@@ -200,6 +214,10 @@ four content-pinned roles from `tests/threshold-raw-artifact.lock.json`.
 Its local `--artifact-root` uses the same checks as the hosted artifact path.
 The 22 raw cases pass independently recorded Ed25519 key and signature
 observations to the model, and Rust and Go exercise their configured verifiers.
+
+```bash
+python3 scripts/check-threshold-raw.py --output "$RUN/threshold-raw" --polyml "$POLYML"
+```
 
 ## Public code linkage
 

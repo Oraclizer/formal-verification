@@ -17,8 +17,9 @@ The assurance scope has three parts:
   This is a manually maintained source relationship, not a verified Rust
   compiler or an automatic theorem about every compiled Rust execution.
 - **Bounded executable wire comparisons.** The consumers compare fixed and
-  seeded inputs, typed values, response construction and current-client
-  admission. Agreement on those inputs is separate from universal refinement.
+  seeded inputs, typed values, response construction, current-client
+  admission and the signature step of raw THRESHOLD packets. Agreement on
+  those inputs is separate from universal refinement.
 
 The reference implementation is **prototype-stage, unaudited and not for
 production**. This material does not establish an operational Witness service,
@@ -43,8 +44,30 @@ storage assumptions remain explicit in the relevant statements.
 The [ROOT](ROOT) declares the base sessions and the v0.6.1 and v0.6.2
 extensions. Record reopening and the current reference profile are separate
 model branches with distinct source contexts. The [source manifest](source-manifest.json)
-pins ROOT and each theory file in this namespace. The compiler-input seal
-records the checked build separately.
+pins ROOT and each theory file in this namespace. The compiler-input seal,
+[Validation/V061/kernel-input-seal.json](Validation/V061/kernel-input-seal.json),
+records the checked build of the current namespace, including the v0.6.2
+targets.
+
+## Extension sessions
+
+The 47 v0.6.1 extension sessions cover state commitment sync, scoped response
+codes and the reference `Write` path. The 120 v0.6.2 extension sessions add
+comparison models for configured threshold admission, retained outcomes and
+selected reference storage boundaries under their stated premises. Both sets
+build on the base sessions and keep the assurance scope stated above.
+
+| Group | Sessions | Content |
+| --- | --- | --- |
+| Wire and authentication | 15 | Negotiation, canonical wire data and threshold signatures |
+| State sync and reads | 39 | Commitment sync, queries, cached and historical reads |
+| Responses and receipts | 14 | Response codes, signed replies and stored outcomes |
+| Authority and asset effects | 61 | Handover, legal controls, locks and reference writes |
+| Ordering and settlement | 17 | Scheduling, primary decisions and settlement queues |
+| Persistence and recovery | 21 | Source journals, witness checks, publication and reopening |
+
+The groups match the [session overview](../docs/assets/session-architecture.svg).
+Exact session names, directories and parents are declared in [ROOT](ROOT).
 
 ## Executable interfaces and comparison consumers
 
@@ -53,7 +76,9 @@ The typed transport export exposes
 `OIP_Wire_Oracle_V061.sync_v061_typed_model_identity`. The Full response export exposes
 the sender, current-client and combined interfaces, including
 `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` and
-`OIP_Wire_Response_Boundary.code_response_full_model_identity`.
+`OIP_Wire_Response_Boundary.code_response_full_model_identity`. These interface
+names date from v0.6.1 and are unchanged in the v0.6.2 binding; each six-field
+identity carries the v0.6.2 runtime source fingerprint.
 
 The THRESHOLD export exposes `OIP_Threshold_Raw_ABI.threshold_raw_packet`
 and `OIP_Threshold_Raw_ABI.threshold_raw_model_identity`. Its 22 raw Packet
@@ -91,3 +116,5 @@ export, artifact origin or lock. Creating the formal sources and model bytes
 does not depend on that later public code link.
 
 The exact public code commit and model content pins are listed in [consumer-binding.json](consumer-binding.json).
+They bind the [OIP v0.6.2 release](https://github.com/Oraclizer/oip-spec/releases/tag/v0.6.2)
+at commit `ba2a775ef41ab368fc243fc07ab5a8ecdd699263`.

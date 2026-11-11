@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="1632" viewBox="0 0 600 1632" role="img" aria-labelledby="title desc">
-<title id="title">CDSP and RAC foundation: direct imports</title><desc id="desc">Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The separate session overview includes all seven registered artifacts.</desc>
+<title id="title">CDSP and RAC foundation: direct imports</title><desc id="desc">Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The session overview lists the registered repository dependencies.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>
 <rect width="600" height="1632" rx="20" fill="#0b142a"/>
 <g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">
