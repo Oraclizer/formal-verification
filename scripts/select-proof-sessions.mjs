@@ -10,6 +10,8 @@ const MODEL_ARTIFACT_INPUTS = new Set([
   "Oracle_Interoperability_Protocol/artifacts/typed/mirror-driver.ML",
   "Oracle_Interoperability_Protocol/artifacts/full/oip_wire_response_full.ML",
   "Oracle_Interoperability_Protocol/artifacts/full/response-full-driver.ML",
+  "Oracle_Interoperability_Protocol/artifacts/threshold/oip_threshold_raw_abi.ML",
+  "Oracle_Interoperability_Protocol/artifacts/threshold/threshold-raw-driver.ML",
   // Standalone Poly/ML drivers and synthetic input files listed in Validation/V061/input-manifest.json.
   "Oracle_Interoperability_Protocol/Validation/V061/drivers/id-guards.ML",
   "Oracle_Interoperability_Protocol/Validation/V061/drivers/trace.ML",

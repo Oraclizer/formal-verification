@@ -1,0 +1,62 @@
+{
+  "lock_version": 1,
+  "binding_status": "bound",
+  "artifact_transport": "github-git-blob-v1",
+  "repository": "Oraclizer/formal-verification",
+  "wire_schema": 1,
+  "abi": "intinf-threshold-raw-v1",
+  "scope": "wire-v6-threshold-raw-observed-primitives",
+  "entrypoint": "OIP_Threshold_Raw_ABI.threshold_raw_packet",
+  "identity_function": "OIP_Threshold_Raw_ABI.threshold_raw_model_identity",
+  "natural_refinement": "HOL-Library.Code_Target_Nat",
+  "runtime_source_hash": "7edc3b1dd127d9ad0e30ff6f2dab57eb3bf624ea60b6b588413534fd148d33a8",
+  "verified_export_sha256": "2e7ad1c34b2afd298b784f40a60d1db546be19fca13602e9add34b8bfa509b11",
+  "public_namespace": "Oracle_Interoperability_Protocol",
+  "fixtures": {
+    "packets": {
+      "path": "tests/vectors/threshold-raw/input.jsonl",
+      "rows": 22,
+      "sha256": "dce75f2c9c399c03462319e96b7859b0f01f0837769c87e1413c3a71bf48fb09"
+    },
+    "signature_observations": {
+      "path": "tests/vectors/threshold-raw/primitive-observations.jsonl",
+      "rows": 22,
+      "sha256": "57436d8708b503d24d939fb09dbc768fd9110f6a9ebc94cd1696cfa01ff76cc0"
+    },
+    "key_observations": {
+      "path": "tests/vectors/threshold-raw/key-observations.json",
+      "rows": 3,
+      "sha256": "6dc8924b20ba59ccd22d7a9d7179fe5804441f3527809334ca97dfcd4b5dfdcb"
+    }
+  },
+  "files": [
+    {
+      "role": "model",
+      "name": "oip_threshold_raw_abi.ML",
+      "git_blob_sha1": "6e60ac1635c88e956a6189b3e1d7fbfc46695959",
+      "sha256": "2e7ad1c34b2afd298b784f40a60d1db546be19fca13602e9add34b8bfa509b11",
+      "bytes": 92122
+    },
+    {
+      "role": "driver",
+      "name": "threshold-raw-driver.ML",
+      "git_blob_sha1": "78ff15a2f995272874aada6a69fc4f9591430e50",
+      "sha256": "74466579c744b02c0337c0a60b647e2950c07c94ae2fcca2868409d62e5ec2b9",
+      "bytes": 1484
+    },
+    {
+      "role": "origin",
+      "name": "threshold-raw-origin.json",
+      "git_blob_sha1": "bd8b2eef889a488bd4c6f67d500249e46d65c15a",
+      "sha256": "ed7f9d79afaa56c5d8cfb8bfb8f01bcb2eb1b06d5ba66a7f4a3354bbbb3df8cb",
+      "bytes": 842
+    },
+    {
+      "role": "diagnostics",
+      "name": "threshold-raw-diagnostics.json",
+      "git_blob_sha1": "c7ab426c1bf9ae3196b61e2f81530e52b10641aa",
+      "sha256": "228dc841742a1e6ec2df807855fcb39ce106998a423c2d772dc3460806bf1473",
+      "bytes": 1225
+    }
+  ]
+}

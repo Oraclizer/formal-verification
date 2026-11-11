@@ -3,17 +3,17 @@
   "schema": "oip-public-CodeCommit-content-consumer-binding-v1",
   "public_code_repository": "Oraclizer/oip-spec",
   "public_code_repository_id": 1450670010,
-  "public_code_commit": "0806876f6e31fd590f951adb31bfc4a00b80dd2a",
-  "public_code_tree": "57c7c98c21c932f2fe3a948772893fb7f740c5f3",
-  "runtime_source_hash": "b1a7fed18699409a20b8b4854bbb21db0115d104cdae6572fa9078aacadd4a79",
+  "public_code_commit": "ba2a775ef41ab368fc243fc07ab5a8ecdd699263",
+  "public_code_tree": "be478084a9fc283994f5765f8cbe2305b95235fc",
+  "runtime_source_hash": "7edc3b1dd127d9ad0e30ff6f2dab57eb3bf624ea60b6b588413534fd148d33a8",
   "public_namespace": "Oracle_Interoperability_Protocol",
-  "formal_root_sha256": "7b728ca0c640f4ad4c80571c88ceaf25d2dc7d55d35c754b74e3fbf374cfe4ae",
-  "source_manifest_sha256": "3e0bc0f4e8e9c0452b8459cb6b584ce26d5e064777edba615550bb522081ee08",
-  "kernel_inputs_sha256": "c8ac59550f7fe1e4e77f41555bf39fcc79cf37223adf7ae198d0adf49404ec55",
+  "formal_root_sha256": "f68d1c24f6e662b410a5aaf7fee8eb626ff3cccece2ea011330d4d11e61d7be1",
+  "source_manifest_sha256": "e50f78164fc26913839e6d6684ef916b6023f1733479983804a7ace35649891b",
+  "kernel_inputs_sha256": "b8536549226c9c188d8541cfdc8641460adbe81767a4f3ac6be9c63f28c69c7c",
   "models": {
     "typed": {
       "lock_path": "Oracle_Interoperability_Protocol/artifacts/locks/model-artifact.lock.json",
-      "lock_sha256": "860926279faade93871f6a5086a6e969624c960fee27ccc8fd629ffabc014aac",
+      "lock_sha256": "4a60a4223c677d7a2eed34a8fa29682835d327802abea9c7fc477188d54134eb",
       "identity_function": "OIP_Wire_Oracle_V061.sync_v061_typed_model_identity",
       "entrypoint": "OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat",
       "abi": "intinf-wire-values-v2",
@@ -22,9 +22,9 @@
         {
           "role": "model",
           "name": "oip_wire_oracle.ML",
-          "git_blob_sha1": "57f01591d32612a2ddab0be9b4832fcbaf633ed8",
-          "sha256": "7c543ae1086757ca12fff402b69614b6ac5e8f5b0f6b1eaeb04a50e56f299cda",
-          "bytes": 255870
+          "git_blob_sha1": "ee21b59e42853047561cbc4bd4867c72f07bb44f",
+          "sha256": "4a1c5ad4b1ab51a02171dbc9900441ea0748527fbe08184c9f74092d946aada9",
+          "bytes": 255861
         },
         {
           "role": "driver",
@@ -36,22 +36,22 @@
         {
           "role": "origin",
           "name": "export-origin.json",
-          "git_blob_sha1": "9f26487339ba8a541bdd6cf40ad30a70e991fb06",
-          "sha256": "0abe7ebddc36f7cf63aa2d67d0735e8459b8bfdf342e1bf554f6893dee859b7a",
+          "git_blob_sha1": "b62ced9d63e079211b329c58c4bc0f3c9a9b124d",
+          "sha256": "bab5bbfc06948eedc586c0ef36aeb2df8c5347be2148662548e7afd471ac045b",
           "bytes": 835
         },
         {
           "role": "diagnostics",
           "name": "compiler-diagnostics.json",
-          "git_blob_sha1": "93031e030fd686289fe6e02b884137a47e83dd01",
-          "sha256": "eec85da066a5be8af0d188cd74efe9144d2c9bcd502c274a5c4dd4f3c359fde4",
+          "git_blob_sha1": "7a133e137655006fcd791f6bf97e43ee6256f630",
+          "sha256": "da046c5d57390648ace5b214a44afe498aa9148647c887c48a2fecaf37386c35",
           "bytes": 1666
         }
       ]
     },
     "full": {
       "lock_path": "Oracle_Interoperability_Protocol/artifacts/locks/wire-response-artifact.lock.json",
-      "lock_sha256": "bc657a9d3961e1e3897e8dc598e66b884be7a7cc7e4e0dfa7c43c33a666e9f24",
+      "lock_sha256": "39b7dbc12c0dcb8bebb5fcb03aac5a9927fd6a9b8eb8b7b454e93949e0a17b00",
       "identity_function": "OIP_Wire_Response_Boundary.code_response_full_model_identity",
       "entrypoint": "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle",
       "abi": "intinf-response-full-v2",
@@ -60,9 +60,9 @@
         {
           "role": "model",
           "name": "oip_wire_response_full.ML",
-          "git_blob_sha1": "c9eef3651a057ce895cadf770fef623e7d278096",
-          "sha256": "8bf39a85ff1d6b498dd9ff420f9ba1d5e59713bf02216fb8584a6e8fffd26904",
-          "bytes": 420159
+          "git_blob_sha1": "72ffa0048ec769991314db17553bf96f92f2b3bf",
+          "sha256": "d8fbeba101fce37eb2a974b5d3b1d05d1afdf20db5c2392367dd727593734384",
+          "bytes": 420150
         },
         {
           "role": "driver",
@@ -74,21 +74,59 @@
         {
           "role": "origin",
           "name": "response-full-origin.json",
-          "git_blob_sha1": "37a6b32287d723a76361f6232b4951a312b08467",
-          "sha256": "00bef3ece86e9af3bf7d072b4bf4a5f52f6d049b013c0d27d893c52711d40c5c",
+          "git_blob_sha1": "d6fd6c98f9cc7a4f46cdaa495c361fa9e5f32530",
+          "sha256": "47974c281fb1d1737e4b345b71c252f0b0dd25e36d90fe7cfd2a6e8ec74d9903",
           "bytes": 858
         },
         {
           "role": "diagnostics",
           "name": "response-full-diagnostics.json",
-          "git_blob_sha1": "e26c84f87eda87c9dc3bb65a3596b7bebec76f10",
-          "sha256": "d422ee6ad4421ec248715a9357d4d5915fd140dd41c00b19b3e6c44bcc478e72",
+          "git_blob_sha1": "b24b5d1b817ee5659671c557dea040b346978681",
+          "sha256": "683b093989837815f7d4823585d72a72488c47e4621c43e3fae7c4f56fd30e75",
           "bytes": 1881
+        }
+      ]
+    },
+    "threshold": {
+      "lock_path": "Oracle_Interoperability_Protocol/artifacts/locks/threshold-raw-artifact.lock.json",
+      "lock_sha256": "2337f0228b81f6fddf8302bc4ca52ba9207d20a1bf19d211eda2954dbaf6ceb7",
+      "identity_function": "OIP_Threshold_Raw_ABI.threshold_raw_model_identity",
+      "entrypoint": "OIP_Threshold_Raw_ABI.threshold_raw_packet",
+      "abi": "intinf-threshold-raw-v1",
+      "scope": "wire-v6-threshold-raw-observed-primitives",
+      "files": [
+        {
+          "role": "model",
+          "name": "oip_threshold_raw_abi.ML",
+          "git_blob_sha1": "6e60ac1635c88e956a6189b3e1d7fbfc46695959",
+          "sha256": "2e7ad1c34b2afd298b784f40a60d1db546be19fca13602e9add34b8bfa509b11",
+          "bytes": 92122
+        },
+        {
+          "role": "driver",
+          "name": "threshold-raw-driver.ML",
+          "git_blob_sha1": "78ff15a2f995272874aada6a69fc4f9591430e50",
+          "sha256": "74466579c744b02c0337c0a60b647e2950c07c94ae2fcca2868409d62e5ec2b9",
+          "bytes": 1484
+        },
+        {
+          "role": "origin",
+          "name": "threshold-raw-origin.json",
+          "git_blob_sha1": "bd8b2eef889a488bd4c6f67d500249e46d65c15a",
+          "sha256": "ed7f9d79afaa56c5d8cfb8bfb8f01bcb2eb1b06d5ba66a7f4a3354bbbb3df8cb",
+          "bytes": 842
+        },
+        {
+          "role": "diagnostics",
+          "name": "threshold-raw-diagnostics.json",
+          "git_blob_sha1": "c7ab426c1bf9ae3196b61e2f81530e52b10641aa",
+          "sha256": "228dc841742a1e6ec2df807855fcb39ce106998a423c2d772dc3460806bf1473",
+          "bytes": 1225
         }
       ]
     }
   },
-  "binding_method": "Actual public signed root and exact content-only artifact pins; no whole-FV commit enters generated ML, model identity, origin or either lock.",
+  "binding_method": "Actual signed public CodeCommit and exact content pins for Typed, Full and THRESHOLD.",
   "correspondence_scope": "Conditional HOL models, manual source correspondence and bounded conformance comparisons. No compiler or whole-product refinement claim.",
   "generated_model_or_lock_CodeCommit_edits": false
 }

@@ -40,8 +40,8 @@ storage assumptions remain explicit in the relevant statements.
 | `OIP_Message_Response` | Correlation, response boundary and client-facing interfaces |
 | `OIP_Message_Egress` | Sender, primitive-query and current-client interfaces |
 
-The [ROOT](ROOT) declares the base sessions above and the v0.6.1 extension
-sessions. Record reopening and the current reference profile are separate
+The [ROOT](ROOT) declares the base sessions and the v0.6.1 and v0.6.2
+extensions. Record reopening and the current reference profile are separate
 model branches with distinct source contexts. The [source manifest](source-manifest.json)
 pins ROOT and each theory file in this namespace. The compiler-input seal
 records the checked build separately.
@@ -54,6 +54,13 @@ The typed transport export exposes
 the sender, current-client and combined interfaces, including
 `OIP_Wire_Response_Boundary.code_response_egress_flat_oracle` and
 `OIP_Wire_Response_Boundary.code_response_full_model_identity`.
+
+The THRESHOLD export exposes `OIP_Threshold_Raw_ABI.threshold_raw_packet`
+and `OIP_Threshold_Raw_ABI.threshold_raw_model_identity`. Its 22 raw Packet
+inputs use independent finite Ed25519 key and signature observations as
+model premises. Rust and Go run their own configured verifiers on those bytes.
+The raw suite compares the signature step and checks the finite transport
+attestation and binding effects separately.
 
 Each identity returns six fields: schema, ABI, scope, entrypoint, natural-number
 refinement and runtime source fingerprint. Identity is not supplied by the

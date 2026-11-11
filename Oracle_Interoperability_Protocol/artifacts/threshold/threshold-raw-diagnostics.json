@@ -1,0 +1,42 @@
+{
+  "schema": "oip-compiler-diagnostics-v1",
+  "model_sha256": "2e7ad1c34b2afd298b784f40a60d1db546be19fca13602e9add34b8bfa509b11",
+  "driver_sha256": "74466579c744b02c0337c0a60b647e2950c07c94ae2fcca2868409d62e5ec2b9",
+  "allowed": [
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:438: warning: Pattern 3 is redundant.",
+        "Found near",
+        "  fun",
+        "     equal_boola false p = not p |",
+        "        equal_boola true ... = p |",
+        "        equal_boola ... = ... ... |",
+        "        equal_boola ... = ..."
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:439: warning: Pattern 4 is redundant.",
+        "Found near",
+        "  fun",
+        "     equal_boola false p = not p |",
+        "        equal_boola true ... = p |",
+        "        equal_boola ... = ... ... |",
+        "        equal_boola ... = ..."
+      ],
+      "maximum": 1
+    },
+    {
+      "stream": "stdout",
+      "lines": [
+        "{model_path}:507: warning: Matches are not exhaustive.",
+        "Found near",
+        "  fun nth (x :: xs) n = (if ... ... zero_nata then x else ... ... (... ...))"
+      ],
+      "maximum": 1
+    }
+  ]
+}
