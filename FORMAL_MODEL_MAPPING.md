@@ -41,6 +41,17 @@ correspondence is owned by the folder-local
 [`CROSS_PROVER_MAPPING.md`](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md).
 This pointer is not a product-coverage or implementation-mapping entry.
 
+### OIP prototype namespace outside this mapping
+
+`Oracle_Interoperability_Protocol` contains prototype-stage conditional HOL
+models of the Oracle Interoperability Protocol, manually maintained Rust
+source correspondence and bounded executable wire comparisons. Its scope,
+reproduction and release binding are described in the folder-local
+[`README.md`](Oracle_Interoperability_Protocol/README.md),
+[`REPRODUCING.md`](Oracle_Interoperability_Protocol/REPRODUCING.md) and
+[`consumer-binding.json`](Oracle_Interoperability_Protocol/consumer-binding.json).
+This pointer is not a product-coverage or implementation-mapping entry.
+
 ## What Verification Establishes and What It Does Not
 
 The Isabelle/HOL proofs in this repository establish properties at the **model level**. All proofs are mechanically checked by Isabelle/HOL 2025-2 with no `sorry` or `oops` occurrences. Mechanical correctness is thus established: the lemmas are valid within the stated assumptions.

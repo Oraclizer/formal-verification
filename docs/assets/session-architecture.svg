@@ -297,7 +297,7 @@
   <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_V062_Confiscate_Prior_Key"/>
   <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Response_Profile_Guard"/>
 </metadata>
-<rect x="0" y="1392" width="1120" height="430" rx="16" fill="#0b142a"/>
+<path d="M0 1380H1120V1806a16 16 0 0 1 -16 16H16a16 16 0 0 1 -16 -16Z" fill="#0b142a"/>
 <g font-family="Arial,Segoe UI,sans-serif" aria-label="OIP extensions by purpose">
 <text x="28" y="1444" font-size="27" fill="#e1eaf8">OIP extension groups</text>
 <text x="28" y="1474" font-size="17" fill="#a8bbd5">167 sessions by purpose · full graph linked below</text>

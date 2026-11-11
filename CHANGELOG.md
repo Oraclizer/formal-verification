@@ -5,12 +5,47 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Updated the public text for the OIP v0.6.2 binding. The README, the OIP
+  namespace guide and its reproduction steps describe the extension sessions
+  and the THRESHOLD export, and the contribution, security, citation and
+  mapping files point to the OIP namespace. Both architecture diagrams now
+  show their narrow versions in windows up to 1121px wide, matching the README
+  column bands of the banner, and the repository health check requires those
+  sources. The OIP extension panel no longer leaves light notches at its seam,
+  and the foundation view description no longer limits the session overview
+  to seven artifacts. Formal sources, proofs and claims are unchanged.
+
+- Summarized the 167 OIP extension sessions in six purpose groups in the
+  session overview. The base graph and the full Mermaid dependency graph keep
+  every edge.
+
+- Extended the OIP namespace with 120 sessions for OIP v0.6.2. The additional
+  comparison models cover configured threshold admission, retained outcomes
+  and selected reference storage boundaries under their stated premises.
+  Added the THRESHOLD raw-packet export and its content lock, and bound the
+  typed transport, Full response and THRESHOLD artifacts to the signed
+  [OIP v0.6.2 release](https://github.com/Oraclizer/oip-spec/releases/tag/v0.6.2)
+  commit.
+
+- Extended the OIP namespace with 47 sessions for OIP v0.6.1 that cover state
+  commitment sync, scoped response codes and the reference `Write` path, and
+  bound the typed transport and Full response exports, with their source,
+  compiler and content identities, to the signed
+  [OIP v0.6.1 release](https://github.com/Oraclizer/oip-spec/releases/tag/v0.6.1)
+  commit.
+
 - Split the README banner into phone, medium and desktop versions chosen by
   the width of the README column, so tablets and unfolded phones no longer
   show the tall phone banner. The banner lettering is drawn as outlines of
   Inter (SIL Open Font License 1.1), so every device shows the same type. The
   repository health check requires the three versions, their canvases and the
   outlined lettering. Formal sources, proofs and claims are unchanged.
+
+- Added the OIP prototype namespace `Oracle_Interoperability_Protocol`, built
+  on Evidence Atomic Binding. Its nine base sessions hold conditional HOL
+  models of the product, reference profile, record reopening, recovery
+  boundary and message interfaces, with manually maintained Rust source
+  correspondence and an exact compiler-input manifest.
 
 - Changed pull-request proof CI from unconditional whole-repository builds to
   source-derived affected-session closure checks. Every changed Isabelle

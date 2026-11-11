@@ -115,7 +115,7 @@ function render(path, columns) {
   const opening = source.replace(/height="\d+" viewBox="0 0 \d+ \d+"/, `height="${height}" viewBox="0 0 ${width} ${height}"`)
     .replace(/<desc id="desc">[^<]*<\/desc>/, `<desc id="desc">${escape(description)}</desc>`)
     .replace("Sixteen registered sessions · dependency → child", "Base sessions · dependency → child");
-  const panel = `<rect x="0" y="${baseHeight - 8}" width="${width}" height="${height - baseHeight + 8}" rx="16" fill="#0b142a"/>`;
+  const panel = `<path d="M0 ${baseHeight - 20}H${width}V${height - 16}a16 16 0 0 1 -16 16H16a16 16 0 0 1 -16 -16Z" fill="#0b142a"/>`;
   writeFileSync(path, [opening, marker, '<metadata id="oip-extension-dependencies">', ...metadata, "</metadata>",
     panel, ...drawing, "</g></svg>", ""].join("\n"));
 }

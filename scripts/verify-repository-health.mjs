@@ -480,6 +480,25 @@ for (const [path, viewBox] of [
   if (/<text[\s>]/.test(text)) failures.push(`banner text must be drawn as outlines: ${path}`);
 }
 
+// The architecture diagrams come in a landscape and a narrow version. The
+// narrow version is chosen below a 680px README column, which the media query
+// writes as a 1121px window (column widths above), and its canvas is 600 wide.
+for (const stem of ["session-architecture", "theory-architecture"]) {
+  const picture = new RegExp(`<picture>\\s*<source media="\\(max-width: 1121px\\)" srcset="docs/assets/${stem}-mobile\\.svg">\\s*<img src="docs/assets/${stem}\\.svg"`);
+  if (!picture.test(readme)) {
+    failures.push(`README ${stem} diagram must choose its narrow version below a 680px README column`);
+  }
+  for (const path of [`docs/assets/${stem}.svg`, `docs/assets/${stem}-mobile.svg`]) {
+    const text = readFileSync(resolve(root, path), "utf8");
+    for (const [name, pattern] of [["title", /<title[\s>]/], ["desc", /<desc[\s>]/]]) {
+      if (!pattern.test(text)) failures.push(`diagram SVG missing ${name}: ${path}`);
+    }
+    if (path.endsWith("-mobile.svg") && !/viewBox="0 0 600 \d+"/.test(text)) {
+      failures.push(`narrow diagram canvas must be 600 wide: ${path}`);
+    }
+  }
+}
+
 for (const [path, marker] of [
   ["CONTRIBUTING.md", "production-maintained as a public research surface"],
   ["GOVERNANCE.md", "## Repository maintenance standard"],

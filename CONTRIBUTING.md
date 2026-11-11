@@ -5,9 +5,12 @@ This repository is the public home of a composable product-model chain:
 `Cross_Chain_Message_Integrity`, `Preemptive_Lock_Correctness`,
 `Evidence_Atomic_Binding` and `Evidence_Binding_Composition`. It also contains the independent
 `PARTIAL / NO SAME` `Protected_Behavior_Obstructions` research companion, which
-has no Oraclizer implementation or product-refinement target. The artifacts are
-maintained as single-author scholarly works rather than as a conventional
-open-source project that routinely merges external theory contributions.
+has no Oraclizer implementation or product-refinement target. The
+`Oracle_Interoperability_Protocol` namespace holds prototype-stage conditional
+models and executable model artifacts for the Oracle Interoperability
+Protocol. The artifacts are maintained as single-author scholarly works rather
+than as a conventional open-source project that routinely merges external
+theory contributions.
 Please keep this context in mind when engaging with the repository.
 
 The repository is production-maintained as a public research surface. That
@@ -179,6 +182,16 @@ repository and fetches it by hash, and the session layout of
 `Regulatory_Action_Composition` participates in that consumer's build. Keep
 the default branch protected, never rewrite published history, and treat
 session-graph changes as coordinated changes with that consumer.
+
+The OIP repository `Oraclizer/oip-spec` downloads the typed transport, Full
+response and THRESHOLD model artifacts in
+`Oracle_Interoperability_Protocol/artifacts/` from this repository by Git blob
+and SHA-256 through its artifact locks. Treat changes to those artifacts,
+their locks, `Oracle_Interoperability_Protocol/consumer-binding.json` or the
+OIP session graph as coordinated changes with that repository. For changes to
+the OIP prototype namespace, also run
+`node Oracle_Interoperability_Protocol/verify-source.mjs` and follow its
+[reproduction guide](Oracle_Interoperability_Protocol/REPRODUCING.md).
 
 
 For changes to Evidence Atomic Binding, also run

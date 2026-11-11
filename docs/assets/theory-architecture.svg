@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="720" viewBox="0 0 1180 720" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="ta-title ta-desc">
   <title id="ta-title">CDSP and RAC foundation: direct theory imports</title>
-  <desc id="ta-desc">Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The separate session overview includes all seven registered artifacts.</desc>
+  <desc id="ta-desc">Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The session overview lists the registered repository dependencies.</desc>
 
   <defs>
     <linearGradient id="ta-bg" x1="0" y1="0" x2="1" y2="1">

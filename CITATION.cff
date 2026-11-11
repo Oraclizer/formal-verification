@@ -23,6 +23,7 @@ keywords:
   - finite funding allocation
   - protected behavior obstructions
   - cross-prover mapping
+  - oracle interoperability protocol
 abstract: >-
   Six dependent Isabelle/HOL sessions formalize cross-domain state
   preservation, regulatory action composition, authenticated message
@@ -40,7 +41,11 @@ abstract: >-
   external assumptions and scope boundaries. The composition extension connects
   the existing source, financial and regulatory consumers to fresh completed
   calls and recovery of the same recorded executions; physical and compiled
-  implementation correspondence remains outside these model results.
+  implementation correspondence remains outside these model results. A
+  separate OIP prototype namespace adds conditional HOL models, manually
+  maintained Rust source correspondence and bounded executable wire
+  comparisons for the Oracle Interoperability Protocol; these comparisons do
+  not establish a verified compiler or whole-product refinement.
 preferred-citation:
   type: article
   title: "The Cross-Domain State Preservation Functor: A Mechanized Theory of Regulatory State Synchronization in Isabelle/HOL"
