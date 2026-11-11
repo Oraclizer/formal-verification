@@ -144,14 +144,17 @@ or a production Witness/storage deployment.
 <div align="center">
   <picture>
     <source media="(max-width: 900px)" srcset="docs/assets/session-architecture-mobile.svg">
-    <img src="docs/assets/session-architecture.svg" alt="The base Isabelle session graph and the OIP extension catalog with each session's direct dependencies." width="900">
+    <img src="docs/assets/session-architecture.svg" alt="The base Isabelle session graph, followed by a compact count of OIP extension sessions grouped by purpose." width="900">
   </picture>
 </div>
 
-Arrows run from a dependency to the session that uses it. The independent
-companion has no dependency on the six-session chain. The auxiliary
-[composition audit](Evidence_Binding_Composition/Audit/README.md) is a separate
-verification session, not an additional catalog artifact.
+Arrows in the upper diagram run from a dependency to the session that uses it.
+The lower overview groups extensions by purpose. For exact dependencies, see
+the [full Mermaid graph](docs/assets/session-architecture.mmd) and the
+[OIP session declarations](Oracle_Interoperability_Protocol/ROOT).
+The independent companion has no dependency on the six-session chain. The
+auxiliary [composition audit](Evidence_Binding_Composition/Audit/README.md) is
+a separate verification session.
 
 ### CDSP and RAC foundation imports
 

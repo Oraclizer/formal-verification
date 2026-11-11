@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="18236" viewBox="0 0 600 18236" role="img" aria-labelledby="title desc">
-<title id="title">Repository session dependencies</title><desc id="desc">183 registered sessions. The upper diagram shows the base dependencies. The catalog below lists each additional OIP session with its direct dependencies. The arrows indicate Isabelle source dependencies.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="3048" viewBox="0 0 600 3048" role="img" aria-labelledby="title desc">
+<title id="title">Repository session dependencies</title><desc id="desc">183 registered sessions. The upper diagram shows the base dependencies. The 167 additional OIP sessions are grouped by purpose below. The arrows above indicate direct Isabelle source dependencies. The full graph and ROOT files are linked in the README.</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>
 <rect width="600" height="2320" rx="20" fill="#0b142a"/>
 <g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">
@@ -86,889 +86,271 @@
 </g>
 </g>
 <!-- Generated extension dependency catalog -->
-<rect x="0" y="2312" width="600" height="15924" rx="16" fill="#0b142a"/>
-<g font-family="Arial,Segoe UI,sans-serif">
-<text x="28" y="2364" font-size="27" fill="#e1eaf8">Additional OIP sessions</text>
-<text x="28" y="2394" font-size="17" fill="#a8bbd5">Each card names the session and its direct dependencies.</text>
-<g data-node="OIP_Ordered_Maintenance_G0_Core">
-<rect x="28" y="2420" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2449" font-size="17" fill="#e1eaf8">OIP_Ordered_Maintenance_G0_Core</text>
-<g data-from="OIP_Reference_Profile" data-to="OIP_Ordered_Maintenance_G0_Core"><text x="42" y="2474" font-size="15" fill="#a8bbd5">← OIP_Reference_Profile</text></g>
-</g>
-<g data-node="OIP_Ordered_Maintenance_Entry">
-<rect x="28" y="2508" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2537" font-size="17" fill="#e1eaf8">OIP_Ordered_Maintenance_Entry</text>
-<g data-from="OIP_Ordered_Maintenance_G0_Core" data-to="OIP_Ordered_Maintenance_Entry"><text x="42" y="2562" font-size="15" fill="#a8bbd5">← OIP_Ordered_Maintenance_G0_Core</text></g>
-</g>
-<g data-node="OIP_Write_Canary_Base">
-<rect x="28" y="2596" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2625" font-size="17" fill="#e1eaf8">OIP_Write_Canary_Base</text>
-<g data-from="OIP_Reference_Profile" data-to="OIP_Write_Canary_Base"><text x="42" y="2650" font-size="15" fill="#a8bbd5">← OIP_Reference_Profile</text></g>
-</g>
-<g data-node="OIP_Write_Canary_Removal">
-<rect x="28" y="2684" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2713" font-size="17" fill="#e1eaf8">OIP_Write_Canary_Removal</text>
-<g data-from="OIP_Write_Canary_Base" data-to="OIP_Write_Canary_Removal"><text x="42" y="2738" font-size="15" fill="#a8bbd5">← OIP_Write_Canary_Base</text></g>
-</g>
-<g data-node="OIP_Write_Canary_DurableV6">
-<rect x="28" y="2772" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2801" font-size="17" fill="#e1eaf8">OIP_Write_Canary_DurableV6</text>
-<g data-from="OIP_Reference_Profile" data-to="OIP_Write_Canary_DurableV6"><text x="42" y="2826" font-size="15" fill="#a8bbd5">← OIP_Reference_Profile</text></g>
-</g>
-<g data-node="OIP_Reference_Write_Profile">
-<rect x="28" y="2860" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2889" font-size="17" fill="#e1eaf8">OIP_Reference_Write_Profile</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Reference_Write_Profile"><text x="42" y="2914" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Reference_Write_AuthorityV4">
-<rect x="28" y="2948" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="2977" font-size="17" fill="#e1eaf8">OIP_Reference_Write_AuthorityV4</text>
-<g data-from="OIP_Reference_Write_Profile" data-to="OIP_Reference_Write_AuthorityV4"><text x="42" y="3002" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_Profile</text></g>
-</g>
-<g data-node="OIP_Reference_Write_ChecksV9">
-<rect x="28" y="3036" width="544" height="148" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3065" font-size="17" fill="#e1eaf8">OIP_Reference_Write_ChecksV9</text>
-<g data-from="OIP_Reference_Write_AuthorityV4" data-to="OIP_Reference_Write_ChecksV9"><text x="42" y="3090" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_AuthorityV4</text></g>
-<g data-from="OIP_Write_Canary_Base" data-to="OIP_Reference_Write_ChecksV9"><text x="42" y="3114" font-size="15" fill="#a8bbd5">← OIP_Write_Canary_Base</text></g>
-<g data-from="OIP_Write_Canary_Removal" data-to="OIP_Reference_Write_ChecksV9"><text x="42" y="3138" font-size="15" fill="#a8bbd5">← OIP_Write_Canary_Removal</text></g>
-<g data-from="OIP_Write_Canary_DurableV6" data-to="OIP_Reference_Write_ChecksV9"><text x="42" y="3162" font-size="15" fill="#a8bbd5">← OIP_Write_Canary_DurableV6</text></g>
-</g>
-<g data-node="OIP_Reference_Write_Vector_Export">
-<rect x="28" y="3196" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3225" font-size="17" fill="#e1eaf8">OIP_Reference_Write_Vector_Export</text>
-<g data-from="OIP_Reference_Write_ChecksV9" data-to="OIP_Reference_Write_Vector_Export"><text x="42" y="3250" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_ChecksV9</text></g>
-</g>
-<g data-node="OIP_Reference_Write_Core_Seed">
-<rect x="28" y="3284" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3313" font-size="17" fill="#e1eaf8">OIP_Reference_Write_Core_Seed</text>
-<g data-from="OIP_Reference_Write_Vector_Export" data-to="OIP_Reference_Write_Core_Seed"><text x="42" y="3338" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_Vector_Export</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Wire_V4">
-<rect x="28" y="3372" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3401" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Wire_V4</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Sync_V061_Wire_V4"><text x="42" y="3426" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Definitions">
-<rect x="28" y="3460" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3489" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Definitions</text>
-<g data-from="OIP_Sync_V061_Wire_V4" data-to="OIP_Sync_V061_Position_Definitions"><text x="42" y="3514" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Wire_V4</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Proofs">
-<rect x="28" y="3548" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3577" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Proofs</text>
-<g data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Position_Proofs"><text x="42" y="3602" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Definitions</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Originals">
-<rect x="28" y="3636" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3665" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Originals</text>
-<g data-from="OIP_Sync_V061_Position_Proofs" data-to="OIP_Sync_V061_Position_Originals"><text x="42" y="3690" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Proofs</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Boundary">
-<rect x="28" y="3724" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3753" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Boundary</text>
-<g data-from="OIP_Sync_V061_Position_Originals" data-to="OIP_Sync_V061_Position_Boundary"><text x="42" y="3778" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Originals</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Selection">
-<rect x="28" y="3812" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3841" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Selection</text>
-<g data-from="OIP_Sync_V061_Position_Proofs" data-to="OIP_Sync_V061_Position_Selection"><text x="42" y="3866" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Proofs</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Provider">
-<rect x="28" y="3900" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="3929" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Provider</text>
-<g data-from="OIP_Sync_V061_Position_Selection" data-to="OIP_Sync_V061_Position_Provider"><text x="42" y="3954" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Selection</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Concrete_Supplier_V2">
-<rect x="28" y="3988" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4017" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Concrete_Supplier_V2</text>
-<g data-from="OIP_Sync_V061_Position_Provider" data-to="OIP_Sync_V061_Concrete_Supplier_V2"><text x="42" y="4042" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Provider</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Direct_IR">
-<rect x="28" y="4076" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4105" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Direct_IR</text>
-<g data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Position_Direct_IR"><text x="42" y="4130" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Definitions</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Transport">
-<rect x="28" y="4164" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4193" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Transport</text>
-<g data-from="OIP_Sync_V061_Position_Direct_IR" data-to="OIP_Sync_V061_Position_Transport"><text x="42" y="4218" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Direct_IR</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Ack">
-<rect x="28" y="4252" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4281" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Ack</text>
-<g data-from="OIP_Sync_V061_Position_Originals" data-to="OIP_Sync_V061_Position_Ack"><text x="42" y="4306" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Originals</text></g>
-<g data-from="OIP_Message_Response" data-to="OIP_Sync_V061_Position_Ack"><text x="42" y="4330" font-size="15" fill="#a8bbd5">← OIP_Message_Response</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Position_Nested_IR">
-<rect x="28" y="4364" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4393" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Position_Nested_IR</text>
-<g data-from="OIP_Sync_V061_Position_Transport" data-to="OIP_Sync_V061_Position_Nested_IR"><text x="42" y="4418" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Transport</text></g>
-<g data-from="OIP_Sync_V061_Position_Ack" data-to="OIP_Sync_V061_Position_Nested_IR"><text x="42" y="4442" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Ack</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Product_ABI">
-<rect x="28" y="4476" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4505" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Product_ABI</text>
-<g data-from="OIP_Sync_V061_Position_Boundary" data-to="OIP_Sync_V061_Product_ABI"><text x="42" y="4530" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Boundary</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Ack_ABI">
-<rect x="28" y="4564" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4593" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Ack_ABI</text>
-<g data-from="OIP_Sync_V061_Position_Ack" data-to="OIP_Sync_V061_Ack_ABI"><text x="42" y="4618" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Ack</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Extraction_V1">
-<rect x="28" y="4652" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4681" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Extraction_V1</text>
-<g data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Extraction_V1"><text x="42" y="4706" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Definitions</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Seeds_V1">
-<rect x="28" y="4740" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4769" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Seeds_V1</text>
-<g data-from="OIP_Sync_V061_Extraction_V1" data-to="OIP_Sync_V061_Seeds_V1"><text x="42" y="4794" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Extraction_V1</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Strict_Proof_Link_V1">
-<rect x="28" y="4828" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4857" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Strict_Proof_Link_V1</text>
-<g data-from="OIP_Sync_V061_Extraction_V1" data-to="OIP_Sync_V061_Strict_Proof_Link_V1"><text x="42" y="4882" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Extraction_V1</text></g>
-</g>
-<g data-node="OIP_Response_Code_Allocation">
-<rect x="28" y="4916" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="4945" font-size="17" fill="#e1eaf8">OIP_Response_Code_Allocation</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Response_Code_Allocation"><text x="42" y="4970" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Response_Code_Extension">
-<rect x="28" y="5004" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5033" font-size="17" fill="#e1eaf8">OIP_Response_Code_Extension</text>
-<g data-from="OIP_Response_Code_Allocation" data-to="OIP_Response_Code_Extension"><text x="42" y="5058" font-size="15" fill="#a8bbd5">← OIP_Response_Code_Allocation</text></g>
-</g>
-<g data-node="OIP_Response_Code_IntInf_Runtime">
-<rect x="28" y="5092" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5121" font-size="17" fill="#e1eaf8">OIP_Response_Code_IntInf_Runtime</text>
-<g data-from="OIP_Response_Code_Extension" data-to="OIP_Response_Code_IntInf_Runtime"><text x="42" y="5146" font-size="15" fill="#a8bbd5">← OIP_Response_Code_Extension</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Mode_Product_ABI">
-<rect x="28" y="5180" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5209" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Mode_Product_ABI</text>
-<g data-from="OIP_Sync_V061_Product_ABI" data-to="OIP_Sync_V061_Mode_Product_ABI"><text x="42" y="5234" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Product_ABI</text></g>
-</g>
-<g data-node="OIP_Current_Read_G0_Source">
-<rect x="28" y="5268" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5297" font-size="17" fill="#e1eaf8">OIP_Current_Read_G0_Source</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Current_Read_G0_Source"><text x="42" y="5322" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Current_Read_G0_V9">
-<rect x="28" y="5356" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5385" font-size="17" fill="#e1eaf8">OIP_Current_Read_G0_V9</text>
-<g data-from="OIP_Current_Read_G0_Source" data-to="OIP_Current_Read_G0_V9"><text x="42" y="5410" font-size="15" fill="#a8bbd5">← OIP_Current_Read_G0_Source</text></g>
-</g>
-<g data-node="OIP_Current_Read_Vector_Export">
-<rect x="28" y="5444" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5473" font-size="17" fill="#e1eaf8">OIP_Current_Read_Vector_Export</text>
-<g data-from="OIP_Current_Read_G0_V9" data-to="OIP_Current_Read_Vector_Export"><text x="42" y="5498" font-size="15" fill="#a8bbd5">← OIP_Current_Read_G0_V9</text></g>
-</g>
-<g data-node="OIP_Reference_Write_Raw_Ack_Seed">
-<rect x="28" y="5532" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5561" font-size="17" fill="#e1eaf8">OIP_Reference_Write_Raw_Ack_Seed</text>
-<g data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Reference_Write_Raw_Ack_Seed"><text x="42" y="5586" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_Core_Seed</text></g>
-</g>
-<g data-node="OIP_Response_Egress_V061_Operands">
-<rect x="28" y="5620" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5649" font-size="17" fill="#e1eaf8">OIP_Response_Egress_V061_Operands</text>
-<g data-from="OIP_Message_Egress" data-to="OIP_Response_Egress_V061_Operands"><text x="42" y="5674" font-size="15" fill="#a8bbd5">← OIP_Message_Egress</text></g>
-<g data-from="OIP_Sync_V061_Position_Nested_IR" data-to="OIP_Response_Egress_V061_Operands"><text x="42" y="5698" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Nested_IR</text></g>
-<g data-from="OIP_Response_Code_Extension" data-to="OIP_Response_Egress_V061_Operands"><text x="42" y="5722" font-size="15" fill="#a8bbd5">← OIP_Response_Code_Extension</text></g>
-</g>
-<g data-node="OIP_Response_Egress_V061_V5">
-<rect x="28" y="5756" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5785" font-size="17" fill="#e1eaf8">OIP_Response_Egress_V061_V5</text>
-<g data-from="OIP_Response_Egress_V061_Operands" data-to="OIP_Response_Egress_V061_V5"><text x="42" y="5810" font-size="15" fill="#a8bbd5">← OIP_Response_Egress_V061_Operands</text></g>
-<g data-from="OIP_Sync_V061_Position_Boundary" data-to="OIP_Response_Egress_V061_V5"><text x="42" y="5834" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Boundary</text></g>
-<g data-from="OIP_Reference_Write_Profile" data-to="OIP_Response_Egress_V061_V5"><text x="42" y="5858" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_Profile</text></g>
-</g>
-<g data-node="OIP_Response_Egress_V061_Runtime_V7">
-<rect x="28" y="5892" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="5921" font-size="17" fill="#e1eaf8">OIP_Response_Egress_V061_Runtime_V7</text>
-<g data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Egress_V061_Runtime_V7"><text x="42" y="5946" font-size="15" fill="#a8bbd5">← OIP_Response_Egress_V061_V5</text></g>
-</g>
-<g data-node="OIP_Response_Egress_V061_Preservation_V7">
-<rect x="28" y="5980" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6009" font-size="17" fill="#e1eaf8">OIP_Response_Egress_V061_Preservation_V7</text>
-<g data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Egress_V061_Preservation_V7"><text x="42" y="6034" font-size="15" fill="#a8bbd5">← OIP_Response_Egress_V061_V5</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Typed_Artifact">
-<rect x="28" y="6068" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6097" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Typed_Artifact</text>
-<g data-from="OIP_Sync_V061_Position_Nested_IR" data-to="OIP_Sync_V061_Typed_Artifact"><text x="42" y="6122" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Nested_IR</text></g>
-</g>
-<g data-node="OIP_Response_Egress_V061_Export">
-<rect x="28" y="6156" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6185" font-size="17" fill="#e1eaf8">OIP_Response_Egress_V061_Export</text>
-<g data-from="OIP_Response_Egress_V061_Runtime_V7" data-to="OIP_Response_Egress_V061_Export"><text x="42" y="6210" font-size="15" fill="#a8bbd5">← OIP_Response_Egress_V061_Runtime_V7</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Configured_Profile_ABI">
-<rect x="28" y="6244" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6273" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Configured_Profile_ABI</text>
-<g data-from="OIP_Sync_V061_Wire_V4" data-to="OIP_Sync_V061_Configured_Profile_ABI"><text x="42" y="6298" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Wire_V4</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Supplier_ABI">
-<rect x="28" y="6332" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6361" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Supplier_ABI</text>
-<g data-from="OIP_Sync_V061_Concrete_Supplier_V2" data-to="OIP_Sync_V061_Supplier_ABI"><text x="42" y="6386" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Concrete_Supplier_V2</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Image_Link">
-<rect x="28" y="6420" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6449" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Image_Link</text>
-<g data-from="OIP_Sync_V061_Position_Selection" data-to="OIP_Sync_V061_Image_Link"><text x="42" y="6474" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Selection</text></g>
-</g>
-<g data-node="OIP_Sync_V061_ID_Guard_ABI_V2">
-<rect x="28" y="6508" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6537" font-size="17" fill="#e1eaf8">OIP_Sync_V061_ID_Guard_ABI_V2</text>
-<g data-from="OIP_Sync_V061_Product_ABI" data-to="OIP_Sync_V061_ID_Guard_ABI_V2"><text x="42" y="6562" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Product_ABI</text></g>
-</g>
-<g data-node="OIP_Reference_Write_Capacity">
-<rect x="28" y="6596" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6625" font-size="17" fill="#e1eaf8">OIP_Reference_Write_Capacity</text>
-<g data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Reference_Write_Capacity"><text x="42" y="6650" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_Core_Seed</text></g>
-</g>
-<g data-node="OIP_Sync_V061_Image_Binding_ABI">
-<rect x="28" y="6684" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6713" font-size="17" fill="#e1eaf8">OIP_Sync_V061_Image_Binding_ABI</text>
-<g data-from="OIP_Sync_V061_Image_Link" data-to="OIP_Sync_V061_Image_Binding_ABI"><text x="42" y="6738" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Image_Link</text></g>
-</g>
-<g data-node="OIP_V062_Negotiation_Core">
-<rect x="28" y="6772" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6801" font-size="17" fill="#e1eaf8">OIP_V062_Negotiation_Core</text>
-<g data-from="HOL" data-to="OIP_V062_Negotiation_Core"><text x="42" y="6826" font-size="15" fill="#a8bbd5">← HOL</text></g>
-</g>
-<g data-node="OIP_V062_Negotiation_G0">
-<rect x="28" y="6860" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6889" font-size="17" fill="#e1eaf8">OIP_V062_Negotiation_G0</text>
-<g data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_G0"><text x="42" y="6914" font-size="15" fill="#a8bbd5">← OIP_V062_Negotiation_Core</text></g>
-</g>
-<g data-node="OIP_V062_Negotiation_Authentication">
-<rect x="28" y="6948" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="6977" font-size="17" fill="#e1eaf8">OIP_V062_Negotiation_Authentication</text>
-<g data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_Authentication"><text x="42" y="7002" font-size="15" fill="#a8bbd5">← OIP_V062_Negotiation_Core</text></g>
-</g>
-<g data-node="OIP_V062_Negotiation_Public_Bridge">
-<rect x="28" y="7036" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7065" font-size="17" fill="#e1eaf8">OIP_V062_Negotiation_Public_Bridge</text>
-<g data-from="OIP_Product" data-to="OIP_V062_Negotiation_Public_Bridge"><text x="42" y="7090" font-size="15" fill="#a8bbd5">← OIP_Product</text></g>
-<g data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_Public_Bridge"><text x="42" y="7114" font-size="15" fill="#a8bbd5">← OIP_V062_Negotiation_Core</text></g>
-</g>
-<g data-node="OIP_V062_Negotiation_Export">
-<rect x="28" y="7148" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7177" font-size="17" fill="#e1eaf8">OIP_V062_Negotiation_Export</text>
-<g data-from="OIP_V062_Negotiation_Authentication" data-to="OIP_V062_Negotiation_Export"><text x="42" y="7202" font-size="15" fill="#a8bbd5">← OIP_V062_Negotiation_Authentication</text></g>
-<g data-from="HOL-Library" data-to="OIP_V062_Negotiation_Export"><text x="42" y="7226" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Transport_Boundary_Arithmetic">
-<rect x="28" y="7260" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7289" font-size="17" fill="#e1eaf8">OIP_Transport_Boundary_Arithmetic</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Transport_Boundary_Arithmetic"><text x="42" y="7314" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Transport_Boundary_Typed">
-<rect x="28" y="7348" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7377" font-size="17" fill="#e1eaf8">OIP_Transport_Boundary_Typed</text>
-<g data-from="OIP_Transport_Boundary_Arithmetic" data-to="OIP_Transport_Boundary_Typed"><text x="42" y="7402" font-size="15" fill="#a8bbd5">← OIP_Transport_Boundary_Arithmetic</text></g>
-</g>
-<g data-node="OIP_Transport_Boundary_G0">
-<rect x="28" y="7436" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7465" font-size="17" fill="#e1eaf8">OIP_Transport_Boundary_G0</text>
-<g data-from="OIP_Transport_Boundary_Typed" data-to="OIP_Transport_Boundary_G0"><text x="42" y="7490" font-size="15" fill="#a8bbd5">← OIP_Transport_Boundary_Typed</text></g>
-</g>
-<g data-node="OIP_P19_Threshold_G0">
-<rect x="28" y="7524" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7553" font-size="17" fill="#e1eaf8">OIP_P19_Threshold_G0</text>
-<g data-from="OIP_Message_Code" data-to="OIP_P19_Threshold_G0"><text x="42" y="7578" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_P19_Threshold_Export">
-<rect x="28" y="7612" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7641" font-size="17" fill="#e1eaf8">OIP_P19_Threshold_Export</text>
-<g data-from="OIP_P19_Threshold_G0" data-to="OIP_P19_Threshold_Export"><text x="42" y="7666" font-size="15" fill="#a8bbd5">← OIP_P19_Threshold_G0</text></g>
-</g>
-<g data-node="OIP_P19_Configured_Registry_G0">
-<rect x="28" y="7700" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7729" font-size="17" fill="#e1eaf8">OIP_P19_Configured_Registry_G0</text>
-<g data-from="OIP_P19_Threshold_G0" data-to="OIP_P19_Configured_Registry_G0"><text x="42" y="7754" font-size="15" fill="#a8bbd5">← OIP_P19_Threshold_G0</text></g>
-</g>
-<g data-node="OIP_P19_Configured_Registry_Export">
-<rect x="28" y="7788" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7817" font-size="17" fill="#e1eaf8">OIP_P19_Configured_Registry_Export</text>
-<g data-from="OIP_P19_Configured_Registry_G0" data-to="OIP_P19_Configured_Registry_Export"><text x="42" y="7842" font-size="15" fill="#a8bbd5">← OIP_P19_Configured_Registry_G0</text></g>
-<g data-from="OIP_P19_Threshold_Export" data-to="OIP_P19_Configured_Registry_Export"><text x="42" y="7866" font-size="15" fill="#a8bbd5">← OIP_P19_Threshold_Export</text></g>
-</g>
-<g data-node="OIP_Record_Reopening_Prefix_G0">
-<rect x="28" y="7900" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="7929" font-size="17" fill="#e1eaf8">OIP_Record_Reopening_Prefix_G0</text>
-<g data-from="OIP_Record_Reopening" data-to="OIP_Record_Reopening_Prefix_G0"><text x="42" y="7954" font-size="15" fill="#a8bbd5">← OIP_Record_Reopening</text></g>
-<g data-from="HOL-Library" data-to="OIP_Record_Reopening_Prefix_G0"><text x="42" y="7978" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Query_Cache_Source_G0">
-<rect x="28" y="8012" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8041" font-size="17" fill="#e1eaf8">OIP_Query_Cache_Source_G0</text>
-<g data-from="OIP_Reference_Profile" data-to="OIP_Query_Cache_Source_G0"><text x="42" y="8066" font-size="15" fill="#a8bbd5">← OIP_Reference_Profile</text></g>
-</g>
-<g data-node="OIP_Query_Cache_Source_Export">
-<rect x="28" y="8100" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8129" font-size="17" fill="#e1eaf8">OIP_Query_Cache_Source_Export</text>
-<g data-from="OIP_Query_Cache_Source_G0" data-to="OIP_Query_Cache_Source_Export"><text x="42" y="8154" font-size="15" fill="#a8bbd5">← OIP_Query_Cache_Source_G0</text></g>
-</g>
-<g data-node="OIP_Query6_Capture_G0">
-<rect x="28" y="8188" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8217" font-size="17" fill="#e1eaf8">OIP_Query6_Capture_G0</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Query6_Capture_G0"><text x="42" y="8242" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Query6_Capture_Export">
-<rect x="28" y="8276" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8305" font-size="17" fill="#e1eaf8">OIP_Query6_Capture_Export</text>
-<g data-from="OIP_Query6_Capture_G0" data-to="OIP_Query6_Capture_Export"><text x="42" y="8330" font-size="15" fill="#a8bbd5">← OIP_Query6_Capture_G0</text></g>
-</g>
-<g data-node="OIP_Settlement_Queue_G0">
-<rect x="28" y="8364" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8393" font-size="17" fill="#e1eaf8">OIP_Settlement_Queue_G0</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Settlement_Queue_G0"><text x="42" y="8418" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-<g data-from="HOL-Library" data-to="OIP_Settlement_Queue_G0"><text x="42" y="8442" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Reserve_Debit_Finite_Base">
-<rect x="28" y="8476" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8505" font-size="17" fill="#e1eaf8">OIP_Reserve_Debit_Finite_Base</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Reserve_Debit_Finite_Base"><text x="42" y="8530" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Reserve_Debit_Replay">
-<rect x="28" y="8564" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8593" font-size="17" fill="#e1eaf8">OIP_Reserve_Debit_Replay</text>
-<g data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Reserve_Debit_Replay"><text x="42" y="8618" font-size="15" fill="#a8bbd5">← OIP_Reserve_Debit_Finite_Base</text></g>
-</g>
-<g data-node="OIP_Reserve_Debit_Replay_Export">
-<rect x="28" y="8652" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8681" font-size="17" fill="#e1eaf8">OIP_Reserve_Debit_Replay_Export</text>
-<g data-from="OIP_Reserve_Debit_Replay" data-to="OIP_Reserve_Debit_Replay_Export"><text x="42" y="8706" font-size="15" fill="#a8bbd5">← OIP_Reserve_Debit_Replay</text></g>
-</g>
-<g data-node="OIP_Secondary_Read_G0">
-<rect x="28" y="8740" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8769" font-size="17" fill="#e1eaf8">OIP_Secondary_Read_G0</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Secondary_Read_G0"><text x="42" y="8794" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Secondary_Read_Export">
-<rect x="28" y="8828" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8857" font-size="17" fill="#e1eaf8">OIP_Secondary_Read_Export</text>
-<g data-from="OIP_Secondary_Read_G0" data-to="OIP_Secondary_Read_Export"><text x="42" y="8882" font-size="15" fill="#a8bbd5">← OIP_Secondary_Read_G0</text></g>
-</g>
-<g data-node="OIP_Historical_Read_G0">
-<rect x="28" y="8916" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="8945" font-size="17" fill="#e1eaf8">OIP_Historical_Read_G0</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Historical_Read_G0"><text x="42" y="8970" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Historical_Read_Export">
-<rect x="28" y="9004" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9033" font-size="17" fill="#e1eaf8">OIP_Historical_Read_Export</text>
-<g data-from="OIP_Historical_Read_G0" data-to="OIP_Historical_Read_Export"><text x="42" y="9058" font-size="15" fill="#a8bbd5">← OIP_Historical_Read_G0</text></g>
-</g>
-<g data-node="OIP_Pending_Lock_Model">
-<rect x="28" y="9092" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9121" font-size="17" fill="#e1eaf8">OIP_Pending_Lock_Model</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Pending_Lock_Model"><text x="42" y="9146" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-</g>
-<g data-node="OIP_Pending_Lock_Export">
-<rect x="28" y="9180" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9209" font-size="17" fill="#e1eaf8">OIP_Pending_Lock_Export</text>
-<g data-from="OIP_Pending_Lock_Model" data-to="OIP_Pending_Lock_Export"><text x="42" y="9234" font-size="15" fill="#a8bbd5">← OIP_Pending_Lock_Model</text></g>
-</g>
-<g data-node="OIP_Terminal_Record_G0">
-<rect x="28" y="9268" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9297" font-size="17" fill="#e1eaf8">OIP_Terminal_Record_G0</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Terminal_Record_G0"><text x="42" y="9322" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-</g>
-<g data-node="OIP_Terminal_Record_Export">
-<rect x="28" y="9356" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9385" font-size="17" fill="#e1eaf8">OIP_Terminal_Record_Export</text>
-<g data-from="OIP_Terminal_Record_G0" data-to="OIP_Terminal_Record_Export"><text x="42" y="9410" font-size="15" fill="#a8bbd5">← OIP_Terminal_Record_G0</text></g>
-<g data-from="HOL-Library" data-to="OIP_Terminal_Record_Export"><text x="42" y="9434" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Primary_Origin_Check">
-<rect x="28" y="9468" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9497" font-size="17" fill="#e1eaf8">OIP_Primary_Origin_Check</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Primary_Origin_Check"><text x="42" y="9522" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-</g>
-<g data-node="OIP_Primary_Origin_Export">
-<rect x="28" y="9556" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9585" font-size="17" fill="#e1eaf8">OIP_Primary_Origin_Export</text>
-<g data-from="OIP_Primary_Origin_Check" data-to="OIP_Primary_Origin_Export"><text x="42" y="9610" font-size="15" fill="#a8bbd5">← OIP_Primary_Origin_Check</text></g>
-</g>
-<g data-node="OIP_Completion_Gates">
-<rect x="28" y="9644" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9673" font-size="17" fill="#e1eaf8">OIP_Completion_Gates</text>
-<g data-from="OIP_Product_Base" data-to="OIP_Completion_Gates"><text x="42" y="9698" font-size="15" fill="#a8bbd5">← OIP_Product_Base</text></g>
-</g>
-<g data-node="OIP_Completion_Gates_Export">
-<rect x="28" y="9732" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9761" font-size="17" fill="#e1eaf8">OIP_Completion_Gates_Export</text>
-<g data-from="OIP_Completion_Gates" data-to="OIP_Completion_Gates_Export"><text x="42" y="9786" font-size="15" fill="#a8bbd5">← OIP_Completion_Gates</text></g>
-</g>
-<g data-node="OIP_Regulatory_Legal_G0">
-<rect x="28" y="9820" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9849" font-size="17" fill="#e1eaf8">OIP_Regulatory_Legal_G0</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Regulatory_Legal_G0"><text x="42" y="9874" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-<g data-from="HOL-Library" data-to="OIP_Regulatory_Legal_G0"><text x="42" y="9898" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Legal_Receipt_Check">
-<rect x="28" y="9932" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="9961" font-size="17" fill="#e1eaf8">OIP_Legal_Receipt_Check</text>
-<g data-from="OIP_Product" data-to="OIP_Legal_Receipt_Check"><text x="42" y="9986" font-size="15" fill="#a8bbd5">← OIP_Product</text></g>
-</g>
-<g data-node="OIP_Legal_Receipt_Export">
-<rect x="28" y="10020" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10049" font-size="17" fill="#e1eaf8">OIP_Legal_Receipt_Export</text>
-<g data-from="OIP_Legal_Receipt_Check" data-to="OIP_Legal_Receipt_Export"><text x="42" y="10074" font-size="15" fill="#a8bbd5">← OIP_Legal_Receipt_Check</text></g>
-</g>
-<g data-node="OIP_Protected_Spend_Core">
-<rect x="28" y="10108" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10137" font-size="17" fill="#e1eaf8">OIP_Protected_Spend_Core</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Protected_Spend_Core"><text x="42" y="10162" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-</g>
-<g data-node="OIP_Protected_Spend_Seed">
-<rect x="28" y="10196" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10225" font-size="17" fill="#e1eaf8">OIP_Protected_Spend_Seed</text>
-<g data-from="OIP_Protected_Spend_Core" data-to="OIP_Protected_Spend_Seed"><text x="42" y="10250" font-size="15" fill="#a8bbd5">← OIP_Protected_Spend_Core</text></g>
-</g>
-<g data-node="OIP_Protected_Spend_G0">
-<rect x="28" y="10284" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10313" font-size="17" fill="#e1eaf8">OIP_Protected_Spend_G0</text>
-<g data-from="OIP_Protected_Spend_Seed" data-to="OIP_Protected_Spend_G0"><text x="42" y="10338" font-size="15" fill="#a8bbd5">← OIP_Protected_Spend_Seed</text></g>
-</g>
-<g data-node="OIP_Protected_Spend_Export">
-<rect x="28" y="10372" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10401" font-size="17" fill="#e1eaf8">OIP_Protected_Spend_Export</text>
-<g data-from="OIP_Protected_Spend_G0" data-to="OIP_Protected_Spend_Export"><text x="42" y="10426" font-size="15" fill="#a8bbd5">← OIP_Protected_Spend_G0</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Seed_Frame">
-<rect x="28" y="10460" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10489" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Seed_Frame</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_V062_Handover_Seed_Frame"><text x="42" y="10514" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Typed_Model">
-<rect x="28" y="10548" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10577" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Typed_Model</text>
-<g data-from="OIP_V062_Handover_Seed_Frame" data-to="OIP_V062_Handover_Typed_Model"><text x="42" y="10602" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Seed_Frame</text></g>
-</g>
-<g data-node="OIP_V062_Handover_G0">
-<rect x="28" y="10636" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10665" font-size="17" fill="#e1eaf8">OIP_V062_Handover_G0</text>
-<g data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_G0"><text x="42" y="10690" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Typed_Model</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Finite_Model">
-<rect x="28" y="10724" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10753" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Finite_Model</text>
-<g data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_Finite_Model"><text x="42" y="10778" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Typed_Model</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Finite_Export">
-<rect x="28" y="10812" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10841" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Finite_Export</text>
-<g data-from="OIP_V062_Handover_Finite_Model" data-to="OIP_V062_Handover_Finite_Export"><text x="42" y="10866" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Finite_Model</text></g>
-<g data-from="HOL-Library" data-to="OIP_V062_Handover_Finite_Export"><text x="42" y="10890" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Recovery_Control_Base">
-<rect x="28" y="10924" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="10953" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Recovery_Control_Base</text>
-<g data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_Recovery_Control_Base"><text x="42" y="10978" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Typed_Model</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Recovery_Control_G0">
-<rect x="28" y="11012" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11041" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Recovery_Control_G0</text>
-<g data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Handover_Recovery_Control_G0"><text x="42" y="11066" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Recovery_Control_Base</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Recovery_Finite_Model">
-<rect x="28" y="11100" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11129" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Recovery_Finite_Model</text>
-<g data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Handover_Recovery_Finite_Model"><text x="42" y="11154" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Recovery_Control_Base</text></g>
-<g data-from="OIP_V062_Handover_Finite_Model" data-to="OIP_V062_Handover_Recovery_Finite_Model"><text x="42" y="11178" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Finite_Model</text></g>
-</g>
-<g data-node="OIP_V062_Handover_Recovery_Export">
-<rect x="28" y="11212" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11241" font-size="17" fill="#e1eaf8">OIP_V062_Handover_Recovery_Export</text>
-<g data-from="OIP_V062_Handover_Recovery_Finite_Model" data-to="OIP_V062_Handover_Recovery_Export"><text x="42" y="11266" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Recovery_Finite_Model</text></g>
-<g data-from="HOL-Library" data-to="OIP_V062_Handover_Recovery_Export"><text x="42" y="11290" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Epoch_Base">
-<rect x="28" y="11324" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11353" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Epoch_Base</text>
-<g data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_P13_Replay_Epoch_Base"><text x="42" y="11378" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Typed_Model</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Epoch_G0">
-<rect x="28" y="11412" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11441" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Epoch_G0</text>
-<g data-from="OIP_V062_P13_Replay_Epoch_Base" data-to="OIP_V062_P13_Replay_Epoch_G0"><text x="42" y="11466" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Epoch_Base</text></g>
-</g>
-<g data-node="OIP_Schedule_Core">
-<rect x="28" y="11500" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11529" font-size="17" fill="#e1eaf8">OIP_Schedule_Core</text>
-<g data-from="OIP_Reference_Execution" data-to="OIP_Schedule_Core"><text x="42" y="11554" font-size="15" fill="#a8bbd5">← OIP_Reference_Execution</text></g>
-</g>
-<g data-node="OIP_Typed_Scheduler">
-<rect x="28" y="11588" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11617" font-size="17" fill="#e1eaf8">OIP_Typed_Scheduler</text>
-<g data-from="OIP_Schedule_Core" data-to="OIP_Typed_Scheduler"><text x="42" y="11642" font-size="15" fill="#a8bbd5">← OIP_Schedule_Core</text></g>
-</g>
-<g data-node="OIP_Schedule_Product">
-<rect x="28" y="11676" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11705" font-size="17" fill="#e1eaf8">OIP_Schedule_Product</text>
-<g data-from="OIP_Typed_Scheduler" data-to="OIP_Schedule_Product"><text x="42" y="11730" font-size="15" fill="#a8bbd5">← OIP_Typed_Scheduler</text></g>
-</g>
-<g data-node="OIP_Schedule_Cases">
-<rect x="28" y="11764" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11793" font-size="17" fill="#e1eaf8">OIP_Schedule_Cases</text>
-<g data-from="OIP_Schedule_Product" data-to="OIP_Schedule_Cases"><text x="42" y="11818" font-size="15" fill="#a8bbd5">← OIP_Schedule_Product</text></g>
-</g>
-<g data-node="OIP_Schedule_Export">
-<rect x="28" y="11852" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11881" font-size="17" fill="#e1eaf8">OIP_Schedule_Export</text>
-<g data-from="OIP_Schedule_Cases" data-to="OIP_Schedule_Export"><text x="42" y="11906" font-size="15" fill="#a8bbd5">← OIP_Schedule_Cases</text></g>
-</g>
-<g data-node="OIP_Schedule_Boundaries">
-<rect x="28" y="11940" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="11969" font-size="17" fill="#e1eaf8">OIP_Schedule_Boundaries</text>
-<g data-from="OIP_Schedule_Product" data-to="OIP_Schedule_Boundaries"><text x="42" y="11994" font-size="15" fill="#a8bbd5">← OIP_Schedule_Product</text></g>
-<g data-from="OIP_Query_Cache_Source_G0" data-to="OIP_Schedule_Boundaries"><text x="42" y="12018" font-size="15" fill="#a8bbd5">← OIP_Query_Cache_Source_G0</text></g>
-</g>
-<g data-node="OIP_Signed_Schedule_Pair">
-<rect x="28" y="12052" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12081" font-size="17" fill="#e1eaf8">OIP_Signed_Schedule_Pair</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Signed_Schedule_Pair"><text x="42" y="12106" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-<g data-from="OIP_Schedule_Product" data-to="OIP_Signed_Schedule_Pair"><text x="42" y="12130" font-size="15" fill="#a8bbd5">← OIP_Schedule_Product</text></g>
-</g>
-<g data-node="OIP_Direct_Publication_Check">
-<rect x="28" y="12164" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12193" font-size="17" fill="#e1eaf8">OIP_Direct_Publication_Check</text>
-<g data-from="OIP_Product" data-to="OIP_Direct_Publication_Check"><text x="42" y="12218" font-size="15" fill="#a8bbd5">← OIP_Product</text></g>
-</g>
-<g data-node="OIP_Direct_Publication_Export">
-<rect x="28" y="12252" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12281" font-size="17" fill="#e1eaf8">OIP_Direct_Publication_Export</text>
-<g data-from="OIP_Direct_Publication_Check" data-to="OIP_Direct_Publication_Export"><text x="42" y="12306" font-size="15" fill="#a8bbd5">← OIP_Direct_Publication_Check</text></g>
-</g>
-<g data-node="OIP_Independent_Publication_Check">
-<rect x="28" y="12340" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12369" font-size="17" fill="#e1eaf8">OIP_Independent_Publication_Check</text>
-<g data-from="OIP_Direct_Publication_Check" data-to="OIP_Independent_Publication_Check"><text x="42" y="12394" font-size="15" fill="#a8bbd5">← OIP_Direct_Publication_Check</text></g>
-</g>
-<g data-node="OIP_Independent_Publication_Export">
-<rect x="28" y="12428" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12457" font-size="17" fill="#e1eaf8">OIP_Independent_Publication_Export</text>
-<g data-from="OIP_Independent_Publication_Check" data-to="OIP_Independent_Publication_Export"><text x="42" y="12482" font-size="15" fill="#a8bbd5">← OIP_Independent_Publication_Check</text></g>
-<g data-from="OIP_Direct_Publication_Export" data-to="OIP_Independent_Publication_Export"><text x="42" y="12506" font-size="15" fill="#a8bbd5">← OIP_Direct_Publication_Export</text></g>
-</g>
-<g data-node="OIP_Etcd_Control_Confirmation">
-<rect x="28" y="12540" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12569" font-size="17" fill="#e1eaf8">OIP_Etcd_Control_Confirmation</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Etcd_Control_Confirmation"><text x="42" y="12594" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Witness_Mirror_Check">
-<rect x="28" y="12628" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12657" font-size="17" fill="#e1eaf8">OIP_Witness_Mirror_Check</text>
-<g data-from="OIP_Reference_Profile" data-to="OIP_Witness_Mirror_Check"><text x="42" y="12682" font-size="15" fill="#a8bbd5">← OIP_Reference_Profile</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Stored_Outcome_Repair">
-<rect x="28" y="12716" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12745" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Stored_Outcome_Repair</text>
-<g data-from="OIP_V062_P13_Replay_Epoch_Base" data-to="OIP_V062_P13_Replay_Stored_Outcome_Repair"><text x="42" y="12770" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Epoch_Base</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final">
-<rect x="28" y="12804" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12833" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Stored_Outcome_Observe_Final</text>
-<g data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final"><text x="42" y="12858" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Stored_Outcome_Repair</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Dispatch">
-<rect x="28" y="12892" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="12921" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Dispatch</text>
-<g data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Dispatch"><text x="42" y="12946" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Stored_Outcome_Repair</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Install">
-<rect x="28" y="12980" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13009" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Install</text>
-<g data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Install"><text x="42" y="13034" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Stored_Outcome_Repair</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Lookup">
-<rect x="28" y="13068" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13097" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Lookup</text>
-<g data-from="OIP_V062_P13_Replay_Install" data-to="OIP_V062_P13_Replay_Lookup"><text x="42" y="13122" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Install</text></g>
-<g data-from="OIP_V062_P13_Replay_Dispatch" data-to="OIP_V062_P13_Replay_Lookup"><text x="42" y="13146" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Dispatch</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Finite_Projection">
-<rect x="28" y="13180" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13209" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Finite_Projection</text>
-<g data-from="OIP_V062_P13_Replay_Lookup" data-to="OIP_V062_P13_Replay_Finite_Projection"><text x="42" y="13234" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Lookup</text></g>
-</g>
-<g data-node="OIP_V062_P13_Replay_Export">
-<rect x="28" y="13268" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13297" font-size="17" fill="#e1eaf8">OIP_V062_P13_Replay_Export</text>
-<g data-from="OIP_V062_P13_Replay_Finite_Projection" data-to="OIP_V062_P13_Replay_Export"><text x="42" y="13322" font-size="15" fill="#a8bbd5">← OIP_V062_P13_Replay_Finite_Projection</text></g>
-</g>
-<g data-node="OIP_Witness_Prepare_Codec_Check">
-<rect x="28" y="13356" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13385" font-size="17" fill="#e1eaf8">OIP_Witness_Prepare_Codec_Check</text>
-<g data-from="OIP_Witness_Mirror_Check" data-to="OIP_Witness_Prepare_Codec_Check"><text x="42" y="13410" font-size="15" fill="#a8bbd5">← OIP_Witness_Mirror_Check</text></g>
-</g>
-<g data-node="OIP_Etcd_Replace_Preflight">
-<rect x="28" y="13444" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13473" font-size="17" fill="#e1eaf8">OIP_Etcd_Replace_Preflight</text>
-<g data-from="OIP_Etcd_Control_Confirmation" data-to="OIP_Etcd_Replace_Preflight"><text x="42" y="13498" font-size="15" fill="#a8bbd5">← OIP_Etcd_Control_Confirmation</text></g>
-</g>
-<g data-node="OIP_Signed_Schedule_Refusals">
-<rect x="28" y="13532" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13561" font-size="17" fill="#e1eaf8">OIP_Signed_Schedule_Refusals</text>
-<g data-from="OIP_Signed_Schedule_Pair" data-to="OIP_Signed_Schedule_Refusals"><text x="42" y="13586" font-size="15" fill="#a8bbd5">← OIP_Signed_Schedule_Pair</text></g>
-</g>
-<g data-node="OIP_Threshold_Raw_Identity">
-<rect x="28" y="13620" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13649" font-size="17" fill="#e1eaf8">OIP_Threshold_Raw_Identity</text>
-<g data-from="OIP_P19_Threshold_Export" data-to="OIP_Threshold_Raw_Identity"><text x="42" y="13674" font-size="15" fill="#a8bbd5">← OIP_P19_Threshold_Export</text></g>
-</g>
-<g data-node="OIP_V062_Refund_Origin_Link">
-<rect x="28" y="13708" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13737" font-size="17" fill="#e1eaf8">OIP_V062_Refund_Origin_Link</text>
-<g data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Refund_Origin_Link"><text x="42" y="13762" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Recovery_Control_Base</text></g>
-<g data-from="OIP_Terminal_Record_G0" data-to="OIP_V062_Refund_Origin_Link"><text x="42" y="13786" font-size="15" fill="#a8bbd5">← OIP_Terminal_Record_G0</text></g>
-</g>
-<g data-node="OIP_V062_Refund_Origin_Export">
-<rect x="28" y="13820" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13849" font-size="17" fill="#e1eaf8">OIP_V062_Refund_Origin_Export</text>
-<g data-from="OIP_V062_Refund_Origin_Link" data-to="OIP_V062_Refund_Origin_Export"><text x="42" y="13874" font-size="15" fill="#a8bbd5">← OIP_V062_Refund_Origin_Link</text></g>
-<g data-from="HOL-Library" data-to="OIP_V062_Refund_Origin_Export"><text x="42" y="13898" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Exact_Receipt_Core_Comparison">
-<rect x="28" y="13932" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="13961" font-size="17" fill="#e1eaf8">OIP_Exact_Receipt_Core_Comparison</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Exact_Receipt_Core_Comparison"><text x="42" y="13986" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Query8_Scope_Binding">
-<rect x="28" y="14020" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14049" font-size="17" fill="#e1eaf8">OIP_Query8_Scope_Binding</text>
-<g data-from="OIP_Exact_Receipt_Core_Comparison" data-to="OIP_Query8_Scope_Binding"><text x="42" y="14074" font-size="15" fill="#a8bbd5">← OIP_Exact_Receipt_Core_Comparison</text></g>
-</g>
-<g data-node="OIP_Lock_Clock_Model_Link">
-<rect x="28" y="14108" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14137" font-size="17" fill="#e1eaf8">OIP_Lock_Clock_Model_Link</text>
-<g data-from="OIP_Pending_Lock_Export" data-to="OIP_Lock_Clock_Model_Link"><text x="42" y="14162" font-size="15" fill="#a8bbd5">← OIP_Pending_Lock_Export</text></g>
-</g>
-<g data-node="OIP_ACK1_Entry">
-<rect x="28" y="14196" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14225" font-size="17" fill="#e1eaf8">OIP_ACK1_Entry</text>
-<g data-from="OIP_Message_Code" data-to="OIP_ACK1_Entry"><text x="42" y="14250" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Dispatch_Debit_Lease_Link">
-<rect x="28" y="14284" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14313" font-size="17" fill="#e1eaf8">OIP_Dispatch_Debit_Lease_Link</text>
-<g data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Dispatch_Debit_Lease_Link"><text x="42" y="14338" font-size="15" fill="#a8bbd5">← OIP_Reserve_Debit_Finite_Base</text></g>
-</g>
-<g data-node="OIP_Response_Signer_Parse_Probe">
-<rect x="28" y="14372" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14401" font-size="17" fill="#e1eaf8">OIP_Response_Signer_Parse_Probe</text>
-<g data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Signer_Parse_Probe"><text x="42" y="14426" font-size="15" fill="#a8bbd5">← OIP_Response_Egress_V061_V5</text></g>
-</g>
-<g data-node="OIP_Signed_Legal_Model_Link">
-<rect x="28" y="14460" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14489" font-size="17" fill="#e1eaf8">OIP_Signed_Legal_Model_Link</text>
-<g data-from="OIP_Protected_Spend_Export" data-to="OIP_Signed_Legal_Model_Link"><text x="42" y="14514" font-size="15" fill="#a8bbd5">← OIP_Protected_Spend_Export</text></g>
-<g data-from="OIP_Message_Code" data-to="OIP_Signed_Legal_Model_Link"><text x="42" y="14538" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Go_Admitted_Operand_Model_Link">
-<rect x="28" y="14572" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14601" font-size="17" fill="#e1eaf8">OIP_Go_Admitted_Operand_Model_Link</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Go_Admitted_Operand_Model_Link"><text x="42" y="14626" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Raw_Terminal_Read_Model_Link">
-<rect x="28" y="14660" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14689" font-size="17" fill="#e1eaf8">OIP_Raw_Terminal_Read_Model_Link</text>
-<g data-from="OIP_Secondary_Read_Export" data-to="OIP_Raw_Terminal_Read_Model_Link"><text x="42" y="14714" font-size="15" fill="#a8bbd5">← OIP_Secondary_Read_Export</text></g>
-</g>
-<g data-node="OIP_Refund_Source_Certificate_Link">
-<rect x="28" y="14748" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14777" font-size="17" fill="#e1eaf8">OIP_Refund_Source_Certificate_Link</text>
-<g data-from="OIP_V062_Refund_Origin_Link" data-to="OIP_Refund_Source_Certificate_Link"><text x="42" y="14802" font-size="15" fill="#a8bbd5">← OIP_V062_Refund_Origin_Link</text></g>
-<g data-from="OIP_Reference_Profile" data-to="OIP_Refund_Source_Certificate_Link"><text x="42" y="14826" font-size="15" fill="#a8bbd5">← OIP_Reference_Profile</text></g>
-<g data-from="HOL-Library" data-to="OIP_Refund_Source_Certificate_Link"><text x="42" y="14850" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Signed_Owner_Read_Model_Link">
-<rect x="28" y="14884" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="14913" font-size="17" fill="#e1eaf8">OIP_Signed_Owner_Read_Model_Link</text>
-<g data-from="OIP_Secondary_Read_Export" data-to="OIP_Signed_Owner_Read_Model_Link"><text x="42" y="14938" font-size="15" fill="#a8bbd5">← OIP_Secondary_Read_Export</text></g>
-</g>
-<g data-node="OIP_Active_Session_Grant_Link">
-<rect x="28" y="14972" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15001" font-size="17" fill="#e1eaf8">OIP_Active_Session_Grant_Link</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Active_Session_Grant_Link"><text x="42" y="15026" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-<g data-from="HOL-Library" data-to="OIP_Active_Session_Grant_Link"><text x="42" y="15050" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Signed_Cache_Capture_Model_Link">
-<rect x="28" y="15084" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15113" font-size="17" fill="#e1eaf8">OIP_Signed_Cache_Capture_Model_Link</text>
-<g data-from="OIP_Query6_Capture_Export" data-to="OIP_Signed_Cache_Capture_Model_Link"><text x="42" y="15138" font-size="15" fill="#a8bbd5">← OIP_Query6_Capture_Export</text></g>
-</g>
-<g data-node="OIP_Selected_Record_Reopening_Model_Link">
-<rect x="28" y="15172" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15201" font-size="17" fill="#e1eaf8">OIP_Selected_Record_Reopening_Model_Link</text>
-<g data-from="OIP_Record_Reopening_Prefix_G0" data-to="OIP_Selected_Record_Reopening_Model_Link"><text x="42" y="15226" font-size="15" fill="#a8bbd5">← OIP_Record_Reopening_Prefix_G0</text></g>
-</g>
-<g data-node="OIP_Maintenance_Selection_Replay_Link">
-<rect x="28" y="15260" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15289" font-size="17" fill="#e1eaf8">OIP_Maintenance_Selection_Replay_Link</text>
-<g data-from="OIP_Ordered_Maintenance_G0_Core" data-to="OIP_Maintenance_Selection_Replay_Link"><text x="42" y="15314" font-size="15" fill="#a8bbd5">← OIP_Ordered_Maintenance_G0_Core</text></g>
-</g>
-<g data-node="OIP_Signed_Historical_Source_Pool_Link">
-<rect x="28" y="15348" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15377" font-size="17" fill="#e1eaf8">OIP_Signed_Historical_Source_Pool_Link</text>
-<g data-from="OIP_Historical_Read_Export" data-to="OIP_Signed_Historical_Source_Pool_Link"><text x="42" y="15402" font-size="15" fill="#a8bbd5">← OIP_Historical_Read_Export</text></g>
-</g>
-<g data-node="OIP_Signed_Cancel_Fence_Model_Link">
-<rect x="28" y="15436" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15465" font-size="17" fill="#e1eaf8">OIP_Signed_Cancel_Fence_Model_Link</text>
-<g data-from="OIP_Lock_Clock_Model_Link" data-to="OIP_Signed_Cancel_Fence_Model_Link"><text x="42" y="15490" font-size="15" fill="#a8bbd5">← OIP_Lock_Clock_Model_Link</text></g>
-<g data-from="OIP_Message_Code" data-to="OIP_Signed_Cancel_Fence_Model_Link"><text x="42" y="15514" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Signed_Write_Reopen_Link">
-<rect x="28" y="15548" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15577" font-size="17" fill="#e1eaf8">OIP_Signed_Write_Reopen_Link</text>
-<g data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Signed_Write_Reopen_Link"><text x="42" y="15602" font-size="15" fill="#a8bbd5">← OIP_Reference_Write_Core_Seed</text></g>
-<g data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Signed_Write_Reopen_Link"><text x="42" y="15626" font-size="15" fill="#a8bbd5">← OIP_Reserve_Debit_Finite_Base</text></g>
-</g>
-<g data-node="OIP_Signed_Ordinary_Spend_Model_Link">
-<rect x="28" y="15660" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15689" font-size="17" fill="#e1eaf8">OIP_Signed_Ordinary_Spend_Model_Link</text>
-<g data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_Signed_Ordinary_Spend_Model_Link"><text x="42" y="15714" font-size="15" fill="#a8bbd5">← OIP_Signed_Legal_Model_Link</text></g>
-</g>
-<g data-node="OIP_Signed_Preempt_Model_Link">
-<rect x="28" y="15748" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15777" font-size="17" fill="#e1eaf8">OIP_Signed_Preempt_Model_Link</text>
-<g data-from="OIP_Lock_Clock_Model_Link" data-to="OIP_Signed_Preempt_Model_Link"><text x="42" y="15802" font-size="15" fill="#a8bbd5">← OIP_Lock_Clock_Model_Link</text></g>
-<g data-from="OIP_Message_Code" data-to="OIP_Signed_Preempt_Model_Link"><text x="42" y="15826" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Signed_Publish_Primary_Model_Link">
-<rect x="28" y="15860" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="15889" font-size="17" fill="#e1eaf8">OIP_Signed_Publish_Primary_Model_Link</text>
-<g data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_Signed_Publish_Primary_Model_Link"><text x="42" y="15914" font-size="15" fill="#a8bbd5">← OIP_Signed_Legal_Model_Link</text></g>
-<g data-from="OIP_Completion_Gates_Export" data-to="OIP_Signed_Publish_Primary_Model_Link"><text x="42" y="15938" font-size="15" fill="#a8bbd5">← OIP_Completion_Gates_Export</text></g>
-</g>
-<g data-node="OIP_V062_Signed_Handover_Model_Link">
-<rect x="28" y="15972" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16001" font-size="17" fill="#e1eaf8">OIP_V062_Signed_Handover_Model_Link</text>
-<g data-from="OIP_Message_Code" data-to="OIP_V062_Signed_Handover_Model_Link"><text x="42" y="16026" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-<g data-from="OIP_V062_Handover_Finite_Export" data-to="OIP_V062_Signed_Handover_Model_Link"><text x="42" y="16050" font-size="15" fill="#a8bbd5">← OIP_V062_Handover_Finite_Export</text></g>
-</g>
-<g data-node="OIP_Retained_Transition_Integrity_Model_Link">
-<rect x="28" y="16084" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16113" font-size="17" fill="#e1eaf8">OIP_Retained_Transition_Integrity_Model_Link</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Retained_Transition_Integrity_Model_Link"><text x="42" y="16138" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Retained_Transition_Source_Link">
-<rect x="28" y="16172" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16201" font-size="17" fill="#e1eaf8">OIP_Retained_Transition_Source_Link</text>
-<g data-from="OIP_Record_Reopening_Prefix_G0" data-to="OIP_Retained_Transition_Source_Link"><text x="42" y="16226" font-size="15" fill="#a8bbd5">← OIP_Record_Reopening_Prefix_G0</text></g>
-</g>
-<g data-node="OIP_Concrete_Enforcement_Spend_Model_Link">
-<rect x="28" y="16260" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16289" font-size="17" fill="#e1eaf8">OIP_Concrete_Enforcement_Spend_Model_Link</text>
-<g data-from="OIP_Signed_Ordinary_Spend_Model_Link" data-to="OIP_Concrete_Enforcement_Spend_Model_Link"><text x="42" y="16314" font-size="15" fill="#a8bbd5">← OIP_Signed_Ordinary_Spend_Model_Link</text></g>
-</g>
-<g data-node="OIP_Source_Writer_JSON_G0">
-<rect x="28" y="16348" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16377" font-size="17" fill="#e1eaf8">OIP_Source_Writer_JSON_G0</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Source_Writer_JSON_G0"><text x="42" y="16402" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-</g>
-<g data-node="OIP_Source_Writer_Phases">
-<rect x="28" y="16436" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16465" font-size="17" fill="#e1eaf8">OIP_Source_Writer_Phases</text>
-<g data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_Source_Writer_Phases"><text x="42" y="16490" font-size="15" fill="#a8bbd5">← OIP_Source_Writer_JSON_G0</text></g>
-</g>
-<g data-node="OIP_Source_Writer_Integer_Transport">
-<rect x="28" y="16524" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16553" font-size="17" fill="#e1eaf8">OIP_Source_Writer_Integer_Transport</text>
-<g data-from="OIP_Source_Writer_Phases" data-to="OIP_Source_Writer_Integer_Transport"><text x="42" y="16578" font-size="15" fill="#a8bbd5">← OIP_Source_Writer_Phases</text></g>
-</g>
-<g data-node="OIP_Resolver_Waiting_Model_Link">
-<rect x="28" y="16612" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16641" font-size="17" fill="#e1eaf8">OIP_Resolver_Waiting_Model_Link</text>
-<g data-from="OIP_Message_Code" data-to="OIP_Resolver_Waiting_Model_Link"><text x="42" y="16666" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-<g data-from="HOL-Library" data-to="OIP_Resolver_Waiting_Model_Link"><text x="42" y="16690" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-<g data-from="OIP_Completion_Gates" data-to="OIP_Resolver_Waiting_Model_Link"><text x="42" y="16714" font-size="15" fill="#a8bbd5">← OIP_Completion_Gates</text></g>
-</g>
-<g data-node="OIP_Unpublished_Typed_Read_Link">
-<rect x="28" y="16748" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16777" font-size="17" fill="#e1eaf8">OIP_Unpublished_Typed_Read_Link</text>
-<g data-from="OIP_Historical_Read_G0" data-to="OIP_Unpublished_Typed_Read_Link"><text x="42" y="16802" font-size="15" fill="#a8bbd5">← OIP_Historical_Read_G0</text></g>
-<g data-from="HOL-Library" data-to="OIP_Unpublished_Typed_Read_Link"><text x="42" y="16826" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_Resolver_Unseen_Close_Link">
-<rect x="28" y="16860" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16889" font-size="17" fill="#e1eaf8">OIP_Resolver_Unseen_Close_Link</text>
-<g data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Unseen_Close_Link"><text x="42" y="16914" font-size="15" fill="#a8bbd5">← OIP_Resolver_Waiting_Model_Link</text></g>
-</g>
-<g data-node="OIP_Resolver_Pending_Control_Link">
-<rect x="28" y="16948" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="16977" font-size="17" fill="#e1eaf8">OIP_Resolver_Pending_Control_Link</text>
-<g data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Pending_Control_Link"><text x="42" y="17002" font-size="15" fill="#a8bbd5">← OIP_Resolver_Waiting_Model_Link</text></g>
-</g>
-<g data-node="OIP_Source_Resume_Link">
-<rect x="28" y="17036" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17065" font-size="17" fill="#e1eaf8">OIP_Source_Resume_Link</text>
-<g data-from="OIP_Source_Writer_Phases" data-to="OIP_Source_Resume_Link"><text x="42" y="17090" font-size="15" fill="#a8bbd5">← OIP_Source_Writer_Phases</text></g>
-</g>
-<g data-node="OIP_Source_Commitment_Resume_Link">
-<rect x="28" y="17124" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17153" font-size="17" fill="#e1eaf8">OIP_Source_Commitment_Resume_Link</text>
-<g data-from="OIP_Source_Resume_Link" data-to="OIP_Source_Commitment_Resume_Link"><text x="42" y="17178" font-size="15" fill="#a8bbd5">← OIP_Source_Resume_Link</text></g>
-<g data-from="OIP_Sync_V061_Concrete_Supplier_V2" data-to="OIP_Source_Commitment_Resume_Link"><text x="42" y="17202" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Concrete_Supplier_V2</text></g>
-</g>
-<g data-node="OIP_V062_Receiver_State_Branches">
-<rect x="28" y="17236" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17265" font-size="17" fill="#e1eaf8">OIP_V062_Receiver_State_Branches</text>
-<g data-from="OIP_Settlement_Queue_G0" data-to="OIP_V062_Receiver_State_Branches"><text x="42" y="17290" font-size="15" fill="#a8bbd5">← OIP_Settlement_Queue_G0</text></g>
-<g data-from="OIP_Message_Code" data-to="OIP_V062_Receiver_State_Branches"><text x="42" y="17314" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
-<g data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_V062_Receiver_State_Branches"><text x="42" y="17338" font-size="15" fill="#a8bbd5">← OIP_Source_Writer_JSON_G0</text></g>
-</g>
-<g data-node="OIP_V062_Receiver_State_ABI">
-<rect x="28" y="17372" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17401" font-size="17" fill="#e1eaf8">OIP_V062_Receiver_State_ABI</text>
-<g data-from="OIP_V062_Receiver_State_Branches" data-to="OIP_V062_Receiver_State_ABI"><text x="42" y="17426" font-size="15" fill="#a8bbd5">← OIP_V062_Receiver_State_Branches</text></g>
-</g>
-<g data-node="OIP_Publication_Endorser_Link">
-<rect x="28" y="17460" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17489" font-size="17" fill="#e1eaf8">OIP_Publication_Endorser_Link</text>
-<g data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Publication_Endorser_Link"><text x="42" y="17514" font-size="15" fill="#a8bbd5">← OIP_Resolver_Waiting_Model_Link</text></g>
-</g>
-<g data-node="OIP_Witness_Prepare_Compare_Link">
-<rect x="28" y="17548" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17577" font-size="17" fill="#e1eaf8">OIP_Witness_Prepare_Compare_Link</text>
-<g data-from="OIP_Witness_Prepare_Codec_Check" data-to="OIP_Witness_Prepare_Compare_Link"><text x="42" y="17602" font-size="15" fill="#a8bbd5">← OIP_Witness_Prepare_Codec_Check</text></g>
-<g data-from="OIP_Etcd_Control_Confirmation" data-to="OIP_Witness_Prepare_Compare_Link"><text x="42" y="17626" font-size="15" fill="#a8bbd5">← OIP_Etcd_Control_Confirmation</text></g>
-</g>
-<g data-node="OIP_Resolver_Current_Control_Link">
-<rect x="28" y="17660" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17689" font-size="17" fill="#e1eaf8">OIP_Resolver_Current_Control_Link</text>
-<g data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Current_Control_Link"><text x="42" y="17714" font-size="15" fill="#a8bbd5">← OIP_Resolver_Waiting_Model_Link</text></g>
-<g data-from="OIP_P19_Threshold_Export" data-to="OIP_Resolver_Current_Control_Link"><text x="42" y="17738" font-size="15" fill="#a8bbd5">← OIP_P19_Threshold_Export</text></g>
-<g data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_Resolver_Current_Control_Link"><text x="42" y="17762" font-size="15" fill="#a8bbd5">← OIP_Source_Writer_JSON_G0</text></g>
-</g>
-<g data-node="OIP_V062_Retained_Write_Receipt">
-<rect x="28" y="17796" width="544" height="100" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17825" font-size="17" fill="#e1eaf8">OIP_V062_Retained_Write_Receipt</text>
-<g data-from="OIP_Signed_Write_Reopen_Link" data-to="OIP_V062_Retained_Write_Receipt"><text x="42" y="17850" font-size="15" fill="#a8bbd5">← OIP_Signed_Write_Reopen_Link</text></g>
-<g data-from="OIP_Active_Session_Grant_Link" data-to="OIP_V062_Retained_Write_Receipt"><text x="42" y="17874" font-size="15" fill="#a8bbd5">← OIP_Active_Session_Grant_Link</text></g>
-</g>
-<g data-node="OIP_Settlement_Sync_Integrity_Link">
-<rect x="28" y="17908" width="544" height="124" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="17937" font-size="17" fill="#e1eaf8">OIP_Settlement_Sync_Integrity_Link</text>
-<g data-from="OIP_Retained_Transition_Integrity_Model_Link" data-to="OIP_Settlement_Sync_Integrity_Link"><text x="42" y="17962" font-size="15" fill="#a8bbd5">← OIP_Retained_Transition_Integrity_Model_Link</text></g>
-<g data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Settlement_Sync_Integrity_Link"><text x="42" y="17986" font-size="15" fill="#a8bbd5">← OIP_Sync_V061_Position_Definitions</text></g>
-<g data-from="HOL-Library" data-to="OIP_Settlement_Sync_Integrity_Link"><text x="42" y="18010" font-size="15" fill="#a8bbd5">← HOL-Library</text></g>
-</g>
-<g data-node="OIP_V062_Confiscate_Prior_Key">
-<rect x="28" y="18044" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="18073" font-size="17" fill="#e1eaf8">OIP_V062_Confiscate_Prior_Key</text>
-<g data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_V062_Confiscate_Prior_Key"><text x="42" y="18098" font-size="15" fill="#a8bbd5">← OIP_Signed_Legal_Model_Link</text></g>
-</g>
-<g data-node="OIP_V062_Response_Profile_Guard">
-<rect x="28" y="18132" width="544" height="76" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="42" y="18161" font-size="17" fill="#e1eaf8">OIP_V062_Response_Profile_Guard</text>
-<g data-from="OIP_Message_Code" data-to="OIP_V062_Response_Profile_Guard"><text x="42" y="18186" font-size="15" fill="#a8bbd5">← OIP_Message_Code</text></g>
+<metadata id="oip-extension-dependencies">
+  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Ordered_Maintenance_G0_Core"/>
+  <dependency data-from="OIP_Ordered_Maintenance_G0_Core" data-to="OIP_Ordered_Maintenance_Entry"/>
+  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Write_Canary_Base"/>
+  <dependency data-from="OIP_Write_Canary_Base" data-to="OIP_Write_Canary_Removal"/>
+  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Write_Canary_DurableV6"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Reference_Write_Profile"/>
+  <dependency data-from="OIP_Reference_Write_Profile" data-to="OIP_Reference_Write_AuthorityV4"/>
+  <dependency data-from="OIP_Reference_Write_AuthorityV4" data-to="OIP_Reference_Write_ChecksV9"/>
+  <dependency data-from="OIP_Write_Canary_Base" data-to="OIP_Reference_Write_ChecksV9"/>
+  <dependency data-from="OIP_Write_Canary_Removal" data-to="OIP_Reference_Write_ChecksV9"/>
+  <dependency data-from="OIP_Write_Canary_DurableV6" data-to="OIP_Reference_Write_ChecksV9"/>
+  <dependency data-from="OIP_Reference_Write_ChecksV9" data-to="OIP_Reference_Write_Vector_Export"/>
+  <dependency data-from="OIP_Reference_Write_Vector_Export" data-to="OIP_Reference_Write_Core_Seed"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Sync_V061_Wire_V4"/>
+  <dependency data-from="OIP_Sync_V061_Wire_V4" data-to="OIP_Sync_V061_Position_Definitions"/>
+  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Position_Proofs"/>
+  <dependency data-from="OIP_Sync_V061_Position_Proofs" data-to="OIP_Sync_V061_Position_Originals"/>
+  <dependency data-from="OIP_Sync_V061_Position_Originals" data-to="OIP_Sync_V061_Position_Boundary"/>
+  <dependency data-from="OIP_Sync_V061_Position_Proofs" data-to="OIP_Sync_V061_Position_Selection"/>
+  <dependency data-from="OIP_Sync_V061_Position_Selection" data-to="OIP_Sync_V061_Position_Provider"/>
+  <dependency data-from="OIP_Sync_V061_Position_Provider" data-to="OIP_Sync_V061_Concrete_Supplier_V2"/>
+  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Position_Direct_IR"/>
+  <dependency data-from="OIP_Sync_V061_Position_Direct_IR" data-to="OIP_Sync_V061_Position_Transport"/>
+  <dependency data-from="OIP_Sync_V061_Position_Originals" data-to="OIP_Sync_V061_Position_Ack"/>
+  <dependency data-from="OIP_Message_Response" data-to="OIP_Sync_V061_Position_Ack"/>
+  <dependency data-from="OIP_Sync_V061_Position_Transport" data-to="OIP_Sync_V061_Position_Nested_IR"/>
+  <dependency data-from="OIP_Sync_V061_Position_Ack" data-to="OIP_Sync_V061_Position_Nested_IR"/>
+  <dependency data-from="OIP_Sync_V061_Position_Boundary" data-to="OIP_Sync_V061_Product_ABI"/>
+  <dependency data-from="OIP_Sync_V061_Position_Ack" data-to="OIP_Sync_V061_Ack_ABI"/>
+  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Extraction_V1"/>
+  <dependency data-from="OIP_Sync_V061_Extraction_V1" data-to="OIP_Sync_V061_Seeds_V1"/>
+  <dependency data-from="OIP_Sync_V061_Extraction_V1" data-to="OIP_Sync_V061_Strict_Proof_Link_V1"/>
+  <dependency data-from="OIP_Response_Code_Extension" data-to="OIP_Response_Code_IntInf_Runtime"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Response_Code_Allocation"/>
+  <dependency data-from="OIP_Response_Code_Allocation" data-to="OIP_Response_Code_Extension"/>
+  <dependency data-from="OIP_Sync_V061_Product_ABI" data-to="OIP_Sync_V061_Mode_Product_ABI"/>
+  <dependency data-from="OIP_Current_Read_G0_Source" data-to="OIP_Current_Read_G0_V9"/>
+  <dependency data-from="OIP_Current_Read_G0_V9" data-to="OIP_Current_Read_Vector_Export"/>
+  <dependency data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Reference_Write_Raw_Ack_Seed"/>
+  <dependency data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Egress_V061_Runtime_V7"/>
+  <dependency data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Egress_V061_Preservation_V7"/>
+  <dependency data-from="OIP_Sync_V061_Position_Nested_IR" data-to="OIP_Sync_V061_Typed_Artifact"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Current_Read_G0_Source"/>
+  <dependency data-from="OIP_Message_Egress" data-to="OIP_Response_Egress_V061_Operands"/>
+  <dependency data-from="OIP_Sync_V061_Position_Nested_IR" data-to="OIP_Response_Egress_V061_Operands"/>
+  <dependency data-from="OIP_Response_Code_Extension" data-to="OIP_Response_Egress_V061_Operands"/>
+  <dependency data-from="OIP_Response_Egress_V061_Operands" data-to="OIP_Response_Egress_V061_V5"/>
+  <dependency data-from="OIP_Sync_V061_Position_Boundary" data-to="OIP_Response_Egress_V061_V5"/>
+  <dependency data-from="OIP_Reference_Write_Profile" data-to="OIP_Response_Egress_V061_V5"/>
+  <dependency data-from="OIP_Response_Egress_V061_Runtime_V7" data-to="OIP_Response_Egress_V061_Export"/>
+  <dependency data-from="OIP_Sync_V061_Wire_V4" data-to="OIP_Sync_V061_Configured_Profile_ABI"/>
+  <dependency data-from="OIP_Sync_V061_Concrete_Supplier_V2" data-to="OIP_Sync_V061_Supplier_ABI"/>
+  <dependency data-from="OIP_Sync_V061_Position_Selection" data-to="OIP_Sync_V061_Image_Link"/>
+  <dependency data-from="OIP_Sync_V061_Product_ABI" data-to="OIP_Sync_V061_ID_Guard_ABI_V2"/>
+  <dependency data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Reference_Write_Capacity"/>
+  <dependency data-from="OIP_Sync_V061_Image_Link" data-to="OIP_Sync_V061_Image_Binding_ABI"/>
+  <dependency data-from="HOL" data-to="OIP_V062_Negotiation_Core"/>
+  <dependency data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_G0"/>
+  <dependency data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_Authentication"/>
+  <dependency data-from="OIP_Product" data-to="OIP_V062_Negotiation_Public_Bridge"/>
+  <dependency data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_Public_Bridge"/>
+  <dependency data-from="OIP_V062_Negotiation_Authentication" data-to="OIP_V062_Negotiation_Export"/>
+  <dependency data-from="HOL-Library" data-to="OIP_V062_Negotiation_Export"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Transport_Boundary_Arithmetic"/>
+  <dependency data-from="OIP_Transport_Boundary_Arithmetic" data-to="OIP_Transport_Boundary_Typed"/>
+  <dependency data-from="OIP_Transport_Boundary_Typed" data-to="OIP_Transport_Boundary_G0"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_P19_Threshold_G0"/>
+  <dependency data-from="OIP_P19_Threshold_G0" data-to="OIP_P19_Threshold_Export"/>
+  <dependency data-from="OIP_P19_Threshold_G0" data-to="OIP_P19_Configured_Registry_G0"/>
+  <dependency data-from="OIP_P19_Configured_Registry_G0" data-to="OIP_P19_Configured_Registry_Export"/>
+  <dependency data-from="OIP_P19_Threshold_Export" data-to="OIP_P19_Configured_Registry_Export"/>
+  <dependency data-from="OIP_Record_Reopening" data-to="OIP_Record_Reopening_Prefix_G0"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Record_Reopening_Prefix_G0"/>
+  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Query_Cache_Source_G0"/>
+  <dependency data-from="OIP_Query_Cache_Source_G0" data-to="OIP_Query_Cache_Source_Export"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Query6_Capture_G0"/>
+  <dependency data-from="OIP_Query6_Capture_G0" data-to="OIP_Query6_Capture_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Settlement_Queue_G0"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Settlement_Queue_G0"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Reserve_Debit_Finite_Base"/>
+  <dependency data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Reserve_Debit_Replay"/>
+  <dependency data-from="OIP_Reserve_Debit_Replay" data-to="OIP_Reserve_Debit_Replay_Export"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Secondary_Read_G0"/>
+  <dependency data-from="OIP_Secondary_Read_G0" data-to="OIP_Secondary_Read_Export"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Historical_Read_G0"/>
+  <dependency data-from="OIP_Historical_Read_G0" data-to="OIP_Historical_Read_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Pending_Lock_Model"/>
+  <dependency data-from="OIP_Pending_Lock_Model" data-to="OIP_Pending_Lock_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Terminal_Record_G0"/>
+  <dependency data-from="OIP_Terminal_Record_G0" data-to="OIP_Terminal_Record_Export"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Terminal_Record_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Primary_Origin_Check"/>
+  <dependency data-from="OIP_Primary_Origin_Check" data-to="OIP_Primary_Origin_Export"/>
+  <dependency data-from="OIP_Product_Base" data-to="OIP_Completion_Gates"/>
+  <dependency data-from="OIP_Completion_Gates" data-to="OIP_Completion_Gates_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Regulatory_Legal_G0"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Regulatory_Legal_G0"/>
+  <dependency data-from="OIP_Product" data-to="OIP_Legal_Receipt_Check"/>
+  <dependency data-from="OIP_Legal_Receipt_Check" data-to="OIP_Legal_Receipt_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Protected_Spend_Core"/>
+  <dependency data-from="OIP_Protected_Spend_Core" data-to="OIP_Protected_Spend_Seed"/>
+  <dependency data-from="OIP_Protected_Spend_Seed" data-to="OIP_Protected_Spend_G0"/>
+  <dependency data-from="OIP_Protected_Spend_G0" data-to="OIP_Protected_Spend_Export"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_V062_Handover_Seed_Frame"/>
+  <dependency data-from="OIP_V062_Handover_Seed_Frame" data-to="OIP_V062_Handover_Typed_Model"/>
+  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_G0"/>
+  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_Finite_Model"/>
+  <dependency data-from="OIP_V062_Handover_Finite_Model" data-to="OIP_V062_Handover_Finite_Export"/>
+  <dependency data-from="HOL-Library" data-to="OIP_V062_Handover_Finite_Export"/>
+  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_Recovery_Control_Base"/>
+  <dependency data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Handover_Recovery_Control_G0"/>
+  <dependency data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Handover_Recovery_Finite_Model"/>
+  <dependency data-from="OIP_V062_Handover_Finite_Model" data-to="OIP_V062_Handover_Recovery_Finite_Model"/>
+  <dependency data-from="OIP_V062_Handover_Recovery_Finite_Model" data-to="OIP_V062_Handover_Recovery_Export"/>
+  <dependency data-from="HOL-Library" data-to="OIP_V062_Handover_Recovery_Export"/>
+  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_P13_Replay_Epoch_Base"/>
+  <dependency data-from="OIP_V062_P13_Replay_Epoch_Base" data-to="OIP_V062_P13_Replay_Epoch_G0"/>
+  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Schedule_Core"/>
+  <dependency data-from="OIP_Schedule_Core" data-to="OIP_Typed_Scheduler"/>
+  <dependency data-from="OIP_Typed_Scheduler" data-to="OIP_Schedule_Product"/>
+  <dependency data-from="OIP_Schedule_Product" data-to="OIP_Schedule_Cases"/>
+  <dependency data-from="OIP_Schedule_Cases" data-to="OIP_Schedule_Export"/>
+  <dependency data-from="OIP_Schedule_Product" data-to="OIP_Schedule_Boundaries"/>
+  <dependency data-from="OIP_Query_Cache_Source_G0" data-to="OIP_Schedule_Boundaries"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Schedule_Pair"/>
+  <dependency data-from="OIP_Schedule_Product" data-to="OIP_Signed_Schedule_Pair"/>
+  <dependency data-from="OIP_Product" data-to="OIP_Direct_Publication_Check"/>
+  <dependency data-from="OIP_Direct_Publication_Check" data-to="OIP_Direct_Publication_Export"/>
+  <dependency data-from="OIP_Direct_Publication_Check" data-to="OIP_Independent_Publication_Check"/>
+  <dependency data-from="OIP_Independent_Publication_Check" data-to="OIP_Independent_Publication_Export"/>
+  <dependency data-from="OIP_Direct_Publication_Export" data-to="OIP_Independent_Publication_Export"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Etcd_Control_Confirmation"/>
+  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Witness_Mirror_Check"/>
+  <dependency data-from="OIP_V062_P13_Replay_Epoch_Base" data-to="OIP_V062_P13_Replay_Stored_Outcome_Repair"/>
+  <dependency data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final"/>
+  <dependency data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Dispatch"/>
+  <dependency data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Install"/>
+  <dependency data-from="OIP_V062_P13_Replay_Install" data-to="OIP_V062_P13_Replay_Lookup"/>
+  <dependency data-from="OIP_V062_P13_Replay_Dispatch" data-to="OIP_V062_P13_Replay_Lookup"/>
+  <dependency data-from="OIP_V062_P13_Replay_Lookup" data-to="OIP_V062_P13_Replay_Finite_Projection"/>
+  <dependency data-from="OIP_V062_P13_Replay_Finite_Projection" data-to="OIP_V062_P13_Replay_Export"/>
+  <dependency data-from="OIP_Witness_Mirror_Check" data-to="OIP_Witness_Prepare_Codec_Check"/>
+  <dependency data-from="OIP_Etcd_Control_Confirmation" data-to="OIP_Etcd_Replace_Preflight"/>
+  <dependency data-from="OIP_Signed_Schedule_Pair" data-to="OIP_Signed_Schedule_Refusals"/>
+  <dependency data-from="OIP_P19_Threshold_Export" data-to="OIP_Threshold_Raw_Identity"/>
+  <dependency data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Refund_Origin_Link"/>
+  <dependency data-from="OIP_Terminal_Record_G0" data-to="OIP_V062_Refund_Origin_Link"/>
+  <dependency data-from="OIP_V062_Refund_Origin_Link" data-to="OIP_V062_Refund_Origin_Export"/>
+  <dependency data-from="HOL-Library" data-to="OIP_V062_Refund_Origin_Export"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Exact_Receipt_Core_Comparison"/>
+  <dependency data-from="OIP_Exact_Receipt_Core_Comparison" data-to="OIP_Query8_Scope_Binding"/>
+  <dependency data-from="OIP_Pending_Lock_Export" data-to="OIP_Lock_Clock_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_ACK1_Entry"/>
+  <dependency data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Dispatch_Debit_Lease_Link"/>
+  <dependency data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Signer_Parse_Probe"/>
+  <dependency data-from="OIP_Protected_Spend_Export" data-to="OIP_Signed_Legal_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Legal_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Go_Admitted_Operand_Model_Link"/>
+  <dependency data-from="OIP_Secondary_Read_Export" data-to="OIP_Raw_Terminal_Read_Model_Link"/>
+  <dependency data-from="OIP_V062_Refund_Origin_Link" data-to="OIP_Refund_Source_Certificate_Link"/>
+  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Refund_Source_Certificate_Link"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Refund_Source_Certificate_Link"/>
+  <dependency data-from="OIP_Secondary_Read_Export" data-to="OIP_Signed_Owner_Read_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Active_Session_Grant_Link"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Active_Session_Grant_Link"/>
+  <dependency data-from="OIP_Query6_Capture_Export" data-to="OIP_Signed_Cache_Capture_Model_Link"/>
+  <dependency data-from="OIP_Record_Reopening_Prefix_G0" data-to="OIP_Selected_Record_Reopening_Model_Link"/>
+  <dependency data-from="OIP_Ordered_Maintenance_G0_Core" data-to="OIP_Maintenance_Selection_Replay_Link"/>
+  <dependency data-from="OIP_Historical_Read_Export" data-to="OIP_Signed_Historical_Source_Pool_Link"/>
+  <dependency data-from="OIP_Lock_Clock_Model_Link" data-to="OIP_Signed_Cancel_Fence_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Cancel_Fence_Model_Link"/>
+  <dependency data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Signed_Write_Reopen_Link"/>
+  <dependency data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Signed_Write_Reopen_Link"/>
+  <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_Signed_Ordinary_Spend_Model_Link"/>
+  <dependency data-from="OIP_Lock_Clock_Model_Link" data-to="OIP_Signed_Preempt_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Preempt_Model_Link"/>
+  <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_Signed_Publish_Primary_Model_Link"/>
+  <dependency data-from="OIP_Completion_Gates_Export" data-to="OIP_Signed_Publish_Primary_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Signed_Handover_Model_Link"/>
+  <dependency data-from="OIP_V062_Handover_Finite_Export" data-to="OIP_V062_Signed_Handover_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Retained_Transition_Integrity_Model_Link"/>
+  <dependency data-from="OIP_Record_Reopening_Prefix_G0" data-to="OIP_Retained_Transition_Source_Link"/>
+  <dependency data-from="OIP_Signed_Ordinary_Spend_Model_Link" data-to="OIP_Concrete_Enforcement_Spend_Model_Link"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Source_Writer_JSON_G0"/>
+  <dependency data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_Source_Writer_Phases"/>
+  <dependency data-from="OIP_Source_Writer_Phases" data-to="OIP_Source_Writer_Integer_Transport"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_Resolver_Waiting_Model_Link"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Resolver_Waiting_Model_Link"/>
+  <dependency data-from="OIP_Completion_Gates" data-to="OIP_Resolver_Waiting_Model_Link"/>
+  <dependency data-from="OIP_Historical_Read_G0" data-to="OIP_Unpublished_Typed_Read_Link"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Unpublished_Typed_Read_Link"/>
+  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Unseen_Close_Link"/>
+  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Pending_Control_Link"/>
+  <dependency data-from="OIP_Source_Writer_Phases" data-to="OIP_Source_Resume_Link"/>
+  <dependency data-from="OIP_Source_Resume_Link" data-to="OIP_Source_Commitment_Resume_Link"/>
+  <dependency data-from="OIP_Sync_V061_Concrete_Supplier_V2" data-to="OIP_Source_Commitment_Resume_Link"/>
+  <dependency data-from="OIP_Settlement_Queue_G0" data-to="OIP_V062_Receiver_State_Branches"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Receiver_State_Branches"/>
+  <dependency data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_V062_Receiver_State_Branches"/>
+  <dependency data-from="OIP_V062_Receiver_State_Branches" data-to="OIP_V062_Receiver_State_ABI"/>
+  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Publication_Endorser_Link"/>
+  <dependency data-from="OIP_Witness_Prepare_Codec_Check" data-to="OIP_Witness_Prepare_Compare_Link"/>
+  <dependency data-from="OIP_Etcd_Control_Confirmation" data-to="OIP_Witness_Prepare_Compare_Link"/>
+  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Current_Control_Link"/>
+  <dependency data-from="OIP_P19_Threshold_Export" data-to="OIP_Resolver_Current_Control_Link"/>
+  <dependency data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_Resolver_Current_Control_Link"/>
+  <dependency data-from="OIP_Signed_Write_Reopen_Link" data-to="OIP_V062_Retained_Write_Receipt"/>
+  <dependency data-from="OIP_Active_Session_Grant_Link" data-to="OIP_V062_Retained_Write_Receipt"/>
+  <dependency data-from="OIP_Retained_Transition_Integrity_Model_Link" data-to="OIP_Settlement_Sync_Integrity_Link"/>
+  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Settlement_Sync_Integrity_Link"/>
+  <dependency data-from="HOL-Library" data-to="OIP_Settlement_Sync_Integrity_Link"/>
+  <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_V062_Confiscate_Prior_Key"/>
+  <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Response_Profile_Guard"/>
+</metadata>
+<rect x="0" y="2312" width="600" height="736" rx="16" fill="#0b142a"/>
+<g font-family="Arial,Segoe UI,sans-serif" aria-label="OIP extensions by purpose">
+<text x="28" y="2364" font-size="27" fill="#e1eaf8">OIP extension groups</text>
+<text x="28" y="2394" font-size="17" fill="#a8bbd5">167 sessions by purpose · full graph linked below</text>
+<g aria-label="Wire and authentication: 15 sessions">
+<rect x="28" y="2420" width="544" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
+<text x="44" y="2449" font-size="22" fill="#e1eaf8">Wire and authentication</text>
+<rect x="456" y="2432" width="100" height="26" rx="13" fill="#233e5e"/>
+<text x="466" y="2450" font-size="16" fill="#cfdef4">15 sessions</text>
+<text x="44" y="2475" font-size="17" fill="#a8bbd5">Negotiation, canonical wire data</text>
+<text x="44" y="2496" font-size="17" fill="#a8bbd5">and threshold signatures</text>
+</g>
+<g aria-label="State sync and reads: 39 sessions">
+<rect x="28" y="2522" width="544" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
+<text x="44" y="2551" font-size="22" fill="#e1eaf8">State sync and reads</text>
+<rect x="456" y="2534" width="100" height="26" rx="13" fill="#233e5e"/>
+<text x="466" y="2552" font-size="16" fill="#cfdef4">39 sessions</text>
+<text x="44" y="2577" font-size="17" fill="#a8bbd5">Commitment sync, queries, cached</text>
+<text x="44" y="2598" font-size="17" fill="#a8bbd5">and historical reads</text>
+</g>
+<g aria-label="Responses and receipts: 14 sessions">
+<rect x="28" y="2624" width="544" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
+<text x="44" y="2653" font-size="22" fill="#e1eaf8">Responses and receipts</text>
+<rect x="456" y="2636" width="100" height="26" rx="13" fill="#233e5e"/>
+<text x="466" y="2654" font-size="16" fill="#cfdef4">14 sessions</text>
+<text x="44" y="2679" font-size="17" fill="#a8bbd5">Response codes, signed replies</text>
+<text x="44" y="2700" font-size="17" fill="#a8bbd5">and stored outcomes</text>
+</g>
+<g aria-label="Authority and asset effects: 61 sessions">
+<rect x="28" y="2726" width="544" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
+<text x="44" y="2755" font-size="22" fill="#e1eaf8">Authority and asset effects</text>
+<rect x="456" y="2738" width="100" height="26" rx="13" fill="#233e5e"/>
+<text x="466" y="2756" font-size="16" fill="#cfdef4">61 sessions</text>
+<text x="44" y="2781" font-size="17" fill="#a8bbd5">Handover, legal controls, locks</text>
+<text x="44" y="2802" font-size="17" fill="#a8bbd5">and reference writes</text>
+</g>
+<g aria-label="Ordering and settlement: 17 sessions">
+<rect x="28" y="2828" width="544" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
+<text x="44" y="2857" font-size="22" fill="#e1eaf8">Ordering and settlement</text>
+<rect x="456" y="2840" width="100" height="26" rx="13" fill="#233e5e"/>
+<text x="466" y="2858" font-size="16" fill="#cfdef4">17 sessions</text>
+<text x="44" y="2883" font-size="17" fill="#a8bbd5">Scheduling, primary decisions</text>
+<text x="44" y="2904" font-size="17" fill="#a8bbd5">and settlement queues</text>
+</g>
+<g aria-label="Persistence and recovery: 21 sessions">
+<rect x="28" y="2930" width="544" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
+<text x="44" y="2959" font-size="22" fill="#e1eaf8">Persistence and recovery</text>
+<rect x="456" y="2942" width="100" height="26" rx="13" fill="#233e5e"/>
+<text x="466" y="2960" font-size="16" fill="#cfdef4">21 sessions</text>
+<text x="44" y="2985" font-size="17" fill="#a8bbd5">Source journals, witness checks,</text>
+<text x="44" y="3006" font-size="17" fill="#a8bbd5">publication and reopening</text>
 </g>
 </g></svg>
