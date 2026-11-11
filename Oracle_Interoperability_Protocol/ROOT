@@ -636,3 +636,704 @@ session OIP_Sync_V061_Image_Binding_ABI in "Extensions/V061/Product/SyncCommitme
   options [document = false]
   theories
     Sync_V061_Image_Binding_ABI
+
+session OIP_V062_Negotiation_Core in "Extensions/V062/Wire/Negotiation/Core" = HOL +
+  options [document = false]
+  theories
+    Negotiation_List_Model
+
+session OIP_V062_Negotiation_G0 in "Extensions/V062/Wire/Negotiation/G0" = OIP_V062_Negotiation_Core +
+  options [document = false]
+  theories
+    Negotiation_G0
+
+session OIP_V062_Negotiation_Authentication in "Extensions/V062/Wire/Negotiation/Boundary" = OIP_V062_Negotiation_Core +
+  options [document = false]
+  theories
+    Negotiation_Authenticated_Model
+
+session OIP_V062_Negotiation_Public_Bridge in "Extensions/V062/Wire/Negotiation/Bridge" = OIP_Product +
+  options [document = false]
+  sessions
+    OIP_V062_Negotiation_Core
+  theories
+    Negotiation_Public_Bridge
+
+session OIP_V062_Negotiation_Export in "Extensions/V062/Wire/Negotiation/Export" = OIP_V062_Negotiation_Authentication +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Negotiation_Export
+
+session OIP_Transport_Boundary_Arithmetic in "Extensions/V062/Wire/TransportBounds/arithmetic" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Boundary_Go_Arithmetic
+
+session OIP_Transport_Boundary_Typed in "Extensions/V062/Wire/TransportBounds/typed" = OIP_Transport_Boundary_Arithmetic +
+  options [document = false]
+  theories
+    Boundary_Typed_G0
+
+session OIP_Transport_Boundary_G0 in "Extensions/V062/Wire/TransportBounds/bytes" = OIP_Transport_Boundary_Typed +
+  options [document = false]
+  theories
+    Boundary_G0_Canary
+
+session OIP_P19_Threshold_G0 in "Extensions/V062/Wire/Threshold" = OIP_Message_Code +
+  options [document = false]
+  theories
+    P19_Threshold_G0
+    P19_Threshold_Raw_G0
+
+session OIP_P19_Threshold_Export in "Extensions/V062/Wire/Threshold/Export" = OIP_P19_Threshold_G0 +
+  options [document = false]
+  theories
+    P19_Threshold_Export
+
+session OIP_P19_Configured_Registry_G0 in "Extensions/V062/Wire/ThresholdRegistry" = OIP_P19_Threshold_G0 +
+  options [document = false]
+  theories
+    P19_Configured_Registry_G0
+
+session OIP_P19_Configured_Registry_Export in "Extensions/V062/Wire/ThresholdRegistry/Export" = OIP_P19_Configured_Registry_G0 +
+  options [document = false]
+  sessions
+    OIP_P19_Threshold_Export
+  theories
+    P19_Configured_Registry_Export
+
+session OIP_Record_Reopening_Prefix_G0 in "Extensions/V062/Product/RecordReopening" = OIP_Record_Reopening +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Record_Reopening_Prefix_G0
+
+session OIP_Query_Cache_Source_G0 in "Extensions/V062/Product/QueryCache" = OIP_Reference_Profile +
+  options [document = false]
+  theories
+    Query_Cache_Source_G0
+
+session OIP_Query_Cache_Source_Export in "Extensions/V062/Product/QueryCache/Export" = OIP_Query_Cache_Source_G0 +
+  options [document = false]
+  theories
+    Query_Cache_Source_Export
+
+session OIP_Query6_Capture_G0 in "Extensions/V062/Product/QueryCapture" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Query6_Capture_G0
+
+session OIP_Query6_Capture_Export in "Extensions/V062/Product/QueryCapture/Export" = OIP_Query6_Capture_G0 +
+  options [document = false]
+  theories
+    Query6_Capture_Export
+
+session OIP_Settlement_Queue_G0 in "Extensions/V062/Product/SettlementQueue" = OIP_Reference_Execution +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Settlement_Queue_G0
+
+session OIP_Reserve_Debit_Finite_Base in "Extensions/V062/Product/ReserveDebitReplay/Base" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Wire_Code_Finite_Source_Slice_Check
+    Wire_Code_Finite_Integer_Check
+    Wire_Code_Finite_Closed_Check
+    Wire_Code_Finite_Closed_Financial
+    Wire_Code_Finite_Context
+    Wire_Code_Finite_Debit
+    Wire_Code_Finite_Financial_State
+    Wire_Code_Finite_Integer_ABI
+    Wire_Code_Finite_Lock_Entry
+    Wire_Code_Finite_Maps
+    Wire_Code_Finite_Raw_Ordinary
+    Wire_Code_Finite_Reservation_Queries
+    Wire_Code_Finite_Source_Slice
+    Wire_Code_Funded_Source_Projection
+
+session OIP_Reserve_Debit_Replay in "Extensions/V062/Product/ReserveDebitReplay/Replay" = OIP_Reserve_Debit_Finite_Base +
+  options [document = false]
+  theories
+    Reserve_Debit_Replay_G0
+    Reserve_Debit_Seed
+    Wire_Code_Fixture_Input_Bytes
+    Wire_Code_Fixture_Input_Data
+    Wire_Code_Fixture_Primitive_Data
+    Wire_Code_Fixture_Replay_Engine
+    Wire_Code_Fixture_Replay_Environment
+
+session OIP_Reserve_Debit_Replay_Export in "Extensions/V062/Product/ReserveDebitReplay/Export" = OIP_Reserve_Debit_Replay +
+  options [document = false]
+  theories
+    Reserve_Debit_Replay_Export
+
+session OIP_Secondary_Read_G0 in "Extensions/V062/Product/SecondaryRead" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Secondary_Read_G0
+
+session OIP_Secondary_Read_Export in "Extensions/V062/Product/SecondaryRead/Export" = OIP_Secondary_Read_G0 +
+  options [document = false]
+  theories
+    Secondary_Read_Export
+
+session OIP_Historical_Read_G0 in "Extensions/V062/Product/HistoricalRead" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Historical_Read_G0
+
+session OIP_Historical_Read_Export in "Extensions/V062/Product/HistoricalRead/Export" = OIP_Historical_Read_G0 +
+  options [document = false]
+  theories
+    Historical_Read_Export
+
+session OIP_Pending_Lock_Model in "Extensions/V062/Product/PendingLock/Model" = OIP_Reference_Execution +
+  options [document = false]
+  theories
+    Pending_Lock_Model
+    Pending_Lock_Seeds
+    Pending_Lock_Inputs
+    Pending_Lock_G0
+
+session OIP_Pending_Lock_Export in "Extensions/V062/Product/PendingLock/Export" = OIP_Pending_Lock_Model +
+  options [document = false]
+  theories
+    Pending_Lock_Export
+
+session OIP_Terminal_Record_G0 in "Extensions/V062/Product/TerminalRecord" = OIP_Reference_Execution +
+  options [document = false]
+  theories
+    Terminal_Record_G0
+
+session OIP_Terminal_Record_Export in "Extensions/V062/Product/TerminalRecord/Export" = OIP_Terminal_Record_G0 +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Terminal_Record_Export
+
+session OIP_Primary_Origin_Check in "Extensions/V062/Product/PrimaryOrigin" = OIP_Reference_Execution +
+  options [document = false]
+  theories
+    Primary_Origin_Check
+
+session OIP_Primary_Origin_Export in "Extensions/V062/Product/PrimaryOrigin/Export" = OIP_Primary_Origin_Check +
+  options [document = false]
+  theories
+    Primary_Origin_Export
+
+session OIP_Completion_Gates in "Extensions/V062/Product/CompletionGates" = OIP_Product_Base +
+  options [document = false]
+  theories
+    Completion_Gates
+
+session OIP_Completion_Gates_Export in "Extensions/V062/Product/CompletionGates/Export" = OIP_Completion_Gates +
+  options [document = false]
+  theories
+    Completion_Gates_Export
+
+session OIP_Regulatory_Legal_G0 in "Extensions/V062/Product/LegalFresh" = OIP_Reference_Execution +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Regulatory_Legal_G0
+
+session OIP_Legal_Receipt_Check in "Extensions/V062/Product/LegalReceipt" = OIP_Product +
+  options [document = false]
+  theories
+    Legal_Receipt_Check
+
+session OIP_Legal_Receipt_Export in "Extensions/V062/Product/LegalReceipt/Export" = OIP_Legal_Receipt_Check +
+  options [document = false]
+  theories
+    Legal_Receipt_Export
+
+session OIP_Protected_Spend_Core in "Extensions/V062/Product/ProtectedSpend/Core" = OIP_Reference_Execution +
+  options [document = false]
+  theories
+    Protected_Spend_Core
+
+session OIP_Protected_Spend_Seed in "Extensions/V062/Product/ProtectedSpend/Seed" = OIP_Protected_Spend_Core +
+  options [document = false]
+  theories
+    Protected_Spend_Seed
+
+session OIP_Protected_Spend_G0 in "Extensions/V062/Product/ProtectedSpend/G0" = OIP_Protected_Spend_Seed +
+  options [document = false]
+  theories
+    Protected_Spend_G0
+
+session OIP_Protected_Spend_Export in "Extensions/V062/Product/ProtectedSpend/Export" = OIP_Protected_Spend_G0 +
+  options [document = false]
+  theories
+    Protected_Spend_Export
+
+session OIP_V062_Handover_Seed_Frame in "Extensions/V062/Product/Handover/Seed" = OIP_Reference_Execution +
+  options [document = false]
+  theories
+    Handover_Seed_Frame
+
+session OIP_V062_Handover_Typed_Model in "Extensions/V062/Product/Handover/Model" = OIP_V062_Handover_Seed_Frame +
+  options [document = false]
+  theories
+    Handover_Typed_Model
+
+session OIP_V062_Handover_G0 in "Extensions/V062/Product/Handover/Checks" = OIP_V062_Handover_Typed_Model +
+  options [document = false]
+  theories
+    Handover_G0
+
+session OIP_V062_Handover_Finite_Model in "Extensions/V062/Product/Handover/Finite/Model" = OIP_V062_Handover_Typed_Model +
+  options [document = false]
+  theories
+    Handover_Finite_Model
+
+session OIP_V062_Handover_Finite_Export in "Extensions/V062/Product/Handover/Finite/Export" = OIP_V062_Handover_Finite_Model +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Handover_Finite_Export
+
+session OIP_V062_Handover_Recovery_Control_Base in "Extensions/V062/Product/Handover/Controls/Base" = OIP_V062_Handover_Typed_Model +
+  options [document = false]
+  theories
+    Control_Recovery_Base
+
+session OIP_V062_Handover_Recovery_Control_G0 in "Extensions/V062/Product/Handover/Controls/Checks" = OIP_V062_Handover_Recovery_Control_Base +
+  options [document = false]
+  theories
+    Control_Recovery_G0
+
+session OIP_V062_Handover_Recovery_Finite_Model in "Extensions/V062/Product/Handover/Controls/Finite" = OIP_V062_Handover_Recovery_Control_Base +
+  options [document = false]
+  sessions
+    OIP_V062_Handover_Finite_Model
+  theories
+    Control_Recovery_Finite
+
+session OIP_V062_Handover_Recovery_Export in "Extensions/V062/Product/Handover/Controls/Export" = OIP_V062_Handover_Recovery_Finite_Model +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Control_Recovery_Export
+
+session OIP_V062_P13_Replay_Epoch_Base in "Extensions/V062/Product/Handover/Controls/Replay/Base" = OIP_V062_Handover_Typed_Model +
+  options [document = false]
+  theories
+    Replay_Epoch_Base
+
+session OIP_V062_P13_Replay_Epoch_G0 in "Extensions/V062/Product/Handover/Controls/Replay/Checks" = OIP_V062_P13_Replay_Epoch_Base +
+  options [document = false]
+  theories
+    Replay_Epoch_G0
+
+session OIP_Schedule_Core in "Extensions/V062/Product/Schedule/Model" = OIP_Reference_Execution +
+  options [document = false]
+  theories
+    Schedule_Core
+
+session OIP_Typed_Scheduler in "Extensions/V062/Product/Schedule/Scheduler" = OIP_Schedule_Core +
+  options [document = false]
+  theories
+    Typed_Scheduler
+
+session OIP_Schedule_Product in "Extensions/V062/Product/Schedule/Product" = OIP_Typed_Scheduler +
+  options [document = false]
+  theories
+    Schedule_Product
+
+session OIP_Schedule_Cases in "Extensions/V062/Product/Schedule/Cases" = OIP_Schedule_Product +
+  options [document = false]
+  theories
+    Schedule_Cases
+
+session OIP_Schedule_Export in "Extensions/V062/Product/Schedule/Export" = OIP_Schedule_Cases +
+  options [document = false]
+  theories
+    Schedule_Export
+
+session OIP_Schedule_Boundaries in "Extensions/V062/Product/Schedule/Boundaries" = OIP_Schedule_Product +
+  options [document = false]
+  sessions
+    OIP_Query_Cache_Source_G0
+  theories
+    Schedule_Boundaries
+
+session OIP_Signed_Schedule_Pair in "Extensions/V062/Product/SignedSchedule" = OIP_Message_Code +
+  options [document = false]
+  sessions
+    OIP_Schedule_Product
+  theories
+    Signed_Schedule_Pair
+
+session OIP_Direct_Publication_Check in "Extensions/V062/Product/DirectPublication" = OIP_Product +
+  options [document = false]
+  theories
+    Direct_Publication_Check
+
+session OIP_Direct_Publication_Export in "Extensions/V062/Product/DirectPublication/Export" = OIP_Direct_Publication_Check +
+  options [document = false]
+  theories
+    Direct_Publication_Export
+
+session OIP_Independent_Publication_Check in "Extensions/V062/Product/IndependentPublication" = OIP_Direct_Publication_Check +
+  options [document = false]
+  theories
+    Independent_Publication_Check
+
+session OIP_Independent_Publication_Export in "Extensions/V062/Product/IndependentPublication/Export" = OIP_Independent_Publication_Check +
+  options [document = false]
+  sessions
+    OIP_Direct_Publication_Export
+  theories
+    Independent_Publication_Export
+
+session OIP_Etcd_Control_Confirmation in "Extensions/V062/Storage/ControlConfirmation" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Etcd_Control_Confirmation
+
+session OIP_Witness_Mirror_Check in "Extensions/V062/Storage/WitnessMirror" = OIP_Reference_Profile +
+  options [document = false]
+  theories
+    Witness_Mirror_Check
+
+session OIP_V062_P13_Replay_Stored_Outcome_Repair in "Extensions/V062/Product/Handover/Controls/Replay/Outcome" = OIP_V062_P13_Replay_Epoch_Base +
+  options [document = false]
+  theories
+    Replay_Stored_Outcome
+
+session OIP_V062_P13_Replay_Stored_Outcome_Observe_Final in "Extensions/V062/Product/Handover/Controls/Replay/Observe" = OIP_V062_P13_Replay_Stored_Outcome_Repair +
+  options [document = false]
+  theories
+    Replay_Stored_Observe
+
+session OIP_V062_P13_Replay_Dispatch in "Extensions/V062/Product/Handover/Controls/Replay/Dispatch" = OIP_V062_P13_Replay_Stored_Outcome_Repair +
+  options [document = false]
+  theories
+    Replay_Outcome_Continuation
+
+session OIP_V062_P13_Replay_Install in "Extensions/V062/Product/Handover/Controls/Replay/Install" = OIP_V062_P13_Replay_Stored_Outcome_Repair +
+  options [document = false]
+  theories
+    Replay_Receipt_Install
+
+session OIP_V062_P13_Replay_Lookup in "Extensions/V062/Product/Handover/Controls/Replay/Lookup" = OIP_V062_P13_Replay_Install +
+  options [document = false]
+  sessions
+    OIP_V062_P13_Replay_Dispatch
+  theories
+    Replay_Receipt_Lookup
+
+session OIP_V062_P13_Replay_Finite_Projection in "Extensions/V062/Product/Handover/Controls/Replay/Projection" = OIP_V062_P13_Replay_Lookup +
+  options [document = false]
+  theories
+    Replay_Finite_Projection
+
+session OIP_V062_P13_Replay_Export in "Extensions/V062/Product/Handover/Controls/Replay/Export" = OIP_V062_P13_Replay_Finite_Projection +
+  options [document = false]
+  theories
+    Replay_Export_Frames
+    Replay_Export_ABI
+
+session OIP_Witness_Prepare_Codec_Check in "Extensions/V062/Storage/WitnessPrepareCodec" = OIP_Witness_Mirror_Check +
+  options [document = false]
+  theories
+    Witness_Prepare_Codec_Check
+
+session OIP_Etcd_Replace_Preflight in "Extensions/V062/Storage/ReplacePreflight" = OIP_Etcd_Control_Confirmation +
+  options [document = false]
+  theories
+    Etcd_Replace_Preflight
+
+session OIP_Signed_Schedule_Refusals in "Extensions/V062/Product/SignedSchedule/Refusals" = OIP_Signed_Schedule_Pair +
+  options [document = false]
+  theories
+    Signed_Schedule_Refusals
+
+session OIP_Threshold_Raw_Identity in "Extensions/V062/Wire/Threshold/Export/Identity" = OIP_P19_Threshold_Export +
+  options [document = false]
+  theories
+    Threshold_Raw_Identity
+
+session OIP_V062_Refund_Origin_Link in "Extensions/V062/Product/Handover/Controls/RefundOrigin/Link" = OIP_V062_Handover_Recovery_Control_Base +
+  options [document = false]
+  sessions
+    OIP_Terminal_Record_G0
+  theories
+    Refund_Origin_Link
+
+session OIP_V062_Refund_Origin_Export in "Extensions/V062/Product/Handover/Controls/RefundOrigin/Export" = OIP_V062_Refund_Origin_Link +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Refund_Origin_Export
+
+session OIP_Exact_Receipt_Core_Comparison in "Extensions/V062/Product/StoredReceipt/ExactCore" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Exact_Receipt_Core_Comparison
+
+session OIP_Query8_Scope_Binding in "Extensions/V062/Product/StoredReceipt/ScopeBinding" = OIP_Exact_Receipt_Core_Comparison +
+  options [document = false]
+  theories
+    Query8_Scope_Binding
+
+session OIP_Lock_Clock_Model_Link in "Extensions/V062/Product/PendingLock/ClockBoundary" = OIP_Pending_Lock_Export +
+  options [document = false]
+  theories
+    Lock_Clock_Model_Link
+
+session OIP_ACK1_Entry in "Extensions/V062/Product/SignedSchedule/AckEntry" = OIP_Message_Code +
+  options [document = false]
+  theories
+    ACK1_Entry
+
+session OIP_Dispatch_Debit_Lease_Link in "Extensions/V062/Product/PendingLock/DispatchDebitLease" = OIP_Reserve_Debit_Finite_Base +
+  options [document = false]
+  theories
+    Dispatch_Debit_Lease_Link
+
+session OIP_Response_Signer_Parse_Probe in "Extensions/V062/Product/ResponseSigner/Parse" = OIP_Response_Egress_V061_V5 +
+  options [document = false]
+  theories
+    Response_Signer_Parse_Probe
+
+session OIP_Signed_Legal_Model_Link in "Extensions/V062/Product/LegalFresh/SignedInput" = OIP_Protected_Spend_Export +
+  options [document = false]
+  sessions
+    OIP_Message_Code
+  theories
+    Signed_Legal_Model_Link
+
+session OIP_Go_Admitted_Operand_Model_Link in "Extensions/V062/Wire/OperandAdmission" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Go_Admitted_Operand_Model_Link
+
+session OIP_Raw_Terminal_Read_Model_Link in "Extensions/V062/Product/SecondaryRead/RawTerminal" = OIP_Secondary_Read_Export +
+  options [document = false]
+  theories
+    Raw_Terminal_Read_Model_Link
+
+session OIP_Refund_Source_Certificate_Link in "Extensions/V062/Product/SourceCertificate/Refund" = OIP_V062_Refund_Origin_Link +
+  options [document = false]
+  sessions
+    "OIP_Reference_Profile"
+    "HOL-Library"
+  theories
+    Refund_Source_Certificate_Link
+
+session OIP_Signed_Owner_Read_Model_Link in "Extensions/V062/Product/Handover/OwnerRead" = OIP_Secondary_Read_Export +
+  options [document = false]
+  theories
+    Signed_Owner_Read_Model_Link
+
+session OIP_Active_Session_Grant_Link in "Extensions/V062/Product/ReferenceSecurity/ActiveSessionGrant" = OIP_Message_Code +
+  options [document = false]
+  sessions
+    "HOL-Library"
+  theories
+    Active_Session_Grant_Link
+
+session OIP_Signed_Cache_Capture_Model_Link in "Extensions/V062/Product/QueryCapture/Signed" = OIP_Query6_Capture_Export +
+  options [document = false]
+  theories
+    Signed_Cache_Capture_Model_Link
+
+session OIP_Selected_Record_Reopening_Model_Link in "Extensions/V062/Product/RecordReopening/Selected" = OIP_Record_Reopening_Prefix_G0 +
+  options [document = false]
+  theories
+    Selected_Record_Reopening_Model_Link
+
+session OIP_Maintenance_Selection_Replay_Link in "Extensions/V062/Product/OrderedMaintenance/SelectionReplay" = OIP_Ordered_Maintenance_G0_Core +
+  options [document = false]
+  theories
+    Maintenance_Selection_Replay_Link
+
+session OIP_Signed_Historical_Source_Pool_Link in "Extensions/V062/Product/HistoricalRead/SignedSourcePool" = OIP_Historical_Read_Export +
+  options [document = false]
+  theories
+    Signed_Historical_Source_Pool_Link
+
+session OIP_Signed_Cancel_Fence_Model_Link in "Extensions/V062/Product/PendingLock/SignedClose" = OIP_Lock_Clock_Model_Link +
+  options [document = false]
+  sessions
+    OIP_Message_Code
+  theories
+    Signed_Cancel_Fence_Model_Link
+
+session OIP_Signed_Write_Reopen_Link in "Extensions/V062/Product/Write/SignedReopen" = OIP_Reference_Write_Core_Seed +
+  options [document = false]
+  sessions
+    OIP_Reserve_Debit_Finite_Base
+  theories
+    Signed_Write_Reopen_Link
+
+session OIP_Signed_Ordinary_Spend_Model_Link in "Extensions/V062/Product/ProtectedSpend/SignedOrdinary" = OIP_Signed_Legal_Model_Link +
+  options [document = false]
+  theories
+    Signed_Ordinary_Spend_Model_Link
+
+session OIP_Signed_Preempt_Model_Link in "Extensions/V062/Product/PendingLock/SignedPreempt" = OIP_Lock_Clock_Model_Link +
+  options [document = false]
+  sessions
+    OIP_Message_Code
+  theories
+    Signed_Preempt_Model_Link
+
+session OIP_Signed_Publish_Primary_Model_Link in "Extensions/V062/Product/PrimaryOrigin/SignedPublish" = OIP_Signed_Legal_Model_Link +
+  options [document = false]
+  sessions
+    OIP_Completion_Gates_Export
+  theories
+    Signed_Publish_Primary_Model_Link
+
+session OIP_V062_Signed_Handover_Model_Link in "Extensions/V062/Product/Handover/SignedModel" = OIP_Message_Code +
+  options [document = false]
+  sessions
+    OIP_V062_Handover_Finite_Export
+  theories
+    Signed_Handover_Model_Link
+
+session OIP_Retained_Transition_Integrity_Model_Link in "Extensions/V062/Product/RecordReopening/RetainedIntegrity" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Retained_Transition_Integrity_Model_Link
+
+session OIP_Retained_Transition_Source_Link in "Extensions/V062/Product/RecordReopening/RetainedSource" = OIP_Record_Reopening_Prefix_G0 +
+  options [document = false]
+  theories
+    Retained_Transition_Source_Link
+
+session OIP_Concrete_Enforcement_Spend_Model_Link in "Extensions/V062/Product/ProtectedSpend/ConcreteEnforcement" = OIP_Signed_Ordinary_Spend_Model_Link +
+  options [document = false]
+  theories
+    Concrete_Enforcement_Spend_Model_Link
+
+session OIP_Source_Writer_JSON_G0 in "Extensions/V062/Product/SourceWriter/Canonical" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Source_Writer_JSON_G0
+
+session OIP_Source_Writer_Phases in "Extensions/V062/Product/SourceWriter/Phases" = OIP_Source_Writer_JSON_G0 +
+  options [document = false]
+  theories
+    Source_Writer_Phases
+    Source_Writer_ABI
+
+session OIP_Source_Writer_Integer_Transport in "Extensions/V062/Product/SourceWriter/Integer" = OIP_Source_Writer_Phases +
+  options [document = false]
+  theories
+    Source_Writer_Integer_Transport
+
+session OIP_Resolver_Waiting_Model_Link in "Extensions/V062/Product/OrderedDebit/ResolveWaiting" = OIP_Message_Code +
+  options [document = false]
+  sessions
+    "HOL-Library"
+    OIP_Completion_Gates
+  theories
+    Resolver_Waiting_Link
+    Resolver_Waiting_ABI
+
+session OIP_Unpublished_Typed_Read_Link in "Extensions/V062/Product/HistoricalRead/TypedUnpublished" = OIP_Historical_Read_G0 +
+  options [document = false]
+  sessions "HOL-Library"
+  theories
+    Unpublished_Read_Link
+    Unpublished_Read_ABI
+
+session OIP_Resolver_Unseen_Close_Link in "Extensions/V062/Product/OrderedDebit/UnseenClose" = OIP_Resolver_Waiting_Model_Link +
+  options [document = false]
+  theories
+    Resolver_Unseen_Close_Link
+
+session OIP_Resolver_Pending_Control_Link in "Extensions/V062/Product/OrderedDebit/PendingControl" = OIP_Resolver_Waiting_Model_Link +
+  options [document = false]
+  theories
+    Resolver_Pending_Control_Link
+
+session OIP_Source_Resume_Link in "Extensions/V062/Product/SourceWriter/Resume" = OIP_Source_Writer_Phases +
+  options [document = false]
+  theories
+    Source_Resume_Link
+    Source_Resume_ABI
+
+session OIP_Source_Commitment_Resume_Link in "Extensions/V062/Product/SourceWriter/CommitmentResume" = OIP_Source_Resume_Link +
+  options [document = false]
+  sessions
+    OIP_Sync_V061_Concrete_Supplier_V2
+  theories
+    Source_Commitment_Resume_Link
+    Source_Commitment_Resume_ABI
+
+session OIP_V062_Receiver_State_Branches in "Extensions/V062/Product/Settlement/ReceiverState" = OIP_Settlement_Queue_G0 +
+  options [document = false]
+  sessions
+    OIP_Message_Code
+    OIP_Source_Writer_JSON_G0
+  theories
+    Receiver_State_Branches
+
+session OIP_V062_Receiver_State_ABI in "Extensions/V062/Product/Settlement/ReceiverABI" = OIP_V062_Receiver_State_Branches +
+  options [document = false]
+  theories
+    Receiver_State_ABI
+
+session OIP_Publication_Endorser_Link in "Extensions/V062/Product/Publish/Endorser" = OIP_Resolver_Waiting_Model_Link +
+  options [document = false]
+  theories
+    Publication_Endorser_Link
+    Publication_Endorser_ABI
+
+session OIP_Witness_Prepare_Compare_Link in "Extensions/V062/Storage/WitnessPrepareCompare" = OIP_Witness_Prepare_Codec_Check +
+  options [document = false]
+  sessions
+    OIP_Etcd_Control_Confirmation
+  theories
+    Witness_Prepare_Compare_Link
+    Witness_Prepare_Compare_ABI
+
+session OIP_Resolver_Current_Control_Link in "Extensions/V062/Product/OrderedDebit/CurrentControl" = OIP_Resolver_Waiting_Model_Link +
+  options [document = false]
+  sessions
+    OIP_P19_Threshold_Export
+    OIP_Source_Writer_JSON_G0
+  theories
+    Resolver_Current_Control_Link
+    Resolver_Current_Control_ABI
+
+session OIP_V062_Retained_Write_Receipt in "Extensions/V062/Product/Write/RetainedReceipt" = OIP_Signed_Write_Reopen_Link +
+  options [document = false]
+  sessions
+    OIP_Active_Session_Grant_Link
+  theories
+    Retained_Write_Receipt
+
+session OIP_Settlement_Sync_Integrity_Link in "Extensions/V062/Product/RecordReopening/SettlementSync" = OIP_Retained_Transition_Integrity_Model_Link +
+  options [document = false]
+  sessions
+    OIP_Sync_V061_Position_Definitions
+    "HOL-Library"
+  theories
+    Settlement_Sync_Integrity_Link
+    Settlement_Sync_Integrity_ABI
+
+session OIP_V062_Confiscate_Prior_Key in "Extensions/V062/Product/ProtectedSpend/ConfiscatePriorKey" = OIP_Signed_Legal_Model_Link +
+  options [document = false]
+  theories
+    Confiscate_Prior_Key
+
+session OIP_V062_Response_Profile_Guard in "Extensions/V062/Product/Response/NegotiatedOutput" = OIP_Message_Code +
+  options [document = false]
+  theories
+    Response_Profile_Guard

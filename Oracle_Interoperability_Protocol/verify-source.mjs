@@ -22,6 +22,18 @@ const PROFILES = {
     entrypoint: "OIP_Wire_Response_Boundary.code_response_egress_flat_oracle", identity: "OIP_Wire_Response_Boundary.code_response_full_model_identity",
     names: { model: "oip_wire_response_full.ML", driver: "response-full-driver.ML", origin: "response-full-origin.json", diagnostics: "response-full-diagnostics.json" },
   },
+  threshold: {
+    lock: "threshold-raw-artifact.lock.json", abi: "intinf-threshold-raw-v1",
+    scope: "wire-v6-threshold-raw-observed-primitives",
+    entrypoint: "OIP_Threshold_Raw_ABI.threshold_raw_packet", identity: "OIP_Threshold_Raw_ABI.threshold_raw_model_identity",
+    names: { model: "oip_threshold_raw_abi.ML", driver: "threshold-raw-driver.ML", origin: "threshold-raw-origin.json", diagnostics: "threshold-raw-diagnostics.json" },
+  },
+};
+const LOCK_EXTRAS = { typed: ["corpus"], full: ["input_schema", "egress_entries"], threshold: ["fixtures"] };
+const THRESHOLD_FIXTURES = {
+  packets: { path: "tests/vectors/threshold-raw/input.jsonl", rows: 22 },
+  signature_observations: { path: "tests/vectors/threshold-raw/primitive-observations.jsonl", rows: 22 },
+  key_observations: { path: "tests/vectors/threshold-raw/key-observations.json", rows: 3 },
 };
 const EGRESS_ENTRIES = {
   queries: "code_response_egress_queries_flat", boundary_queries: "code_response_encode_boundary_queries_flat",
@@ -92,7 +104,7 @@ export function verifySource(namespaceRoot) {
     const bad = lines.findIndex((line) => UNTRUSTED_LINE.test(line));
     need(bad === -1, "PROOF_SOURCE_FORM", `untrusted proof source form: ${name}:${bad + 1}`);
   }
-  need(Array.isArray(inventory.files) && inventory.files.length === 399 && actualTheories.length === 398, "SOURCE_INVENTORY", "ROOT plus exactly 398 theory inputs required");
+  need(Array.isArray(inventory.files) && inventory.files.length === 552 && actualTheories.length === 551, "SOURCE_INVENTORY", "ROOT plus exactly 551 theory inputs required");
   sameSet(inventory.files.map((row) => row.path), ["ROOT", ...actualTheories], "SOURCE_INVENTORY", "exact compiler inventory");
   for (const row of inventory.files) {
     exact(row, ["path", "bytes", "sha256"], "SOURCE_INVENTORY", "compiler input");
@@ -102,13 +114,13 @@ export function verifySource(namespaceRoot) {
     need(raw.length === row.bytes && sha256(raw) === row.sha256, "SOURCE_INVENTORY", `compiler bytes/SHA256 differ: ${row.path}`);
   }
 
-  // This separate metadata does not alter the 399-file compiler inventory or
-  // any model identity. Its ten rows include both lock files themselves.
+  // This separate metadata does not alter the 552-file compiler inventory or
+  // any model identity. The artifact inventory includes all three lock files.
   const artifacts = json(read(root, "artifact-manifest.json", "ARTIFACT_INVENTORY"), "ARTIFACT_INVENTORY", "artifact-manifest.json");
   exact(artifacts, ["format", "namespace", "files"], "ARTIFACT_INVENTORY", "artifact inventory");
   equal(artifacts.format, "oip-public-model-artifact-inventory-v1", "ARTIFACT_INVENTORY", "artifact inventory format");
   equal(artifacts.namespace, NAMESPACE, "ARTIFACT_INVENTORY", "artifact namespace");
-  need(Array.isArray(artifacts.files) && artifacts.files.length === 10, "ARTIFACT_INVENTORY", "exact ten public files required");
+  need(Array.isArray(artifacts.files) && artifacts.files.length === ARTIFACT_PATHS.length, "ARTIFACT_INVENTORY", "exact public artifact inventory required");
   sameSet(artifacts.files.map((row) => row.path), ARTIFACT_PATHS, "ARTIFACT_INVENTORY", "artifact declared paths");
   sameSet(files(root, "artifacts"), ARTIFACT_PATHS, "ARTIFACT_INVENTORY", "artifact on-disk paths");
   const rawFiles = new Map();
@@ -124,7 +136,7 @@ export function verifySource(namespaceRoot) {
   for (const [bundle, profile] of Object.entries(PROFILES)) {
     const lockName = `artifacts/locks/${profile.lock}`;
     const lock = json(rawFiles.get(lockName), "ARTIFACT_SCHEMA", lockName);
-    exact(lock, [...COMMON_LOCK, ...(bundle === "typed" ? ["corpus"] : ["input_schema", "egress_entries"])], "ARTIFACT_SCHEMA", `${bundle} lock`);
+    exact(lock, [...COMMON_LOCK, ...LOCK_EXTRAS[bundle]], "ARTIFACT_SCHEMA", `${bundle} lock`);
     for (const [key, expected] of Object.entries({ lock_version: 1, binding_status: "bound", artifact_transport: "github-git-blob-v1", repository: "Oraclizer/formal-verification", wire_schema: 1, abi: profile.abi, scope: profile.scope, entrypoint: profile.entrypoint, natural_refinement: "HOL-Library.Code_Target_Nat", public_namespace: NAMESPACE, identity_function: profile.identity })) equal(lock[key], expected, "ARTIFACT_SCHEMA", `${bundle} ${key}`);
     digest(lock.runtime_source_hash, 64, "ARTIFACT_SCHEMA", "runtime source hash");
     digest(lock.verified_export_sha256, 64, "ARTIFACT_SCHEMA", "verified export hash");
@@ -133,10 +145,19 @@ export function verifySource(namespaceRoot) {
       equal(lock.corpus.path, "tests/vectors/wire-operations.jsonl", "ARTIFACT_SCHEMA", "typed corpus path");
       equal(lock.corpus.rows, 692, "ARTIFACT_SCHEMA", "typed corpus rows");
       digest(lock.corpus.sha256, 64, "ARTIFACT_SCHEMA", "typed corpus hash");
-    } else {
+    } else if (bundle === "full") {
       equal(lock.input_schema, "tests/response-full-abi.json", "ARTIFACT_SCHEMA", "Full input schema");
       exact(lock.egress_entries, Object.keys(EGRESS_ENTRIES), "ARTIFACT_SCHEMA", "Full entries");
       for (const [key, value] of Object.entries(EGRESS_ENTRIES)) equal(lock.egress_entries[key], value, "ARTIFACT_SCHEMA", `Full entry ${key}`);
+    } else {
+      exact(lock.fixtures, Object.keys(THRESHOLD_FIXTURES), "ARTIFACT_SCHEMA", "threshold fixtures");
+      for (const [role, fixture] of Object.entries(THRESHOLD_FIXTURES)) {
+        const pin = lock.fixtures[role];
+        exact(pin, ["path", "rows", "sha256"], "ARTIFACT_SCHEMA", `threshold ${role}`);
+        equal(pin.path, fixture.path, "ARTIFACT_SCHEMA", `threshold ${role} path`);
+        equal(pin.rows, fixture.rows, "ARTIFACT_SCHEMA", `threshold ${role} rows`);
+        digest(pin.sha256, 64, "ARTIFACT_SCHEMA", `threshold ${role} hash`);
+      }
     }
     need(Array.isArray(lock.files) && lock.files.length === 4, "ARTIFACT_SCHEMA", `${bundle} requires four roles`);
     sameSet(lock.files.map((row) => row.role), Object.keys(profile.names), "ARTIFACT_SCHEMA", `${bundle} roles`);
@@ -170,8 +191,8 @@ export function verifySource(namespaceRoot) {
     }
     locks.push(lock); origins.push(origin);
   }
-  equal(locks[0].runtime_source_hash, locks[1].runtime_source_hash, "ARTIFACT_LINK", "two current source epochs");
-  equal(origins[0].kernel_inputs_sha256, origins[1].kernel_inputs_sha256, "ARTIFACT_LINK", "two common kernel input seals");
+  for (const lock of locks.slice(1)) equal(lock.runtime_source_hash, locks[0].runtime_source_hash, "ARTIFACT_LINK", "common runtime source");
+  for (const origin of origins.slice(1)) equal(origin.kernel_inputs_sha256, origins[0].kernel_inputs_sha256, "ARTIFACT_LINK", "common kernel input seal");
   const sealRaw = read(root, "Validation/V061/kernel-input-seal.json", "ARTIFACT_LINK");
   const seal = json(sealRaw, "ARTIFACT_LINK", "v0.6.1 compiler input seal");
   equal(seal.format, "oip-v061-compiler-input-seal-v1", "ARTIFACT_LINK", "kernel seal format");
@@ -181,9 +202,9 @@ export function verifySource(namespaceRoot) {
     "ARTIFACT_LINK", "seal compiler source manifest");
   equal(seal.root_sha256, sha256(read(root, "ROOT", "SOURCE_INVENTORY")), "ARTIFACT_LINK", "seal ROOT");
   equal(seal.compiler_inputs, inventory.files.length, "ARTIFACT_LINK", "seal compiler input count");
-  need(Array.isArray(seal.targets) && ["OIP_Sync_V061_Typed_Artifact", "OIP_Response_Egress_V061_Export"]
-    .every((name) => seal.targets.includes(name)), "ARTIFACT_LINK", "both checked export targets are required");
-  return { compiler_files: 399, theory_files: 398, public_artifact_files: 10, runtime_source_hash: locks[0].runtime_source_hash, proof_or_model_execution: false };
+  need(Array.isArray(seal.targets) && ["OIP_Sync_V061_Typed_Artifact", "OIP_Response_Egress_V061_Export", "OIP_Threshold_Raw_Identity"]
+    .every((name) => seal.targets.includes(name)), "ARTIFACT_LINK", "all checked export targets are required");
+  return { compiler_files: inventory.files.length, theory_files: actualTheories.length, public_artifact_files: ARTIFACT_PATHS.length, runtime_source_hash: locks[0].runtime_source_hash, proof_or_model_execution: false };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

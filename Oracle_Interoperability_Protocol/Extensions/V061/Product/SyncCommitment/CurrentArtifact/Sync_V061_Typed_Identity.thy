@@ -4,14 +4,14 @@ begin
 
 definition sync_v061_typed_model_identity :: "unit \<Rightarrow> integer list list" where
   "sync_v061_typed_model_identity = (\<lambda>ignored.
-    map (map integer_of_nat \<circ> code_json_ascii) [''1'',''intinf-wire-values-v2'',''wire-v6-general-33-values'',''OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat'',''HOL-Library.Code_Target_Nat'',''b1a7fed18699409a20b8b4854bbb21db0115d104cdae6572fa9078aacadd4a79''])"
+    map (map integer_of_nat \<circ> code_json_ascii) [''1'',''intinf-wire-values-v2'',''wire-v6-general-33-values'',''OIP_Wire_Oracle_V061.sync_v061_nested_transport_flat'',''HOL-Library.Code_Target_Nat'',''7edc3b1dd127d9ad0e30ff6f2dab57eb3bf624ea60b6b588413534fd148d33a8''])"
 
 lemma sync_v061_typed_identity_has_six_fields:
   "length (sync_v061_typed_model_identity ()) = 6"
   by (simp add: sync_v061_typed_model_identity_def)
 
 lemma sync_v061_typed_identity_binds_its_consumer_source:
-  "last (sync_v061_typed_model_identity ()) = map integer_of_nat (code_json_ascii ''b1a7fed18699409a20b8b4854bbb21db0115d104cdae6572fa9078aacadd4a79'')"
+  "last (sync_v061_typed_model_identity ()) = map integer_of_nat (code_json_ascii ''7edc3b1dd127d9ad0e30ff6f2dab57eb3bf624ea60b6b588413534fd148d33a8'')"
   by (simp add: sync_v061_typed_model_identity_def)
 
 ML_val \<open>

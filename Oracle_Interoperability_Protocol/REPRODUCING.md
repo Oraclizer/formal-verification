@@ -7,14 +7,14 @@ ABI loading and sampled value comparisons have separate purposes.
 
 ## Compiler-input identity
 
-`source-manifest.json` contains ROOT plus 398 theory records with relative path,
+`source-manifest.json` contains ROOT plus 551 theory records with relative path,
 byte count and SHA256. The raw manifest SHA256 is
-`3e0bc0f4e8e9c0452b8459cb6b584ce26d5e064777edba615550bb522081ee08`.
+`e50f78164fc26913839e6d6684ef916b6023f1733479983804a7ace35649891b`.
 The canonical inventory identity is
-`7b728ca0c640f4ad4c80571c88ceaf25d2dc7d55d35c754b74e3fbf374cfe4ae`:
+`f68d1c24f6e662b410a5aaf7fee8eb626ff3cccece2ea011330d4d11e61d7be1`:
 SHA256 of ASCII JSON with sorted keys, compact separators and no final newline.
 ROOT separately hashes to
-`f79ab1c2d2ea32f4e70a2c21df3e1dd92eabdc06b5af663d6679dec90d02563d`.
+`371cd27081ddcc680659891310abc74722df7098e937e2aa4a8ff5359f16eda4`.
 These are source identities, not assertions of a build or comparison result.
 
 The following reads the actual bytes and displays the two compiler-input
@@ -26,13 +26,13 @@ from pathlib import Path
 import hashlib, json, stat
 root = Path('Oracle_Interoperability_Protocol')
 raw = (root / 'source-manifest.json').read_bytes()
-assert hashlib.sha256(raw).hexdigest() == '3e0bc0f4e8e9c0452b8459cb6b584ce26d5e064777edba615550bb522081ee08'
+assert hashlib.sha256(raw).hexdigest() == 'e50f78164fc26913839e6d6684ef916b6023f1733479983804a7ace35649891b'
 manifest = json.loads(raw)
 assert manifest['format'] == 'oip-public-formal-source-inventory-v1'
 assert manifest['namespace'] == 'Oracle_Interoperability_Protocol'
 rows = manifest['files']
 expected = {'ROOT', *(p.relative_to(root).as_posix() for p in root.rglob('*.thy'))}
-assert len(rows) == 399 and {row['path'] for row in rows} == expected
+assert len(rows) == 552 and {row['path'] for row in rows} == expected
 for row in rows:
     relative = Path(row['path'])
     assert not relative.is_absolute() and '..' not in relative.parts
@@ -44,8 +44,8 @@ for row in rows:
 canonical = json.dumps(manifest, sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode('ascii')
 formal = hashlib.sha256(canonical).hexdigest()
 root_sha = hashlib.sha256((root / 'ROOT').read_bytes()).hexdigest()
-assert formal == '7b728ca0c640f4ad4c80571c88ceaf25d2dc7d55d35c754b74e3fbf374cfe4ae'
-assert root_sha == 'f79ab1c2d2ea32f4e70a2c21df3e1dd92eabdc06b5af663d6679dec90d02563d'
+assert formal == 'f68d1c24f6e662b410a5aaf7fee8eb626ff3cccece2ea011330d4d11e61d7be1'
+assert root_sha == '371cd27081ddcc680659891310abc74722df7098e937e2aa4a8ff5359f16eda4'
 print('formal_root_sha256=' + formal)
 print('ROOT_sha256=' + root_sha)
 PY
@@ -191,6 +191,15 @@ The consumer compares 33 original-operation, 207 boundary and 21 current-client
 inputs. Its model-side combined entry consumes the model's sender packet.
 These are bounded comparisons, not a theorem covering every compiled Rust/Go
 input or a running production Witness/storage deployment.
+
+The separate THRESHOLD model is built by `OIP_Threshold_Raw_Identity`. Its
+stored export is
+`OIP_Threshold_Raw_Identity.Threshold_Raw_Identity:code/oip_threshold_raw_abi.ML`.
+The corresponding OIP consumer `scripts/check-threshold-raw.py` loads the
+four content-pinned roles from `tests/threshold-raw-artifact.lock.json`.
+Its local `--artifact-root` uses the same checks as the hosted artifact path.
+The 22 raw cases pass independently recorded Ed25519 key and signature
+observations to the model, and Rust and Go exercise their configured verifiers.
 
 ## Public code linkage
 
