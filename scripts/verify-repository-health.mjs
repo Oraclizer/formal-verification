@@ -73,6 +73,13 @@ const required = [
   "docs/assets/formal-verification-banner-medium.svg",
   "docs/assets/formal-verification-banner-mobile.svg",
   "docs/assets/theory-architecture.svg",
+  "docs/assets/theory-architecture-medium.svg",
+  "docs/assets/theory-architecture-mobile.svg",
+  "docs/assets/theory-architecture.mmd",
+  "docs/assets/session-architecture.svg",
+  "docs/assets/session-architecture-medium.svg",
+  "docs/assets/session-architecture-mobile.svg",
+  "docs/assets/session-architecture.mmd",
   ".github/PULL_REQUEST_TEMPLATE.md",
   ".github/dependabot.yml",
   ".github/ISSUE_TEMPLATE/config.yml",
@@ -480,22 +487,31 @@ for (const [path, viewBox] of [
   if (/<text[\s>]/.test(text)) failures.push(`banner text must be drawn as outlines: ${path}`);
 }
 
-// The architecture diagrams come in a landscape and a narrow version. The
-// narrow version is chosen below a 680px README column, which the media query
-// writes as a 1121px window (column widths above), and its canvas is 600 wide.
+// The architecture diagrams come in three versions, chosen by README column
+// width like the banner: the phone version below a 440px column, the medium
+// version below 680px and the landscape version above (column widths above).
+// A portrait version scaled up to a wider column draws its letters larger than
+// the README text, so each band has its own canvas: 600, 820 and 1200 wide.
+// Letters are drawn as outlines, so every device shows the same type.
+const diagramCanvas = [["-mobile", 600], ["-medium", 820], ["", 1200]];
 for (const stem of ["session-architecture", "theory-architecture"]) {
-  const picture = new RegExp(`<picture>\\s*<source media="\\(max-width: 1121px\\)" srcset="docs/assets/${stem}-mobile\\.svg">\\s*<img src="docs/assets/${stem}\\.svg"`);
+  const picture = new RegExp(`<picture>\\s*<source media="\\(max-width: 505px\\), \\(min-width: 768px\\) and \\(max-width: 801px\\)" srcset="docs/assets/${stem}-mobile\\.svg">\\s*<source media="\\(max-width: 1121px\\)" srcset="docs/assets/${stem}-medium\\.svg">\\s*<img src="docs/assets/${stem}\\.svg" alt="[^"]+" width="\\d+">\\s*</picture>`);
   if (!picture.test(readme)) {
-    failures.push(`README ${stem} diagram must choose its narrow version below a 680px README column`);
+    failures.push(`README ${stem} diagram must be a <picture> with the phone and medium sources for 440px and 680px README columns and the landscape image`);
   }
-  for (const path of [`docs/assets/${stem}.svg`, `docs/assets/${stem}-mobile.svg`]) {
-    const text = readFileSync(resolve(root, path), "utf8");
-    for (const [name, pattern] of [["title", /<title[\s>]/], ["desc", /<desc[\s>]/]]) {
+  for (const [suffix, width] of diagramCanvas) {
+    const path = `docs/assets/${stem}${suffix}.svg`;
+    let text;
+    try {
+      text = readFileSync(resolve(root, path), "utf8");
+    } catch {
+      continue; // reported above as a missing required file
+    }
+    for (const [name, pattern] of [["title", /<title[\s>]/], ["desc", /<desc[\s>]/], ['role="img"', /\brole="img"/]]) {
       if (!pattern.test(text)) failures.push(`diagram SVG missing ${name}: ${path}`);
     }
-    if (path.endsWith("-mobile.svg") && !/viewBox="0 0 600 \d+"/.test(text)) {
-      failures.push(`narrow diagram canvas must be 600 wide: ${path}`);
-    }
+    if (!new RegExp(`viewBox="0 0 ${width} \\d+"`).test(text)) failures.push(`diagram canvas must be ${width} wide: ${path}`);
+    if (/<text[\s>]/.test(text)) failures.push(`diagram text must be drawn as outlines: ${path}`);
   }
 }
 
@@ -549,15 +565,52 @@ for (const [name, deps] of directImports) {
     if (directImports.has(target) || target === "ADS_Functor") foundationEdges.add(pairKey(target, name));
   }
 }
+// The Mermaid sources and every theory diagram list every edge. The session map
+// draws its stations (data-node) with exactly the edges between them, and one
+// square (data-session) for every other registered session; a square is an
+// outline exactly when that session builds on no station.
+const sessionDependencies = new Map(sessionInventory.graph.registeredNames.map((name) =>
+  [name, sessionInventory.graph.byName.get(name).dependencies]));
+const sameSet = (list, wanted) =>
+  list.length === wanted.size && new Set(list).size === wanted.size && list.every((item) => wanted.has(item));
 for (const [stem, expected] of [["session-architecture", sessionEdges], ["theory-architecture", foundationEdges]]) {
-  for (const suffix of [".svg", "-mobile.svg", ".mmd"]) {
+  for (const suffix of [".svg", "-medium.svg", "-mobile.svg", ".mmd"]) {
     const path = `docs/assets/${stem}${suffix}`;
-    const input = readFileSync(resolve(root, path), "utf8");
+    let input;
+    try {
+      input = readFileSync(resolve(root, path), "utf8");
+    } catch {
+      continue; // reported above as a missing required file
+    }
     const pairs = suffix === ".mmd"
       ? [...input.matchAll(/^\s*(\w+) --> (\w+)\s*$/gm)].map(m => pairKey(m[1], m[2]))
       : [...input.matchAll(/data-from="([^"]+)" data-to="([^"]+)"/g)].map(m => pairKey(m[1], m[2]));
-    const wanted = new Set([...expected].map(s => suffix === ".mmd" ? s.replaceAll("-", "_") : s));
-    if (pairs.length !== wanted.size || new Set(pairs).size !== wanted.size || pairs.some(s => !wanted.has(s))) {
+    let wanted = new Set([...expected].map(s => suffix === ".mmd" ? s.replaceAll("-", "_") : s));
+    if (stem === "session-architecture" && suffix !== ".mmd") {
+      const stationList = [...input.matchAll(/data-node="([^"]+)"/g)].map((m) => m[1]);
+      const stations = new Set(stationList);
+      if (stations.size !== stationList.length || stationList.some((name) => !sessionDependencies.has(name))) {
+        failures.push(`Session map stations must be distinct registered sessions: ${path}`);
+      }
+      wanted = new Set([...expected].filter((edge) => edge.split("|").every((name) => stations.has(name))));
+      const squares = [...input.matchAll(/<rect data-session="([^"]+)"([^>]*)>/g)];
+      const others = new Set(sessionInventory.graph.registeredNames.filter((name) => !stations.has(name)));
+      if (!sameSet(squares.map((m) => m[1]), others)) {
+        failures.push(`Session chart must draw every other registered session once: ${path}`);
+      }
+      const buildsOnStation = (name, seen = new Set()) => {
+        if (stations.has(name)) return true;
+        if (seen.has(name)) return false;
+        seen.add(name);
+        return (sessionDependencies.get(name) ?? []).some((dependency) => buildsOnStation(dependency, seen));
+      };
+      for (const [, name, attributes] of squares) {
+        if (/\bfill="none"/.test(attributes) === buildsOnStation(name)) {
+          failures.push(`Session chart outline differs from the source for ${name}: ${path}`);
+        }
+      }
+    }
+    if (!sameSet(pairs, wanted)) {
       failures.push(`Diagram edge inventory differs from source: ${path}`);
     }
   }
