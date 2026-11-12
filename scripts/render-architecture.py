@@ -1,10 +1,11 @@
-"""Regenerate dependency diagrams from ROOTS, ROOT, and direct theory imports.
+"""Regenerate the Mermaid dependency sources from ROOTS, ROOT, and direct theory imports.
 
 Run with Python 3.9+ and Node.js from any directory. Standard Isabelle theory imports
-are omitted from the foundation view; AFP imports are grouped by session.
+are omitted from the foundation graph; AFP imports are grouped by session. The SVG
+diagrams in docs/assets draw the same imports, and scripts/verify-repository-health.mjs
+checks that every version of them draws exactly these edges.
 """
 from pathlib import Path
-from html import escape
 import re
 import subprocess
 
@@ -31,68 +32,6 @@ def mermaid(pairs, title):
                      [f'    {a.replace("-", "_")} --> {b.replace("-", "_")}' for a, b in pairs])
 
 desc = 'Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importing theory. Standard Isabelle library imports are omitted; ADS_Functor imports are grouped by AFP session. The session overview lists the registered repository dependencies.'
-paths = {
-    ('State_Preservation', 'Regulatory_Instance'): 'M350 173 V239',
-    ('State_Preservation', 'Proof_Automation'): 'M310 173 V208 H145 V239',
-    ('State_Preservation', 'Composition'): 'M410 173 V196 H862 V374 H844',
-    ('Priority_Resolution', 'DQuencer_Instance'): 'M760 173 V239',
-    ('Regulatory_Instance', 'DQuencer_Instance'): 'M434 270 H451 V325 H656 V262 H676',
-    ('Proof_Automation', 'External_Instance'): 'M145 285 V307 H555 V285',
-    ('Proof_Automation', 'Functor_Laws'): 'M125 285 V432 H300 V463',
-    ('DQuencer_Instance', 'Functor_Laws'): 'M676 280 H661 V442 H450 V480 H434',
-    ('Composition', 'Functor_Laws'): 'M740 397 V422 H374 V463',
-    ('Regulatory_Instance', 'Functor_Laws'): 'M350 285 V463',
-    ('Regulatory_Instance', 'Regulatory_Action_Composition'): 'M420 285 V410 H900 V614 H920',
-    ('Functor_Laws', 'Hierarchy'): 'M310 509 V545 H145 V575',
-    ('Functor_Laws', 'Canton_Bridge'): 'M390 509 V545 H555 V575',
-    ('ADS_Functor', 'Functor_Laws'): 'M985 181 V451 H410 V463',
-    ('ADS_Functor', 'Canton_Bridge'): 'M1035 181 V530 H600 V575',
-}
-assert set(paths) == set(edges), 'Direct imports changed: update the desktop routing before regenerating.'
-svg = (assets / 'theory-architecture.svg').read_text(encoding='utf-8')
-svg = re.sub(r'<title id="ta-title">.*?</title>', '<title id="ta-title">CDSP and RAC foundation: direct theory imports</title>', svg)
-svg = re.sub(r'<desc id="ta-desc">.*?</desc>', '<desc id="ta-desc">' + desc + '</desc>', svg)
-def arrows(external):
-    color = '#8b76e8' if external else '#5f7aa8'
-    marker = 'ta-arrow-ext' if external else 'ta-arrow'
-    dash = ' stroke-dasharray="6 4"' if external else ''
-    return '<g fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"' + dash + ' marker-end="url(#' + marker + ')">\n' + '\n'.join(
-        f'    <path data-from="{a}" data-to="{b}" d="{paths[a,b]}"/>' for a,b in edges if (a == 'ADS_Functor') == external) + '\n  </g>\n\n  '
-svg = re.sub(r'(?s)(<!-- edges: session-internal -->\s*).*?(<!-- edges: external AFP dependency -->)', lambda m: m[1] + arrows(False) + m[2], svg)
-svg = re.sub(r'(?s)(<!-- edges: external AFP dependency -->\s*).*?(<!-- nodes -->)', lambda m: m[1] + arrows(True) + m[2], svg)
-svg = svg.replace('imports within this repository', 'dependency → direct importer').replace('imports the external AFP session', 'external AFP dependency → importer')
-write('theory-architecture.svg', svg)
 write('theory-architecture.mmd', mermaid(edges, desc))
-
-def start(width, height, title, detail):
-    return [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">',
-            f'<title id="title">{escape(title)}</title><desc id="desc">{escape(detail)}</desc>',
-            '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>',
-            f'<rect width="{width}" height="{height}" rx="20" fill="#0b142a"/>',
-            '<g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">']
-def text(x,y,value,size=20,color='#e1eaf8'):
-    return f'<text x="{x}" y="{y}" font-size="{size}" fill="{color}">{escape(value)}</text>'
-
-order = ['State_Preservation', 'Priority_Resolution', 'Proof_Automation', 'Regulatory_Instance',
-         'Composition', 'DQuencer_Instance', 'External_Instance', 'Functor_Laws', 'Hierarchy',
-         'Canton_Bridge', 'Regulatory_Action_Composition']
-heights = {name: 68 + 29 * max(1, len([a for a,b in edges if b == name])) for name in order}
-height = 154 + sum(heights.values()) + len(order)*15 + 72
-mobile = start(600, height, 'CDSP and RAC foundation: direct imports', desc)
-mobile += [text(28,46,'Foundation direct imports',27), text(28,80,'Each card names a theory and its direct dependencies.',18,'#a8bbd5'),
-           text(28,108,'Standard Isabelle libraries omitted; AFP grouped.',18,'#a8bbd5')]
-y = 136
-for name in order:
-    deps = [a for a,b in edges if b == name]
-    mobile += [f'<g data-node="{name}"><rect x="24" y="{y}" width="552" height="{heights[name]}" rx="12" fill="#111f39" stroke="#49678e"/>',
-               text(42,y+32,name,21), text(42,y+59,'Direct imports:',17,'#a8bbd5')]
-    if deps:
-        for i,dep in enumerate(deps):
-            mobile += [f'<g data-from="{dep}" data-to="{name}">' + text(58,y+85+i*29,dep,20) + '</g>']
-    else:
-        mobile += [text(58,y+85,'Standard Isabelle library only',19,'#a8bbd5')]
-    mobile += ['</g>']; y += heights[name] + 15
-mobile += [text(28,y+27,'The full session chain is shown in the overview.',18,'#a8bbd5'),'</g></svg>']
-write('theory-architecture-mobile.svg','\n'.join(mobile))
 
 subprocess.run(['node', str(root / 'scripts/render-session-architecture.mjs')], check=True)

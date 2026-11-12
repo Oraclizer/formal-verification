@@ -147,15 +147,19 @@ universal Rust/Go refinement or a production Witness/storage deployment.
 
 <div align="center">
   <picture>
-    <source media="(max-width: 1121px)" srcset="docs/assets/session-architecture-mobile.svg">
-    <img src="docs/assets/session-architecture.svg" alt="The base Isabelle session graph, followed by a compact count of OIP extension sessions grouped by purpose." width="900">
+    <source media="(max-width: 505px), (min-width: 768px) and (max-width: 801px)" srcset="docs/assets/session-architecture-mobile.svg">
+    <source media="(max-width: 1121px)" srcset="docs/assets/session-architecture-medium.svg">
+    <img src="docs/assets/session-architecture.svg" alt="Sessions drawn as stations on lines: the six-session chain on Isabelle/HOL, the independent companion, and the OIP prototype line leaving Evidence Atomic Binding, with one square per OIP extension session grouped by purpose." width="900">
   </picture>
 </div>
 
-Arrows in the upper diagram run from a dependency to the session that uses it.
-The lower overview groups extensions by purpose. For exact dependencies, see
-the [full Mermaid graph](docs/assets/session-architecture.mmd) and the
-[OIP session declarations](Oracle_Interoperability_Protocol/ROOT).
+Each line runs from a session to the sessions that import it. The chart in the
+same figure draws one square per OIP extension session, grouped by purpose.
+All of them build on the core OIP sessions except four negotiation-model
+sessions in the wire group, which import Isabelle/HOL only and join the product
+model through a bridge session; they are drawn as outlines. For exact
+dependencies, see the [full Mermaid graph](docs/assets/session-architecture.mmd)
+and the [OIP session declarations](Oracle_Interoperability_Protocol/ROOT).
 The independent companion has no dependency on the six-session chain. The
 auxiliary [composition audit](Evidence_Binding_Composition/Audit/README.md) is
 a separate verification session.
@@ -164,8 +168,9 @@ a separate verification session.
 
 <div align="center">
   <picture>
-    <source media="(max-width: 1121px)" srcset="docs/assets/theory-architecture-mobile.svg">
-    <img src="docs/assets/theory-architecture.svg" alt="Direct theory imports in the CDSP and RAC foundation. Arrows run from dependency to importer. Standard Isabelle libraries are omitted; ADS_Functor imports are grouped by AFP session." width="900">
+    <source media="(max-width: 505px), (min-width: 768px) and (max-width: 801px)" srcset="docs/assets/theory-architecture-mobile.svg">
+    <source media="(max-width: 1121px)" srcset="docs/assets/theory-architecture-medium.svg">
+    <img src="docs/assets/theory-architecture.svg" alt="Direct theory imports in the CDSP and RAC foundation. Lines run down from each theory to the theories that import it. Standard Isabelle libraries are omitted; ADS_Functor imports are grouped by AFP session." width="900">
   </picture>
 </div>
 
@@ -185,11 +190,14 @@ Composition adds finite allocation, historical-state projection and actual
 call/recovery applications without changing those parent operations.
 
 The foundation view shows direct imports, with AFP theories grouped under
-their session and standard Isabelle library imports omitted. The narrow view
-lists the same dependencies per importing theory. Regenerate both views and
-their Mermaid sources with `python scripts/render-architecture.py`;
-`node scripts/verify-repository-health.mjs` compares their edge inventories
-with the actual `ROOTS`, `ROOT`, and theory headers.
+their session and standard Isabelle library imports omitted. Wide windows
+show them as a layered graph; narrower windows show the same imports as arcs
+between theories listed in import order. Regenerate the Mermaid sources with
+`python scripts/render-architecture.py`;
+`node scripts/verify-repository-health.mjs` checks that the Mermaid sources and
+every version of both diagrams draw exactly the imports in the actual `ROOTS`,
+`ROOT`, and theory headers, and that the session chart has one square per
+remaining registered session.
 
 ## Assurance boundary
 

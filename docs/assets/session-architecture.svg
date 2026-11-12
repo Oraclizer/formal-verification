@@ -1,352 +1,420 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1822" viewBox="0 0 1120 1822" role="img" aria-labelledby="title desc">
-<title id="title">Repository session dependencies</title><desc id="desc">183 registered sessions. The upper diagram shows the base dependencies. The 167 additional OIP sessions are grouped by purpose below. The arrows above indicate direct Isabelle source dependencies. The full graph and ROOT files are linked in the README.</desc>
-<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L9 5L0 9Z" fill="#91acd5"/></marker></defs>
-<rect width="1120" height="1400" rx="20" fill="#0b142a"/>
-<g font-family="Arial,Segoe UI,sans-serif" fill="#e1eaf8">
-<text x="28" y="48" font-size="27" fill="#e1eaf8">Repository session dependencies</text>
-<text x="28" y="83" font-size="19" fill="#a8bbd5">Base sessions · dependency → child</text>
-<path data-from="ADS_Functor" data-to="Cross_Domain_State_Preservation" d="M620.0 182 V221.0 H190.0 V260" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="Cross_Chain_Message_Integrity" data-to="Preemptive_Lock_Correctness" d="M900.0 350 V399 H190.0 V448" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="Cross_Domain_State_Preservation" data-to="Regulatory_Action_Composition" d="M340 305.0 H395" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="Evidence_Atomic_Binding" data-to="Evidence_Binding_Composition" d="M695 493.0 H750" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="HOL" data-to="Protected_Behavior_Obstructions" d="M230 681.0 H320" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="HOL-Eisbach" data-to="Cross_Domain_State_Preservation" d="M380.0 182 V221.0 H190.0 V260" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="HOL-Library" data-to="Cross_Domain_State_Preservation" d="M140.0 182 V221.0 H190.0 V260" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="Preemptive_Lock_Correctness" data-to="Evidence_Atomic_Binding" d="M340 493.0 H395" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="Regulatory_Action_Composition" data-to="Cross_Chain_Message_Integrity" d="M695 305.0 H750" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<g data-node="Cross_Domain_State_Preservation"><rect x="40" y="260" width="300" height="90" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="190.0" y="298.5" text-anchor="middle" font-size="22">Cross-Domain State</text>
-<text x="190.0" y="325.5" text-anchor="middle" font-size="22">Preservation</text>
-</g>
-<g data-node="Regulatory_Action_Composition"><rect x="395" y="260" width="300" height="90" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="545.0" y="298.5" text-anchor="middle" font-size="22">Regulatory Action</text>
-<text x="545.0" y="325.5" text-anchor="middle" font-size="22">Composition</text>
-</g>
-<g data-node="Cross_Chain_Message_Integrity"><rect x="750" y="260" width="300" height="90" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="900.0" y="298.5" text-anchor="middle" font-size="22">Cross-Chain Message</text>
-<text x="900.0" y="325.5" text-anchor="middle" font-size="22">Integrity</text>
-</g>
-<g data-node="Preemptive_Lock_Correctness"><rect x="40" y="448" width="300" height="90" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="190.0" y="486.5" text-anchor="middle" font-size="22">Preemptive Lock</text>
-<text x="190.0" y="513.5" text-anchor="middle" font-size="22">Correctness</text>
-</g>
-<g data-node="Evidence_Atomic_Binding"><rect x="395" y="448" width="300" height="90" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="545.0" y="486.5" text-anchor="middle" font-size="22">Evidence Atomic</text>
-<text x="545.0" y="513.5" text-anchor="middle" font-size="22">Binding</text>
-</g>
-<g data-node="Evidence_Binding_Composition"><rect x="750" y="448" width="300" height="90" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="900.0" y="486.5" text-anchor="middle" font-size="22">Evidence Binding</text>
-<text x="900.0" y="513.5" text-anchor="middle" font-size="22">Composition</text>
-</g>
-<g data-node="HOL-Library"><rect x="40" y="124" width="200" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
-<text x="140.0" y="160.0" text-anchor="middle" font-size="18">HOL-Library</text>
-</g>
-<g data-node="HOL-Eisbach"><rect x="280" y="124" width="200" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
-<text x="380.0" y="160.0" text-anchor="middle" font-size="18">HOL-Eisbach</text>
-</g>
-<g data-node="ADS_Functor"><rect x="520" y="124" width="200" height="58" rx="12" fill="#201b3e" stroke="#9583db"/>
-<text x="620.0" y="160.0" text-anchor="middle" font-size="18">AFP ADS_Functor</text>
-</g>
-<g data-node="HOL"><rect x="40" y="649" width="190" height="64" rx="12" fill="#201b3e" stroke="#9583db"/>
-<text x="135.0" y="688.0" text-anchor="middle" font-size="18">HOL</text>
-</g>
-<g data-node="Protected_Behavior_Obstructions"><rect x="320" y="635" width="410" height="88" rx="12" fill="#11233c" stroke="#527aa1"/>
-<text x="525.0" y="672.5" text-anchor="middle" font-size="22">Protected Behavior</text>
-<text x="525.0" y="699.5" text-anchor="middle" font-size="22">Obstructions</text>
-</g>
-<text x="28" y="770" font-size="18" fill="#a8bbd5">Protected Behavior Obstructions is independent.</text>
-<text x="28" y="800" font-size="18" fill="#a8bbd5">Auxiliary audit sessions are separate from this catalog.</text>
-<g aria-label="OIP namespace source dependency inset">
-<rect x="28" y="840" width="1064" height="535" rx="16" fill="#0f1d32" stroke="#36516d"/>
-<text x="50" y="878" font-size="22">OIP namespace · HOL source dependencies</text>
-<text x="50" y="907" font-size="16" fill="#a8bbd5">Model, profile, reopening, recovery-boundary and message scopes remain distinct.</text>
-<text x="50" y="1345" font-size="16" fill="#a8bbd5">ROOT parent links describe source dependencies, not deployment or whole-implementation verification.</text>
-<path data-from="Evidence_Atomic_Binding" data-to="OIP_Product_Base" d="M545 538 V580 H1080 V925 H150 V940" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Product_Base" data-to="OIP_Product" d="M240 967 H280" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Product" data-to="OIP_Reference_Profile" d="M460 967 H500" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Product" data-to="OIP_Record_Reopening" d="M370 994 V1040" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Reference_Profile" data-to="OIP_Reference_Execution" d="M740 967 H780" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Reference_Profile" data-to="OIP_Recovery_Boundary" d="M620 994 V1017 H645 V1040" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Reference_Execution" data-to="OIP_Message_Code" d="M915 994 V1040" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Message_Code" data-to="OIP_Message_Response" d="M915 1094 V1140" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<path data-from="OIP_Message_Response" data-to="OIP_Message_Egress" d="M915 1194 V1240" fill="none" stroke="#91acd5" stroke-width="2" marker-end="url(#arrow)"/>
-<g data-node="OIP_Product_Base"><rect x="60" y="940" width="180" height="54" rx="9" fill="#11233c" stroke="#527aa1"/><text x="150" y="961" text-anchor="middle" font-size="16">Base model</text><text x="150" y="982" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Product_Base</text></g>
-<g data-node="OIP_Product"><rect x="280" y="940" width="180" height="54" rx="9" fill="#11233c" stroke="#527aa1"/><text x="370" y="961" text-anchor="middle" font-size="16">Product model</text><text x="370" y="982" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Product</text></g>
-<g data-node="OIP_Reference_Profile"><rect x="500" y="940" width="240" height="54" rx="9" fill="#10303b" stroke="#4b9b99"/><text x="620" y="961" text-anchor="middle" font-size="16">Reference profile</text><text x="620" y="982" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Reference_Profile</text></g>
-<g data-node="OIP_Reference_Execution"><rect x="780" y="940" width="265" height="54" rx="9" fill="#10303b" stroke="#4b9b99"/><text x="912.5" y="961" text-anchor="middle" font-size="16">Reference execution</text><text x="912.5" y="982" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Reference_Execution</text></g>
-<g data-node="OIP_Record_Reopening"><rect x="270" y="1040" width="220" height="54" rx="9" fill="#302a35" stroke="#b49a7b"/><text x="380" y="1061" text-anchor="middle" font-size="16">Record reopening</text><text x="380" y="1082" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Record_Reopening</text></g>
-<g data-node="OIP_Recovery_Boundary"><rect x="525" y="1040" width="240" height="54" rx="9" fill="#302536" stroke="#ad85ac"/><text x="645" y="1061" text-anchor="middle" font-size="16">Recovery boundary</text><text x="645" y="1082" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Recovery_Boundary</text></g>
-<g data-node="OIP_Message_Code"><rect x="790" y="1040" width="250" height="54" rx="9" fill="#14283f" stroke="#6794cf"/><text x="915" y="1061" text-anchor="middle" font-size="16">Message code</text><text x="915" y="1082" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Message_Code</text></g>
-<g data-node="OIP_Message_Response"><rect x="790" y="1140" width="250" height="54" rx="9" fill="#14283f" stroke="#6794cf"/><text x="915" y="1161" text-anchor="middle" font-size="16">Response model</text><text x="915" y="1182" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Message_Response</text></g>
-<g data-node="OIP_Message_Egress"><rect x="790" y="1240" width="250" height="54" rx="9" fill="#14283f" stroke="#6794cf"/><text x="915" y="1261" text-anchor="middle" font-size="16">Response egress</text><text x="915" y="1282" text-anchor="middle" font-family="Consolas,monospace" font-size="12">OIP_Message_Egress</text></g>
-</g>
-</g>
-<!-- Generated extension dependency catalog -->
-<metadata id="oip-extension-dependencies">
-  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Ordered_Maintenance_G0_Core"/>
-  <dependency data-from="OIP_Ordered_Maintenance_G0_Core" data-to="OIP_Ordered_Maintenance_Entry"/>
-  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Write_Canary_Base"/>
-  <dependency data-from="OIP_Write_Canary_Base" data-to="OIP_Write_Canary_Removal"/>
-  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Write_Canary_DurableV6"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Reference_Write_Profile"/>
-  <dependency data-from="OIP_Reference_Write_Profile" data-to="OIP_Reference_Write_AuthorityV4"/>
-  <dependency data-from="OIP_Reference_Write_AuthorityV4" data-to="OIP_Reference_Write_ChecksV9"/>
-  <dependency data-from="OIP_Write_Canary_Base" data-to="OIP_Reference_Write_ChecksV9"/>
-  <dependency data-from="OIP_Write_Canary_Removal" data-to="OIP_Reference_Write_ChecksV9"/>
-  <dependency data-from="OIP_Write_Canary_DurableV6" data-to="OIP_Reference_Write_ChecksV9"/>
-  <dependency data-from="OIP_Reference_Write_ChecksV9" data-to="OIP_Reference_Write_Vector_Export"/>
-  <dependency data-from="OIP_Reference_Write_Vector_Export" data-to="OIP_Reference_Write_Core_Seed"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Sync_V061_Wire_V4"/>
-  <dependency data-from="OIP_Sync_V061_Wire_V4" data-to="OIP_Sync_V061_Position_Definitions"/>
-  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Position_Proofs"/>
-  <dependency data-from="OIP_Sync_V061_Position_Proofs" data-to="OIP_Sync_V061_Position_Originals"/>
-  <dependency data-from="OIP_Sync_V061_Position_Originals" data-to="OIP_Sync_V061_Position_Boundary"/>
-  <dependency data-from="OIP_Sync_V061_Position_Proofs" data-to="OIP_Sync_V061_Position_Selection"/>
-  <dependency data-from="OIP_Sync_V061_Position_Selection" data-to="OIP_Sync_V061_Position_Provider"/>
-  <dependency data-from="OIP_Sync_V061_Position_Provider" data-to="OIP_Sync_V061_Concrete_Supplier_V2"/>
-  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Position_Direct_IR"/>
-  <dependency data-from="OIP_Sync_V061_Position_Direct_IR" data-to="OIP_Sync_V061_Position_Transport"/>
-  <dependency data-from="OIP_Sync_V061_Position_Originals" data-to="OIP_Sync_V061_Position_Ack"/>
-  <dependency data-from="OIP_Message_Response" data-to="OIP_Sync_V061_Position_Ack"/>
-  <dependency data-from="OIP_Sync_V061_Position_Transport" data-to="OIP_Sync_V061_Position_Nested_IR"/>
-  <dependency data-from="OIP_Sync_V061_Position_Ack" data-to="OIP_Sync_V061_Position_Nested_IR"/>
-  <dependency data-from="OIP_Sync_V061_Position_Boundary" data-to="OIP_Sync_V061_Product_ABI"/>
-  <dependency data-from="OIP_Sync_V061_Position_Ack" data-to="OIP_Sync_V061_Ack_ABI"/>
-  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Sync_V061_Extraction_V1"/>
-  <dependency data-from="OIP_Sync_V061_Extraction_V1" data-to="OIP_Sync_V061_Seeds_V1"/>
-  <dependency data-from="OIP_Sync_V061_Extraction_V1" data-to="OIP_Sync_V061_Strict_Proof_Link_V1"/>
-  <dependency data-from="OIP_Response_Code_Extension" data-to="OIP_Response_Code_IntInf_Runtime"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Response_Code_Allocation"/>
-  <dependency data-from="OIP_Response_Code_Allocation" data-to="OIP_Response_Code_Extension"/>
-  <dependency data-from="OIP_Sync_V061_Product_ABI" data-to="OIP_Sync_V061_Mode_Product_ABI"/>
-  <dependency data-from="OIP_Current_Read_G0_Source" data-to="OIP_Current_Read_G0_V9"/>
-  <dependency data-from="OIP_Current_Read_G0_V9" data-to="OIP_Current_Read_Vector_Export"/>
-  <dependency data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Reference_Write_Raw_Ack_Seed"/>
-  <dependency data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Egress_V061_Runtime_V7"/>
-  <dependency data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Egress_V061_Preservation_V7"/>
-  <dependency data-from="OIP_Sync_V061_Position_Nested_IR" data-to="OIP_Sync_V061_Typed_Artifact"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Current_Read_G0_Source"/>
-  <dependency data-from="OIP_Message_Egress" data-to="OIP_Response_Egress_V061_Operands"/>
-  <dependency data-from="OIP_Sync_V061_Position_Nested_IR" data-to="OIP_Response_Egress_V061_Operands"/>
-  <dependency data-from="OIP_Response_Code_Extension" data-to="OIP_Response_Egress_V061_Operands"/>
-  <dependency data-from="OIP_Response_Egress_V061_Operands" data-to="OIP_Response_Egress_V061_V5"/>
-  <dependency data-from="OIP_Sync_V061_Position_Boundary" data-to="OIP_Response_Egress_V061_V5"/>
-  <dependency data-from="OIP_Reference_Write_Profile" data-to="OIP_Response_Egress_V061_V5"/>
-  <dependency data-from="OIP_Response_Egress_V061_Runtime_V7" data-to="OIP_Response_Egress_V061_Export"/>
-  <dependency data-from="OIP_Sync_V061_Wire_V4" data-to="OIP_Sync_V061_Configured_Profile_ABI"/>
-  <dependency data-from="OIP_Sync_V061_Concrete_Supplier_V2" data-to="OIP_Sync_V061_Supplier_ABI"/>
-  <dependency data-from="OIP_Sync_V061_Position_Selection" data-to="OIP_Sync_V061_Image_Link"/>
-  <dependency data-from="OIP_Sync_V061_Product_ABI" data-to="OIP_Sync_V061_ID_Guard_ABI_V2"/>
-  <dependency data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Reference_Write_Capacity"/>
-  <dependency data-from="OIP_Sync_V061_Image_Link" data-to="OIP_Sync_V061_Image_Binding_ABI"/>
-  <dependency data-from="HOL" data-to="OIP_V062_Negotiation_Core"/>
-  <dependency data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_G0"/>
-  <dependency data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_Authentication"/>
-  <dependency data-from="OIP_Product" data-to="OIP_V062_Negotiation_Public_Bridge"/>
-  <dependency data-from="OIP_V062_Negotiation_Core" data-to="OIP_V062_Negotiation_Public_Bridge"/>
-  <dependency data-from="OIP_V062_Negotiation_Authentication" data-to="OIP_V062_Negotiation_Export"/>
-  <dependency data-from="HOL-Library" data-to="OIP_V062_Negotiation_Export"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Transport_Boundary_Arithmetic"/>
-  <dependency data-from="OIP_Transport_Boundary_Arithmetic" data-to="OIP_Transport_Boundary_Typed"/>
-  <dependency data-from="OIP_Transport_Boundary_Typed" data-to="OIP_Transport_Boundary_G0"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_P19_Threshold_G0"/>
-  <dependency data-from="OIP_P19_Threshold_G0" data-to="OIP_P19_Threshold_Export"/>
-  <dependency data-from="OIP_P19_Threshold_G0" data-to="OIP_P19_Configured_Registry_G0"/>
-  <dependency data-from="OIP_P19_Configured_Registry_G0" data-to="OIP_P19_Configured_Registry_Export"/>
-  <dependency data-from="OIP_P19_Threshold_Export" data-to="OIP_P19_Configured_Registry_Export"/>
-  <dependency data-from="OIP_Record_Reopening" data-to="OIP_Record_Reopening_Prefix_G0"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Record_Reopening_Prefix_G0"/>
-  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Query_Cache_Source_G0"/>
-  <dependency data-from="OIP_Query_Cache_Source_G0" data-to="OIP_Query_Cache_Source_Export"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Query6_Capture_G0"/>
-  <dependency data-from="OIP_Query6_Capture_G0" data-to="OIP_Query6_Capture_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Settlement_Queue_G0"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Settlement_Queue_G0"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Reserve_Debit_Finite_Base"/>
-  <dependency data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Reserve_Debit_Replay"/>
-  <dependency data-from="OIP_Reserve_Debit_Replay" data-to="OIP_Reserve_Debit_Replay_Export"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Secondary_Read_G0"/>
-  <dependency data-from="OIP_Secondary_Read_G0" data-to="OIP_Secondary_Read_Export"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Historical_Read_G0"/>
-  <dependency data-from="OIP_Historical_Read_G0" data-to="OIP_Historical_Read_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Pending_Lock_Model"/>
-  <dependency data-from="OIP_Pending_Lock_Model" data-to="OIP_Pending_Lock_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Terminal_Record_G0"/>
-  <dependency data-from="OIP_Terminal_Record_G0" data-to="OIP_Terminal_Record_Export"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Terminal_Record_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Primary_Origin_Check"/>
-  <dependency data-from="OIP_Primary_Origin_Check" data-to="OIP_Primary_Origin_Export"/>
-  <dependency data-from="OIP_Product_Base" data-to="OIP_Completion_Gates"/>
-  <dependency data-from="OIP_Completion_Gates" data-to="OIP_Completion_Gates_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Regulatory_Legal_G0"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Regulatory_Legal_G0"/>
-  <dependency data-from="OIP_Product" data-to="OIP_Legal_Receipt_Check"/>
-  <dependency data-from="OIP_Legal_Receipt_Check" data-to="OIP_Legal_Receipt_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Protected_Spend_Core"/>
-  <dependency data-from="OIP_Protected_Spend_Core" data-to="OIP_Protected_Spend_Seed"/>
-  <dependency data-from="OIP_Protected_Spend_Seed" data-to="OIP_Protected_Spend_G0"/>
-  <dependency data-from="OIP_Protected_Spend_G0" data-to="OIP_Protected_Spend_Export"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_V062_Handover_Seed_Frame"/>
-  <dependency data-from="OIP_V062_Handover_Seed_Frame" data-to="OIP_V062_Handover_Typed_Model"/>
-  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_G0"/>
-  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_Finite_Model"/>
-  <dependency data-from="OIP_V062_Handover_Finite_Model" data-to="OIP_V062_Handover_Finite_Export"/>
-  <dependency data-from="HOL-Library" data-to="OIP_V062_Handover_Finite_Export"/>
-  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_Handover_Recovery_Control_Base"/>
-  <dependency data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Handover_Recovery_Control_G0"/>
-  <dependency data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Handover_Recovery_Finite_Model"/>
-  <dependency data-from="OIP_V062_Handover_Finite_Model" data-to="OIP_V062_Handover_Recovery_Finite_Model"/>
-  <dependency data-from="OIP_V062_Handover_Recovery_Finite_Model" data-to="OIP_V062_Handover_Recovery_Export"/>
-  <dependency data-from="HOL-Library" data-to="OIP_V062_Handover_Recovery_Export"/>
-  <dependency data-from="OIP_V062_Handover_Typed_Model" data-to="OIP_V062_P13_Replay_Epoch_Base"/>
-  <dependency data-from="OIP_V062_P13_Replay_Epoch_Base" data-to="OIP_V062_P13_Replay_Epoch_G0"/>
-  <dependency data-from="OIP_Reference_Execution" data-to="OIP_Schedule_Core"/>
-  <dependency data-from="OIP_Schedule_Core" data-to="OIP_Typed_Scheduler"/>
-  <dependency data-from="OIP_Typed_Scheduler" data-to="OIP_Schedule_Product"/>
-  <dependency data-from="OIP_Schedule_Product" data-to="OIP_Schedule_Cases"/>
-  <dependency data-from="OIP_Schedule_Cases" data-to="OIP_Schedule_Export"/>
-  <dependency data-from="OIP_Schedule_Product" data-to="OIP_Schedule_Boundaries"/>
-  <dependency data-from="OIP_Query_Cache_Source_G0" data-to="OIP_Schedule_Boundaries"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Schedule_Pair"/>
-  <dependency data-from="OIP_Schedule_Product" data-to="OIP_Signed_Schedule_Pair"/>
-  <dependency data-from="OIP_Product" data-to="OIP_Direct_Publication_Check"/>
-  <dependency data-from="OIP_Direct_Publication_Check" data-to="OIP_Direct_Publication_Export"/>
-  <dependency data-from="OIP_Direct_Publication_Check" data-to="OIP_Independent_Publication_Check"/>
-  <dependency data-from="OIP_Independent_Publication_Check" data-to="OIP_Independent_Publication_Export"/>
-  <dependency data-from="OIP_Direct_Publication_Export" data-to="OIP_Independent_Publication_Export"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Etcd_Control_Confirmation"/>
-  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Witness_Mirror_Check"/>
-  <dependency data-from="OIP_V062_P13_Replay_Epoch_Base" data-to="OIP_V062_P13_Replay_Stored_Outcome_Repair"/>
-  <dependency data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final"/>
-  <dependency data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Dispatch"/>
-  <dependency data-from="OIP_V062_P13_Replay_Stored_Outcome_Repair" data-to="OIP_V062_P13_Replay_Install"/>
-  <dependency data-from="OIP_V062_P13_Replay_Install" data-to="OIP_V062_P13_Replay_Lookup"/>
-  <dependency data-from="OIP_V062_P13_Replay_Dispatch" data-to="OIP_V062_P13_Replay_Lookup"/>
-  <dependency data-from="OIP_V062_P13_Replay_Lookup" data-to="OIP_V062_P13_Replay_Finite_Projection"/>
-  <dependency data-from="OIP_V062_P13_Replay_Finite_Projection" data-to="OIP_V062_P13_Replay_Export"/>
-  <dependency data-from="OIP_Witness_Mirror_Check" data-to="OIP_Witness_Prepare_Codec_Check"/>
-  <dependency data-from="OIP_Etcd_Control_Confirmation" data-to="OIP_Etcd_Replace_Preflight"/>
-  <dependency data-from="OIP_Signed_Schedule_Pair" data-to="OIP_Signed_Schedule_Refusals"/>
-  <dependency data-from="OIP_P19_Threshold_Export" data-to="OIP_Threshold_Raw_Identity"/>
-  <dependency data-from="OIP_V062_Handover_Recovery_Control_Base" data-to="OIP_V062_Refund_Origin_Link"/>
-  <dependency data-from="OIP_Terminal_Record_G0" data-to="OIP_V062_Refund_Origin_Link"/>
-  <dependency data-from="OIP_V062_Refund_Origin_Link" data-to="OIP_V062_Refund_Origin_Export"/>
-  <dependency data-from="HOL-Library" data-to="OIP_V062_Refund_Origin_Export"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Exact_Receipt_Core_Comparison"/>
-  <dependency data-from="OIP_Exact_Receipt_Core_Comparison" data-to="OIP_Query8_Scope_Binding"/>
-  <dependency data-from="OIP_Pending_Lock_Export" data-to="OIP_Lock_Clock_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_ACK1_Entry"/>
-  <dependency data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Dispatch_Debit_Lease_Link"/>
-  <dependency data-from="OIP_Response_Egress_V061_V5" data-to="OIP_Response_Signer_Parse_Probe"/>
-  <dependency data-from="OIP_Protected_Spend_Export" data-to="OIP_Signed_Legal_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Legal_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Go_Admitted_Operand_Model_Link"/>
-  <dependency data-from="OIP_Secondary_Read_Export" data-to="OIP_Raw_Terminal_Read_Model_Link"/>
-  <dependency data-from="OIP_V062_Refund_Origin_Link" data-to="OIP_Refund_Source_Certificate_Link"/>
-  <dependency data-from="OIP_Reference_Profile" data-to="OIP_Refund_Source_Certificate_Link"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Refund_Source_Certificate_Link"/>
-  <dependency data-from="OIP_Secondary_Read_Export" data-to="OIP_Signed_Owner_Read_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Active_Session_Grant_Link"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Active_Session_Grant_Link"/>
-  <dependency data-from="OIP_Query6_Capture_Export" data-to="OIP_Signed_Cache_Capture_Model_Link"/>
-  <dependency data-from="OIP_Record_Reopening_Prefix_G0" data-to="OIP_Selected_Record_Reopening_Model_Link"/>
-  <dependency data-from="OIP_Ordered_Maintenance_G0_Core" data-to="OIP_Maintenance_Selection_Replay_Link"/>
-  <dependency data-from="OIP_Historical_Read_Export" data-to="OIP_Signed_Historical_Source_Pool_Link"/>
-  <dependency data-from="OIP_Lock_Clock_Model_Link" data-to="OIP_Signed_Cancel_Fence_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Cancel_Fence_Model_Link"/>
-  <dependency data-from="OIP_Reference_Write_Core_Seed" data-to="OIP_Signed_Write_Reopen_Link"/>
-  <dependency data-from="OIP_Reserve_Debit_Finite_Base" data-to="OIP_Signed_Write_Reopen_Link"/>
-  <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_Signed_Ordinary_Spend_Model_Link"/>
-  <dependency data-from="OIP_Lock_Clock_Model_Link" data-to="OIP_Signed_Preempt_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Signed_Preempt_Model_Link"/>
-  <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_Signed_Publish_Primary_Model_Link"/>
-  <dependency data-from="OIP_Completion_Gates_Export" data-to="OIP_Signed_Publish_Primary_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Signed_Handover_Model_Link"/>
-  <dependency data-from="OIP_V062_Handover_Finite_Export" data-to="OIP_V062_Signed_Handover_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Retained_Transition_Integrity_Model_Link"/>
-  <dependency data-from="OIP_Record_Reopening_Prefix_G0" data-to="OIP_Retained_Transition_Source_Link"/>
-  <dependency data-from="OIP_Signed_Ordinary_Spend_Model_Link" data-to="OIP_Concrete_Enforcement_Spend_Model_Link"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Source_Writer_JSON_G0"/>
-  <dependency data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_Source_Writer_Phases"/>
-  <dependency data-from="OIP_Source_Writer_Phases" data-to="OIP_Source_Writer_Integer_Transport"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_Resolver_Waiting_Model_Link"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Resolver_Waiting_Model_Link"/>
-  <dependency data-from="OIP_Completion_Gates" data-to="OIP_Resolver_Waiting_Model_Link"/>
-  <dependency data-from="OIP_Historical_Read_G0" data-to="OIP_Unpublished_Typed_Read_Link"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Unpublished_Typed_Read_Link"/>
-  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Unseen_Close_Link"/>
-  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Pending_Control_Link"/>
-  <dependency data-from="OIP_Source_Writer_Phases" data-to="OIP_Source_Resume_Link"/>
-  <dependency data-from="OIP_Source_Resume_Link" data-to="OIP_Source_Commitment_Resume_Link"/>
-  <dependency data-from="OIP_Sync_V061_Concrete_Supplier_V2" data-to="OIP_Source_Commitment_Resume_Link"/>
-  <dependency data-from="OIP_Settlement_Queue_G0" data-to="OIP_V062_Receiver_State_Branches"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Receiver_State_Branches"/>
-  <dependency data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_V062_Receiver_State_Branches"/>
-  <dependency data-from="OIP_V062_Receiver_State_Branches" data-to="OIP_V062_Receiver_State_ABI"/>
-  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Publication_Endorser_Link"/>
-  <dependency data-from="OIP_Witness_Prepare_Codec_Check" data-to="OIP_Witness_Prepare_Compare_Link"/>
-  <dependency data-from="OIP_Etcd_Control_Confirmation" data-to="OIP_Witness_Prepare_Compare_Link"/>
-  <dependency data-from="OIP_Resolver_Waiting_Model_Link" data-to="OIP_Resolver_Current_Control_Link"/>
-  <dependency data-from="OIP_P19_Threshold_Export" data-to="OIP_Resolver_Current_Control_Link"/>
-  <dependency data-from="OIP_Source_Writer_JSON_G0" data-to="OIP_Resolver_Current_Control_Link"/>
-  <dependency data-from="OIP_Signed_Write_Reopen_Link" data-to="OIP_V062_Retained_Write_Receipt"/>
-  <dependency data-from="OIP_Active_Session_Grant_Link" data-to="OIP_V062_Retained_Write_Receipt"/>
-  <dependency data-from="OIP_Retained_Transition_Integrity_Model_Link" data-to="OIP_Settlement_Sync_Integrity_Link"/>
-  <dependency data-from="OIP_Sync_V061_Position_Definitions" data-to="OIP_Settlement_Sync_Integrity_Link"/>
-  <dependency data-from="HOL-Library" data-to="OIP_Settlement_Sync_Integrity_Link"/>
-  <dependency data-from="OIP_Signed_Legal_Model_Link" data-to="OIP_V062_Confiscate_Prior_Key"/>
-  <dependency data-from="OIP_Message_Code" data-to="OIP_V062_Response_Profile_Guard"/>
-</metadata>
-<path d="M0 1380H1120V1806a16 16 0 0 1 -16 16H16a16 16 0 0 1 -16 -16Z" fill="#0b142a"/>
-<g font-family="Arial,Segoe UI,sans-serif" aria-label="OIP extensions by purpose">
-<text x="28" y="1444" font-size="27" fill="#e1eaf8">OIP extension groups</text>
-<text x="28" y="1474" font-size="17" fill="#a8bbd5">167 sessions by purpose · full graph linked below</text>
-<g aria-label="Wire and authentication: 15 sessions">
-<rect x="28" y="1500" width="524" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="44" y="1529" font-size="22" fill="#e1eaf8">Wire and authentication</text>
-<rect x="436" y="1512" width="100" height="26" rx="13" fill="#233e5e"/>
-<text x="446" y="1530" font-size="16" fill="#cfdef4">15 sessions</text>
-<text x="44" y="1555" font-size="17" fill="#a8bbd5">Negotiation, canonical wire data</text>
-<text x="44" y="1576" font-size="17" fill="#a8bbd5">and threshold signatures</text>
-</g>
-<g aria-label="State sync and reads: 39 sessions">
-<rect x="568" y="1500" width="524" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="584" y="1529" font-size="22" fill="#e1eaf8">State sync and reads</text>
-<rect x="976" y="1512" width="100" height="26" rx="13" fill="#233e5e"/>
-<text x="986" y="1530" font-size="16" fill="#cfdef4">39 sessions</text>
-<text x="584" y="1555" font-size="17" fill="#a8bbd5">Commitment sync, queries, cached</text>
-<text x="584" y="1576" font-size="17" fill="#a8bbd5">and historical reads</text>
-</g>
-<g aria-label="Responses and receipts: 14 sessions">
-<rect x="28" y="1602" width="524" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="44" y="1631" font-size="22" fill="#e1eaf8">Responses and receipts</text>
-<rect x="436" y="1614" width="100" height="26" rx="13" fill="#233e5e"/>
-<text x="446" y="1632" font-size="16" fill="#cfdef4">14 sessions</text>
-<text x="44" y="1657" font-size="17" fill="#a8bbd5">Response codes, signed replies</text>
-<text x="44" y="1678" font-size="17" fill="#a8bbd5">and stored outcomes</text>
-</g>
-<g aria-label="Authority and asset effects: 61 sessions">
-<rect x="568" y="1602" width="524" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="584" y="1631" font-size="22" fill="#e1eaf8">Authority and asset effects</text>
-<rect x="976" y="1614" width="100" height="26" rx="13" fill="#233e5e"/>
-<text x="986" y="1632" font-size="16" fill="#cfdef4">61 sessions</text>
-<text x="584" y="1657" font-size="17" fill="#a8bbd5">Handover, legal controls, locks</text>
-<text x="584" y="1678" font-size="17" fill="#a8bbd5">and reference writes</text>
-</g>
-<g aria-label="Ordering and settlement: 17 sessions">
-<rect x="28" y="1704" width="524" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="44" y="1733" font-size="22" fill="#e1eaf8">Ordering and settlement</text>
-<rect x="436" y="1716" width="100" height="26" rx="13" fill="#233e5e"/>
-<text x="446" y="1734" font-size="16" fill="#cfdef4">17 sessions</text>
-<text x="44" y="1759" font-size="17" fill="#a8bbd5">Scheduling, primary decisions</text>
-<text x="44" y="1780" font-size="17" fill="#a8bbd5">and settlement queues</text>
-</g>
-<g aria-label="Persistence and recovery: 21 sessions">
-<rect x="568" y="1704" width="524" height="90" rx="10" fill="#11233c" stroke="#527aa1"/>
-<text x="584" y="1733" font-size="22" fill="#e1eaf8">Persistence and recovery</text>
-<rect x="976" y="1716" width="100" height="26" rx="13" fill="#233e5e"/>
-<text x="986" y="1734" font-size="16" fill="#cfdef4">21 sessions</text>
-<text x="584" y="1759" font-size="17" fill="#a8bbd5">Source journals, witness checks,</text>
-<text x="584" y="1780" font-size="17" fill="#a8bbd5">publication and reopening</text>
-</g>
-</g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="732" viewBox="0 0 1200 732" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="fvmap-title fvmap-desc">
+  <title id="fvmap-title">How the proof sessions build on each other</title>
+  <desc id="fvmap-desc">Six Isabelle/HOL sessions form one chain: Cross-Domain State Preservation imports HOL-Library, HOL-Eisbach and the AFP session ADS_Functor; Regulatory Action Composition, Cross-Chain Message Integrity, Preemptive Lock Correctness, Evidence Atomic Binding and Evidence Binding Composition each import the session before them. Protected Behavior Obstructions imports HOL only and is independent of the chain. The OIP prototype builds on Evidence Atomic Binding with nine core sessions: base model, product model, reference profile, reference execution, message code, response model and response egress in a line, with record reopening on the product model and the recovery boundary on the reference profile. 167 OIP extension sessions by purpose: authority and asset effects 61, state sync and reads 39, persistence and recovery 21, ordering and settlement 17, wire and authentication 15, responses and receipts 14. All of them build on the core sessions except four sessions in the wire and authentication group, which import Isabelle/HOL only and are drawn as outlines. Lines show ROOT imports, not deployment steps or whole-implementation verification.</desc>
+  <defs>
+    <linearGradient id="fvmap-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#060b18"/><stop offset=".62" stop-color="#0a1430"/><stop offset="1" stop-color="#0c1a3d"/></linearGradient>
+    <pattern id="fvmap-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0v40" fill="none" stroke="#9fb6e0" stroke-width="1" opacity=".035"/></pattern>
+    <linearGradient id="fvmap-rule" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6aa6ff"/><stop offset=".54" stop-color="#c79d58"/><stop offset="1" stop-color="#c79d58" stop-opacity="0"/></linearGradient>
+    <path id="fvmap-g0" d="M135 0v-1490h305v602h649v-602h306v1490h-306v-635h-649v635h-305z"/>
+    <path id="fvmap-g1" d="M628 22q-168 0-291-72q-123-73-189-202q-67-130-67-302q0-174 67-304q66-129 189-202q123-72 291-72q169 0 291 72q123 73 189 202q67 130 67 304q0 172-67 302q-66 129-189 202q-122 72-291 72zm0-236q80 0 134-45q54-44 81-121q27-78 27-175q0-99-27-176q-27-77-81-121q-54-44-134-44q-80 0-134 44q-53 44-80 121q-27 77-27 176q0 97 27 175q27 77 80 121q54 45 134 45z"/>
+    <path id="fvmap-g2" d="M361 0l-330-1118h315l97 413q25 111 54 242q29 130 53 288h-34q26-154 57-285q31-132 58-245l102-413h276l100 413q25 113 56 243q31 131 58 287h-34q24-155 52-286q27-130 53-244l97-413h319l-332 1118h-305l-124-431q-18-65-36-143q-18-79-35-160q-17-82-35-153h53q-17 71-34 152q-18 82-36 161q-18 79-36 143l-124 431h-305z"/>
+    <path id="fvmap-g3" d="M683-1118v229h-663v-229h663zm-509-266h300v1057q0 53 24 78q23 26 78 26q17 0 48-4q31-5 47-9l43 225q-50 15-100 21q-49 6-94 6q-168 0-257-82q-89-82-89-235v-1083z"/>
+    <path id="fvmap-g4" d="M428-647v647h-300v-1490h294v651h-24q44-140 133-216q90-77 232-77q116 0 202 51q87 50 135 144q48 95 48 226v711h-301v-659q0-104-54-163q-53-59-148-59q-63 0-113 27q-49 28-77 80q-27 52-27 127z"/>
+    <path id="fvmap-g5" d="M633 22q-171 0-295-70q-124-70-190-199q-67-129-67-306q0-173 66-303q66-130 187-203q121-73 284-73q110 0 205 35q95 35 167 105q72 71 112 177q41 106 41 250v84h-939v-188h792l-140 50q0-87-26-152q-27-64-79-100q-53-35-130-35q-78 0-132 36q-55 36-83 98q-28 61-28 140v133q0 97 32 163q33 66 92 99q58 33 136 33q53 0 96-15q43-15 73-44q31-30 47-73l272 51q-27 92-94 161q-67 70-168 108q-100 38-231 38z"/>
+    <path id="fvmap-g6" d="M128 418v-1536h295v188h14q21-44 59-91q39-47 102-79q63-32 158-32q124 0 227 64q103 64 165 192q61 128 61 319q0 186-60 314q-60 129-163 195q-103 67-232 67q-91 0-154-31q-63-31-102-76q-40-46-61-91h-9v597h-300zm534-640q78 0 132-43q53-43 80-119q28-76 28-174q0-98-28-173q-27-75-80-118q-53-43-132-43q-77 0-131 42q-54 41-82 115q-28 75-28 177q0 101 28 176q29 76 83 118q54 42 130 42z"/>
+    <path id="fvmap-g7" d="M128 0v-1118h290v195h12q31-104 103-157q73-53 167-53q23 0 50 3q27 2 47 7v268q-20-7-58-11q-38-4-72-4q-68 0-123 29q-55 30-85 83q-31 52-31 122v636h-300z"/>
+    <path id="fvmap-g8" d="M750-1118v229h-730v-229h730zm-533 1118v-1204q0-119 48-198q47-79 129-119q82-39 186-39q71 0 129 11q59 12 86 20l-54 226q-19-5-44-10q-26-5-56-5q-68 0-97 33q-28 32-28 91v1194h-299z"/>
+    <path id="fvmap-g9" d="M572 22q-135 0-239-39q-104-38-170-112q-66-73-85-177l279-48q22 78 77 117q55 39 147 39q86 0 135-32q50-33 50-83q0-44-35-72q-36-28-109-43l-193-40q-162-33-242-113q-80-79-80-204q0-108 59-185q59-78 164-120q105-42 247-42q132 0 229 37q97 36 157 103q60 67 80 158l-266 47q-17-57-66-94q-48-36-130-36q-74 0-124 31q-50 31-50 83q0 42 32 71q33 29 112 45l201 40q162 33 241 108q79 74 79 194q0 110-64 193q-64 82-177 128q-112 46-259 46z"/>
+    <path id="fvmap-g10" d="M128 0v-1118h300v1118h-300zm150-1264q-68 0-116-45q-49-45-49-109q0-64 49-109q48-45 116-45q68 0 116 45q49 44 49 109q0 64-49 109q-48 45-116 45z"/>
+    <path id="fvmap-g11" d="M428-647v647h-300v-1118h283l5 279h-18q44-140 133-216q90-77 232-77q116 0 202 51q87 50 134 144q48 95 48 226v711h-300v-659q0-104-54-163q-53-59-148-59q-63 0-113 27q-49 28-77 80q-27 52-27 127z"/>
+    <path id="fvmap-g12" d="M754 19q-91 0-154-31q-63-31-102-76q-40-46-61-91h-14v179h-295v-1490h300v560h9q21-44 59-91q39-47 102-79q63-32 158-32q124 0 227 64q103 64 165 192q61 128 61 319q0 186-60 314q-60 129-163 195q-103 67-232 67zm-92-241q78 0 132-43q53-43 80-119q28-76 28-174q0-98-28-173q-27-75-80-118q-53-43-132-43q-77 0-131 42q-54 41-82 115q-28 75-28 177q0 101 28 176q29 76 83 118q54 42 130 42z"/>
+    <path id="fvmap-g13" d="M513 14q-116 0-203-51q-87-50-134-145q-48-94-48-225v-711h300v659q0 104 54 163q54 59 148 59q64 0 113-27q49-28 76-81q28-52 28-126v-647h301v1118h-284l-4-279h17q-44 141-134 217q-91 76-230 76z"/>
+    <path id="fvmap-g14" d="M428-1490v1490h-300v-1490h300z"/>
+    <path id="fvmap-g15" d="M536 19q-128 0-231-67q-104-66-164-195q-60-128-60-314q0-191 62-319q62-128 165-192q103-64 227-64q95 0 158 32q63 32 102 79q39 47 58 91h10v-560h300v1490h-295v-179h-15q-20 45-60 91q-39 45-102 76q-63 31-155 31zm93-241q76 0 130-42q54-42 82-118q28-75 28-176q0-102-28-177q-27-74-81-115q-54-42-131-42q-79 0-132 43q-54 43-81 118q-27 75-27 173q0 98 27 174q28 76 82 119q53 43 131 43z"/>
+    <path id="fvmap-g16" d="M440 22q-106 0-191-38q-84-37-132-112q-49-74-49-185q0-93 35-156q34-63 93-101q60-38 135-58q76-20 159-28q97-10 156-19q60-8 87-27q28-18 28-54v-5q0-48-20-81q-20-33-59-51q-40-17-96-17q-58 0-101 17q-43 18-70 47q-27 29-40 65l-275-45q29-98 96-166q67-68 167-104q99-36 224-36q90 0 175 21q85 22 152 67q68 45 107 117q40 73 40 174v753h-284v-155h-10q-27 52-72 92q-45 39-108 62q-64 23-147 23zm85-211q71 0 124-28q54-28 84-76q30-48 30-107v-121q-13 10-40 18q-27 8-60 14q-33 6-65 11q-32 5-57 8q-55 8-97 26q-42 18-65 48q-23 29-23 75q0 43 22 73q22 29 60 44q38 15 87 15z"/>
+    <path id="fvmap-g17" d="M628 22q-169 0-291-72q-123-73-189-202q-67-130-67-302q0-174 67-304q66-129 189-202q122-72 291-72q99 0 183 26q84 26 149 74q65 48 107 117q42 69 58 155l-279 52q-9-44-28-78q-19-35-46-60q-27-24-63-37q-35-13-78-13q-80 0-134 43q-55 43-82 120q-28 77-28 178q0 99 28 176q27 77 82 121q54 44 134 44q43 0 79-14q36-13 64-38q28-26 47-62q19-36 27-81l279 51q-16 89-58 159q-42 69-107 119q-65 50-149 76q-85 26-185 26z"/>
+    <path id="fvmap-g18" d="M180 0v-1490h908v168h-718v486h669v168h-669v500h727v168h-917z"/>
+    <path id="fvmap-g19" d="M471 26q-106 0-193-40q-86-40-137-117q-51-77-51-187q0-96 38-156q38-60 102-94q63-35 140-52q77-17 155-27q100-13 163-20q63-7 94-24q30-17 30-58v-6q0-70-26-119q-26-48-78-74q-52-26-130-26q-80 0-137 25q-57 25-93 63q-35 37-53 76l-173-57q43-102 116-159q73-58 161-82q88-24 174-24q56 0 127 14q72 13 138 53q67 40 110 119q44 78 44 209v737h-177v-152h-12q-19 39-61 80q-42 42-109 70q-67 28-162 28zm31-159q100 0 169-39q69-39 105-102q36-62 36-130v-155q-11 13-48 23q-37 11-84 19q-48 8-92 13q-45 6-71 9q-65 8-121 27q-57 20-91 58q-34 37-34 101q0 58 30 97q30 39 82 59q52 20 119 20z"/>
+    <path id="fvmap-g20" d="M613 24q-152 0-267-72q-114-72-178-202q-64-130-64-302q0-175 64-306q64-130 178-202q115-72 267-72q81 0 153 21q72 21 132 61q59 39 102 96q43 58 66 131l-173 49q-12-43-37-79q-25-36-60-63q-36-26-82-40q-46-15-101-15q-112 0-184 59q-72 58-107 153q-35 95-35 207q0 110 35 204q35 95 107 153q72 58 184 58q56 0 103-15q47-15 84-42q36-28 61-66q25-38 37-83l172 49q-22 75-66 134q-43 58-103 100q-60 41-133 62q-73 22-155 22z"/>
+    <path id="fvmap-g21" d="M338-670v670h-180v-1490h180v643h-31q51-155 145-220q95-65 222-65q113 0 198 46q86 47 134 140q47 94 47 236v710h-181v-695q0-129-68-202q-67-73-184-73q-80 0-144 35q-64 35-101 102q-37 67-37 163z"/>
+    <path id="fvmap-g22" d="M338-1490v1490h-180v-1490h180z"/>
+    <path id="fvmap-g23" d="M158 0v-1118h180v1118h-180zm91-1301q-51 0-88-35q-37-35-37-84q0-50 37-84q37-35 88-35q52 0 89 35q37 34 37 84q0 49-37 84q-37 35-89 35z"/>
+    <path id="fvmap-g24" d="M338-670v670h-180v-1118h173l1 271h-25q51-155 145-220q95-65 222-65q113 0 198 46q85 47 132 140q48 94 48 236v710h-180v-695q0-129-68-202q-67-73-184-73q-80 0-144 35q-64 35-101 102q-37 67-37 163z"/>
+    <path id="fvmap-g25" d="M628 24q-162 0-280-72q-117-72-180-201q-64-129-64-301q0-172 62-303q62-131 176-205q113-74 265-74q89 0 175 30q87 29 158 94q70 66 112 173q42 107 42 262v75h-868v-152h771l-84 56q0-110-35-196q-34-85-102-134q-68-48-169-48q-101 0-173 50q-72 49-110 128q-38 80-38 171v101q0 124 43 210q43 87 121 132q77 44 179 44q66 0 120-19q54-19 93-57q39-39 60-96l174 48q-26 84-88 148q-62 64-154 100q-91 36-206 36z"/>
+    <path id="fvmap-g26" d="M158 0v-1118h174v172h12q31-85 110-136q80-52 180-52q20 0 48 1q27 1 43 2v181q-8-2-40-6q-32-4-68-4q-80 0-143 34q-64 33-100 92q-36 58-36 134v700h-180z"/>
+    <path id="fvmap-g27" d="M537 14q-113 0-199-46q-85-47-132-141q-48-94-48-235v-710h180v695q0 129 68 202q68 73 185 73q80 0 143-35q64-35 101-103q37-67 37-162v-670h181v1118h-174v-271h24q-52 157-147 221q-96 64-219 64z"/>
+    <path id="fvmap-g28" d="M538 24q-115 0-204-34q-90-33-148-99q-58-66-78-162l171-41q24 92 91 135q66 43 166 43q117 0 186-50q70-50 70-119q0-58-40-97q-41-38-124-57l-186-44q-152-36-226-111q-74-76-74-194q0-96 54-170q54-73 148-114q93-42 212-42q115 0 196 34q80 35 130 96q51 60 76 139l-163 42q-23-60-77-109q-53-49-161-49q-100 0-167 46q-66 46-66 116q0 62 45 99q45 38 143 61l169 40q152 36 225 111q73 76 73 191q0 98-55 175q-56 76-156 120q-99 44-230 44z"/>
+    <path id="fvmap-g29" d="M678-1118v154h-658v-154h658zm-438 1118v-1267q0-97 46-162q45-65 118-98q73-33 154-33q64 0 106 10q42 11 62 20l-50 154q-14-5-36-11q-23-6-61-6q-83 0-121 43q-38 42-38 123v1227h-180z"/>
+    <path id="fvmap-g30" d="M613 24q-152 0-267-72q-114-72-178-202q-64-130-64-302q0-175 64-306q64-130 178-202q115-72 267-72q153 0 268 72q115 72 179 202q64 131 64 306q0 172-64 302q-64 130-179 202q-115 72-268 72zm0-161q113 0 186-58q73-58 108-153q35-94 35-204q0-111-35-206q-35-96-108-154q-73-59-186-59q-112 0-184 59q-72 58-107 153q-35 95-35 207q0 110 35 204q35 95 107 153q72 58 184 58z"/>
+    <path id="fvmap-g31" d="M158 0v-1118h175l1 250h-14q23-91 72-150q50-60 116-90q67-30 139-30q122 0 197 75q76 75 98 197h-24q20-84 73-145q53-61 129-94q75-33 164-33q97 0 177 42q80 42 127 127q48 85 48 215v754h-180v-749q0-121-68-173q-68-52-158-52q-75 0-130 32q-54 31-84 86q-29 55-29 126v730h-180v-767q0-93-62-150q-62-57-157-57q-65 0-122 30q-58 31-93 91q-35 60-35 149v704h-180z"/>
+    <path id="fvmap-g32" d="M598-1118v154h-578v-154h578zm-410-266h180v1094q0 75 30 110q31 34 102 34q17 0 44-4q26-4 48-8l37 152q-28 10-63 15q-36 5-71 5q-145 0-226-76q-81-77-81-214v-1108z"/>
+    <path id="fvmap-g33" d="M158 418v-1536h174v179h20q19-30 53-75q34-46 98-82q64-36 173-36q140 0 246 70q107 70 168 200q60 129 60 306q0 178-60 308q-60 130-166 201q-107 71-247 71q-106 0-171-36q-65-37-100-84q-35-46-54-77h-14v591h-180zm492-555q105 0 176-57q70-56 106-152q35-95 35-212q0-116-35-210q-35-93-106-148q-70-55-176-55q-103 0-173 52q-70 52-105 145q-36 92-36 216q0 124 36 219q36 95 106 149q71 53 172 53z"/>
+    <path id="fvmap-g34" d="M295 13q-56 0-95-39q-40-40-40-96q0-56 40-96q39-39 95-39q56 0 95 39q40 40 40 96q0 56-40 96q-39 39-95 39z"/>
+    <path id="fvmap-g35" d="M440-1490v1490h-305v-1490h305z"/>
+    <path id="fvmap-g36" d="M768-1560l-480 1784h-260l480-1784h260z"/>
+    <path id="fvmap-g37" d="M789 20q-197 0-355-90q-157-90-249-261q-91-171-91-413q0-243 91-415q92-171 249-261q158-90 355-90q198 0 355 90q157 90 249 261q91 172 91 415q0 242-91 413q-92 171-249 261q-157 90-355 90zm0-271q116 0 203-57q86-56 134-167q48-110 48-269q0-161-48-271q-48-111-134-167q-87-57-203-57q-115 0-202 57q-87 57-135 167q-48 111-48 271q0 159 48 269q48 110 135 167q87 57 202 57z"/>
+    <path id="fvmap-g38" d="M135 0v-1490h305v1237h643v253h-948z"/>
+    <path id="fvmap-g39" d="M180 0v-1490h190v644h782v-644h190v1490h-190v-678h-782v678h-190z"/>
+    <path id="fvmap-g40" d="M784 20q-191 0-340-92q-150-93-236-264q-86-172-86-408q0-237 86-408q86-172 236-265q149-93 340-93q191 0 340 93q149 93 234 265q86 171 86 408q0 236-86 408q-85 171-234 264q-149 92-340 92zm0-176q133 0 240-68q108-67 172-198q63-132 63-322q0-192-63-324q-64-131-172-198q-107-68-240-68q-134 0-242 68q-108 68-172 200q-63 131-63 322q0 190 63 321q64 131 172 199q108 68 242 68z"/>
+    <path id="fvmap-g41" d="M180 0v-1490h190v1322h690v168h-880z"/>
+    <path id="fvmap-g42" d="M798-826v166h-654v-166h654z"/>
+    <path id="fvmap-g43" d="M677 24q-106 0-171-36q-65-37-100-84q-35-46-54-77h-20v173h-174v-1490h180v551h14q19-30 53-75q34-46 98-82q64-36 173-36q140 0 246 70q107 70 168 200q60 129 60 306q0 178-60 308q-60 130-166 201q-107 71-247 71zm-27-161q105 0 176-57q70-56 106-152q35-95 35-212q0-116-35-210q-35-93-106-148q-70-55-176-55q-103 0-173 52q-70 52-105 145q-36 92-36 216q0 124 36 219q36 95 106 149q71 53 172 53z"/>
+    <path id="fvmap-g44" d="M140 405l46-156l19 5q55 14 100 8q45-7 81-45q36-38 63-118l32-93l-427-1124h197l238 663q38 104 64 206q26 102 55 198h-66q29-96 56-199q26-102 63-205l240-663h196l-491 1285q-34 89-82 147q-47 57-110 84q-63 28-142 28q-48 0-83-7q-35-7-49-14z"/>
+    <path id="fvmap-g45" d="M295-573q-56 0-95-39q-40-40-40-96q0-56 40-96q39-39 95-39q56 0 95 39q40 40 40 96q0 56-40 96q-39 39-95 39z"/>
+    <path id="fvmap-g46" d="M52 0l541-1490h220l548 1490h-200l-316-884q-29-82-67-204q-39-123-94-313h36q-54 192-94 317q-39 124-65 200l-307 884h-202zm272-416v-166h765v166h-765z"/>
+    <path id="fvmap-g47" d="M180 0v-1490h901v168h-711v510h643v168h-643v644h-190z"/>
+    <path id="fvmap-g48" d="M180 0v-1490h510q174 0 286 64q113 63 168 170q54 107 54 240q0 133-54 241q-55 108-167 172q-112 64-286 64h-361v-167h352q118 0 190-40q72-41 104-112q33-70 33-158q0-88-33-158q-32-69-104-109q-73-40-192-40h-310v1323h-190z"/>
+    <path id="fvmap-g49" d="M645 0h-360v-168h348q182 0 301-70q120-69 179-199q59-130 59-311q0-179-58-308q-59-128-174-197q-116-69-289-69h-374v-168h387q218 0 372 89q155 89 238 255q82 167 82 398q0 233-83 400q-83 168-242 258q-159 90-386 90zm-275-1490v1490h-190v-1490h190z"/>
+    <path id="fvmap-g50" d="M657 26q-161 0-279-52q-119-52-186-146q-67-93-76-218h195q8 84 57 138q49 55 126 82q76 26 163 26q101 0 181-33q81-33 128-93q47-60 47-139q0-72-41-117q-40-45-107-74q-67-29-147-51l-180-51q-180-51-280-146q-100-95-100-243q0-126 68-221q68-94 184-146q116-52 260-52q147 0 260 52q113 52 178 142q66 89 70 202h-186q-13-109-104-168q-91-60-224-60q-96 0-168 32q-73 31-113 86q-40 54-40 124q0 78 49 126q48 47 114 74q67 26 121 41l149 41q60 16 132 44q73 28 139 74q66 47 109 118q42 72 42 176q0 122-64 220q-63 98-184 155q-121 57-293 57z"/>
+    <path id="fvmap-g51" d="M934 0v166h-934v-166h934z"/>
+    <path id="fvmap-g52" d="M785 20q-196 0-350-91q-154-91-243-262q-89-171-89-411q0-241 90-413q89-171 243-262q155-91 349-91q122 0 229 35q106 34 190 101q83 66 137 162q54 96 72 218h-269q-13-67-44-118q-32-51-79-87q-47-35-106-53q-59-19-126-19q-122 0-217 62q-94 61-147 178q-54 118-54 287q0 171 54 288q54 117 148 177q95 60 215 60q67 0 126-19q59-18 106-54q48-35 80-87q32-51 44-117h270q-15 107-66 200q-50 94-132 165q-82 71-190 111q-109 40-241 40z"/>
+    <path id="fvmap-g53" d="M138 0v-1118h252v187h12q30-97 105-150q75-52 171-52q22 0 49 2q27 2 46 5v239q-16-5-52-9q-36-4-71-4q-72 0-130 31q-57 31-90 85q-32 55-32 126v658h-260z"/>
+    <path id="fvmap-g54" d="M623 23q-163 0-283-73q-120-72-185-202q-66-129-66-301q0-174 66-305q65-130 185-202q120-72 283-72q164 0 284 72q120 72 185 202q66 131 66 305q0 172-66 301q-65 130-185 202q-120 73-284 73zm0-211q91 0 151-49q61-49 90-132q30-83 30-185q0-103-30-186q-29-83-90-132q-60-49-151-49q-91 0-150 49q-60 49-90 132q-29 82-29 186q0 102 29 185q30 83 90 132q59 49 150 49z"/>
+    <path id="fvmap-g55" d="M561 23q-129 0-228-37q-99-37-162-108q-64-71-83-172l243-46q23 83 82 123q58 41 153 41q96 0 152-39q57-38 57-95q0-48-37-80q-37-31-114-48l-191-41q-158-34-236-112q-78-78-78-201q0-104 57-180q57-76 159-118q101-42 235-42q127 0 218 36q92 36 148 101q57 64 79 151l-232 46q-19-59-69-99q-50-41-141-41q-83 0-138 36q-56 37-56 94q0 49 37 81q37 32 122 50l190 40q159 34 236 109q77 75 77 193q0 106-61 187q-61 80-170 125q-108 46-249 46z"/>
+    <path id="fvmap-g56" d="M811-728v215h-670v-215h670z"/>
+    <path id="fvmap-g57" d="M654 0h-377v-231h364q156 0 261-57q104-58 157-172q53-115 53-287q0-170-53-284q-53-114-155-171q-103-57-256-57h-379v-231h395q222 0 381 89q159 89 245 256q85 167 85 398q0 233-85 400q-86 168-247 257q-162 90-389 90zm-237-1490v1490h-267v-1490h267z"/>
+    <path id="fvmap-g58" d="M138 0v-1118h244l10 269h-19q24-100 75-163q50-63 118-93q67-31 141-31q121 0 196 76q74 76 105 224h-31q23-100 78-167q56-66 133-100q76-33 163-33q101 0 181 44q80 44 127 129q47 84 47 209v754h-260v-714q0-104-57-152q-57-48-137-48q-62 0-108 27q-46 27-71 74q-24 48-24 111v702h-254v-726q0-85-53-137q-53-51-136-51q-57 0-104 26q-48 26-76 77q-28 51-28 126v685h-260z"/>
+    <path id="fvmap-g59" d="M450 23q-106 0-191-38q-85-39-134-114q-49-75-49-185q0-95 35-157q36-62 96-99q61-37 137-56q76-19 158-27q97-11 158-19q61-8 89-26q29-18 29-56v-5q0-55-22-93q-22-39-66-59q-43-21-107-21q-65 0-112 20q-48 20-78 52q-30 32-44 69l-241-49q33-99 102-164q69-64 165-96q95-32 207-32q79 0 159 19q81 18 148 62q67 44 108 118q41 74 41 186v747h-249v-154h-10q-25 47-68 88q-44 40-109 65q-64 24-152 24zm67-193q81 0 139-32q59-32 91-84q33-53 33-115v-132q-13 10-43 19q-31 9-68 16q-38 7-74 12q-37 5-62 8q-58 8-105 26q-47 18-74 51q-26 32-26 84q0 48 24 81q25 32 67 49q43 17 98 17z"/>
+    <path id="fvmap-g60" d="M138 0v-1118h260v1118h-260zm130-1276q-62 0-107-42q-44-42-44-100q0-60 44-102q45-41 107-41q63 0 107 41q45 42 45 102q0 58-45 100q-44 42-107 42z"/>
+    <path id="fvmap-g61" d="M398-655v655h-260v-1118h246l4 276h-21q47-145 138-217q91-73 228-73q115 0 201 49q86 49 134 143q47 94 47 229v711h-260v-671q0-112-58-176q-58-64-160-64q-69 0-123 30q-54 30-85 87q-31 58-31 139z"/>
+    <path id="fvmap-g62" d="M673 23q-173 0-301-54q-127-54-199-157q-72-103-78-250h263q7 78 49 130q42 52 111 77q69 26 153 26q88 0 155-27q68-27 106-76q38-48 38-112q0-58-33-96q-34-38-95-65q-60-26-141-46l-169-44q-187-48-291-145q-105-97-105-255q0-132 71-231q71-99 194-153q123-55 279-55q159 0 279 55q120 55 187 152q68 97 71 221h-259q-10-96-86-148q-75-53-196-53q-84 0-144 25q-61 26-94 70q-32 44-32 101q0 62 38 102q39 40 97 64q59 24 119 39l139 36q83 20 161 53q78 33 141 84q62 50 99 122q37 72 37 169q0 131-67 230q-67 100-193 156q-126 55-304 55z"/>
+    <path id="fvmap-g63" d="M655-1118v204h-635v-204h635zm-476-266h260v1069q0 61 26 89q26 29 85 29q18 0 47-5q30-4 48-8l41 201q-43 13-88 19q-45 5-86 5q-161 0-247-80q-86-80-86-228v-1091z"/>
+    <path id="fvmap-g64" d="M632 23q-169 0-290-71q-122-71-188-200q-65-129-65-304q0-173 65-303q64-130 183-204q118-73 278-73q102 0 194 33q93 33 164 102q72 69 112 175q41 107 41 254v82h-914v-177h785l-122 52q0-94-29-166q-29-71-87-111q-57-40-143-40q-86 0-146 40q-60 41-91 109q-32 67-32 150v122q0 106 36 179q36 73 101 110q65 37 151 37q57 0 104-17q46-16 80-48q34-33 51-80l239 49q-27 90-92 157q-65 68-163 105q-97 38-222 38z"/>
+    <path id="fvmap-g65" d="M150 0v-1490h557q171 0 288 64q117 64 177 176q60 111 60 253q0 143-61 254q-60 111-178 175q-118 64-290 64h-369v-220h334q101 0 165-35q65-35 95-97q31-62 31-141q0-79-31-140q-30-61-95-95q-65-34-167-34h-249v1266h-267z"/>
+    <path id="fvmap-g66" d="M455 0l-416-1118h278l204 608q36 107 62 215q26 108 53 219h-65q28-111 53-219q26-108 61-215l203-608h276l-418 1118h-291z"/>
+    <path id="fvmap-g67" d="M150 0v-1490h557q171 0 288 60q117 60 177 167q60 108 60 250q0 142-61 247q-60 105-178 162q-118 57-290 57h-398v-221h363q101 0 165-29q64-28 95-83q31-55 31-133q0-80-31-137q-31-56-95-86q-65-30-167-30h-249v1266h-267zm838 0l-362-676h292l369 676h-299z"/>
+    <path id="fvmap-g68" d="M620 442q-134 0-234-34q-99-34-162-93q-64-58-92-132l220-79q18 31 49 64q32 33 84 55q53 21 134 21q121 0 194-56q73-57 73-177v-211h-22q-19 40-56 83q-37 42-100 71q-62 29-159 29q-128 0-233-60q-104-61-166-182q-61-121-61-303q0-184 62-311q62-127 166-193q105-66 234-66q99 0 163 33q64 33 102 80q38 46 58 86h14v-185h255v1121q0 149-68 247q-68 97-186 145q-118 47-269 47zm2-664q85 0 144-41q59-40 90-117q31-77 31-184q0-106-31-186q-30-79-89-124q-59-44-145-44q-88 0-147 46q-60 47-90 126q-30 80-30 182q0 103 30 180q31 77 90 120q60 42 147 42z"/>
+    <path id="fvmap-g69" d="M521 14q-115 0-201-49q-87-49-134-144q-48-94-48-228v-711h260v671q0 112 58 176q59 64 161 64q69 0 123-30q54-30 85-88q30-58 30-138v-655h261v1118h-247l-3-276h20q-47 146-139 218q-92 72-226 72z"/>
+    <path id="fvmap-g70" d="M398-1490v1490h-260v-1490h260z"/>
+    <path id="fvmap-g71" d="M127 399l61-203l31 8q59 15 105 9q46-7 77-41q31-33 44-97l16-71l-422-1122h278l204 608q36 108 59 215q23 107 51 219h-68q27-112 54-220q27-107 63-214l211-608h275l-480 1262q-34 89-85 153q-51 63-125 96q-74 33-175 33q-55 0-102-8q-46-8-72-19z"/>
+    <path id="fvmap-g72" d="M50 0l520-1490h339l532 1490h-293l-265-774q-39-120-81-271q-42-152-93-345h56q-50 195-90 347q-41 153-77 269l-256 774h-292zm303-369v-215h785v215h-785z"/>
+    <path id="fvmap-g73" d="M623 23q-163 0-283-73q-120-72-185-202q-66-129-66-301q0-174 66-305q65-130 185-202q120-72 283-72q93 0 173 24q80 24 143 70q63 45 106 110q42 65 60 147l-243 51q-11-43-31-79q-21-35-51-60q-30-25-69-39q-39-13-86-13q-91 0-151 48q-60 49-90 131q-30 83-30 188q0 103 30 186q30 83 90 131q60 49 151 49q48 0 87-14q40-14 71-40q30-26 51-63q21-37 31-82l243 51q-18 84-60 150q-43 66-106 113q-64 46-144 71q-81 25-175 25z"/>
+    <path id="fvmap-g74" d="M138 418v-1536h254v185h17q20-40 57-86q37-46 100-80q64-33 163-33q130 0 234 66q104 66 165 195q62 128 62 314q0 184-60 313q-60 129-165 196q-104 68-237 68q-95 0-159-32q-64-33-102-79q-38-46-58-86h-11v595h-260zm520-612q87 0 146-47q59-48 89-130q30-83 30-187q0-104-29-185q-30-82-89-128q-59-47-147-47q-86 0-145 45q-59 45-90 125q-30 81-30 190q0 109 31 191q30 82 90 128q59 45 144 45z"/>
+    <path id="fvmap-g75" d="M398-655v655h-260v-1490h256v648h-27q47-145 138-217q91-73 228-73q115 0 201 49q87 49 134 143q48 94 48 229v711h-261v-671q0-112-58-176q-58-64-160-64q-69 0-123 30q-54 30-85 87q-31 58-31 139z"/>
+    <path id="fvmap-g76" d="M150 0v-1490h402l283 769q15 43 33 110q19 68 38 146q20 78 37 152q18 75 30 132h-54q12-56 29-129q18-74 37-152q20-79 38-147q19-68 33-112l280-769h403v1490h-266v-752q0-48 1-116q1-68 3-146q2-78 4-158q2-79 2-151h19q-20 79-43 161q-24 83-47 161q-23 77-43 142q-21 65-36 107l-275 752h-227l-279-752q-15-42-35-105q-21-64-44-141q-24-77-47-160q-24-84-47-165h22q1 67 3 146q2 78 4 157q1 79 3 148q1 70 1 120v752h-262z"/>
+    <path id="fvmap-g77" d="M417-1490v1490h-267v-1490h267z"/>
+    <path id="fvmap-g78" d="M150 0v-1490h267v1265h658v225h-925z"/>
+    <path id="fvmap-g79" d="M376-352v-315h41l403-451h305l-494 551h-54l-201 215zm-238 352v-1490h260v1490h-260zm701 0l-366-509l176-184l502 693h-312z"/>
+    <path id="fvmap-g80" d="M150 0v-1490h968v225h-701v402h649v222h-649v416h705v225h-972z"/>
+    <path id="fvmap-g81" d="M550 20q-132 0-236-68q-105-67-165-196q-60-129-60-313q0-186 61-314q62-129 166-195q105-66 233-66q100 0 163 33q64 34 101 80q38 46 57 86h11v-557h260v1490h-255v-177h-16q-20 40-58 86q-39 46-102 79q-63 32-160 32zm71-214q85 0 144-45q59-46 90-128q31-82 31-191q0-109-31-190q-30-80-90-125q-59-45-144-45q-88 0-147 47q-59 46-89 128q-30 81-30 185q0 104 30 187q30 82 90 130q59 47 146 47z"/>
+    <path id="fvmap-g82" d="M150 0v-1490h570q161 0 268 51q107 51 160 138q53 87 53 198q0 91-35 155q-35 65-94 105q-58 40-131 57v15q79 4 152 48q73 44 119 124q47 80 47 193q0 116-56 208q-56 92-168 145q-113 53-284 53h-601zm267-223h292q148 0 214-57q65-57 65-146q0-67-33-121q-33-53-93-84q-61-31-144-31h-301v439zm0-632h269q71 0 127-26q56-26 89-74q32-48 32-114q0-87-61-143q-61-56-181-56h-275v413z"/>
+    <path id="fvmap-g83" d="M788 20q-196 0-351-91q-155-91-244-262q-90-171-90-411q0-241 90-413q89-171 244-262q155-91 351-91q195 0 349 91q155 91 244 262q90 172 90 413q0 240-90 411q-89 172-244 262q-154 91-349 91zm0-239q121 0 215-61q93-60 146-177q53-118 53-287q0-171-53-289q-53-117-146-177q-94-61-215-61q-122 0-216 61q-94 61-147 178q-54 118-54 288q0 169 54 286q53 117 147 178q94 61 216 61z"/>
+    <path id="fvmap-g84" d="M728 20q-95 0-159-32q-64-33-102-79q-38-46-58-86h-17v177h-254v-1490h260v557h11q20-40 57-86q37-46 100-80q64-33 163-33q130 0 234 66q104 66 165 195q62 128 62 314q0 184-60 313q-60 129-165 196q-104 68-237 68zm-70-214q87 0 146-47q59-48 89-130q30-83 30-187q0-104-29-185q-30-82-89-128q-59-47-147-47q-86 0-145 45q-59 45-90 125q-30 81-30 190q0 109 31 191q30 82 90 128q59 45 144 45z"/>
+    <path id="fvmap-g85" d="M370-1490v1490h-190v-1490h190z"/>
+    <path id="fvmap-g86" d="M577 24q-139 0-246-71q-107-71-167-201q-60-130-60-308q0-177 60-306q61-130 168-200q107-70 246-70q109 0 173 36q64 36 99 82q34 45 52 75h14v-551h180v1490h-174v-173h-20q-18 31-54 77q-35 47-100 84q-64 36-171 36zm27-161q102 0 172-53q70-54 106-149q36-95 36-219q0-124-36-216q-35-93-105-145q-70-52-173-52q-106 0-176 55q-71 55-106 148q-35 94-35 210q0 117 35 212q36 96 107 152q71 57 175 57z"/>
+    <path id="fvmap-g87" d="M128 359l88-567h206l-156 567h-138z"/>
+    <path id="fvmap-g88" d="M135 0v-1490h581q170 0 289 65q119 64 181 178q63 113 63 260q0 148-64 260q-63 113-184 177q-120 63-292 63h-374v-246h325q94 0 154-32q61-33 90-90q30-57 30-132q0-75-30-132q-29-56-90-88q-61-31-155-31h-219v1238h-305z"/>
+    <path id="fvmap-g89" d="M120 396l69-226l37 9q60 16 107 9q47-7 75-38q29-31 35-87l8-60l-420-1121h319l188 580q34 110 56 220q21 110 49 230h-70q27-120 54-231q27-110 63-219l196-580h315l-475 1250q-34 90-87 156q-53 66-132 102q-79 36-191 36q-60 0-112-9q-52-8-84-21z"/>
+    <path id="fvmap-g90" d="M905-745q0-329-67-470q-68-141-222-141q-153 0-220 141q-68 141-68 470q0 328 68 469q67 141 220 141q154 0 222-141q67-140 67-469zm211 0q0 390-124 582q-123 192-376 192q-253 0-376-191q-123-191-123-583q0-391 123-583q124-192 376-192q253 0 376 192q124 192 124 583z"/>
+    <path id="fvmap-g91" d="M201-1493h829v170h-313v1153h313v170h-829v-170h313v-1153h-313v-170z"/>
+    <path id="fvmap-g92" d="M399-1327v561h234q140 0 219-74q78-74 78-207q0-133-78-207q-78-73-219-73h-234zm-202-166h436q250 0 379 113q129 114 129 333q0 221-129 334q-128 113-379 113h-234v600h-202v-1493z"/>
+    <path id="fvmap-g93" d="M1233 403v80h-1233v-80h1233z"/>
+    <path id="fvmap-g94" d="M1155-889q-59-46-120-67q-61-21-134-21q-172 0-263 108q-91 108-91 312v557h-185v-1120h185v219q46-119 141-183q96-63 227-63q68 0 127 17q59 17 113 53v188z"/>
+    <path id="fvmap-g95" d="M616-991q-140 0-212 109q-72 109-72 323q0 213 72 323q72 109 212 109q141 0 213-109q72-110 72-323q0-214-72-323q-72-109-213-109zm0-156q233 0 356 151q124 151 124 437q0 287-123 437q-123 151-357 151q-233 0-356-151q-123-150-123-437q0-286 123-437q123-151 356-151z"/>
+    <path id="fvmap-g96" d="M858-977v-579h184v1556h-184v-141q-46 83-122 127q-77 43-177 43q-203 0-319-157q-117-158-117-435q0-273 117-429q117-155 319-155q101 0 178 43q77 44 121 127zm-541 418q0 214 68 323q68 109 201 109q133 0 202-110q70-110 70-322q0-213-70-323q-69-109-202-109q-133 0-201 109q-68 109-68 323z"/>
+    <path id="fvmap-g97" d="M195-424v-694h184v694q0 151 53 222q54 71 166 71q130 0 199-91q69-92 69-263v-633h185v1118h-185v-168q-49 97-134 147q-84 50-197 50q-172 0-256-113q-84-112-84-340z"/>
+    <path id="fvmap-g98" d="M1061-57q-74 43-153 65q-78 21-160 21q-260 0-406-156q-147-156-147-432q0-276 147-432q146-156 406-156q81 0 158 21q77 21 155 65v193q-73-65-147-94q-73-29-166-29q-173 0-266 112q-93 112-93 320q0 207 93 319q94 113 266 113q96 0 172-29q76-30 141-92v191z"/>
+    <path id="fvmap-g99" d="M614-1438v318h418v143h-418v608q0 124 47 173q47 49 164 49h207v147h-225q-207 0-292-83q-85-83-85-286v-608h-299v-143h299v-318h184z"/>
+    <path id="fvmap-g100" d="M369-713v547h239q176 0 251-62q75-61 75-202q0-146-79-214q-79-69-247-69h-239zm0-614v450h235q146 0 212-56q65-56 65-181q0-113-65-163q-64-50-212-50h-235zm-203-166h442q229 0 353 99q124 99 124 280q0 137-65 216q-66 79-197 99q147 22 231 125q83 104 83 264q0 203-133 306q-133 104-396 104h-442v-1493z"/>
+    <path id="fvmap-g101" d="M702-563h-61q-161 0-243 57q-81 56-81 168q0 101 61 157q61 56 169 56q152 0 239-105q87-106 88-292v-41h-172zm357-76v639h-185v-166q-59 100-148 148q-90 47-218 47q-171 0-273-97q-102-96-102-258q0-187 125-284q126-97 369-97h247v-29q-1-134-68-194q-67-61-214-61q-94 0-190 27q-96 27-187 79v-184q102-39 195-59q94-19 182-19q139 0 238 41q98 41 159 123q38 50 54 123q16 74 16 221z"/>
+    <path id="fvmap-g102" d="M973-1081v180q-79-46-159-69q-80-23-163-23q-125 0-187 41q-61 40-61 123q0 75 46 112q46 37 229 72l74 14q137 26 208 104q70 78 70 203q0 166-118 260q-118 93-328 93q-83 0-174-17q-91-18-197-53v-190q103 53 197 79q94 27 178 27q122 0 189-49q67-50 67-139q0-128-245-177l-8-2l-69-14q-159-31-232-104q-73-74-73-201q0-161 109-249q109-87 311-87q90 0 173 17q83 16 163 49z"/>
+    <path id="fvmap-g103" d="M1112-606v90h-797v6q0 183 95 283q96 100 270 100q88 0 184-28q96-28 205-85v183q-105 43-203 65q-97 21-188 21q-261 0-408-157q-147-156-147-431q0-268 144-428q144-160 384-160q214 0 337 145q124 145 124 396zm-184-54q-4-162-76-246q-73-85-209-85q-133 0-219 88q-86 88-102 244l606-1z"/>
+    <path id="fvmap-g104" d="M760-705q78 20 133 75q55 56 137 222l203 408h-217l-178-377q-77-161-138-207q-62-47-161-47h-193v631h-203v-1493h416q246 0 377 111q131 111 131 321q0 148-81 241q-80 94-226 115zm-414-622v530h221q145 0 216-65q71-65 71-199q0-129-76-197q-75-69-219-69h-213z"/>
+    <path id="fvmap-g105" d="M375-141v567h-185v-1546h185v143q46-83 123-127q76-43 176-43q203 0 318 157q116 157 116 435q0 273-116 429q-116 155-318 155q-102 0-178-43q-77-44-121-127zm540-418q0-214-67-323q-68-109-201-109q-134 0-203 109q-69 110-69 323q0 212 69 322q69 110 203 110q133 0 201-109q67-109 67-323z"/>
+    <path id="fvmap-g106" d="M1051-694v694h-185v-694q0-151-53-222q-53-71-166-71q-129 0-199 91q-69 92-69 263v633h-184v-1120h184v168q49-96 133-146q84-49 199-49q171 0 255 113q85 112 85 340z"/>
+    <path id="fvmap-g107" d="M256-1120h471v977h365v143h-914v-143h365v-834h-287v-143zm287-436h184v233h-184v-233z"/>
+    <path id="fvmap-g108" d="M858-569q0-207-68-315q-67-107-196-107q-135 0-206 107q-71 108-71 315q0 207 71 315q72 109 208 109q127 0 194-109q68-109 68-315zm184 497q0 252-119 382q-119 130-350 130q-76 0-159-14q-83-14-166-41v-182q98 46 178 68q80 22 147 22q149 0 217-81q68-81 68-257v-8v-125q-44 94-120 140q-76 46-185 46q-196 0-313-157q-117-157-117-420q0-264 117-421q117-157 313-157q108 0 183 43q75 43 122 133v-145h184v1044z"/>
+    <path id="fvmap-g109" d="M100-1120h191l325 940l326-940h191l-398 1120h-237l-398-1120z"/>
+    <path id="fvmap-g110" d="M858-360q-46 117-117 308q-99 264-133 322q-46 78-115 117q-69 39-161 39h-148v-154h109q81 0 127-47q46-47 117-243l-433-1102h195l332 876l327-876h195l-295 760z"/>
+    <path id="fvmap-g111" d="M726-1118v204h-706v-204h706zm-501 1118v-1225q0-112 47-186q46-74 126-112q79-37 174-37q69 0 122 11q53 11 78 20l-53 202q-17-5-41-11q-25-5-58-5q-73 0-104 36q-32 36-32 102v1205h-259z"/>
+    <path id="fvmap-g112" d="M1063-1556v153h-209q-99 0-138 41q-38 40-38 143v99h385v143h-385v977h-184v-977h-299v-143h299v-78q0-184 84-271q85-87 264-87h221z"/>
+    <path id="fvmap-g113" d="M639-406q0 124 45 187q46 63 135 63h215v156h-233q-165 0-255-106q-91-106-91-300v-1017h-295v-144h479v1161z"/>
+    <path id="fvmap-g114" d="M50 0l435-675l-1 202l-412-645h286l114 190q50 85 89 166q39 81 79 157h-108q42-75 79-156q38-82 89-167l118-190h280l-418 649v-197l435 666h-284l-138-224q-50-85-89-165q-40-80-80-153h108q-40 73-76 153q-37 80-87 165l-138 224h-281z"/>
+    <path id="fvmap-g115" d="M197-1493h886v170h-684v442h654v170h-654v541h703v170h-905v-1493z"/>
+    <path id="fvmap-g116" d="M1118-1120l-401 536l440 584h-213l-328-449l-327 449h-213l440-584l-401-536h204l297 405l295-405h207z"/>
+    <path id="fvmap-g117" d="M86-1493h270l258 760l260-760h271v1493h-187v-1319l-266 787h-153l-267-787v1319h-186v-1493z"/>
+    <path id="fvmap-g118" d="M1073-53q-77 41-158 61q-81 21-172 21q-287 0-445-203q-159-203-159-571q0-366 159-571q160-204 445-204q91 0 172 20q81 21 158 62v207q-74-61-159-93q-85-32-171-32q-197 0-295 152q-98 152-98 459q0 306 98 458q98 152 295 152q88 0 173-32q84-32 157-93v207z"/>
+    <path id="fvmap-g119" d="M749-1490v1490h-305v-1221h-10l-341 242v-280l329-231h327z"/>
+    <path id="fvmap-g120" d="M684 20q-113 0-219-38q-106-38-190-122q-83-85-132-225q-49-140-49-345q0-188 42-336q42-148 121-252q79-104 190-158q111-54 248-54q147 0 260 57q113 58 182 155q70 98 84 221h-300q-19-79-78-124q-60-46-148-46q-98 0-165 58q-68 58-102 164q-34 107-34 254h10q34-65 90-112q57-47 130-72q73-24 154-24q132 0 236 62q103 61 163 170q60 109 60 249q0 151-70 268q-70 117-194 183q-124 67-289 67zm-2-242q74 0 132-36q58-35 92-96q34-60 34-136q0-75-33-135q-33-60-91-95q-58-36-132-36q-55 0-102 21q-47 21-83 58q-35 37-55 85q-19 48-19 103q0 73 33 134q33 60 92 97q58 36 132 36z"/>
+    <path id="fvmap-g121" d="M177 0l620-1228v-10h-722v-252h1041v256l-622 1234h-317z"/>
+    <path id="fvmap-g122" d="M42 0l433-691l-1 234l-410-661h324l101 176q48 87 87 172q38 84 78 164h-114q41-79 79-164q38-85 88-172l105-176h318l-418 664v-231l434 685h-322l-124-210q-49-86-89-171q-39-85-80-163h115q-39 78-76 163q-38 85-86 171l-124 210h-318z"/>
+    <path id="fvmap-g123" d="M1096 418h-180v-591h-14q-18 31-54 77q-35 47-100 84q-64 36-171 36q-139 0-246-71q-107-71-167-201q-60-130-60-308q0-177 60-306q61-130 168-200q107-70 246-70q109 0 173 36q64 36 99 82q34 45 52 75h20v-179h174v1536zm-492-555q102 0 172-53q70-54 106-149q36-95 36-219q0-124-36-216q-35-93-105-145q-70-52-173-52q-106 0-176 55q-71 55-106 148q-35 94-35 210q0 117 35 212q36 96 107 152q71 57 175 57z"/>
+    <path id="fvmap-g124" d="M65 0l441-643l-1 138l-417-613h210l139 217q54 84 93 157q40 73 82 141h-94q43-68 78-141q36-73 91-157l142-217h206l-419 621v-133l437 630h-209l-164-251q-53-82-92-153q-38-70-79-135h95q-41 65-76 135q-35 71-89 153l-166 251h-208z"/>
+    <path id="fvmap-g125" d="M659 20q-162 0-288-56q-125-55-198-154q-72-99-74-228h307q3 56 36 98q34 41 91 64q57 23 127 23q74 0 130-26q56-25 88-71q32-46 32-107q0-62-33-109q-34-47-96-73q-62-27-149-27h-138v-227h138q73 0 128-25q55-26 87-70q31-45 31-105q0-58-27-101q-27-43-75-67q-49-25-114-25q-65 0-119 24q-54 23-87 65q-33 42-34 100h-294q2-127 73-225q70-98 191-153q121-55 272-55q153 0 268 56q115 56 178 151q64 95 64 211q0 125-78 209q-77 84-201 108v11q108 14 183 61q74 47 112 120q38 73 38 166q0 126-73 225q-73 99-201 156q-129 56-295 56z"/>
+    <path id="fvmap-g126" d="M636 22q-147 0-260-58q-114-58-183-157q-69-99-84-222h302q18 80 77 127q59 47 148 47q98 0 165-58q68-59 102-166q35-108 35-255h-10q-34 64-91 111q-56 47-129 73q-72 25-154 25q-132 0-236-62q-105-62-164-171q-60-109-60-249q0-151 70-268q70-118 195-185q125-68 290-66q113 0 218 39q105 38 188 123q84 84 133 224q49 140 49 345q0 189-43 337q-42 149-120 253q-79 104-190 159q-111 54-248 54zm11-757q55 0 103-21q47-22 82-58q35-37 55-85q20-48 20-104q0-72-34-132q-33-60-91-97q-58-36-133-36q-73 0-131 35q-59 36-93 96q-34 61-34 136q0 75 33 135q34 60 91 96q58 35 132 35z"/>
+    <path id="fvmap-g127" d="M124 0v-220l528-495q68-66 114-119q47-54 72-105q24-52 24-112q0-67-30-115q-30-48-82-74q-52-26-119-26q-69 0-121 28q-52 28-80 80q-28 52-28 125h-292q0-145 67-252q66-108 184-166q118-59 272-59q158 0 276 56q118 57 183 156q66 99 66 228q0 83-33 164q-32 81-115 181q-84 101-237 241l-225 222v11h630v251h-1054z"/>
+    <path id="fvmap-g128" d="M452 0l-402-1490h287l194 793q20 86 37 181q18 95 34 191q17 96 32 188h-43q17-92 34-188q17-96 36-191q19-95 40-181l202-793h283l201 793q22 86 40 181q19 95 37 191q17 96 35 188h-46q16-92 33-188q16-96 34-191q18-95 38-181l193-793h288l-403 1490h-306l-217-823q-30-115-52-250q-23-135-49-286h64q-28 146-48 279q-20 132-53 257l-217 823h-306z"/>
+    <path id="fvmap-g129" d="M628 20q-153 0-272-56q-120-57-190-156q-69-99-73-226h298q3 58 35 102q33 45 86 69q53 25 116 25q75 0 133-34q57-33 90-93q33-60 33-139q0-79-34-141q-33-61-92-95q-58-34-135-34q-67 0-129 27q-61 26-95 71l-274-48l71-782h902v252h-649l-38 377h8q40-54 118-89q79-35 175-35q101 0 186 36q86 36 149 101q63 66 98 156q35 90 35 197q0 150-70 266q-69 116-193 183q-125 66-289 66z"/>
+    <path id="fvmap-g130" d="M101-265v-241l623-984h207v336h-123l-399 631v12h884v246h-1192zm713 265v-338l6-108v-1044h287v1490h-293z"/>
+    <path id="fvmap-g131" d="M409 0l-339-1118h191l136 488q28 100 60 226q32 127 63 287h-31q30-153 61-280q31-127 60-233l134-488h192l132 488q28 103 58 230q31 126 61 283h-32q32-155 63-281q32-127 61-232l136-488h191l-339 1118h-179l-145-506q-22-77-43-157q-21-80-41-164q-20-84-41-171h40q-20 86-40 170q-21 85-42 166q-21 81-43 156l-145 506h-179z"/>
+    <path id="fvmap-g132" d="M180 0v-1490h510q174 0 286 60q113 59 168 163q54 104 54 237q0 133-54 235q-55 102-167 159q-112 58-286 58h-405v-169h396q118 0 190-35q71-34 104-98q33-63 33-150q0-89-33-154q-33-66-105-102q-72-37-191-37h-310v1323h-190zm856 0l-360-671h214l366 671h-220z"/>
+    <path id="fvmap-g133" d="M98-1322v-168h1126v168h-467v1322h-190v-1322h-469z"/>
+    <path id="fvmap-g134" d="M798-719v166h-654v-166h654z"/>
+    <path id="fvmap-g135" d="M481 0l-427-1118h197l238 663q38 103 65 205q26 103 55 199h-66q29-96 55-199q27-102 64-205l238-663h197l-427 1118h-189z"/>
+    <marker id="fvmap-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#6aa6ff"/></marker>
+    <marker id="fvmap-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#e8b660"/></marker>
+    <marker id="fvmap-coral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#e07a66"/></marker>
+    <marker id="fvmap-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#8fa3cf"/></marker>
+    <marker id="fvmap-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#a493ff"/></marker>
+    <marker id="fvmap-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#5ccfb0"/></marker>
+  </defs>
+  <rect width="1200" height="732" rx="24" fill="url(#fvmap-bg)"/>
+  <rect width="1200" height="732" rx="24" fill="url(#fvmap-grid)"/>
+  <rect x=".75" y=".75" width="1198.5" height="730.5" rx="23.5" fill="none" stroke="#1d3159" stroke-width="1.5"/>
+  <g class="t" transform="matrix(.0136719 0 0 .0136719 48 62)"><g fill="#eef3ff"><use href="#fvmap-g0" x="0"/><use href="#fvmap-g1" x="1530"/><use href="#fvmap-g2" x="2758"/><use href="#fvmap-g3" x="4984"/><use href="#fvmap-g4" x="5739"/><use href="#fvmap-g5" x="7014"/><use href="#fvmap-g6" x="8719"/><use href="#fvmap-g7" x="10010"/><use href="#fvmap-g1" x="10794"/><use href="#fvmap-g1" x="12050"/><use href="#fvmap-g8" x="13306"/><use href="#fvmap-g9" x="14606"/><use href="#fvmap-g5" x="15753"/><use href="#fvmap-g9" x="16973"/><use href="#fvmap-g9" x="18120"/><use href="#fvmap-g10" x="19267"/><use href="#fvmap-g1" x="19822"/><use href="#fvmap-g11" x="21078"/><use href="#fvmap-g9" x="22353"/><use href="#fvmap-g12" x="23985"/><use href="#fvmap-g13" x="25276"/><use href="#fvmap-g10" x="26551"/><use href="#fvmap-g14" x="27106"/><use href="#fvmap-g15" x="27661"/><use href="#fvmap-g1" x="29437"/><use href="#fvmap-g11" x="30693"/><use href="#fvmap-g5" x="32453"/><use href="#fvmap-g16" x="33693"/><use href="#fvmap-g17" x="34882"/><use href="#fvmap-g4" x="36087"/><use href="#fvmap-g1" x="37847"/><use href="#fvmap-g3" x="39103"/><use href="#fvmap-g4" x="39858"/><use href="#fvmap-g5" x="41133"/><use href="#fvmap-g7" x="42353"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 48 94.3)"><g fill="#a8bde6"><use href="#fvmap-g18" x="0"/><use href="#fvmap-g19" x="1231"/><use href="#fvmap-g20" x="2381"/><use href="#fvmap-g21" x="3551"/><use href="#fvmap-g22" x="5338"/><use href="#fvmap-g23" x="5834"/><use href="#fvmap-g24" x="6330"/><use href="#fvmap-g25" x="7540"/><use href="#fvmap-g26" x="9310"/><use href="#fvmap-g27" x="10081"/><use href="#fvmap-g24" x="11292"/><use href="#fvmap-g28" x="12502"/><use href="#fvmap-g29" x="14159"/><use href="#fvmap-g26" x="14917"/><use href="#fvmap-g30" x="15654"/><use href="#fvmap-g31" x="16882"/><use href="#fvmap-g19" x="19252"/><use href="#fvmap-g28" x="20978"/><use href="#fvmap-g25" x="22059"/><use href="#fvmap-g28" x="23253"/><use href="#fvmap-g28" x="24334"/><use href="#fvmap-g23" x="25415"/><use href="#fvmap-g30" x="25911"/><use href="#fvmap-g24" x="27139"/><use href="#fvmap-g32" x="28925"/><use href="#fvmap-g30" x="29575"/><use href="#fvmap-g32" x="31379"/><use href="#fvmap-g21" x="32049"/><use href="#fvmap-g25" x="33260"/><use href="#fvmap-g28" x="35030"/><use href="#fvmap-g25" x="36111"/><use href="#fvmap-g28" x="37305"/><use href="#fvmap-g28" x="38386"/><use href="#fvmap-g23" x="39467"/><use href="#fvmap-g30" x="39963"/><use href="#fvmap-g24" x="41191"/><use href="#fvmap-g28" x="42401"/><use href="#fvmap-g32" x="44058"/><use href="#fvmap-g21" x="44728"/><use href="#fvmap-g19" x="45939"/><use href="#fvmap-g32" x="47089"/><use href="#fvmap-g23" x="48335"/><use href="#fvmap-g31" x="48831"/><use href="#fvmap-g33" x="50625"/><use href="#fvmap-g30" x="51879"/><use href="#fvmap-g26" x="53107"/><use href="#fvmap-g32" x="53910"/><use href="#fvmap-g23" x="55156"/><use href="#fvmap-g32" x="55652"/><use href="#fvmap-g34" x="56322"/></g></g>
+  <rect x="48" y="112" width="300" height="2" rx="1" fill="url(#fvmap-rule)"/>
+  <rect x="45" y="212" width="26" height="130" rx="13.0" fill="#171338" stroke="#5f53b8" stroke-width="1.6"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 84 280)"><g fill="#d4ccff"><use href="#fvmap-g35" x="0"/><use href="#fvmap-g9" x="575"/><use href="#fvmap-g16" x="1722"/><use href="#fvmap-g12" x="2911"/><use href="#fvmap-g5" x="4202"/><use href="#fvmap-g14" x="5422"/><use href="#fvmap-g14" x="5977"/><use href="#fvmap-g5" x="6532"/><use href="#fvmap-g36" x="7752"/><use href="#fvmap-g0" x="8547"/><use href="#fvmap-g37" x="10077"/><use href="#fvmap-g38" x="11655"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 181.59 280)"><g fill="#93a8d4"><use href="#fvmap-g39" x="0"/><use href="#fvmap-g40" x="1522"/><use href="#fvmap-g41" x="3088"/><use href="#fvmap-g42" x="4072"/><use href="#fvmap-g41" x="5014"/><use href="#fvmap-g23" x="6172"/><use href="#fvmap-g43" x="6668"/><use href="#fvmap-g26" x="7922"/><use href="#fvmap-g19" x="8693"/><use href="#fvmap-g26" x="9843"/><use href="#fvmap-g44" x="10646"/><use href="#fvmap-g45" x="12373"/><use href="#fvmap-g39" x="13539"/><use href="#fvmap-g40" x="15061"/><use href="#fvmap-g41" x="16627"/><use href="#fvmap-g42" x="17611"/><use href="#fvmap-g18" x="18553"/><use href="#fvmap-g23" x="19784"/><use href="#fvmap-g28" x="20280"/><use href="#fvmap-g43" x="21361"/><use href="#fvmap-g19" x="22635"/><use href="#fvmap-g20" x="23785"/><use href="#fvmap-g21" x="24955"/><use href="#fvmap-g45" x="26742"/><use href="#fvmap-g46" x="27908"/><use href="#fvmap-g47" x="29321"/><use href="#fvmap-g48" x="30530"/><use href="#fvmap-g46" x="32414"/><use href="#fvmap-g49" x="33827"/><use href="#fvmap-g50" x="35305"/><use href="#fvmap-g51" x="36619"/><use href="#fvmap-g47" x="37622"/><use href="#fvmap-g27" x="38762"/><use href="#fvmap-g24" x="39973"/><use href="#fvmap-g20" x="41183"/><use href="#fvmap-g32" x="42353"/><use href="#fvmap-g30" x="43003"/><use href="#fvmap-g26" x="44231"/></g></g>
+  <path d="M58 236 L210 236" fill="none" stroke="#6aa6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="Cross_Domain_State_Preservation" data-to="Regulatory_Action_Composition" d="M210 236 L382 236" fill="none" stroke="#6aa6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="Regulatory_Action_Composition" data-to="Cross_Chain_Message_Integrity" d="M382 236 L554 236" fill="none" stroke="#6aa6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="Cross_Chain_Message_Integrity" data-to="Preemptive_Lock_Correctness" d="M554 236 L726 236" fill="none" stroke="#6aa6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="Preemptive_Lock_Correctness" data-to="Evidence_Atomic_Binding" d="M726 236 L898 236" fill="none" stroke="#6aa6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="Evidence_Atomic_Binding" data-to="Evidence_Binding_Composition" d="M898 236 L1070 236" fill="none" stroke="#6aa6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 137 190)"><g fill="#eef3ff"><use href="#fvmap-g52" x="0"/><use href="#fvmap-g53" x="1509"/><use href="#fvmap-g54" x="2277"/><use href="#fvmap-g55" x="3524"/><use href="#fvmap-g55" x="4649"/><use href="#fvmap-g56" x="5774"/><use href="#fvmap-g57" x="6727"/><use href="#fvmap-g54" x="8206"/><use href="#fvmap-g58" x="9453"/><use href="#fvmap-g59" x="11297"/><use href="#fvmap-g60" x="12473"/><use href="#fvmap-g61" x="13009"/><use href="#fvmap-g62" x="14778"/><use href="#fvmap-g63" x="16110"/><use href="#fvmap-g59" x="16843"/><use href="#fvmap-g63" x="18019"/><use href="#fvmap-g64" x="18722"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 163.85 208.75)"><g fill="#eef3ff"><use href="#fvmap-g65" x="0"/><use href="#fvmap-g53" x="1321"/><use href="#fvmap-g64" x="2089"/><use href="#fvmap-g55" x="3300"/><use href="#fvmap-g64" x="4425"/><use href="#fvmap-g53" x="5636"/><use href="#fvmap-g66" x="6481"/><use href="#fvmap-g59" x="7666"/><use href="#fvmap-g63" x="8842"/><use href="#fvmap-g60" x="9565"/><use href="#fvmap-g54" x="10101"/><use href="#fvmap-g61" x="11348"/></g></g>
+  <circle data-node="Cross_Domain_State_Preservation" cx="210" cy="236" r="10" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 317.2 190)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g68" x="2521"/><use href="#fvmap-g69" x="3802"/><use href="#fvmap-g70" x="5056"/><use href="#fvmap-g59" x="5592"/><use href="#fvmap-g63" x="6768"/><use href="#fvmap-g54" x="7471"/><use href="#fvmap-g53" x="8718"/><use href="#fvmap-g71" x="9563"/><use href="#fvmap-g72" x="11284"/><use href="#fvmap-g73" x="12743"/><use href="#fvmap-g63" x="13936"/><use href="#fvmap-g60" x="14659"/><use href="#fvmap-g54" x="15195"/><use href="#fvmap-g61" x="16442"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 336.06 208.75)"><g fill="#eef3ff"><use href="#fvmap-g52" x="0"/><use href="#fvmap-g54" x="1509"/><use href="#fvmap-g58" x="2756"/><use href="#fvmap-g74" x="4600"/><use href="#fvmap-g54" x="5878"/><use href="#fvmap-g55" x="7125"/><use href="#fvmap-g60" x="8250"/><use href="#fvmap-g63" x="8786"/><use href="#fvmap-g60" x="9509"/><use href="#fvmap-g54" x="10045"/><use href="#fvmap-g61" x="11292"/></g></g>
+  <circle data-node="Regulatory_Action_Composition" cx="382" cy="236" r="10" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 508.39 190)"><g fill="#eef3ff"><use href="#fvmap-g52" x="0"/><use href="#fvmap-g53" x="1509"/><use href="#fvmap-g54" x="2277"/><use href="#fvmap-g55" x="3524"/><use href="#fvmap-g55" x="4649"/><use href="#fvmap-g56" x="5774"/><use href="#fvmap-g52" x="6727"/><use href="#fvmap-g75" x="8236"/><use href="#fvmap-g59" x="9490"/><use href="#fvmap-g60" x="10666"/><use href="#fvmap-g61" x="11202"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 488.51 208.75)"><g fill="#eef3ff"><use href="#fvmap-g76" x="0"/><use href="#fvmap-g64" x="1889"/><use href="#fvmap-g55" x="3100"/><use href="#fvmap-g55" x="4225"/><use href="#fvmap-g59" x="5350"/><use href="#fvmap-g68" x="6526"/><use href="#fvmap-g64" x="7807"/><use href="#fvmap-g77" x="9534"/><use href="#fvmap-g61" x="10101"/><use href="#fvmap-g63" x="11354"/><use href="#fvmap-g64" x="12057"/><use href="#fvmap-g68" x="13268"/><use href="#fvmap-g53" x="14549"/><use href="#fvmap-g60" x="15375"/><use href="#fvmap-g63" x="15911"/><use href="#fvmap-g71" x="16678"/></g></g>
+  <circle data-node="Cross_Chain_Message_Integrity" cx="554" cy="236" r="10" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 665.4 190)"><g fill="#eef3ff"><use href="#fvmap-g65" x="0"/><use href="#fvmap-g53" x="1321"/><use href="#fvmap-g64" x="2089"/><use href="#fvmap-g64" x="3300"/><use href="#fvmap-g58" x="4511"/><use href="#fvmap-g74" x="6355"/><use href="#fvmap-g63" x="7633"/><use href="#fvmap-g60" x="8356"/><use href="#fvmap-g66" x="8892"/><use href="#fvmap-g64" x="10056"/><use href="#fvmap-g78" x="11783"/><use href="#fvmap-g54" x="12941"/><use href="#fvmap-g73" x="14188"/><use href="#fvmap-g79" x="15381"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 681.33 208.75)"><g fill="#eef3ff"><use href="#fvmap-g52" x="0"/><use href="#fvmap-g54" x="1509"/><use href="#fvmap-g53" x="2756"/><use href="#fvmap-g53" x="3589"/><use href="#fvmap-g64" x="4357"/><use href="#fvmap-g73" x="5568"/><use href="#fvmap-g63" x="6761"/><use href="#fvmap-g61" x="7484"/><use href="#fvmap-g64" x="8737"/><use href="#fvmap-g55" x="9948"/><use href="#fvmap-g55" x="11073"/></g></g>
+  <circle data-node="Preemptive_Lock_Correctness" cx="726" cy="236" r="10" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 837.2 190)"><g fill="#eef3ff"><use href="#fvmap-g80" x="0"/><use href="#fvmap-g66" x="1240"/><use href="#fvmap-g60" x="2442"/><use href="#fvmap-g81" x="2978"/><use href="#fvmap-g64" x="4256"/><use href="#fvmap-g61" x="5467"/><use href="#fvmap-g73" x="6720"/><use href="#fvmap-g64" x="7913"/><use href="#fvmap-g72" x="9640"/><use href="#fvmap-g63" x="11080"/><use href="#fvmap-g54" x="11783"/><use href="#fvmap-g58" x="13030"/><use href="#fvmap-g60" x="14874"/><use href="#fvmap-g73" x="15410"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 870.58 208.75)"><g fill="#eef3ff"><use href="#fvmap-g82" x="0"/><use href="#fvmap-g60" x="1350"/><use href="#fvmap-g61" x="1886"/><use href="#fvmap-g81" x="3139"/><use href="#fvmap-g60" x="4417"/><use href="#fvmap-g61" x="4953"/><use href="#fvmap-g68" x="6206"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 1007.28 190)"><g fill="#eef3ff"><use href="#fvmap-g80" x="0"/><use href="#fvmap-g66" x="1240"/><use href="#fvmap-g60" x="2442"/><use href="#fvmap-g81" x="2978"/><use href="#fvmap-g64" x="4256"/><use href="#fvmap-g61" x="5467"/><use href="#fvmap-g73" x="6720"/><use href="#fvmap-g64" x="7913"/><use href="#fvmap-g82" x="9640"/><use href="#fvmap-g60" x="10990"/><use href="#fvmap-g61" x="11526"/><use href="#fvmap-g81" x="12779"/><use href="#fvmap-g60" x="14057"/><use href="#fvmap-g61" x="14593"/><use href="#fvmap-g68" x="15846"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 1024.06 208.75)"><g fill="#eef3ff"><use href="#fvmap-g52" x="0"/><use href="#fvmap-g54" x="1509"/><use href="#fvmap-g58" x="2756"/><use href="#fvmap-g74" x="4600"/><use href="#fvmap-g54" x="5878"/><use href="#fvmap-g55" x="7125"/><use href="#fvmap-g60" x="8250"/><use href="#fvmap-g63" x="8786"/><use href="#fvmap-g60" x="9509"/><use href="#fvmap-g54" x="10045"/><use href="#fvmap-g61" x="11292"/></g></g>
+  <circle data-node="Evidence_Binding_Composition" cx="1070" cy="236" r="10" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
+  <path d="M58 318 L212 318" fill="none" stroke="#a493ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle data-node="Protected_Behavior_Obstructions" cx="212" cy="318" r="10" fill="#0b1834" stroke="#a493ff" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 236 316)"><g fill="#eef3ff"><use href="#fvmap-g65" x="0"/><use href="#fvmap-g53" x="1321"/><use href="#fvmap-g54" x="2089"/><use href="#fvmap-g63" x="3336"/><use href="#fvmap-g64" x="4039"/><use href="#fvmap-g73" x="5250"/><use href="#fvmap-g63" x="6443"/><use href="#fvmap-g64" x="7146"/><use href="#fvmap-g81" x="8357"/><use href="#fvmap-g82" x="10151"/><use href="#fvmap-g64" x="11501"/><use href="#fvmap-g75" x="12712"/><use href="#fvmap-g59" x="13966"/><use href="#fvmap-g66" x="15108"/><use href="#fvmap-g60" x="16310"/><use href="#fvmap-g54" x="16846"/><use href="#fvmap-g53" x="18093"/><use href="#fvmap-g83" x="19422"/><use href="#fvmap-g84" x="20996"/><use href="#fvmap-g55" x="22274"/><use href="#fvmap-g63" x="23399"/><use href="#fvmap-g53" x="24122"/><use href="#fvmap-g69" x="24935"/><use href="#fvmap-g73" x="26189"/><use href="#fvmap-g63" x="27382"/><use href="#fvmap-g60" x="28105"/><use href="#fvmap-g54" x="28641"/><use href="#fvmap-g61" x="29888"/><use href="#fvmap-g55" x="31141"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 236 336)"><g fill="#93a8d4"><use href="#fvmap-g85" x="0"/><use href="#fvmap-g24" x="550"/><use href="#fvmap-g86" x="1760"/><use href="#fvmap-g25" x="3014"/><use href="#fvmap-g33" x="4208"/><use href="#fvmap-g25" x="5462"/><use href="#fvmap-g24" x="6656"/><use href="#fvmap-g86" x="7866"/><use href="#fvmap-g25" x="9120"/><use href="#fvmap-g24" x="10314"/><use href="#fvmap-g32" x="11524"/><use href="#fvmap-g30" x="12770"/><use href="#fvmap-g29" x="13998"/><use href="#fvmap-g32" x="15332"/><use href="#fvmap-g21" x="16002"/><use href="#fvmap-g25" x="17213"/><use href="#fvmap-g20" x="18983"/><use href="#fvmap-g21" x="20153"/><use href="#fvmap-g19" x="21364"/><use href="#fvmap-g23" x="22514"/><use href="#fvmap-g24" x="23010"/><use href="#fvmap-g87" x="24220"/><use href="#fvmap-g23" x="25386"/><use href="#fvmap-g31" x="25882"/><use href="#fvmap-g33" x="27676"/><use href="#fvmap-g30" x="28930"/><use href="#fvmap-g26" x="30158"/><use href="#fvmap-g32" x="30961"/><use href="#fvmap-g28" x="31611"/><use href="#fvmap-g39" x="33268"/><use href="#fvmap-g40" x="34790"/><use href="#fvmap-g41" x="36356"/><use href="#fvmap-g30" x="38090"/><use href="#fvmap-g24" x="39318"/><use href="#fvmap-g22" x="40528"/><use href="#fvmap-g44" x="41034"/></g></g>
+  <path data-from="Evidence_Atomic_Binding" data-to="OIP_Product_Base" d="M898 236 L898 332" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="OIP_Product_Base" data-to="OIP_Product" d="M898 332 L898 384" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="OIP_Product" data-to="OIP_Reference_Profile" d="M898 384 L898 436" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="OIP_Reference_Profile" data-to="OIP_Reference_Execution" d="M898 436 L898 488" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="OIP_Reference_Execution" data-to="OIP_Message_Code" d="M898 488 L898 540" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="OIP_Message_Code" data-to="OIP_Message_Response" d="M898 540 L898 592" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path data-from="OIP_Message_Response" data-to="OIP_Message_Egress" d="M898 592 L898 644" fill="none" stroke="#5ccfb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 924 286)"><g fill="#5ccfb0"><use href="#fvmap-g37" x="0"/><use href="#fvmap-g35" x="1578"/><use href="#fvmap-g88" x="2153"/><use href="#fvmap-g6" x="3965"/><use href="#fvmap-g7" x="5256"/><use href="#fvmap-g1" x="6040"/><use href="#fvmap-g3" x="7296"/><use href="#fvmap-g1" x="8026"/><use href="#fvmap-g3" x="9282"/><use href="#fvmap-g89" x="10077"/><use href="#fvmap-g6" x="11310"/><use href="#fvmap-g5" x="12601"/></g></g>
+  <circle data-node="OIP_Product_Base" cx="898" cy="332" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 327.98)"><g fill="#eef3ff"><use href="#fvmap-g82" x="0"/><use href="#fvmap-g59" x="1350"/><use href="#fvmap-g55" x="2526"/><use href="#fvmap-g64" x="3651"/><use href="#fvmap-g58" x="5378"/><use href="#fvmap-g54" x="7222"/><use href="#fvmap-g81" x="8469"/><use href="#fvmap-g64" x="9747"/><use href="#fvmap-g70" x="10958"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 346.83)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g92" x="4932"/><use href="#fvmap-g94" x="6165"/><use href="#fvmap-g95" x="7398"/><use href="#fvmap-g96" x="8631"/><use href="#fvmap-g97" x="9864"/><use href="#fvmap-g98" x="11097"/><use href="#fvmap-g99" x="12330"/><use href="#fvmap-g93" x="13563"/><use href="#fvmap-g100" x="14796"/><use href="#fvmap-g101" x="16029"/><use href="#fvmap-g102" x="17262"/><use href="#fvmap-g103" x="18495"/></g></g>
+  <path data-from="OIP_Product" data-to="OIP_Record_Reopening" d="M898 384 L834 384" fill="none" stroke="#5ccfb0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle data-node="OIP_Record_Reopening" cx="834" cy="384" r="7" fill="#0b1834" stroke="#5ccfb0" stroke-width="3"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 695.95 379.62)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g73" x="2521"/><use href="#fvmap-g54" x="3714"/><use href="#fvmap-g53" x="4961"/><use href="#fvmap-g81" x="5729"/><use href="#fvmap-g53" x="7523"/><use href="#fvmap-g64" x="8291"/><use href="#fvmap-g54" x="9502"/><use href="#fvmap-g74" x="10749"/><use href="#fvmap-g64" x="12027"/><use href="#fvmap-g61" x="13238"/><use href="#fvmap-g60" x="14491"/><use href="#fvmap-g61" x="15027"/><use href="#fvmap-g68" x="16280"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 659.47 398.47)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g104" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g98" x="7398"/><use href="#fvmap-g95" x="8631"/><use href="#fvmap-g94" x="9864"/><use href="#fvmap-g96" x="11097"/><use href="#fvmap-g93" x="12330"/><use href="#fvmap-g104" x="13563"/><use href="#fvmap-g103" x="14796"/><use href="#fvmap-g95" x="16029"/><use href="#fvmap-g105" x="17262"/><use href="#fvmap-g103" x="18495"/><use href="#fvmap-g106" x="19728"/><use href="#fvmap-g107" x="20961"/><use href="#fvmap-g106" x="22194"/><use href="#fvmap-g108" x="23427"/></g></g>
+  <circle data-node="OIP_Product" cx="898" cy="384" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 379.98)"><g fill="#eef3ff"><use href="#fvmap-g65" x="0"/><use href="#fvmap-g53" x="1321"/><use href="#fvmap-g54" x="2089"/><use href="#fvmap-g81" x="3336"/><use href="#fvmap-g69" x="4614"/><use href="#fvmap-g73" x="5868"/><use href="#fvmap-g63" x="7061"/><use href="#fvmap-g58" x="8300"/><use href="#fvmap-g54" x="10144"/><use href="#fvmap-g81" x="11391"/><use href="#fvmap-g64" x="12669"/><use href="#fvmap-g70" x="13880"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 398.83)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g92" x="4932"/><use href="#fvmap-g94" x="6165"/><use href="#fvmap-g95" x="7398"/><use href="#fvmap-g96" x="8631"/><use href="#fvmap-g97" x="9864"/><use href="#fvmap-g98" x="11097"/><use href="#fvmap-g99" x="12330"/></g></g>
+  <path data-from="OIP_Reference_Profile" data-to="OIP_Recovery_Boundary" d="M898 436 L834 436" fill="none" stroke="#5ccfb0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle data-node="OIP_Recovery_Boundary" cx="834" cy="436" r="7" fill="#0b1834" stroke="#5ccfb0" stroke-width="3"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 683.38 431.62)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g73" x="2521"/><use href="#fvmap-g54" x="3714"/><use href="#fvmap-g66" x="4923"/><use href="#fvmap-g64" x="6087"/><use href="#fvmap-g53" x="7298"/><use href="#fvmap-g71" x="8143"/><use href="#fvmap-g84" x="9864"/><use href="#fvmap-g54" x="11142"/><use href="#fvmap-g69" x="12389"/><use href="#fvmap-g61" x="13643"/><use href="#fvmap-g81" x="14896"/><use href="#fvmap-g59" x="16174"/><use href="#fvmap-g53" x="17350"/><use href="#fvmap-g71" x="18195"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 651.64 450.47)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g104" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g98" x="7398"/><use href="#fvmap-g95" x="8631"/><use href="#fvmap-g109" x="9864"/><use href="#fvmap-g103" x="11097"/><use href="#fvmap-g94" x="12330"/><use href="#fvmap-g110" x="13563"/><use href="#fvmap-g93" x="14796"/><use href="#fvmap-g100" x="16029"/><use href="#fvmap-g95" x="17262"/><use href="#fvmap-g97" x="18495"/><use href="#fvmap-g106" x="19728"/><use href="#fvmap-g96" x="20961"/><use href="#fvmap-g101" x="22194"/><use href="#fvmap-g94" x="23427"/><use href="#fvmap-g110" x="24660"/></g></g>
+  <circle data-node="OIP_Reference_Profile" cx="898" cy="436" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 431.98)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g111" x="2521"/><use href="#fvmap-g64" x="3268"/><use href="#fvmap-g53" x="4479"/><use href="#fvmap-g64" x="5247"/><use href="#fvmap-g61" x="6458"/><use href="#fvmap-g73" x="7711"/><use href="#fvmap-g64" x="8904"/><use href="#fvmap-g74" x="10631"/><use href="#fvmap-g53" x="11909"/><use href="#fvmap-g54" x="12677"/><use href="#fvmap-g111" x="13924"/><use href="#fvmap-g60" x="14732"/><use href="#fvmap-g70" x="15268"/><use href="#fvmap-g64" x="15804"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 450.83)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g104" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g112" x="7398"/><use href="#fvmap-g103" x="8631"/><use href="#fvmap-g94" x="9864"/><use href="#fvmap-g103" x="11097"/><use href="#fvmap-g106" x="12330"/><use href="#fvmap-g98" x="13563"/><use href="#fvmap-g103" x="14796"/><use href="#fvmap-g93" x="16029"/><use href="#fvmap-g92" x="17262"/><use href="#fvmap-g94" x="18495"/><use href="#fvmap-g95" x="19728"/><use href="#fvmap-g112" x="20961"/><use href="#fvmap-g107" x="22194"/><use href="#fvmap-g113" x="23427"/><use href="#fvmap-g103" x="24660"/></g></g>
+  <circle data-node="OIP_Reference_Execution" cx="898" cy="488" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 483.98)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g111" x="2521"/><use href="#fvmap-g64" x="3268"/><use href="#fvmap-g53" x="4479"/><use href="#fvmap-g64" x="5247"/><use href="#fvmap-g61" x="6458"/><use href="#fvmap-g73" x="7711"/><use href="#fvmap-g64" x="8904"/><use href="#fvmap-g64" x="10631"/><use href="#fvmap-g114" x="11799"/><use href="#fvmap-g64" x="12921"/><use href="#fvmap-g73" x="14132"/><use href="#fvmap-g69" x="15325"/><use href="#fvmap-g63" x="16579"/><use href="#fvmap-g60" x="17302"/><use href="#fvmap-g54" x="17838"/><use href="#fvmap-g61" x="19085"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 502.83)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g104" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g112" x="7398"/><use href="#fvmap-g103" x="8631"/><use href="#fvmap-g94" x="9864"/><use href="#fvmap-g103" x="11097"/><use href="#fvmap-g106" x="12330"/><use href="#fvmap-g98" x="13563"/><use href="#fvmap-g103" x="14796"/><use href="#fvmap-g93" x="16029"/><use href="#fvmap-g115" x="17262"/><use href="#fvmap-g116" x="18495"/><use href="#fvmap-g103" x="19728"/><use href="#fvmap-g98" x="20961"/><use href="#fvmap-g97" x="22194"/><use href="#fvmap-g99" x="23427"/><use href="#fvmap-g107" x="24660"/><use href="#fvmap-g95" x="25893"/><use href="#fvmap-g106" x="27126"/></g></g>
+  <circle data-node="OIP_Message_Code" cx="898" cy="540" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 535.97)"><g fill="#eef3ff"><use href="#fvmap-g76" x="0"/><use href="#fvmap-g64" x="1889"/><use href="#fvmap-g55" x="3100"/><use href="#fvmap-g55" x="4225"/><use href="#fvmap-g59" x="5350"/><use href="#fvmap-g68" x="6526"/><use href="#fvmap-g64" x="7807"/><use href="#fvmap-g73" x="9534"/><use href="#fvmap-g54" x="10727"/><use href="#fvmap-g81" x="11974"/><use href="#fvmap-g64" x="13252"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 554.82)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g117" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g102" x="7398"/><use href="#fvmap-g102" x="8631"/><use href="#fvmap-g101" x="9864"/><use href="#fvmap-g108" x="11097"/><use href="#fvmap-g103" x="12330"/><use href="#fvmap-g93" x="13563"/><use href="#fvmap-g118" x="14796"/><use href="#fvmap-g95" x="16029"/><use href="#fvmap-g96" x="17262"/><use href="#fvmap-g103" x="18495"/></g></g>
+  <circle data-node="OIP_Message_Response" cx="898" cy="592" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 587.97)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g55" x="2521"/><use href="#fvmap-g74" x="3646"/><use href="#fvmap-g54" x="4924"/><use href="#fvmap-g61" x="6171"/><use href="#fvmap-g55" x="7424"/><use href="#fvmap-g64" x="8549"/><use href="#fvmap-g58" x="10276"/><use href="#fvmap-g54" x="12120"/><use href="#fvmap-g81" x="13367"/><use href="#fvmap-g64" x="14645"/><use href="#fvmap-g70" x="15856"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 606.82)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g117" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g102" x="7398"/><use href="#fvmap-g102" x="8631"/><use href="#fvmap-g101" x="9864"/><use href="#fvmap-g108" x="11097"/><use href="#fvmap-g103" x="12330"/><use href="#fvmap-g93" x="13563"/><use href="#fvmap-g104" x="14796"/><use href="#fvmap-g103" x="16029"/><use href="#fvmap-g102" x="17262"/><use href="#fvmap-g105" x="18495"/><use href="#fvmap-g95" x="19728"/><use href="#fvmap-g106" x="20961"/><use href="#fvmap-g102" x="22194"/><use href="#fvmap-g103" x="23427"/></g></g>
+  <circle data-node="OIP_Message_Egress" cx="898" cy="644" r="9" fill="#0b1834" stroke="#5ccfb0" stroke-width="3.5"/>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 922 639.97)"><g fill="#eef3ff"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g55" x="2521"/><use href="#fvmap-g74" x="3646"/><use href="#fvmap-g54" x="4924"/><use href="#fvmap-g61" x="6171"/><use href="#fvmap-g55" x="7424"/><use href="#fvmap-g64" x="8549"/><use href="#fvmap-g64" x="10276"/><use href="#fvmap-g68" x="11487"/><use href="#fvmap-g53" x="12768"/><use href="#fvmap-g64" x="13536"/><use href="#fvmap-g55" x="14747"/><use href="#fvmap-g55" x="15872"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 922 658.82)"><g fill="#93a8d4"><use href="#fvmap-g90" x="0"/><use href="#fvmap-g91" x="1233"/><use href="#fvmap-g92" x="2466"/><use href="#fvmap-g93" x="3699"/><use href="#fvmap-g117" x="4932"/><use href="#fvmap-g103" x="6165"/><use href="#fvmap-g102" x="7398"/><use href="#fvmap-g102" x="8631"/><use href="#fvmap-g101" x="9864"/><use href="#fvmap-g108" x="11097"/><use href="#fvmap-g103" x="12330"/><use href="#fvmap-g93" x="13563"/><use href="#fvmap-g115" x="14796"/><use href="#fvmap-g108" x="16029"/><use href="#fvmap-g94" x="17262"/><use href="#fvmap-g103" x="18495"/><use href="#fvmap-g102" x="19728"/><use href="#fvmap-g102" x="20961"/></g></g>
+  <circle data-node="Evidence_Atomic_Binding" cx="898" cy="236" r="13" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
+  <circle cx="898" cy="236" r="5.98" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 48 430)"><g fill="#a6f0dc"><use href="#fvmap-g119" x="0"/><use href="#fvmap-g120" x="883"/><use href="#fvmap-g121" x="2213"/><use href="#fvmap-g5" x="3889"/><use href="#fvmap-g122" x="5068"/><use href="#fvmap-g3" x="6285"/><use href="#fvmap-g5" x="7015"/><use href="#fvmap-g11" x="8235"/><use href="#fvmap-g9" x="9510"/><use href="#fvmap-g10" x="10657"/><use href="#fvmap-g1" x="11212"/><use href="#fvmap-g11" x="12468"/><use href="#fvmap-g9" x="14228"/><use href="#fvmap-g5" x="15375"/><use href="#fvmap-g9" x="16595"/><use href="#fvmap-g9" x="17742"/><use href="#fvmap-g10" x="18889"/><use href="#fvmap-g1" x="19444"/><use href="#fvmap-g11" x="20700"/><use href="#fvmap-g9" x="21975"/><use href="#fvmap-g12" x="23607"/><use href="#fvmap-g89" x="24861"/><use href="#fvmap-g6" x="26579"/><use href="#fvmap-g13" x="27870"/><use href="#fvmap-g7" x="29145"/><use href="#fvmap-g6" x="29994"/><use href="#fvmap-g1" x="31285"/><use href="#fvmap-g9" x="32541"/><use href="#fvmap-g5" x="33688"/></g></g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 48 450.8)"><g fill="#93a8d4"><use href="#fvmap-g40" x="0"/><use href="#fvmap-g24" x="1566"/><use href="#fvmap-g25" x="2776"/><use href="#fvmap-g28" x="4546"/><use href="#fvmap-g123" x="5627"/><use href="#fvmap-g27" x="6881"/><use href="#fvmap-g19" x="8092"/><use href="#fvmap-g26" x="9242"/><use href="#fvmap-g25" x="9979"/><use href="#fvmap-g33" x="11749"/><use href="#fvmap-g25" x="13003"/><use href="#fvmap-g26" x="14197"/><use href="#fvmap-g28" x="15544"/><use href="#fvmap-g25" x="16625"/><use href="#fvmap-g28" x="17819"/><use href="#fvmap-g28" x="18900"/><use href="#fvmap-g23" x="19981"/><use href="#fvmap-g30" x="20477"/><use href="#fvmap-g24" x="21705"/><use href="#fvmap-g34" x="22915"/><use href="#fvmap-g46" x="24081"/><use href="#fvmap-g22" x="25494"/><use href="#fvmap-g22" x="25990"/><use href="#fvmap-g25" x="27062"/><use href="#fvmap-g124" x="28210"/><use href="#fvmap-g20" x="29282"/><use href="#fvmap-g25" x="30452"/><use href="#fvmap-g33" x="31646"/><use href="#fvmap-g32" x="32900"/><use href="#fvmap-g32" x="34146"/><use href="#fvmap-g21" x="34816"/><use href="#fvmap-g25" x="36027"/><use href="#fvmap-g29" x="37797"/><use href="#fvmap-g30" x="38495"/><use href="#fvmap-g27" x="39723"/><use href="#fvmap-g26" x="40934"/><use href="#fvmap-g30" x="42281"/><use href="#fvmap-g27" x="43509"/><use href="#fvmap-g32" x="44720"/><use href="#fvmap-g22" x="45390"/><use href="#fvmap-g23" x="45886"/><use href="#fvmap-g24" x="46382"/><use href="#fvmap-g25" x="47592"/><use href="#fvmap-g86" x="48786"/><use href="#fvmap-g43" x="50616"/><use href="#fvmap-g27" x="51870"/><use href="#fvmap-g23" x="53081"/><use href="#fvmap-g22" x="53577"/><use href="#fvmap-g86" x="54073"/><use href="#fvmap-g30" x="55903"/><use href="#fvmap-g24" x="57131"/><use href="#fvmap-g32" x="58917"/><use href="#fvmap-g21" x="59587"/><use href="#fvmap-g25" x="60798"/><use href="#fvmap-g20" x="62568"/><use href="#fvmap-g30" x="63738"/><use href="#fvmap-g26" x="64966"/><use href="#fvmap-g25" x="65703"/><use href="#fvmap-g28" x="67473"/><use href="#fvmap-g25" x="68554"/><use href="#fvmap-g28" x="69748"/><use href="#fvmap-g28" x="70829"/><use href="#fvmap-g23" x="71910"/><use href="#fvmap-g30" x="72406"/><use href="#fvmap-g24" x="73634"/><use href="#fvmap-g28" x="74844"/><use href="#fvmap-g34" x="75925"/></g></g>
+  <g data-group="Authority and asset effects">
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 48 489.24)"><g fill="#d3def5"><use href="#fvmap-g72" x="0"/><use href="#fvmap-g69" x="1490"/><use href="#fvmap-g63" x="2744"/><use href="#fvmap-g75" x="3471"/><use href="#fvmap-g54" x="4725"/><use href="#fvmap-g53" x="5972"/><use href="#fvmap-g60" x="6798"/><use href="#fvmap-g63" x="7334"/><use href="#fvmap-g71" x="8101"/><use href="#fvmap-g59" x="9822"/><use href="#fvmap-g61" x="10998"/><use href="#fvmap-g81" x="12251"/><use href="#fvmap-g59" x="14045"/><use href="#fvmap-g55" x="15221"/><use href="#fvmap-g55" x="16346"/><use href="#fvmap-g64" x="17471"/><use href="#fvmap-g63" x="18682"/><use href="#fvmap-g64" x="19921"/><use href="#fvmap-g111" x="21132"/><use href="#fvmap-g111" x="21844"/><use href="#fvmap-g64" x="22591"/><use href="#fvmap-g73" x="23802"/><use href="#fvmap-g63" x="24995"/><use href="#fvmap-g55" x="25701"/></g></g>
+  <rect data-session="OIP_Ordered_Maintenance_G0_Core" x="280" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Ordered_Maintenance_Entry" x="280" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Write_Canary_Base" x="291" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Write_Canary_Removal" x="291" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Write_Canary_DurableV6" x="302" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Profile" x="302" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_AuthorityV4" x="313" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_ChecksV9" x="313" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Vector_Export" x="324" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Core_Seed" x="324" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Raw_Ack_Seed" x="335" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Capacity" x="335" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reserve_Debit_Finite_Base" x="346" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reserve_Debit_Replay" x="346" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reserve_Debit_Replay_Export" x="357" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Pending_Lock_Model" x="357" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Pending_Lock_Export" x="368" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Regulatory_Legal_G0" x="368" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Legal_Receipt_Check" x="379" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Legal_Receipt_Export" x="379" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_Core" x="390" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_Seed" x="390" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_G0" x="401" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_Export" x="401" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Seed_Frame" x="412" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Typed_Model" x="412" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_G0" x="423" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Finite_Model" x="423" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Finite_Export" x="434" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Control_Base" x="434" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Control_G0" x="445" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Finite_Model" x="445" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Export" x="456" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Epoch_Base" x="456" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Epoch_G0" x="467" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Stored_Outcome_Repair" x="467" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final" x="478" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Dispatch" x="478" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Install" x="489" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Lookup" x="489" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Finite_Projection" x="500" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Export" x="500" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Refund_Origin_Link" x="511" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Refund_Origin_Export" x="511" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Lock_Clock_Model_Link" x="522" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Dispatch_Debit_Lease_Link" x="522" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Legal_Model_Link" x="533" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Owner_Read_Model_Link" x="533" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Maintenance_Selection_Replay_Link" x="544" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Cancel_Fence_Model_Link" x="544" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Write_Reopen_Link" x="555" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Ordinary_Spend_Model_Link" x="555" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Preempt_Model_Link" x="566" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Signed_Handover_Model_Link" x="566" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Concrete_Enforcement_Spend_Model_Link" x="577" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Waiting_Model_Link" x="577" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Unseen_Close_Link" x="588" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Pending_Control_Link" x="588" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Current_Control_Link" x="599" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Retained_Write_Receipt" x="599" y="485.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Confiscate_Prior_Key" x="610" y="474.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 629 489.24)"><g fill="#a6f0dc"><use href="#fvmap-g120" x="0"/><use href="#fvmap-g119" x="1330"/></g></g>
+  </g>
+  <g data-group="State sync and reads">
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 48 522.24)"><g fill="#d3def5"><use href="#fvmap-g62" x="0"/><use href="#fvmap-g63" x="1332"/><use href="#fvmap-g59" x="2065"/><use href="#fvmap-g63" x="3241"/><use href="#fvmap-g64" x="3944"/><use href="#fvmap-g55" x="5671"/><use href="#fvmap-g71" x="6796"/><use href="#fvmap-g61" x="8001"/><use href="#fvmap-g73" x="9254"/><use href="#fvmap-g59" x="10963"/><use href="#fvmap-g61" x="12139"/><use href="#fvmap-g81" x="13392"/><use href="#fvmap-g53" x="15186"/><use href="#fvmap-g64" x="15954"/><use href="#fvmap-g59" x="17185"/><use href="#fvmap-g81" x="18361"/><use href="#fvmap-g55" x="19639"/></g></g>
+  <rect data-session="OIP_Sync_V061_Wire_V4" x="280" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Definitions" x="280" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Proofs" x="291" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Originals" x="291" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Boundary" x="302" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Selection" x="302" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Provider" x="313" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Concrete_Supplier_V2" x="313" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Direct_IR" x="324" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Transport" x="324" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Ack" x="335" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Nested_IR" x="335" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Product_ABI" x="346" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Ack_ABI" x="346" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Extraction_V1" x="357" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Seeds_V1" x="357" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Strict_Proof_Link_V1" x="368" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Mode_Product_ABI" x="368" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Current_Read_G0_V9" x="379" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Current_Read_Vector_Export" x="379" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Typed_Artifact" x="390" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Current_Read_G0_Source" x="390" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Configured_Profile_ABI" x="401" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Supplier_ABI" x="401" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Image_Link" x="412" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_ID_Guard_ABI_V2" x="412" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Image_Binding_ABI" x="423" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query_Cache_Source_G0" x="423" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query_Cache_Source_Export" x="434" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query6_Capture_G0" x="434" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query6_Capture_Export" x="445" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Secondary_Read_G0" x="445" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Secondary_Read_Export" x="456" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Historical_Read_G0" x="456" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Historical_Read_Export" x="467" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Raw_Terminal_Read_Model_Link" x="467" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Cache_Capture_Model_Link" x="478" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Historical_Source_Pool_Link" x="478" y="518.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Unpublished_Typed_Read_Link" x="489" y="507.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 508 522.24)"><g fill="#a6f0dc"><use href="#fvmap-g125" x="0"/><use href="#fvmap-g126" x="1322"/></g></g>
+  </g>
+  <g data-group="Persistence and recovery">
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 48 555.24)"><g fill="#d3def5"><use href="#fvmap-g65" x="0"/><use href="#fvmap-g64" x="1306"/><use href="#fvmap-g53" x="2517"/><use href="#fvmap-g55" x="3330"/><use href="#fvmap-g60" x="4455"/><use href="#fvmap-g55" x="4991"/><use href="#fvmap-g63" x="6116"/><use href="#fvmap-g64" x="6819"/><use href="#fvmap-g61" x="8030"/><use href="#fvmap-g73" x="9283"/><use href="#fvmap-g64" x="10476"/><use href="#fvmap-g59" x="12203"/><use href="#fvmap-g61" x="13379"/><use href="#fvmap-g81" x="14632"/><use href="#fvmap-g53" x="16426"/><use href="#fvmap-g64" x="17194"/><use href="#fvmap-g73" x="18405"/><use href="#fvmap-g54" x="19598"/><use href="#fvmap-g66" x="20807"/><use href="#fvmap-g64" x="21971"/><use href="#fvmap-g53" x="23182"/><use href="#fvmap-g71" x="24027"/></g></g>
+  <rect data-session="OIP_Record_Reopening_Prefix_G0" x="280" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Direct_Publication_Check" x="280" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Direct_Publication_Export" x="291" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Independent_Publication_Check" x="291" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Independent_Publication_Export" x="302" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Etcd_Control_Confirmation" x="302" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Witness_Mirror_Check" x="313" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Witness_Prepare_Codec_Check" x="313" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Etcd_Replace_Preflight" x="324" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Refund_Source_Certificate_Link" x="324" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Selected_Record_Reopening_Model_Link" x="335" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Retained_Transition_Integrity_Model_Link" x="335" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Retained_Transition_Source_Link" x="346" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Writer_JSON_G0" x="346" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Writer_Phases" x="357" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Writer_Integer_Transport" x="357" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Resume_Link" x="368" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Commitment_Resume_Link" x="368" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Publication_Endorser_Link" x="379" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Witness_Prepare_Compare_Link" x="379" y="551.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Settlement_Sync_Integrity_Link" x="390" y="540.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 409 555.24)"><g fill="#a6f0dc"><use href="#fvmap-g127" x="0"/><use href="#fvmap-g119" x="1290"/></g></g>
+  </g>
+  <g data-group="Ordering and settlement">
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 48 588.24)"><g fill="#d3def5"><use href="#fvmap-g83" x="0"/><use href="#fvmap-g53" x="1574"/><use href="#fvmap-g81" x="2342"/><use href="#fvmap-g64" x="3620"/><use href="#fvmap-g53" x="4831"/><use href="#fvmap-g60" x="5657"/><use href="#fvmap-g61" x="6193"/><use href="#fvmap-g68" x="7446"/><use href="#fvmap-g59" x="9243"/><use href="#fvmap-g61" x="10419"/><use href="#fvmap-g81" x="11672"/><use href="#fvmap-g55" x="13466"/><use href="#fvmap-g64" x="14591"/><use href="#fvmap-g63" x="15802"/><use href="#fvmap-g63" x="16511"/><use href="#fvmap-g70" x="17238"/><use href="#fvmap-g64" x="17774"/><use href="#fvmap-g58" x="18985"/><use href="#fvmap-g64" x="20829"/><use href="#fvmap-g61" x="22040"/><use href="#fvmap-g63" x="23293"/></g></g>
+  <rect data-session="OIP_Settlement_Queue_G0" x="280" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Terminal_Record_G0" x="280" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Terminal_Record_Export" x="291" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Primary_Origin_Check" x="291" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Primary_Origin_Export" x="302" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Core" x="302" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Typed_Scheduler" x="313" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Product" x="313" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Cases" x="324" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Export" x="324" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Boundaries" x="335" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Schedule_Pair" x="335" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Schedule_Refusals" x="346" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_ACK1_Entry" x="346" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Publish_Primary_Model_Link" x="357" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Receiver_State_Branches" x="357" y="584.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Receiver_State_ABI" x="368" y="573.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 387 588.24)"><g fill="#a6f0dc"><use href="#fvmap-g119" x="0"/><use href="#fvmap-g121" x="883"/></g></g>
+  </g>
+  <g data-group="Wire and authentication">
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 48 621.24)"><g fill="#d3def5"><use href="#fvmap-g128" x="0"/><use href="#fvmap-g60" x="2089"/><use href="#fvmap-g53" x="2625"/><use href="#fvmap-g64" x="3393"/><use href="#fvmap-g59" x="5120"/><use href="#fvmap-g61" x="6296"/><use href="#fvmap-g81" x="7549"/><use href="#fvmap-g59" x="9343"/><use href="#fvmap-g69" x="10519"/><use href="#fvmap-g63" x="11773"/><use href="#fvmap-g75" x="12500"/><use href="#fvmap-g64" x="13754"/><use href="#fvmap-g61" x="14965"/><use href="#fvmap-g63" x="16218"/><use href="#fvmap-g60" x="16941"/><use href="#fvmap-g73" x="17477"/><use href="#fvmap-g59" x="18690"/><use href="#fvmap-g63" x="19866"/><use href="#fvmap-g60" x="20589"/><use href="#fvmap-g54" x="21125"/><use href="#fvmap-g61" x="22372"/></g></g>
+  <rect data-session="OIP_V062_Negotiation_Public_Bridge" x="280" y="606.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Transport_Boundary_Arithmetic" x="280" y="617.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Transport_Boundary_Typed" x="291" y="606.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Transport_Boundary_G0" x="291" y="617.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Threshold_G0" x="302" y="606.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Threshold_Export" x="302" y="617.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Configured_Registry_G0" x="313" y="606.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Configured_Registry_Export" x="313" y="617.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Threshold_Raw_Identity" x="324" y="606.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Go_Admitted_Operand_Model_Link" x="324" y="617.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Active_Session_Grant_Link" x="335" y="606.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Negotiation_Core" x="354.775" y="606.875" width="7.65" height="7.65" rx="1.8" fill="none" stroke="#5ccfb0" stroke-width="1.35"/>
+  <rect data-session="OIP_V062_Negotiation_G0" x="354.775" y="617.875" width="7.65" height="7.65" rx="1.8" fill="none" stroke="#5ccfb0" stroke-width="1.35"/>
+  <rect data-session="OIP_V062_Negotiation_Authentication" x="365.775" y="606.875" width="7.65" height="7.65" rx="1.8" fill="none" stroke="#5ccfb0" stroke-width="1.35"/>
+  <rect data-session="OIP_V062_Negotiation_Export" x="365.775" y="617.875" width="7.65" height="7.65" rx="1.8" fill="none" stroke="#5ccfb0" stroke-width="1.35"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 384.1 621.24)"><g fill="#a6f0dc"><use href="#fvmap-g119" x="0"/><use href="#fvmap-g129" x="883"/></g></g>
+  </g>
+  <g data-group="Responses and receipts">
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 48 654.24)"><g fill="#d3def5"><use href="#fvmap-g67" x="0"/><use href="#fvmap-g64" x="1310"/><use href="#fvmap-g55" x="2521"/><use href="#fvmap-g74" x="3646"/><use href="#fvmap-g54" x="4924"/><use href="#fvmap-g61" x="6171"/><use href="#fvmap-g55" x="7424"/><use href="#fvmap-g64" x="8549"/><use href="#fvmap-g55" x="9760"/><use href="#fvmap-g59" x="11401"/><use href="#fvmap-g61" x="12577"/><use href="#fvmap-g81" x="13830"/><use href="#fvmap-g53" x="15624"/><use href="#fvmap-g64" x="16392"/><use href="#fvmap-g73" x="17603"/><use href="#fvmap-g64" x="18796"/><use href="#fvmap-g60" x="20007"/><use href="#fvmap-g74" x="20543"/><use href="#fvmap-g63" x="21821"/><use href="#fvmap-g55" x="22527"/></g></g>
+  <rect data-session="OIP_Response_Code_IntInf_Runtime" x="280" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Code_Allocation" x="280" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Code_Extension" x="291" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Runtime_V7" x="291" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Preservation_V7" x="302" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Operands" x="302" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_V5" x="313" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Export" x="313" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Completion_Gates" x="324" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Completion_Gates_Export" x="324" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Exact_Receipt_Core_Comparison" x="335" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query8_Scope_Binding" x="335" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Signer_Parse_Probe" x="346" y="639.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Response_Profile_Guard" x="346" y="650.2" width="9" height="9" rx="1.98" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0068359 0 0 .0068359 365 654.24)"><g fill="#a6f0dc"><use href="#fvmap-g119" x="0"/><use href="#fvmap-g130" x="883"/></g></g>
+  </g>
+  <g class="t" transform="matrix(.0063477 0 0 .0063477 48 706)"><g fill="#7f93bd"><use href="#fvmap-g41" x="0"/><use href="#fvmap-g23" x="1158"/><use href="#fvmap-g24" x="1654"/><use href="#fvmap-g25" x="2864"/><use href="#fvmap-g28" x="4058"/><use href="#fvmap-g28" x="5715"/><use href="#fvmap-g21" x="6796"/><use href="#fvmap-g30" x="8007"/><use href="#fvmap-g131" x="9198"/><use href="#fvmap-g132" x="11450"/><use href="#fvmap-g40" x="12768"/><use href="#fvmap-g40" x="14334"/><use href="#fvmap-g133" x="15839"/><use href="#fvmap-g23" x="17737"/><use href="#fvmap-g31" x="18233"/><use href="#fvmap-g33" x="20027"/><use href="#fvmap-g30" x="21281"/><use href="#fvmap-g26" x="22509"/><use href="#fvmap-g32" x="23312"/><use href="#fvmap-g28" x="23962"/><use href="#fvmap-g87" x="25043"/><use href="#fvmap-g24" x="26209"/><use href="#fvmap-g30" x="27419"/><use href="#fvmap-g32" x="28647"/><use href="#fvmap-g86" x="29893"/><use href="#fvmap-g25" x="31147"/><use href="#fvmap-g33" x="32341"/><use href="#fvmap-g22" x="33595"/><use href="#fvmap-g30" x="34091"/><use href="#fvmap-g44" x="35279"/><use href="#fvmap-g31" x="36430"/><use href="#fvmap-g25" x="38224"/><use href="#fvmap-g24" x="39418"/><use href="#fvmap-g32" x="40628"/><use href="#fvmap-g28" x="41874"/><use href="#fvmap-g32" x="42955"/><use href="#fvmap-g25" x="43605"/><use href="#fvmap-g33" x="44799"/><use href="#fvmap-g28" x="46053"/><use href="#fvmap-g30" x="47710"/><use href="#fvmap-g26" x="48938"/><use href="#fvmap-g131" x="50285"/><use href="#fvmap-g21" x="51961"/><use href="#fvmap-g30" x="53172"/><use href="#fvmap-g22" x="54400"/><use href="#fvmap-g25" x="54896"/><use href="#fvmap-g134" x="56090"/><use href="#fvmap-g23" x="57032"/><use href="#fvmap-g31" x="57528"/><use href="#fvmap-g33" x="59322"/><use href="#fvmap-g22" x="60576"/><use href="#fvmap-g25" x="61072"/><use href="#fvmap-g31" x="62266"/><use href="#fvmap-g25" x="64060"/><use href="#fvmap-g24" x="65254"/><use href="#fvmap-g32" x="66464"/><use href="#fvmap-g19" x="67144"/><use href="#fvmap-g32" x="68294"/><use href="#fvmap-g23" x="68964"/><use href="#fvmap-g30" x="69460"/><use href="#fvmap-g24" x="70688"/><use href="#fvmap-g135" x="72474"/><use href="#fvmap-g25" x="73585"/><use href="#fvmap-g26" x="74779"/><use href="#fvmap-g23" x="75570"/><use href="#fvmap-g29" x="76066"/><use href="#fvmap-g23" x="76824"/><use href="#fvmap-g20" x="77320"/><use href="#fvmap-g19" x="78510"/><use href="#fvmap-g32" x="79660"/><use href="#fvmap-g23" x="80330"/><use href="#fvmap-g30" x="80826"/><use href="#fvmap-g24" x="82054"/><use href="#fvmap-g34" x="83264"/></g></g>
+</svg>

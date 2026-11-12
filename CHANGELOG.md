@@ -5,6 +5,17 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Redrew both architecture diagrams. The session map draws the sessions as
+  stations on their import lines and the OIP extension sessions as one square
+  per session, grouped by purpose; the four negotiation-model sessions that
+  import Isabelle/HOL only are drawn as outlines. The theory map draws the
+  direct imports as a layered graph on wide windows and as arcs on narrow
+  ones. Each diagram has phone, medium and landscape versions chosen by README
+  column width, like the banner, so no version is enlarged past its design
+  size. The repository health check requires the three versions and compares
+  every station, line and square they draw with `ROOTS`, `ROOT` and the theory
+  headers. Formal sources, proofs and claims are unchanged.
+
 - Updated the public text for the OIP v0.6.2 binding. The README, the OIP
   namespace guide and its reproduction steps describe the extension sessions
   and the THRESHOLD export, and the contribution, security, citation and
