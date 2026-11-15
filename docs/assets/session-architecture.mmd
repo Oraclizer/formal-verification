@@ -184,8 +184,12 @@ flowchart TB
     OIP_Write_Canary_Base["OIP_Write_Canary_Base"]
     OIP_Write_Canary_DurableV6["OIP_Write_Canary_DurableV6"]
     OIP_Write_Canary_Removal["OIP_Write_Canary_Removal"]
+    Operational_Trace_Contracts["Operational_Trace_Contracts"]
     Preemptive_Lock_Correctness["Preemptive_Lock_Correctness"]
     Protected_Behavior_Obstructions["Protected_Behavior_Obstructions"]
+    REOS_Rollback["REOS_Rollback"]
+    REOS_Rollback_Examples["REOS_Rollback_Examples"]
+    REOS_Rollback_Legacy["REOS_Rollback_Legacy"]
     Regulatory_Action_Composition["Regulatory_Action_Composition"]
     HOL_Library --> Cross_Domain_State_Preservation
     HOL_Eisbach --> Cross_Domain_State_Preservation
@@ -418,3 +422,8 @@ flowchart TB
     HOL_Library --> OIP_Settlement_Sync_Integrity_Link
     OIP_Signed_Legal_Model_Link --> OIP_V062_Confiscate_Prior_Key
     OIP_Message_Code --> OIP_V062_Response_Profile_Guard
+    HOL --> Operational_Trace_Contracts
+    Operational_Trace_Contracts --> REOS_Rollback
+    REOS_Rollback --> REOS_Rollback_Examples
+    Regulatory_Action_Composition --> REOS_Rollback_Legacy
+    REOS_Rollback --> REOS_Rollback_Legacy

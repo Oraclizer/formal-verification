@@ -1,0 +1,20 @@
+session REOS_Rollback = Operational_Trace_Contracts +
+  options [document = false]
+  theories
+    Rollback_Model
+    Rollback_Contracts
+
+session REOS_Rollback_Examples in "examples" = REOS_Rollback +
+  options [document = false]
+  theories
+    Rollback_Examples
+    Deployment_Recovery
+    Rollback_Kernel_Inspection
+
+session REOS_Rollback_Legacy in "legacy-adapter" = Regulatory_Action_Composition +
+  options [document = false]
+  sessions
+    REOS_Rollback
+  theories
+    Rollback_Legacy
+    Rollback_Legacy_Inspection

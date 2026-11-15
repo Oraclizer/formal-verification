@@ -1,0 +1,4 @@
+session Operational_Trace_Contracts = HOL +
+  options [document = false]
+  theories
+    Operational_Trace_Contracts

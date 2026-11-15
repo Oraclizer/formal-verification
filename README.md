@@ -70,6 +70,7 @@ covers ROOT and its theories.
 | **Preemptive Lock Correctness** | Extension | Asset reservations, source/destination once, evidence-based release, rooted funding, timeout boundaries and journal recovery | [Source](Preemptive_Lock_Correctness/ROOT) · [Scope and build](Preemptive_Lock_Correctness/README.md) · [Claims](Preemptive_Lock_Correctness/claims.json) · [Source manifest](Preemptive_Lock_Correctness/source-manifest.json) |
 | **Evidence Atomic Binding** | Extension | Source-qualified terminal records, guarded financial/regulatory effects, completed observations and checked recovery | [Source](Evidence_Atomic_Binding/ROOT) · [Scope and build](Evidence_Atomic_Binding/README.md) · [Claims](Evidence_Atomic_Binding/claims.json) · [Source manifest](Evidence_Atomic_Binding/source-manifest.json) |
 | **Evidence Binding Composition** | Extension | Finite allocation characterization, actual source-to-call execution, historical projection and recovery of completed decisions | [Source](Evidence_Binding_Composition/ROOT) · [Scope and build](Evidence_Binding_Composition/README.md) · [Claims](Evidence_Binding_Composition/claims.json) · [Source manifest](Evidence_Binding_Composition/source-manifest.json) |
+| **Authorized selective rollback** | Extension | Current authority, journal-scoped restoration and terminal observations | [Scope and build](REOS_Rollback/README.md) · [Source](REOS_Rollback/ROOT) |
 | **Protected Behavior Obstructions** | Partial companion | Set/profile consequences, explicit stochastic assumptions, set-level morphism laws, preorder facts, and bounded controls | [Source](Protected_Behavior_Obstructions/ROOT) · [Scope](Protected_Behavior_Obstructions/README.md) · [Cross-prover map](Protected_Behavior_Obstructions/CROSS_PROVER_MAPPING.md) · PDF/manifest not produced (`document = false`) |
 | **OIP prototype** | Extension | Conditional HOL models, manually maintained Rust source correspondence and bounded typed-wire, sender/client and raw THRESHOLD packet comparisons | [Source](Oracle_Interoperability_Protocol/ROOT) · [Scope](Oracle_Interoperability_Protocol/README.md) · [Reproduction](Oracle_Interoperability_Protocol/REPRODUCING.md) · [Source manifest](Oracle_Interoperability_Protocol/source-manifest.json) |
 
@@ -119,6 +120,7 @@ submission, review, and acceptance are separate states.
 | Preemptive lock correctness | Complete-footprint ownership, stale-version protection, source/credit/return uniqueness, exclusive settlement, source-pool conservation and rooted continuation/recovery | Atomic local commits, stable-source/current-context assumptions; conditional cleanup bounds, no runtime refinement or distributed observational atomicity |
 | Evidence atomic binding | Immutable terminal cores, source/credit/return exclusion and allocation, actual callback response provenance, fresh-call revision order, product words and current-source recovery | Conditional source, authority and durability contracts; no whole-runtime refinement, all-API linearizability or unconditional termination |
 | Evidence binding composition | Finite allocation iff with supplied current contexts; actual source and fresh completed calls; historical projection over finite call words; recovery and financial/regulatory applications | Credited distinct roots and finite holders; current policy and durable-source obligations; no arbitrary fixed-policy realization, global minimal representation or implementation refinement |
+| Authorized selective rollback | Authorized cell restoration, stable terminal effects and exact case-local accounting | Verified authority and finality evidence at the transition boundary |
 | Protected behavior obstructions | nested profile algebra, assumption-transparent T2/T3/T4/T5 consequences, set-level morphism laws, preorder facts, and direct finite witnesses | `PARTIAL`; no kernel-derived first-hit law, scheduler correspondence, quantitative pushforward, or `SAME` credit |
 
 Every row is shorthand. The Oraclizer theorem-to-target map, assumptions, open
@@ -149,13 +151,13 @@ universal Rust/Go refinement or a production Witness/storage deployment.
   <picture>
     <source media="(max-width: 505px), (min-width: 768px) and (max-width: 801px)" srcset="docs/assets/session-architecture-mobile.svg">
     <source media="(max-width: 1121px)" srcset="docs/assets/session-architecture-medium.svg">
-    <img src="docs/assets/session-architecture.svg" alt="Sessions drawn as stations on lines: the six-session chain on Isabelle/HOL, the independent companion, and the OIP prototype line leaving Evidence Atomic Binding, with one square per OIP extension session grouped by purpose." width="900">
+    <img src="docs/assets/session-architecture.svg" alt="Sessions drawn as stations on lines: the six-session chain on Isabelle/HOL, the independent companion, and the OIP prototype line leaving Evidence Atomic Binding, with OIP extensions and regulatory execution sessions shown as squares." width="900">
   </picture>
 </div>
 
 Each line runs from a session to the sessions that import it. The chart in the
-same figure draws one square per OIP extension session, grouped by purpose.
-All of them build on the core OIP sessions except four negotiation-model
+same figure groups OIP extensions and regulatory execution sessions by purpose.
+The OIP extensions build on the core OIP sessions except four negotiation-model
 sessions in the wire group, which import Isabelle/HOL only and join the product
 model through a bridge session; they are drawn as outlines. For exact
 dependencies, see the [full Mermaid graph](docs/assets/session-architecture.mmd)
@@ -248,7 +250,7 @@ Register the AFP once:
 isabelle components -u /path/to/afp/thys
 ```
 
-Check the seven sessions in the result table from the repository root:
+Check the original proof chain and independent companion from the repository root:
 
 ```bash
 isabelle build \
@@ -321,7 +323,7 @@ its base and extension sessions beneath one namespace:
 
 | Path | Purpose |
 | --- | --- |
-| `ROOTS` | Registers the seven artifact session directories and the OIP prototype namespace; auxiliary audit sessions are invoked separately |
+| `ROOTS` | Registers the artifact session directories and the OIP prototype namespace; auxiliary audit sessions are invoked separately |
 | `<Session>/` | One directory per catalog artifact: the authoritative `*.thy` theories and the session `ROOT`. Sessions that produce a reading copy add `document/` (LaTeX source) and `release/` (session-named PDF and manifest); session-scoped docs such as a scope README or a cross-prover mapping live inside the same directory |
 | `Oracle_Interoperability_Protocol/` | Base and extension prototype sessions declared with source subdirectories in ROOT, their exact compiler-input manifest, the typed transport, Full response and THRESHOLD model artifacts with their content locks, scope and reproduction instructions |
 | `docs/assets/` | README banners for phone, medium and desktop widths, the grouped session overview and the foundation import views, with Mermaid sources (the session source holds the full graph) and narrow-screen variants |
