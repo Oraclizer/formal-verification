@@ -119,7 +119,13 @@ const initialGraph = assertProofCoverage(root);
 const oipRegistrations = initialGraph.registeredNames.filter((name) => name.startsWith("OIP_"));
 if (oipRegistrations.length) assert.deepEqual(new Set(oipRegistrations), new Set(expectedOipChain));
 const oipChain = oipRegistrations.length ? expectedOipChain : [];
-const completeProductChain = [...productChain, ...oipChain];
+const regulatoryExecutionSessions = [
+  "Operational_Trace_Contracts",
+  "REOS_Rollback",
+  "REOS_Rollback_Examples",
+  "REOS_Rollback_Legacy",
+];
+const completeProductChain = [...productChain, ...oipChain, ...regulatoryExecutionSessions];
 const standaloneNegotiationSessions = new Set([
   "OIP_V062_Negotiation_Core",
   "OIP_V062_Negotiation_G0",
@@ -135,6 +141,7 @@ test("every tracked theory belongs to and is registered by one session", () => {
     "Protected_Behavior_Obstructions",
     ...productChain.slice(1),
     ...oipRegistrations,
+    ...regulatoryExecutionSessions,
   ]);
   assert.deepEqual(graph.byName.get("Cross_Domain_State_Preservation").dependencies,
     ["HOL-Library", "HOL-Eisbach", "ADS_Functor"]);
@@ -180,7 +187,9 @@ test("standalone OIP validation inputs retain an exact external boundary", () =>
 
 test("session document inputs rebuild their session and downstream consumers", () => {
   const selected = selectProofSessions(root, ["Regulatory_Action_Composition/document/root.tex"]);
-  assert.deepEqual(selected.productSessions, [...productChain.slice(1), ...oipProductDescendants]);
+  assert.deepEqual(selected.productSessions, [
+    ...productChain.slice(1), ...oipProductDescendants, "REOS_Rollback_Legacy",
+  ]);
   assert.equal(selected.audit, true);
 });
 
@@ -206,4 +215,10 @@ test("a graph-control change safely covers proof paths removed by a migration", 
   assert.equal(selected.audit, true);
   assert.equal(selected.protected, true);
   assert.equal(selected.forceAll, true);
+});
+
+test("the shared trace theory selects its registered regulatory execution consumers", () => {
+  const selected = selectProofSessions(root, ["Operational_Trace_Contracts/Operational_Trace_Contracts.thy"]);
+  assert.deepEqual(selected.productSessions, regulatoryExecutionSessions);
+  assert.equal(selected.audit, false);
 });

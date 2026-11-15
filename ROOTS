@@ -6,3 +6,5 @@ Preemptive_Lock_Correctness
 Evidence_Atomic_Binding
 Evidence_Binding_Composition
 Oracle_Interoperability_Protocol
+Operational_Trace_Contracts
+REOS_Rollback

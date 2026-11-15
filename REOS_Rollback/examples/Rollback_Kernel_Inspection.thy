@@ -1,0 +1,26 @@
+theory Rollback_Kernel_Inspection
+  imports Rollback_Examples Deployment_Recovery
+begin
+
+ML \<open>
+val roots = @{thms
+  rollback_authority_contract broad_rollback_requires_ratification
+  selective_restoration immutable_terminal_effect finalized_effect_survives_trace
+  aborted_effect_cannot_be_finalized no_literal_finalized_inverse pending_and_finality_require_fence
+  rollback_cannot_cross_unsettled_effect unauthenticated_intent_rejected stale_authority_rejected
+  finality_installs_recorded_value installed_finality_value_survives_trace
+  abort_records_only_the_authenticated_pending_effect new_receipt_agrees_with_existing_record_on_overlap
+  finality_repair_matches_record rejected_transition_unchanged
+  rollback_cycle_well_founded trace_rollback_budget
+  selected_value_changes_and_peers_survive wide_with_and_without_ratification head_role_controls
+  scope_and_context_denials primary_finality_and_rollback_controls
+  pending_receipt_then_real_compensation incoming_receipt_matching_live_value_still_needs_old_receipt_agreement
+  rollback_of_rollback_really_fires_then_exhausts artifact_resolution_after_targeted_restore
+  consumers_need_the_manifest_agreement}
+val _ =
+  if null (Thm_Deps.all_oracles roots)
+  then Output.physical_stdout "ROLLBACK CLAIM-ROOT ORACLES: 0\n"
+  else error "An oracle occurs in the rollback claim-root closure"
+\<close>
+
+end

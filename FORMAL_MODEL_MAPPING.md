@@ -32,6 +32,10 @@ This mapping covers:
 
 All theory files mapped below are mechanically checked by Isabelle/HOL 2025-2 with no `sorry` or `oops` occurrences.
 
+### Authorized selective rollback
+
+The [rollback contracts](REOS_Rollback/README.md) verify authority, footprint restoration, terminal effects and budget accounting for the abstract rollback transition. Runtime authentication, durable records and external abort and finality evidence remain interface obligations.
+
 ### Independent research companion outside this mapping
 
 `Protected_Behavior_Obstructions` is an independent research companion. It has

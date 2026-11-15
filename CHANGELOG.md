@@ -5,6 +5,8 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added the shared operational trace contracts and the authorized selective rollback model, including its scoped restoration, terminal-effect and case-budget proofs.
+
 - Redrew both architecture diagrams. The session map draws the sessions as
   stations on their import lines and the OIP extension sessions as one square
   per session, grouped by purpose; the four negotiation-model sessions that
