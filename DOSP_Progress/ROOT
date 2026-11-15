@@ -1,0 +1,4 @@
+session DOSP_Progress = Operational_Trace_Contracts +
+  options [document = false]
+  theories
+    Recovery_Progress

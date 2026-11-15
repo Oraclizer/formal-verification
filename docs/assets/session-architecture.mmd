@@ -3,6 +3,7 @@ flowchart TB
     ADS_Functor["ADS_Functor"]
     Cross_Chain_Message_Integrity["Cross_Chain_Message_Integrity"]
     Cross_Domain_State_Preservation["Cross_Domain_State_Preservation"]
+    DOSP_Progress["DOSP_Progress"]
     Evidence_Atomic_Binding["Evidence_Atomic_Binding"]
     Evidence_Binding_Composition["Evidence_Binding_Composition"]
     HOL["HOL"]
@@ -187,9 +188,12 @@ flowchart TB
     Operational_Trace_Contracts["Operational_Trace_Contracts"]
     Preemptive_Lock_Correctness["Preemptive_Lock_Correctness"]
     Protected_Behavior_Obstructions["Protected_Behavior_Obstructions"]
+    REOS_Open_Scheduler["REOS_Open_Scheduler"]
+    REOS_Request_Progress["REOS_Request_Progress"]
     REOS_Rollback["REOS_Rollback"]
     REOS_Rollback_Examples["REOS_Rollback_Examples"]
     REOS_Rollback_Legacy["REOS_Rollback_Legacy"]
+    REOS_Scheduler_Controls["REOS_Scheduler_Controls"]
     Regulatory_Action_Composition["Regulatory_Action_Composition"]
     HOL_Library --> Cross_Domain_State_Preservation
     HOL_Eisbach --> Cross_Domain_State_Preservation
@@ -427,3 +431,9 @@ flowchart TB
     REOS_Rollback --> REOS_Rollback_Examples
     Regulatory_Action_Composition --> REOS_Rollback_Legacy
     REOS_Rollback --> REOS_Rollback_Legacy
+    Operational_Trace_Contracts --> DOSP_Progress
+    REOS_Rollback --> REOS_Open_Scheduler
+    REOS_Open_Scheduler --> REOS_Request_Progress
+    DOSP_Progress --> REOS_Request_Progress
+    REOS_Request_Progress --> REOS_Scheduler_Controls
+    REOS_Rollback_Examples --> REOS_Scheduler_Controls
