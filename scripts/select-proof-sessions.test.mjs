@@ -124,6 +124,10 @@ const regulatoryExecutionSessions = [
   "REOS_Rollback",
   "REOS_Rollback_Examples",
   "REOS_Rollback_Legacy",
+  "DOSP_Progress",
+  "REOS_Open_Scheduler",
+  "REOS_Request_Progress",
+  "REOS_Scheduler_Controls",
 ];
 const completeProductChain = [...productChain, ...oipChain, ...regulatoryExecutionSessions];
 const standaloneNegotiationSessions = new Set([
@@ -220,5 +224,13 @@ test("a graph-control change safely covers proof paths removed by a migration", 
 test("the shared trace theory selects its registered regulatory execution consumers", () => {
   const selected = selectProofSessions(root, ["Operational_Trace_Contracts/Operational_Trace_Contracts.thy"]);
   assert.deepEqual(selected.productSessions, regulatoryExecutionSessions);
+  assert.equal(selected.audit, false);
+});
+
+test("the supplied completion proof rebuilds both request-progress consumers", () => {
+  const selected = selectProofSessions(root, ["DOSP_Progress/Recovery_Progress.thy"]);
+  assert.deepEqual(selected.productSessions, [
+    "DOSP_Progress", "REOS_Request_Progress", "REOS_Scheduler_Controls",
+  ]);
   assert.equal(selected.audit, false);
 });

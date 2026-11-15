@@ -64,7 +64,7 @@ The current proofs do **not** establish:
 
 - Correspondence between the Isabelle/HOL model and the Rust implementation (refinement proof; addressed during refinement-proof work using Creusot/Kani).
 - Probabilistic properties of VRF-based leader election (abstracted as the deterministic `fair_leader` assumption; see Assumption Gap Analysis below).
-- Individual request starvation freedom or request-identity service order; the liveness theorems use only an aggregate pending count.
+- Unconditional freedom from individual-request starvation. The CDSP progress results track the aggregate pending count. The [open scheduler](REOS_Scheduler/README.md) proves conditional service of the exact admitted packet under finite executed regulatory interference and recurring honest turns.
 - Distributed runtime lock correctness or arbitrary worker-workflow deadlock freedom. The reservation extension separately proves abstract complete-footprint exclusion, snapshot conflict acyclicity and conditional cleanup paths; CDSP locking remains its original atomic Boolean metadata model.
 - An executable recovery, queue, priority, or BFT algorithm for convergence; `oss_realize` uses existential choice and ignores its event when selecting recovery.
 - Network-level properties such as message loss, partial synchrony, or dynamic topology changes; these remain unverified external/refinement obligations.

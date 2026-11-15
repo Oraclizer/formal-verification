@@ -5,6 +5,8 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added the open regulatory scheduler and its exact ordinary-service proof, with the imported completion theorem and machine-checked controls.
+
 - Added the shared operational trace contracts and the authorized selective rollback model, including its scoped restoration, terminal-effect and case-budget proofs.
 
 - Redrew both architecture diagrams. The session map draws the sessions as

@@ -1,0 +1,24 @@
+session REOS_Open_Scheduler = REOS_Rollback +
+  options [document = false]
+  theories
+    Open_Scheduler
+    Scheduler_Safety
+    Interference_Bounds
+
+session REOS_Request_Progress in "progress" = REOS_Open_Scheduler +
+  options [document = false]
+  sessions
+    DOSP_Progress
+  theories
+    Request_Progress
+    Escalation_Progress
+
+session REOS_Scheduler_Controls in "examples" = REOS_Request_Progress +
+  options [document = false]
+  sessions
+    REOS_Rollback_Examples
+  theories
+    Scheduler_Examples
+    Scheduler_Lasso
+    Request_Example
+    Scheduler_Proof_Inspection

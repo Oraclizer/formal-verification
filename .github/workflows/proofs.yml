@@ -95,7 +95,7 @@ jobs:
         run: |
           set -euo pipefail
           if grep -R -n -E '^\s*(sorry|oops|axiomatization|oracle)\b|\bby\s+eval\b|\bnative_decide\b|\bskip_proof\b|\bsledgehammer\b|\bsmt_oracle\b' \
-            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Evidence_Atomic_Binding Evidence_Binding_Composition Protected_Behavior_Obstructions Oracle_Interoperability_Protocol Operational_Trace_Contracts REOS_Rollback --include='*.thy'; then
+            Cross_Domain_State_Preservation Regulatory_Action_Composition Cross_Chain_Message_Integrity Preemptive_Lock_Correctness Evidence_Atomic_Binding Evidence_Binding_Composition Protected_Behavior_Obstructions Oracle_Interoperability_Protocol Operational_Trace_Contracts REOS_Rollback DOSP_Progress REOS_Scheduler --include='*.thy'; then
             exit 1
           fi
       - name: Verify model source manifests
