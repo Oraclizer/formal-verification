@@ -1,0 +1,116 @@
+chapter Oraclizer
+
+session DOSP_Degree in "degree" = Operational_Trace_Contracts +
+  options [document = false]
+  theories
+    Operational_Degree
+    Promotion_Cutover
+    Degree_Examples
+
+session DOSP_Recovery in "recovery" = DOSP_Progress +
+  options [document = false]
+  theories
+    Domain_Recovery
+    Catalog_Recovery
+    Recovery_Examples
+
+session DOSP_Views in "views" = DOSP_Recovery +
+  options [document = false]
+  theories
+    Recovery_Observations
+    Catalog_Dynamics
+
+session DOSP_Legacy in "legacy" = DOSP_Recovery +
+  options [document = false]
+  sessions
+    DOSP_Degree
+    Cross_Domain_State_Preservation
+    Regulatory_Action_Composition
+  theories
+    Legacy_Views
+
+session DOSP_OIP_Profile in "oip" = DOSP_Recovery +
+  options [document = false]
+  theories
+    OIP_Successor_Fact
+    OIP_Adapter_Boundary
+
+session DOSP_Atomic_Comparison in "atomic-comparison" = DOSP_Views +
+  options [document = false]
+  theories
+    Atomic_Comparison
+
+session DOSP_Quiet_Run_Comparison in "quiet-run-comparison" = DOSP_Atomic_Comparison +
+  options [document = false]
+  theories
+    Quiet_Run_Comparison
+    Quiet_Run_Examples
+    Quiet_Run_Projection_Harness
+
+session DOSP_Rollback_Trade_Recovery in "rollback-trade-recovery" = DOSP_Recovery +
+  options [document = false]
+  theories
+    Rollback_Trade_Recovery
+    Rollback_Trade_Examples
+
+session DOSP_Router_Metadata_Projection in "router-metadata-projection" = DOSP_Degree +
+  options [document = false]
+  theories
+    Router_Metadata_Projection
+
+session DOSP_Billing_Epoch_Projection in "billing-epoch-projection" = DOSP_Degree +
+  options [document = false]
+  theories
+    Billing_Epoch_Projection
+
+session DOSP_Terminal_Repair in "terminal-repair" = DOSP_Recovery +
+  options [document = false]
+  sessions
+    REOS_Rollback
+    REOS_Rollback_Examples
+  theories
+    Terminal_Repair_View
+    Terminal_Repair_Cases
+
+
+session DOSP_EAB_Coupling in "eab-coupling" = Evidence_Binding_Composition +
+  options [document = false, timeout = 300]
+  sessions
+    DOSP_Degree
+    DOSP_Recovery
+  theories
+    EAB_Primary_Repair
+    EAB_Binding_Cutover
+    EAB_Lifecycle_Cutover
+    EAB_Cycle_Accounting
+    EAB_Recovery_Replay
+
+session DOSP_EAB_Coupling_Cases in "eab-coupling-cases" = DOSP_EAB_Coupling +
+  options [document = false, timeout = 240]
+  theories
+    EAB_Adapter_Cases
+    EAB_Dynamic_Cases
+    EAB_Replay_Cases
+    EAB_Billing_Cases
+
+session DOSP_EAB_Lifecycle_Cases in "eab-lifecycle-cases" = DOSP_EAB_Coupling_Cases +
+  options [document = false, timeout = 180]
+  theories
+    EAB_Lifecycle_Cases
+
+session DOSP_Integrated_Authority in "integrated" = DOSP_EAB_Coupling +
+  options [document = false]
+  theories
+    Integrated_Authority
+
+session DOSP_Integrated_Cases in "integrated/cases" = DOSP_Integrated_Authority +
+  options [document = false, timeout = 300]
+  sessions
+    DOSP_EAB_Coupling_Cases
+  theories
+    Integrated_Same_Asset
+
+session DOSP_Integrated_Recovery in "integrated/recovery" = DOSP_Integrated_Cases +
+  options [document = false, timeout = 300]
+  theories
+    Integrated_Recovery_Path

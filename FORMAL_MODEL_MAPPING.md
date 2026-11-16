@@ -36,6 +36,16 @@ All theory files mapped below are mechanically checked by Isabelle/HOL 2025-2 wi
 
 The [rollback contracts](REOS_Rollback/README.md) verify authority, footprint restoration, terminal effects and budget accounting for the abstract rollback transition. Runtime authentication, durable records and external abort and finality evidence remain interface obligations.
 
+### Dynamic operational state preservation
+
+The [operational preservation model](Dynamic_Operational_State_Preservation/README.md)
+connects synchronization degrees and metering across a promotion to current
+publication replay and installation of the same recovery job at its new owner.
+It also identifies the conditions for comparing stepwise recovery with an atomic
+repair. Runtime correspondence requires authoritative registry and consensus
+records, durable journal and slot storage, and an installation acknowledged by
+the destination for the exact publication and job.
+
 ### Independent research companion outside this mapping
 
 `Protected_Behavior_Obstructions` is an independent research companion. It has

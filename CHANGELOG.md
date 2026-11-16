@@ -5,6 +5,8 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added the dynamic operational state preservation model, with metered cutover, replay of issued publications and same-job replica installation after a membership change.
+
 - Added the open regulatory scheduler and its exact ordinary-service proof, with the imported completion theorem and machine-checked controls.
 
 - Added the shared operational trace contracts and the authorized selective rollback model, including its scoped restoration, terminal-effect and case-budget proofs.
