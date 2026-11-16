@@ -1,0 +1,39 @@
+# Dynamic operational state preservation
+
+The Isabelle/HOL sessions model synchronization degrees, authorized
+promotion, metered credit and dynamic replica repair. The degree model
+separates hub-only observation from commits initiated by other domains.
+The cutover admits promotion after the affected locks have cleared and
+charges each admitted binding against the applicable registry ticket.
+
+The integrated example runs two credits for the same asset with distinct
+bindings on opposite sides of a promotion. One authority supplies the
+settlement clock, issues the publication sequence and records the metered
+transition in its journal. It checks the active session identity and retains
+the new metering version on an authorized promotion. The replayed publication
+then drives installation of the original job at its successor domain after a
+membership change.
+The example also exercises a stale registry ticket and a modified journal.
+
+The recovery proofs track pending jobs and irreversible facts. With finite
+interference and an actual installation selected whenever recovery is pending,
+the fixed-primary execution converges and agrees with the selected repair
+observation. The replicated catalog instantiates the progress argument with
+its own publication, withdrawal, transfer and removal events.
+
+The model takes registry, clock, membership and attestation decisions as
+verified inputs. Runtime correspondence requires matching these inputs and the
+journal and replica installation effects to the deployed authority and storage
+interfaces.
+
+## Reproduce
+
+With Isabelle2025-2 and the repository's pinned AFP ADS_Functor dependency,
+run from the repository root.
+
+~~~sh
+isabelle build -d . -d /path/to/ADS_Functor -j 1 -o threads=1 -o parallel_proofs=0 \
+  DOSP_Integrated_Recovery DOSP_Quiet_Run_Comparison DOSP_Rollback_Trade_Recovery \
+  DOSP_Terminal_Repair DOSP_Legacy DOSP_OIP_Profile \
+  DOSP_Router_Metadata_Projection DOSP_Billing_Epoch_Projection
+~~~

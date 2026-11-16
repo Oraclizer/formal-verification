@@ -3,7 +3,24 @@ flowchart TB
     ADS_Functor["ADS_Functor"]
     Cross_Chain_Message_Integrity["Cross_Chain_Message_Integrity"]
     Cross_Domain_State_Preservation["Cross_Domain_State_Preservation"]
+    DOSP_Atomic_Comparison["DOSP_Atomic_Comparison"]
+    DOSP_Billing_Epoch_Projection["DOSP_Billing_Epoch_Projection"]
+    DOSP_Degree["DOSP_Degree"]
+    DOSP_EAB_Coupling["DOSP_EAB_Coupling"]
+    DOSP_EAB_Coupling_Cases["DOSP_EAB_Coupling_Cases"]
+    DOSP_EAB_Lifecycle_Cases["DOSP_EAB_Lifecycle_Cases"]
+    DOSP_Integrated_Authority["DOSP_Integrated_Authority"]
+    DOSP_Integrated_Cases["DOSP_Integrated_Cases"]
+    DOSP_Integrated_Recovery["DOSP_Integrated_Recovery"]
+    DOSP_Legacy["DOSP_Legacy"]
+    DOSP_OIP_Profile["DOSP_OIP_Profile"]
     DOSP_Progress["DOSP_Progress"]
+    DOSP_Quiet_Run_Comparison["DOSP_Quiet_Run_Comparison"]
+    DOSP_Recovery["DOSP_Recovery"]
+    DOSP_Rollback_Trade_Recovery["DOSP_Rollback_Trade_Recovery"]
+    DOSP_Router_Metadata_Projection["DOSP_Router_Metadata_Projection"]
+    DOSP_Terminal_Repair["DOSP_Terminal_Repair"]
+    DOSP_Views["DOSP_Views"]
     Evidence_Atomic_Binding["Evidence_Atomic_Binding"]
     Evidence_Binding_Composition["Evidence_Binding_Composition"]
     HOL["HOL"]
@@ -437,3 +454,28 @@ flowchart TB
     DOSP_Progress --> REOS_Request_Progress
     REOS_Request_Progress --> REOS_Scheduler_Controls
     REOS_Rollback_Examples --> REOS_Scheduler_Controls
+    Operational_Trace_Contracts --> DOSP_Degree
+    DOSP_Progress --> DOSP_Recovery
+    DOSP_Recovery --> DOSP_Views
+    DOSP_Recovery --> DOSP_Legacy
+    DOSP_Degree --> DOSP_Legacy
+    Cross_Domain_State_Preservation --> DOSP_Legacy
+    Regulatory_Action_Composition --> DOSP_Legacy
+    DOSP_Recovery --> DOSP_OIP_Profile
+    DOSP_Views --> DOSP_Atomic_Comparison
+    DOSP_Atomic_Comparison --> DOSP_Quiet_Run_Comparison
+    DOSP_Recovery --> DOSP_Rollback_Trade_Recovery
+    DOSP_Degree --> DOSP_Router_Metadata_Projection
+    DOSP_Degree --> DOSP_Billing_Epoch_Projection
+    DOSP_Recovery --> DOSP_Terminal_Repair
+    REOS_Rollback --> DOSP_Terminal_Repair
+    REOS_Rollback_Examples --> DOSP_Terminal_Repair
+    Evidence_Binding_Composition --> DOSP_EAB_Coupling
+    DOSP_Degree --> DOSP_EAB_Coupling
+    DOSP_Recovery --> DOSP_EAB_Coupling
+    DOSP_EAB_Coupling --> DOSP_EAB_Coupling_Cases
+    DOSP_EAB_Coupling_Cases --> DOSP_EAB_Lifecycle_Cases
+    DOSP_EAB_Coupling --> DOSP_Integrated_Authority
+    DOSP_Integrated_Authority --> DOSP_Integrated_Cases
+    DOSP_EAB_Coupling_Cases --> DOSP_Integrated_Cases
+    DOSP_Integrated_Cases --> DOSP_Integrated_Recovery

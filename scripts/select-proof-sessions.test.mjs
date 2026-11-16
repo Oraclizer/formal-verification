@@ -129,7 +129,32 @@ const regulatoryExecutionSessions = [
   "REOS_Request_Progress",
   "REOS_Scheduler_Controls",
 ];
-const completeProductChain = [...productChain, ...oipChain, ...regulatoryExecutionSessions];
+const dospIntegratedSessions = [
+  "DOSP_Integrated_Authority",
+  "DOSP_Integrated_Cases",
+  "DOSP_Integrated_Recovery",
+];
+const dospEabConsumers = [
+  "DOSP_EAB_Coupling",
+  "DOSP_EAB_Coupling_Cases",
+  "DOSP_EAB_Lifecycle_Cases",
+  ...dospIntegratedSessions,
+];
+const dospSessions = [
+  "DOSP_Degree",
+  "DOSP_Recovery",
+  "DOSP_Views",
+  "DOSP_Legacy",
+  "DOSP_OIP_Profile",
+  "DOSP_Atomic_Comparison",
+  "DOSP_Quiet_Run_Comparison",
+  "DOSP_Rollback_Trade_Recovery",
+  "DOSP_Router_Metadata_Projection",
+  "DOSP_Billing_Epoch_Projection",
+  "DOSP_Terminal_Repair",
+  ...dospEabConsumers,
+];
+const completeProductChain = [...productChain, ...oipChain, ...regulatoryExecutionSessions, ...dospSessions];
 const standaloneNegotiationSessions = new Set([
   "OIP_V062_Negotiation_Core",
   "OIP_V062_Negotiation_G0",
@@ -146,21 +171,24 @@ test("every tracked theory belongs to and is registered by one session", () => {
     ...productChain.slice(1),
     ...oipRegistrations,
     ...regulatoryExecutionSessions,
+    ...dospSessions,
   ]);
   assert.deepEqual(graph.byName.get("Cross_Domain_State_Preservation").dependencies,
     ["HOL-Library", "HOL-Eisbach", "ADS_Functor"]);
 });
 
-test("an EAB leaf change rebuilds EAB, its composition consumer and the audit", () => {
+test("an EAB leaf change rebuilds its composition and DOSP consumers and the audit", () => {
   const selected = selectProofSessions(root, ["Evidence_Atomic_Binding/Finality_Protocol.thy"]);
-  assert.deepEqual(selected.productSessions, ["Evidence_Atomic_Binding", "Evidence_Binding_Composition", ...oipProductDescendants]);
+  assert.deepEqual(selected.productSessions, [
+    "Evidence_Atomic_Binding", "Evidence_Binding_Composition", ...oipProductDescendants, ...dospEabConsumers,
+  ]);
   assert.equal(selected.audit, true);
   assert.equal(selected.protected, false);
 });
 
-test("a composition leaf change stays at the composition and audit boundary", () => {
+test("a composition leaf change rebuilds its DOSP consumers and the audit", () => {
   const selected = selectProofSessions(root, ["Evidence_Binding_Composition/Funding_Realization.thy"]);
-  assert.deepEqual(selected.productSessions, ["Evidence_Binding_Composition"]);
+  assert.deepEqual(selected.productSessions, ["Evidence_Binding_Composition", ...dospEabConsumers]);
   assert.equal(selected.audit, true);
   assert.equal(selected.protected, false);
 });
@@ -192,7 +220,7 @@ test("standalone OIP validation inputs retain an exact external boundary", () =>
 test("session document inputs rebuild their session and downstream consumers", () => {
   const selected = selectProofSessions(root, ["Regulatory_Action_Composition/document/root.tex"]);
   assert.deepEqual(selected.productSessions, [
-    ...productChain.slice(1), ...oipProductDescendants, "REOS_Rollback_Legacy",
+    ...productChain.slice(1), ...oipProductDescendants, "REOS_Rollback_Legacy", "DOSP_Legacy", ...dospEabConsumers,
   ]);
   assert.equal(selected.audit, true);
 });
@@ -221,16 +249,24 @@ test("a graph-control change safely covers proof paths removed by a migration", 
   assert.equal(selected.forceAll, true);
 });
 
-test("the shared trace theory selects its registered regulatory execution consumers", () => {
+test("the shared trace theory selects its regulatory execution and DOSP consumers", () => {
   const selected = selectProofSessions(root, ["Operational_Trace_Contracts/Operational_Trace_Contracts.thy"]);
-  assert.deepEqual(selected.productSessions, regulatoryExecutionSessions);
+  assert.deepEqual(selected.productSessions, [...regulatoryExecutionSessions, ...dospSessions]);
   assert.equal(selected.audit, false);
 });
 
-test("the supplied completion proof rebuilds both request-progress consumers", () => {
+test("the supplied completion proof rebuilds request-progress and recovery consumers", () => {
   const selected = selectProofSessions(root, ["DOSP_Progress/Recovery_Progress.thy"]);
   assert.deepEqual(selected.productSessions, [
     "DOSP_Progress", "REOS_Request_Progress", "REOS_Scheduler_Controls",
+    "DOSP_Recovery", "DOSP_Views", "DOSP_Legacy", "DOSP_OIP_Profile", "DOSP_Atomic_Comparison",
+    "DOSP_Quiet_Run_Comparison", "DOSP_Rollback_Trade_Recovery", "DOSP_Terminal_Repair", ...dospEabConsumers,
   ]);
+  assert.equal(selected.audit, false);
+});
+
+test("an integrated DOSP authority change rebuilds the joined example and recovery", () => {
+  const selected = selectProofSessions(root, ["Dynamic_Operational_State_Preservation/integrated/Integrated_Authority.thy"]);
+  assert.deepEqual(selected.productSessions, dospIntegratedSessions);
   assert.equal(selected.audit, false);
 });
