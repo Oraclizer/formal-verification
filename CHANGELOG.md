@@ -5,6 +5,10 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Checked ordered routing approvals, authenticated retained settlement after
+  exit, and recovery of a replica reporting a competing receipt at the same
+  sequence in the dynamic operational state preservation model.
+
 - Added the scoped service extension for current certified orders,
   preserved receipts, checked restoration, and bounded progress in
   effective service slots.

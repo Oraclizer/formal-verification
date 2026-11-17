@@ -56,6 +56,14 @@ repair. Runtime correspondence requires authoritative registry and consensus
 records, durable journal and slot storage, and an installation acknowledged by
 the destination for the exact publication and job.
 
+The model checks prospective ordered routing approvals, preservation of the
+charge history across promotion, and settlement of an authenticated pending
+binding after an exit. A reported receipt can initiate recovery when it
+differs from the current typed receipt, even at the same sequence. The
+installation consumes the appointed current receipt and records the value
+and exact job completion. See the
+[model defense session](Dynamic_Operational_State_Preservation/model-defense/DOSP_Product_Source.thy).
+
 ### Independent research companion outside this mapping
 
 `Protected_Behavior_Obstructions` is an independent research companion. It has
