@@ -437,6 +437,7 @@
   <rect data-session="DOSP_Integrated_Authority" x="285.5" y="1037.95" width="8" height="8" rx="1.76" fill="#5ccfb0"/>
   <rect data-session="DOSP_Integrated_Cases" x="285.5" y="1047.45" width="8" height="8" rx="1.76" fill="#5ccfb0"/>
   <rect data-session="DOSP_Integrated_Recovery" x="295" y="1028.45" width="8" height="8" rx="1.76" fill="#5ccfb0"/>
+  <rect data-session="DOSP_Model_Defense" x="295" y="1037.95" width="8" height="8" rx="1.76" fill="#5ccfb0"/>
   <rect data-session="DOSP_Progress" x="312.35" y="1033.85" width="6.7" height="6.7" rx="1.6" fill="none" stroke="#5ccfb0" stroke-width="1.3"/>
   <rect data-session="DOSP_Degree" x="312.35" y="1043.35" width="6.7" height="6.7" rx="1.6" fill="none" stroke="#5ccfb0" stroke-width="1.3"/>
   <rect data-session="DOSP_Recovery" x="321.85" y="1033.85" width="6.7" height="6.7" rx="1.6" fill="none" stroke="#5ccfb0" stroke-width="1.3"/>

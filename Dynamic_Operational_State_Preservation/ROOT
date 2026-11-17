@@ -114,3 +114,50 @@ session DOSP_Integrated_Recovery in "integrated/recovery" = DOSP_Integrated_Case
   options [document = false, timeout = 300]
   theories
     Integrated_Recovery_Path
+
+session DOSP_Model_Defense in "model-defense" = DOSP_Integrated_Recovery +
+  options [document = false, timeout = 300]
+  sessions
+    DOSP_Degree
+    DOSP_Views
+    DOSP_Atomic_Comparison
+    DOSP_Quiet_Run_Comparison
+    DOSP_Terminal_Repair
+    DOSP_EAB_Lifecycle_Cases
+  theories
+    DOSP_Registry_Defense
+    DOSP_Commit_Defense
+    DOSP_Router_Defense_Cases
+    DOSP_Source_Defense
+    DOSP_Same_Sequence_Cases
+    DOSP_Lifecycle_Defense
+    DOSP_Lifecycle_Defense_Cases
+    DOSP_Soft_Retry_Cases
+    DOSP_Billing_Public
+    DOSP_Repin_Cases
+    DOSP_Native_Lifecycle
+    DOSP_Consensus_Billing
+    DOSP_Native_Phases
+    DOSP_Recovery_Progress
+    DOSP_Recovery_Defense_Cases
+    DOSP_Repair_Boundaries
+    DOSP_Integrated_Defense
+    DOSP_Scoped_Recovery
+    DOSP_Product_Recovery
+    DOSP_Consensus_Billing_Cases
+    DOSP_Credit_Reconciliation
+    DOSP_Joint_Metering
+    DOSP_Joint_Failure
+    DOSP_Native_Admission
+    DOSP_Product_Source
+    DOSP_Classified_Entry
+    DOSP_Product_Progress
+    DOSP_Joint_Metering_Cases
+    DOSP_Admission_Cases
+    DOSP_Retained_Settlement_Cases
+    DOSP_Native_Cleanup_Cases
+    DOSP_Pending_Renewal_Cases
+    DOSP_Route_And_Recovery_Cases
+    DOSP_Retained_Failure_Case
+    DOSP_Central_Router_Defense
+    DOSP_Model_Defense_Audit

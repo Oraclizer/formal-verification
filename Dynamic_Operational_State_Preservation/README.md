@@ -26,6 +26,25 @@ verified inputs. Runtime correspondence requires matching these inputs and the
 journal and replica installation effects to the deployed authority and storage
 interfaces.
 
+## Routing, settlement and receipt checks
+
+The [model defense session](model-defense/DOSP_Product_Source.thy) connects the routing, billing and
+recovery decisions in one product model. It checks an ordered plan of
+outstanding routing grants, rejects new grants with retroactive activation
+times, and preserves earlier approvals when a proposed plan conflicts.
+An exit closes the ordinary route. A previously debited binding can still
+settle under its live lock and exact confirmation. A locally rolled-back
+attempt leaves that binding pending and records the verified failure charge.
+
+One checked trace starts with a native publication and reports a receipt for
+the same asset observed at a replica. Two independently replayed journals
+establish that the competing receipt has the same sequence and a different
+binding. The report opens a recovery job, and the appointed current receipt
+authorizes its installation. The replica stores the projected value and the
+job is completed; other pending jobs and irreversible facts are preserved.
+The recovery convergence theorem uses verified-ready service on an execution
+with finite interference.
+
 ## Reproduce
 
 With Isabelle2025-2 and the repository's pinned AFP ADS_Functor dependency,
@@ -33,7 +52,7 @@ run from the repository root.
 
 ~~~sh
 isabelle build -d . -d /path/to/ADS_Functor -j 1 -o threads=1 -o parallel_proofs=0 \
-  DOSP_Integrated_Recovery DOSP_Quiet_Run_Comparison DOSP_Rollback_Trade_Recovery \
+  DOSP_Model_Defense DOSP_Quiet_Run_Comparison DOSP_Rollback_Trade_Recovery \
   DOSP_Terminal_Repair DOSP_Legacy DOSP_OIP_Profile \
   DOSP_Router_Metadata_Projection DOSP_Billing_Epoch_Projection
 ~~~

@@ -134,6 +134,7 @@ const dospIntegratedSessions = [
   "DOSP_Integrated_Authority",
   "DOSP_Integrated_Cases",
   "DOSP_Integrated_Recovery",
+  "DOSP_Model_Defense",
 ];
 const dospEabConsumers = [
   "DOSP_EAB_Coupling",
@@ -275,5 +276,11 @@ test("a scoped service theory selects its registered session", () => {
 test("an integrated DOSP authority change rebuilds the joined example and recovery", () => {
   const selected = selectProofSessions(root, ["Dynamic_Operational_State_Preservation/integrated/Integrated_Authority.thy"]);
   assert.deepEqual(selected.productSessions, dospIntegratedSessions);
+  assert.equal(selected.audit, false);
+});
+
+test("the receipt observation theory selects the registered DOSP model session", () => {
+  const selected = selectProofSessions(root, ["Dynamic_Operational_State_Preservation/model-defense/DOSP_Product_Source.thy"]);
+  assert.deepEqual(selected.productSessions, ["DOSP_Model_Defense"]);
   assert.equal(selected.audit, false);
 });

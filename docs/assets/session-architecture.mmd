@@ -13,6 +13,7 @@ flowchart TB
     DOSP_Integrated_Cases["DOSP_Integrated_Cases"]
     DOSP_Integrated_Recovery["DOSP_Integrated_Recovery"]
     DOSP_Legacy["DOSP_Legacy"]
+    DOSP_Model_Defense["DOSP_Model_Defense"]
     DOSP_OIP_Profile["DOSP_OIP_Profile"]
     DOSP_Progress["DOSP_Progress"]
     DOSP_Quiet_Run_Comparison["DOSP_Quiet_Run_Comparison"]
@@ -481,3 +482,10 @@ flowchart TB
     DOSP_Integrated_Authority --> DOSP_Integrated_Cases
     DOSP_EAB_Coupling_Cases --> DOSP_Integrated_Cases
     DOSP_Integrated_Cases --> DOSP_Integrated_Recovery
+    DOSP_Integrated_Recovery --> DOSP_Model_Defense
+    DOSP_Degree --> DOSP_Model_Defense
+    DOSP_Views --> DOSP_Model_Defense
+    DOSP_Atomic_Comparison --> DOSP_Model_Defense
+    DOSP_Quiet_Run_Comparison --> DOSP_Model_Defense
+    DOSP_Terminal_Repair --> DOSP_Model_Defense
+    DOSP_EAB_Lifecycle_Cases --> DOSP_Model_Defense
