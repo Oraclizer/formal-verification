@@ -5,6 +5,10 @@ history remains available in Git and in `FORMAL_MODEL_MAPPING.md`.
 
 ## Unreleased
 
+- Added the scoped service extension for current certified orders,
+  preserved receipts, checked restoration, and bounded progress in
+  effective service slots.
+
 - Added the dynamic operational state preservation model, with metered cutover, replay of issued publications and same-job replica installation after a membership change.
 
 - Added the open regulatory scheduler and its exact ordinary-service proof, with the imported completion theorem and machine-checked controls.

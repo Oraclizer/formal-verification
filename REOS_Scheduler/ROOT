@@ -22,3 +22,32 @@ session REOS_Scheduler_Controls in "examples" = REOS_Request_Progress +
     Scheduler_Lasso
     Request_Example
     Scheduler_Proof_Inspection
+
+session REOS_Scoped_Service in "scoped" = REOS_Scheduler_Controls +
+  options [document = false]
+  theories
+    Approved_Scoped_Execution
+    Decoded_Correspondence_Examples
+    Decoded_Service_Correspondence
+    Fresh_Case_Interference
+    Mixed_Service_Example
+    Mixed_Service_Fixture
+    Scoped_Budgets
+    Scoped_Controls
+    Scoped_Counting
+    Scoped_Dispatch
+    Scoped_Integration
+    Scoped_Level_Boundaries
+    Scoped_Machine
+    Scoped_Necessity
+    Scoped_Order_Safety
+    Scoped_Ordinary
+    Scoped_Product_Target
+    Scoped_Receipt_Trace
+    Scoped_Receipts
+    Scoped_Record
+    Scoped_Rotation
+    Scoped_Source_Finality
+    Scoped_Starvation
+    Stored_Service_Observation
+    Verified_Rollback_Authority

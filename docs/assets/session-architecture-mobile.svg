@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1874" viewBox="0 0 600 1874" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="fvmaps-title fvmaps-desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1853" viewBox="0 0 600 1853" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="fvmaps-title fvmaps-desc">
   <title id="fvmaps-title">How the proof sessions build on each other</title>
-  <desc id="fvmaps-desc">Session maps for the foundational chain, protected behavior and the OIP prototype. The purpose groups list every other registered session, including operational state preservation, regulatory execution and shared transition contracts.</desc>
+  <desc id="fvmaps-desc">Grouped maps of the registered proof sessions, including shared transition contracts, scoped regulatory service and operational state preservation.</desc>
   <defs>
     <linearGradient id="fvmaps-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#060b18"/><stop offset=".62" stop-color="#0a1430"/><stop offset="1" stop-color="#0c1a3d"/></linearGradient>
     <pattern id="fvmaps-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0v40" fill="none" stroke="#9fb6e0" stroke-width="1" opacity=".035"/></pattern>
@@ -99,12 +99,12 @@
     <path id="fvmaps-g91" d="M50 0l435-675l-1 202l-412-645h286l114 190q50 85 89 166q39 81 79 157h-108q42-75 79-156q38-82 89-167l118-190h280l-418 649v-197l435 666h-284l-138-224q-50-85-89-165q-40-80-80-153h108q-40 73-76 153q-37 80-87 165l-138 224h-281z"/>
     <path id="fvmaps-g92" d="M749-1490v1490h-305v-1221h-10l-341 242v-280l329-231h327z"/>
     <path id="fvmaps-g93" d="M636 22q-147 0-260-58q-114-58-183-157q-69-99-84-222h302q18 80 77 127q59 47 148 47q98 0 165-58q68-59 102-166q35-108 35-255h-10q-34 64-91 111q-56 47-129 73q-72 25-154 25q-132 0-236-62q-105-62-164-171q-60-109-60-249q0-151 70-268q70-118 195-185q125-68 290-66q113 0 218 39q105 38 188 123q84 84 133 224q49 140 49 345q0 189-43 337q-42 149-120 253q-79 104-190 159q-111 54-248 54zm11-757q55 0 103-21q47-22 82-58q35-37 55-85q20-48 20-104q0-72-34-132q-33-60-91-97q-58-36-133-36q-73 0-131 35q-59 36-93 96q-34 61-34 136q0 75 33 135q34 60 91 96q58 35 132 35z"/>
-    <path id="fvmaps-g94" d="M124 0v-220l528-495q68-66 114-119q47-54 72-105q24-52 24-112q0-67-30-115q-30-48-82-74q-52-26-119-26q-69 0-121 28q-52 28-80 80q-28 52-28 125h-292q0-145 67-252q66-108 184-166q118-59 272-59q158 0 276 56q118 57 183 156q66 99 66 228q0 83-33 164q-32 81-115 181q-84 101-237 241l-225 222v11h630v251h-1054z"/>
-    <path id="fvmaps-g95" d="M42 0l433-691l-1 234l-410-661h324l101 176q48 87 87 172q38 84 78 164h-114q41-79 79-164q38-85 88-172l105-176h318l-418 664v-231l434 685h-322l-124-210q-49-86-89-171q-39-85-80-163h115q-39 78-76 163q-38 85-86 171l-124 210h-318z"/>
+    <path id="fvmaps-g94" d="M659 20q-162 0-288-56q-125-55-198-154q-72-99-74-228h307q3 56 36 98q34 41 91 64q57 23 127 23q74 0 130-26q56-25 88-71q32-46 32-107q0-62-33-109q-34-47-96-73q-62-27-149-27h-138v-227h138q73 0 128-25q55-26 87-70q31-45 31-105q0-58-27-101q-27-43-75-67q-49-25-114-25q-65 0-119 24q-54 23-87 65q-33 42-34 100h-294q2-127 73-225q70-98 191-153q121-55 272-55q153 0 268 56q115 56 178 151q64 95 64 211q0 125-78 209q-77 84-201 108v11q108 14 183 61q74 47 112 120q38 73 38 166q0 126-73 225q-73 99-201 156q-129 56-295 56z"/>
+    <path id="fvmaps-g95" d="M625 442q-140 0-244-35q-104-36-169-98q-65-62-90-141l258-72q14 31 44 61q29 29 78 48q49 19 121 19q115 0 181-53q65-52 65-163v-206h-23q-20 45-58 87q-38 42-100 68q-61 27-152 27q-126 0-229-59q-103-59-164-180q-62-121-62-306q0-189 63-316q62-127 165-191q104-64 228-64q94 0 158 32q64 31 103 79q40 47 60 91h13v-188h295v1109q0 151-70 251q-69 100-191 150q-122 50-280 50zm5-686q77 0 130-38q54-38 82-109q28-72 28-172q0-99-28-173q-28-74-81-115q-54-41-131-41q-79 0-132 43q-54 42-82 116q-27 74-27 170q0 98 28 169q27 72 81 111q54 39 132 39z"/>
     <path id="fvmaps-g96" d="M1096 418h-180v-591h-14q-18 31-54 77q-35 47-100 84q-64 36-171 36q-139 0-246-71q-107-71-167-201q-60-130-60-308q0-177 60-306q61-130 168-200q107-70 246-70q109 0 173 36q64 36 99 82q34 45 52 75h20v-179h174v1536zm-492-555q102 0 172-53q70-54 106-149q36-95 36-219q0-124-36-216q-35-93-105-145q-70-52-173-52q-106 0-176 55q-71 55-106 148q-35 94-35 210q0 117 35 212q36 96 107 152q71 57 175 57z"/>
-    <path id="fvmaps-g97" d="M611 442q-124 0-215-32q-90-31-150-83q-60-52-95-113l146-94q24 32 59 71q36 39 96 67q61 27 159 27q134 0 221-64q86-64 86-202v-224h-17q-19 32-53 76q-35 44-100 77q-64 34-172 34q-134 0-241-64q-107-63-169-185q-62-122-62-297q0-173 61-300q61-128 169-198q107-70 246-70q108 0 172 36q65 35 100 81q35 46 54 76h17v-179h175v1147q0 144-65 235q-65 92-175 135q-111 43-247 43zm-5-620q102 0 172-46q70-47 106-134q36-88 36-210q0-119-36-210q-35-90-105-142q-70-51-173-51q-106 0-177 55q-71 54-107 145q-35 91-35 203q0 115 36 203q36 88 107 137q71 50 176 50z"/>
+    <path id="fvmaps-g97" d="M327-402v-223h33l478-493h223l-517 531h-20l-197 185zm-169 402v-1490h180v1490h-180zm707 0l-428-547l128-127l531 674h-231z"/>
     <path id="fvmaps-g98" d="M684 20q-113 0-219-38q-106-38-190-122q-83-85-132-225q-49-140-49-345q0-188 42-336q42-148 121-252q79-104 190-158q111-54 248-54q147 0 260 57q113 58 182 155q70 98 84 221h-300q-19-79-78-124q-60-46-148-46q-98 0-165 58q-68 58-102 164q-34 107-34 254h10q34-65 90-112q57-47 130-72q73-24 154-24q132 0 236 62q103 61 163 170q60 109 60 249q0 151-70 268q-70 117-194 183q-124 67-289 67zm-2-242q74 0 132-36q58-35 92-96q34-60 34-136q0-75-33-135q-33-60-91-95q-58-36-132-36q-55 0-102 21q-47 21-83 58q-35 37-55 85q-19 48-19 103q0 73 33 134q33 60 92 97q58 36 132 36z"/>
-    <path id="fvmaps-g99" d="M659 20q-162 0-288-56q-125-55-198-154q-72-99-74-228h307q3 56 36 98q34 41 91 64q57 23 127 23q74 0 130-26q56-25 88-71q32-46 32-107q0-62-33-109q-34-47-96-73q-62-27-149-27h-138v-227h138q73 0 128-25q55-26 87-70q31-45 31-105q0-58-27-101q-27-43-75-67q-49-25-114-25q-65 0-119 24q-54 23-87 65q-33 42-34 100h-294q2-127 73-225q70-98 191-153q121-55 272-55q153 0 268 56q115 56 178 151q64 95 64 211q0 125-78 209q-77 84-201 108v11q108 14 183 61q74 47 112 120q38 73 38 166q0 126-73 225q-73 99-201 156q-129 56-295 56z"/>
+    <path id="fvmaps-g99" d="M124 0v-220l528-495q68-66 114-119q47-54 72-105q24-52 24-112q0-67-30-115q-30-48-82-74q-52-26-119-26q-69 0-121 28q-52 28-80 80q-28 52-28 125h-292q0-145 67-252q66-108 184-166q118-59 272-59q158 0 276 56q118 57 183 156q66 99 66 228q0 83-33 164q-32 81-115 181q-84 101-237 241l-225 222v11h630v251h-1054z"/>
     <path id="fvmaps-g100" d="M177 0l620-1228v-10h-722v-252h1041v256l-622 1234h-317z"/>
     <path id="fvmaps-g101" d="M452 0l-402-1490h287l194 793q20 86 37 181q18 95 34 191q17 96 32 188h-43q17-92 34-188q17-96 36-191q19-95 40-181l202-793h283l201 793q22 86 40 181q19 95 37 191q17 96 35 188h-46q16-92 33-188q16-96 34-191q18-95 38-181l193-793h288l-403 1490h-306l-217-823q-30-115-52-250q-23-135-49-286h64q-28 146-48 279q-20 132-53 257l-217 823h-306z"/>
     <path id="fvmaps-g102" d="M628 20q-153 0-272-56q-120-57-190-156q-69-99-73-226h298q3 58 35 102q33 45 86 69q53 25 116 25q75 0 133-34q57-33 90-93q33-60 33-139q0-79-34-141q-33-61-92-95q-58-34-135-34q-67 0-129 27q-61 26-95 71l-274-48l71-782h902v252h-649l-38 377h8q40-54 118-89q79-35 175-35q101 0 186 36q86 36 149 101q63 66 98 156q35 90 35 197q0 150-70 266q-69 116-193 183q-125 66-289 66z"/>
@@ -112,9 +112,10 @@
     <path id="fvmaps-g104" d="M83-1265v-225h1186v225h-459v1265h-267v-1265h-460z"/>
     <path id="fvmaps-g105" d="M666 20q-167 0-296-55q-129-55-203-150q-73-95-73-215q0-93 42-172q43-78 115-130q73-53 164-68v-9q-119-25-193-117q-74-92-74-214q0-115 67-206q67-90 184-142q117-52 267-52q149 0 267 52q117 52 184 143q68 90 68 205q0 122-75 214q-75 92-191 117v9q89 15 162 68q72 52 115 130q44 79 44 172q0 120-74 215q-74 95-204 150q-129 55-296 55zm0-226q77 0 134-28q57-27 89-77q32-49 32-113q0-66-33-117q-33-50-91-79q-57-30-131-30q-74 0-131 29q-58 29-91 80q-33 50-33 117q0 64 32 113q31 49 89 77q58 28 134 28zm0-668q64 0 113-26q50-26 78-72q29-46 29-105q0-60-28-105q-28-45-78-70q-49-25-114-25q-65 0-114 25q-50 25-78 70q-28 45-28 105q0 59 28 105q28 46 78 72q50 26 114 26z"/>
     <path id="fvmaps-g106" d="M409 0l-339-1118h191l136 488q28 100 60 226q32 127 63 287h-31q30-153 61-280q31-127 60-233l134-488h192l132 488q28 103 58 230q31 126 61 283h-32q32-155 63-281q32-127 61-232l136-488h191l-339 1118h-179l-145-506q-22-77-43-157q-21-80-41-164q-20-84-41-171h40q-20 86-40 170q-21 85-42 166q-21 81-43 156l-145 506h-179z"/>
-    <path id="fvmaps-g107" d="M98-1322v-168h1126v168h-467v1322h-190v-1322h-469z"/>
-    <path id="fvmaps-g108" d="M180 0v-1490h270l367 940q13 33 29 82q17 50 36 108q18 58 35 116q17 57 30 106h-42q14-46 31-102q17-57 36-116q18-58 35-109q17-51 30-85l362-940h271v1490h-187v-851q0-46 1-105q0-59 2-124q1-65 2-132q2-67 3-130h16q-21 69-45 140q-23 72-46 138q-22 67-42 122q-20 55-34 91l-333 851h-165l-338-851q-14-35-33-89q-19-53-41-118q-23-66-47-138q-24-73-49-146h18q2 56 4 121q1 65 2 131q1 67 2 128q1 62 1 111v851h-181z"/>
-    <path id="fvmaps-g109" d="M481 0l-427-1118h197l238 663q38 103 65 205q26 103 55 199h-66q29-96 55-199q27-102 64-205l238-663h197l-427 1118h-189z"/>
+    <path id="fvmaps-g107" d="M180 0v-1490h510q174 0 286 60q113 59 168 163q54 104 54 237q0 133-54 235q-55 102-167 159q-112 58-286 58h-405v-169h396q118 0 190-35q71-34 104-98q33-63 33-150q0-89-33-154q-33-66-105-102q-72-37-191-37h-310v1323h-190zm856 0l-360-671h214l366 671h-220z"/>
+    <path id="fvmaps-g108" d="M98-1322v-168h1126v168h-467v1322h-190v-1322h-469z"/>
+    <path id="fvmaps-g109" d="M798-719v166h-654v-166h654z"/>
+    <path id="fvmaps-g110" d="M481 0l-427-1118h197l238 663q38 103 65 205q26 103 55 199h-66q29-96 55-199q27-102 64-205l238-663h197l-427 1118h-189z"/>
     <marker id="fvmaps-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#6aa6ff"/></marker>
     <marker id="fvmaps-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#e8b660"/></marker>
     <marker id="fvmaps-coral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#e07a66"/></marker>
@@ -122,9 +123,9 @@
     <marker id="fvmaps-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#a493ff"/></marker>
     <marker id="fvmaps-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1.2 9 5 0 8.8Z" fill="#5ccfb0"/></marker>
   </defs>
-  <rect width="600" height="1874" rx="24" fill="url(#fvmaps-bg)"/>
-  <rect width="600" height="1874" rx="24" fill="url(#fvmaps-grid)"/>
-  <rect x=".75" y=".75" width="598.5" height="1872.5" rx="23.5" fill="none" stroke="#1d3159" stroke-width="1.5"/>
+  <rect width="600" height="1853" rx="24" fill="url(#fvmaps-bg)"/>
+  <rect width="600" height="1853" rx="24" fill="url(#fvmaps-grid)"/>
+  <rect x=".75" y=".75" width="598.5" height="1851.5" rx="23.5" fill="none" stroke="#1d3159" stroke-width="1.5"/>
   <g class="t" transform="matrix(.0126953 0 0 .0126953 28 58)"><g fill="#eef3ff"><use href="#fvmaps-g0" x="0"/><use href="#fvmaps-g1" x="1530"/><use href="#fvmaps-g2" x="2758"/><use href="#fvmaps-g3" x="4984"/><use href="#fvmaps-g4" x="5739"/><use href="#fvmaps-g5" x="7014"/><use href="#fvmaps-g6" x="8719"/><use href="#fvmaps-g7" x="10010"/><use href="#fvmaps-g1" x="10794"/><use href="#fvmaps-g1" x="12050"/><use href="#fvmaps-g8" x="13306"/><use href="#fvmaps-g9" x="14606"/><use href="#fvmaps-g5" x="15753"/><use href="#fvmaps-g9" x="16973"/><use href="#fvmaps-g9" x="18120"/><use href="#fvmaps-g10" x="19267"/><use href="#fvmaps-g1" x="19822"/><use href="#fvmaps-g11" x="21078"/><use href="#fvmaps-g9" x="22353"/></g></g>
   <g class="t" transform="matrix(.0126953 0 0 .0126953 28 91.8)"><g fill="#eef3ff"><use href="#fvmaps-g12" x="0"/><use href="#fvmaps-g13" x="1291"/><use href="#fvmaps-g10" x="2566"/><use href="#fvmaps-g14" x="3121"/><use href="#fvmaps-g15" x="3676"/><use href="#fvmaps-g1" x="5452"/><use href="#fvmaps-g11" x="6708"/><use href="#fvmaps-g5" x="8468"/><use href="#fvmaps-g16" x="9708"/><use href="#fvmaps-g17" x="10897"/><use href="#fvmaps-g4" x="12102"/><use href="#fvmaps-g1" x="13862"/><use href="#fvmaps-g3" x="15118"/><use href="#fvmaps-g4" x="15873"/><use href="#fvmaps-g5" x="17148"/><use href="#fvmaps-g7" x="18368"/></g></g>
   <g class="t" transform="matrix(.0083008 0 0 .0083008 28 124.1)"><g fill="#a8bde6"><use href="#fvmaps-g18" x="0"/><use href="#fvmaps-g19" x="1231"/><use href="#fvmaps-g20" x="2381"/><use href="#fvmaps-g21" x="3551"/><use href="#fvmaps-g22" x="5338"/><use href="#fvmaps-g23" x="5834"/><use href="#fvmaps-g24" x="6330"/><use href="#fvmaps-g25" x="7540"/><use href="#fvmaps-g26" x="9310"/><use href="#fvmaps-g27" x="10081"/><use href="#fvmaps-g24" x="11292"/><use href="#fvmaps-g28" x="12502"/><use href="#fvmaps-g29" x="14159"/><use href="#fvmaps-g26" x="14917"/><use href="#fvmaps-g30" x="15654"/><use href="#fvmaps-g31" x="16882"/><use href="#fvmaps-g19" x="19252"/><use href="#fvmaps-g28" x="20978"/><use href="#fvmaps-g25" x="22059"/><use href="#fvmaps-g28" x="23253"/><use href="#fvmaps-g28" x="24334"/><use href="#fvmaps-g23" x="25415"/><use href="#fvmaps-g30" x="25911"/><use href="#fvmaps-g24" x="27139"/><use href="#fvmaps-g32" x="28925"/><use href="#fvmaps-g30" x="29575"/><use href="#fvmaps-g32" x="31379"/><use href="#fvmaps-g21" x="32049"/><use href="#fvmaps-g25" x="33260"/><use href="#fvmaps-g28" x="35030"/><use href="#fvmaps-g25" x="36111"/><use href="#fvmaps-g28" x="37305"/><use href="#fvmaps-g28" x="38386"/><use href="#fvmaps-g23" x="39467"/><use href="#fvmaps-g30" x="39963"/><use href="#fvmaps-g24" x="41191"/><use href="#fvmaps-g28" x="42401"/><use href="#fvmaps-g32" x="44058"/><use href="#fvmaps-g21" x="44728"/><use href="#fvmaps-g19" x="45939"/><use href="#fvmaps-g32" x="47089"/><use href="#fvmaps-g23" x="48335"/><use href="#fvmaps-g31" x="48831"/><use href="#fvmaps-g33" x="50625"/><use href="#fvmaps-g30" x="51879"/><use href="#fvmaps-g26" x="53107"/><use href="#fvmaps-g32" x="53910"/><use href="#fvmaps-g23" x="55156"/><use href="#fvmaps-g32" x="55652"/><use href="#fvmaps-g34" x="56322"/></g></g>
@@ -183,237 +184,237 @@
   <g class="t" transform="matrix(.0097656 0 0 .0097656 72 1097.95)"><g fill="#eef3ff"><use href="#fvmaps-g67" x="0"/><use href="#fvmaps-g64" x="1310"/><use href="#fvmaps-g55" x="2521"/><use href="#fvmaps-g74" x="3646"/><use href="#fvmaps-g54" x="4924"/><use href="#fvmaps-g61" x="6171"/><use href="#fvmaps-g55" x="7424"/><use href="#fvmaps-g64" x="8549"/><use href="#fvmaps-g64" x="10276"/><use href="#fvmaps-g68" x="11487"/><use href="#fvmaps-g53" x="12768"/><use href="#fvmaps-g64" x="13536"/><use href="#fvmaps-g55" x="14747"/><use href="#fvmaps-g55" x="15872"/></g></g>
   <circle data-node="Evidence_Atomic_Binding" cx="88" cy="560.75" r="15" fill="#0b1834" stroke="#6aa6ff" stroke-width="3.5"/>
   <circle cx="88" cy="560.75" r="6.9" fill="#5ccfb0"/>
-  <g class="t" transform="matrix(.0092773 0 0 .0092773 28 1162.75)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g93" x="883"/><use href="#fvmaps-g94" x="2213"/><use href="#fvmaps-g5" x="3988"/><use href="#fvmaps-g95" x="5167"/><use href="#fvmaps-g3" x="6384"/><use href="#fvmaps-g5" x="7114"/><use href="#fvmaps-g11" x="8334"/><use href="#fvmaps-g9" x="9609"/><use href="#fvmaps-g10" x="10756"/><use href="#fvmaps-g1" x="11311"/><use href="#fvmaps-g11" x="12567"/><use href="#fvmaps-g9" x="14327"/><use href="#fvmaps-g5" x="15474"/><use href="#fvmaps-g9" x="16694"/><use href="#fvmaps-g9" x="17841"/><use href="#fvmaps-g10" x="18988"/><use href="#fvmaps-g1" x="19543"/><use href="#fvmaps-g11" x="20799"/><use href="#fvmaps-g9" x="22074"/><use href="#fvmaps-g12" x="23706"/><use href="#fvmaps-g89" x="24960"/><use href="#fvmaps-g6" x="26678"/><use href="#fvmaps-g13" x="27969"/><use href="#fvmaps-g7" x="29244"/><use href="#fvmaps-g6" x="30093"/><use href="#fvmaps-g1" x="31384"/><use href="#fvmaps-g9" x="32640"/><use href="#fvmaps-g5" x="33787"/></g></g>
-  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1186.75)"><g fill="#93a8d4"><use href="#fvmaps-g40" x="0"/><use href="#fvmaps-g24" x="1566"/><use href="#fvmaps-g25" x="2776"/><use href="#fvmaps-g28" x="4546"/><use href="#fvmaps-g96" x="5627"/><use href="#fvmaps-g27" x="6881"/><use href="#fvmaps-g19" x="8092"/><use href="#fvmaps-g26" x="9242"/><use href="#fvmaps-g25" x="9979"/><use href="#fvmaps-g33" x="11749"/><use href="#fvmaps-g25" x="13003"/><use href="#fvmaps-g26" x="14197"/><use href="#fvmaps-g26" x="15544"/><use href="#fvmaps-g25" x="16281"/><use href="#fvmaps-g97" x="17475"/><use href="#fvmaps-g23" x="18731"/><use href="#fvmaps-g28" x="19227"/><use href="#fvmaps-g32" x="20308"/><use href="#fvmaps-g25" x="20958"/><use href="#fvmaps-g26" x="22152"/><use href="#fvmaps-g25" x="22889"/><use href="#fvmaps-g86" x="24083"/><use href="#fvmaps-g28" x="25913"/><use href="#fvmaps-g25" x="26994"/><use href="#fvmaps-g28" x="28188"/><use href="#fvmaps-g28" x="29269"/><use href="#fvmaps-g23" x="30350"/><use href="#fvmaps-g30" x="30846"/><use href="#fvmaps-g24" x="32074"/><use href="#fvmaps-g30" x="33860"/><use href="#fvmaps-g27" x="35088"/><use href="#fvmaps-g32" x="36299"/><use href="#fvmaps-g28" x="36949"/><use href="#fvmaps-g23" x="38030"/><use href="#fvmaps-g86" x="38526"/><use href="#fvmaps-g25" x="39780"/><use href="#fvmaps-g32" x="41550"/><use href="#fvmaps-g21" x="42220"/><use href="#fvmaps-g25" x="43431"/><use href="#fvmaps-g28" x="45201"/><use href="#fvmaps-g32" x="46282"/><use href="#fvmaps-g19" x="46962"/><use href="#fvmaps-g32" x="48112"/><use href="#fvmaps-g23" x="48782"/><use href="#fvmaps-g30" x="49278"/><use href="#fvmaps-g24" x="50506"/><use href="#fvmaps-g31" x="52292"/><use href="#fvmaps-g19" x="54086"/><use href="#fvmaps-g33" x="55236"/><use href="#fvmaps-g28" x="56490"/><use href="#fvmaps-g34" x="57571"/></g></g>
-  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1208.5)"><g fill="#93a8d4"><use href="#fvmaps-g40" x="0"/><use href="#fvmaps-g27" x="1566"/><use href="#fvmaps-g32" x="2777"/><use href="#fvmaps-g22" x="3447"/><use href="#fvmaps-g23" x="3943"/><use href="#fvmaps-g24" x="4439"/><use href="#fvmaps-g25" x="5649"/><use href="#fvmaps-g86" x="6843"/><use href="#fvmaps-g28" x="8673"/><use href="#fvmaps-g96" x="9754"/><use href="#fvmaps-g27" x="11008"/><use href="#fvmaps-g19" x="12219"/><use href="#fvmaps-g26" x="13369"/><use href="#fvmaps-g25" x="14106"/><use href="#fvmaps-g28" x="15300"/><use href="#fvmaps-g43" x="16957"/><use href="#fvmaps-g27" x="18211"/><use href="#fvmaps-g23" x="19422"/><use href="#fvmaps-g22" x="19918"/><use href="#fvmaps-g86" x="20414"/><use href="#fvmaps-g30" x="22244"/><use href="#fvmaps-g24" x="23472"/><use href="#fvmaps-g23" x="25258"/><use href="#fvmaps-g24" x="25754"/><use href="#fvmaps-g86" x="26964"/><use href="#fvmaps-g25" x="28218"/><use href="#fvmaps-g33" x="29412"/><use href="#fvmaps-g25" x="30666"/><use href="#fvmaps-g24" x="31860"/><use href="#fvmaps-g86" x="33070"/><use href="#fvmaps-g25" x="34324"/><use href="#fvmaps-g24" x="35518"/><use href="#fvmaps-g32" x="36728"/><use href="#fvmaps-g29" x="37974"/><use href="#fvmaps-g30" x="38672"/><use href="#fvmaps-g27" x="39900"/><use href="#fvmaps-g24" x="41111"/><use href="#fvmaps-g86" x="42321"/><use href="#fvmaps-g19" x="43575"/><use href="#fvmaps-g32" x="44725"/><use href="#fvmaps-g23" x="45395"/><use href="#fvmaps-g30" x="45891"/><use href="#fvmaps-g24" x="47119"/><use href="#fvmaps-g28" x="48329"/><use href="#fvmaps-g34" x="49410"/></g></g>
+  <g class="t" transform="matrix(.0092773 0 0 .0092773 28 1162.75)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g93" x="883"/><use href="#fvmaps-g94" x="2213"/><use href="#fvmaps-g9" x="4020"/><use href="#fvmaps-g5" x="5167"/><use href="#fvmaps-g9" x="6387"/><use href="#fvmaps-g9" x="7534"/><use href="#fvmaps-g10" x="8681"/><use href="#fvmaps-g1" x="9236"/><use href="#fvmaps-g11" x="10492"/><use href="#fvmaps-g9" x="11767"/><use href="#fvmaps-g95" x="13399"/><use href="#fvmaps-g7" x="14693"/><use href="#fvmaps-g1" x="15477"/><use href="#fvmaps-g13" x="16733"/><use href="#fvmaps-g6" x="18008"/><use href="#fvmaps-g5" x="19299"/><use href="#fvmaps-g15" x="20519"/><use href="#fvmaps-g12" x="22295"/><use href="#fvmaps-g89" x="23549"/><use href="#fvmaps-g6" x="25267"/><use href="#fvmaps-g13" x="26558"/><use href="#fvmaps-g7" x="27833"/><use href="#fvmaps-g6" x="28682"/><use href="#fvmaps-g1" x="29973"/><use href="#fvmaps-g9" x="31229"/><use href="#fvmaps-g5" x="32376"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1186.75)"><g fill="#93a8d4"><use href="#fvmaps-g40" x="0"/><use href="#fvmaps-g24" x="1566"/><use href="#fvmaps-g25" x="2776"/><use href="#fvmaps-g28" x="4546"/><use href="#fvmaps-g96" x="5627"/><use href="#fvmaps-g27" x="6881"/><use href="#fvmaps-g19" x="8092"/><use href="#fvmaps-g26" x="9242"/><use href="#fvmaps-g25" x="9979"/><use href="#fvmaps-g33" x="11749"/><use href="#fvmaps-g25" x="13003"/><use href="#fvmaps-g26" x="14197"/><use href="#fvmaps-g28" x="15544"/><use href="#fvmaps-g25" x="16625"/><use href="#fvmaps-g28" x="17819"/><use href="#fvmaps-g28" x="18900"/><use href="#fvmaps-g23" x="19981"/><use href="#fvmaps-g30" x="20477"/><use href="#fvmaps-g24" x="21705"/><use href="#fvmaps-g34" x="22915"/><use href="#fvmaps-g40" x="24081"/><use href="#fvmaps-g27" x="25647"/><use href="#fvmaps-g32" x="26858"/><use href="#fvmaps-g22" x="27528"/><use href="#fvmaps-g23" x="28024"/><use href="#fvmaps-g24" x="28520"/><use href="#fvmaps-g25" x="29730"/><use href="#fvmaps-g28" x="30924"/><use href="#fvmaps-g31" x="32581"/><use href="#fvmaps-g19" x="34375"/><use href="#fvmaps-g26" x="35525"/><use href="#fvmaps-g97" x="36328"/><use href="#fvmaps-g23" x="38028"/><use href="#fvmaps-g24" x="38524"/><use href="#fvmaps-g86" x="39734"/><use href="#fvmaps-g25" x="40988"/><use href="#fvmaps-g33" x="42182"/><use href="#fvmaps-g25" x="43436"/><use href="#fvmaps-g24" x="44630"/><use href="#fvmaps-g86" x="45840"/><use href="#fvmaps-g25" x="47094"/><use href="#fvmaps-g24" x="48288"/><use href="#fvmaps-g32" x="49498"/><use href="#fvmaps-g43" x="50744"/><use href="#fvmaps-g26" x="51998"/><use href="#fvmaps-g19" x="52769"/><use href="#fvmaps-g24" x="53919"/><use href="#fvmaps-g20" x="55129"/><use href="#fvmaps-g21" x="56299"/><use href="#fvmaps-g25" x="57510"/><use href="#fvmaps-g28" x="58704"/><use href="#fvmaps-g34" x="59785"/></g></g>
   <g data-group="Authority and asset effects">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1248.75)"><g fill="#d3def5"><use href="#fvmaps-g72" x="0"/><use href="#fvmaps-g69" x="1490"/><use href="#fvmaps-g63" x="2744"/><use href="#fvmaps-g75" x="3471"/><use href="#fvmaps-g54" x="4725"/><use href="#fvmaps-g53" x="5972"/><use href="#fvmaps-g60" x="6798"/><use href="#fvmaps-g63" x="7334"/><use href="#fvmaps-g71" x="8101"/><use href="#fvmaps-g59" x="9822"/><use href="#fvmaps-g61" x="10998"/><use href="#fvmaps-g81" x="12251"/><use href="#fvmaps-g59" x="14045"/><use href="#fvmaps-g55" x="15221"/><use href="#fvmaps-g55" x="16346"/><use href="#fvmaps-g64" x="17471"/><use href="#fvmaps-g63" x="18682"/><use href="#fvmaps-g64" x="19921"/><use href="#fvmaps-g90" x="21132"/><use href="#fvmaps-g90" x="21844"/><use href="#fvmaps-g64" x="22591"/><use href="#fvmaps-g73" x="23802"/><use href="#fvmaps-g63" x="24995"/><use href="#fvmaps-g55" x="25701"/></g></g>
-  <rect data-session="OIP_Ordered_Maintenance_G0_Core" x="28" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Ordered_Maintenance_Entry" x="28" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Write_Canary_Base" x="42" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Write_Canary_Removal" x="42" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Write_Canary_DurableV6" x="56" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_Profile" x="56" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_AuthorityV4" x="70" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_ChecksV9" x="70" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_Vector_Export" x="84" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_Core_Seed" x="84" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_Raw_Ack_Seed" x="98" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reference_Write_Capacity" x="98" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reserve_Debit_Finite_Base" x="112" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reserve_Debit_Replay" x="112" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Reserve_Debit_Replay_Export" x="126" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Pending_Lock_Model" x="126" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Pending_Lock_Export" x="140" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Regulatory_Legal_G0" x="140" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Legal_Receipt_Check" x="154" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Legal_Receipt_Export" x="154" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Protected_Spend_Core" x="168" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Protected_Spend_Seed" x="168" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Protected_Spend_G0" x="182" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Protected_Spend_Export" x="182" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Seed_Frame" x="196" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Typed_Model" x="196" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_G0" x="210" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Finite_Model" x="210" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Finite_Export" x="224" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Recovery_Control_Base" x="224" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Recovery_Control_G0" x="238" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Recovery_Finite_Model" x="238" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Handover_Recovery_Export" x="252" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Epoch_Base" x="252" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Epoch_G0" x="266" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Stored_Outcome_Repair" x="266" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final" x="280" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Dispatch" x="280" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Install" x="294" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Lookup" x="294" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Finite_Projection" x="308" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_P13_Replay_Export" x="308" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Refund_Origin_Link" x="322" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Refund_Origin_Export" x="322" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Lock_Clock_Model_Link" x="336" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Dispatch_Debit_Lease_Link" x="336" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Legal_Model_Link" x="350" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Owner_Read_Model_Link" x="350" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Maintenance_Selection_Replay_Link" x="364" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Cancel_Fence_Model_Link" x="364" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Write_Reopen_Link" x="378" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Ordinary_Spend_Model_Link" x="378" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Preempt_Model_Link" x="392" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Signed_Handover_Model_Link" x="392" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Concrete_Enforcement_Spend_Model_Link" x="406" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Resolver_Waiting_Model_Link" x="406" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Resolver_Unseen_Close_Link" x="420" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Resolver_Pending_Control_Link" x="420" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Resolver_Current_Control_Link" x="434" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Retained_Write_Receipt" x="434" y="1272.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Confiscate_Prior_Key" x="448" y="1258.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 469 1276.72)"><g fill="#a6f0dc"><use href="#fvmaps-g98" x="0"/><use href="#fvmaps-g92" x="1330"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1227)"><g fill="#d3def5"><use href="#fvmaps-g72" x="0"/><use href="#fvmaps-g69" x="1490"/><use href="#fvmaps-g63" x="2744"/><use href="#fvmaps-g75" x="3471"/><use href="#fvmaps-g54" x="4725"/><use href="#fvmaps-g53" x="5972"/><use href="#fvmaps-g60" x="6798"/><use href="#fvmaps-g63" x="7334"/><use href="#fvmaps-g71" x="8101"/><use href="#fvmaps-g59" x="9822"/><use href="#fvmaps-g61" x="10998"/><use href="#fvmaps-g81" x="12251"/><use href="#fvmaps-g59" x="14045"/><use href="#fvmaps-g55" x="15221"/><use href="#fvmaps-g55" x="16346"/><use href="#fvmaps-g64" x="17471"/><use href="#fvmaps-g63" x="18682"/><use href="#fvmaps-g64" x="19921"/><use href="#fvmaps-g90" x="21132"/><use href="#fvmaps-g90" x="21844"/><use href="#fvmaps-g64" x="22591"/><use href="#fvmaps-g73" x="23802"/><use href="#fvmaps-g63" x="24995"/><use href="#fvmaps-g55" x="25701"/></g></g>
+  <rect data-session="OIP_Ordered_Maintenance_G0_Core" x="28" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Ordered_Maintenance_Entry" x="28" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Write_Canary_Base" x="42" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Write_Canary_Removal" x="42" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Write_Canary_DurableV6" x="56" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Profile" x="56" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_AuthorityV4" x="70" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_ChecksV9" x="70" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Vector_Export" x="84" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Core_Seed" x="84" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Raw_Ack_Seed" x="98" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reference_Write_Capacity" x="98" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reserve_Debit_Finite_Base" x="112" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reserve_Debit_Replay" x="112" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Reserve_Debit_Replay_Export" x="126" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Pending_Lock_Model" x="126" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Pending_Lock_Export" x="140" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Regulatory_Legal_G0" x="140" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Legal_Receipt_Check" x="154" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Legal_Receipt_Export" x="154" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_Core" x="168" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_Seed" x="168" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_G0" x="182" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Protected_Spend_Export" x="182" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Seed_Frame" x="196" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Typed_Model" x="196" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_G0" x="210" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Finite_Model" x="210" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Finite_Export" x="224" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Control_Base" x="224" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Control_G0" x="238" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Finite_Model" x="238" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Handover_Recovery_Export" x="252" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Epoch_Base" x="252" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Epoch_G0" x="266" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Stored_Outcome_Repair" x="266" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Stored_Outcome_Observe_Final" x="280" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Dispatch" x="280" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Install" x="294" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Lookup" x="294" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Finite_Projection" x="308" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_P13_Replay_Export" x="308" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Refund_Origin_Link" x="322" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Refund_Origin_Export" x="322" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Lock_Clock_Model_Link" x="336" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Dispatch_Debit_Lease_Link" x="336" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Legal_Model_Link" x="350" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Owner_Read_Model_Link" x="350" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Maintenance_Selection_Replay_Link" x="364" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Cancel_Fence_Model_Link" x="364" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Write_Reopen_Link" x="378" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Ordinary_Spend_Model_Link" x="378" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Preempt_Model_Link" x="392" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Signed_Handover_Model_Link" x="392" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Concrete_Enforcement_Spend_Model_Link" x="406" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Waiting_Model_Link" x="406" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Unseen_Close_Link" x="420" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Pending_Control_Link" x="420" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Resolver_Current_Control_Link" x="434" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Retained_Write_Receipt" x="434" y="1250.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Confiscate_Prior_Key" x="448" y="1236.35" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 469 1254.97)"><g fill="#a6f0dc"><use href="#fvmaps-g98" x="0"/><use href="#fvmaps-g92" x="1330"/></g></g>
   </g>
   <g data-group="State sync and reads">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1310.7)"><g fill="#d3def5"><use href="#fvmaps-g62" x="0"/><use href="#fvmaps-g63" x="1332"/><use href="#fvmaps-g59" x="2065"/><use href="#fvmaps-g63" x="3241"/><use href="#fvmaps-g64" x="3944"/><use href="#fvmaps-g55" x="5671"/><use href="#fvmaps-g71" x="6796"/><use href="#fvmaps-g61" x="8001"/><use href="#fvmaps-g73" x="9254"/><use href="#fvmaps-g59" x="10963"/><use href="#fvmaps-g61" x="12139"/><use href="#fvmaps-g81" x="13392"/><use href="#fvmaps-g53" x="15186"/><use href="#fvmaps-g64" x="15954"/><use href="#fvmaps-g59" x="17185"/><use href="#fvmaps-g81" x="18361"/><use href="#fvmaps-g55" x="19639"/></g></g>
-  <rect data-session="OIP_Sync_V061_Wire_V4" x="28" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Definitions" x="28" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Proofs" x="42" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Originals" x="42" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Boundary" x="56" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Selection" x="56" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Provider" x="70" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Concrete_Supplier_V2" x="70" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Direct_IR" x="84" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Transport" x="84" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Ack" x="98" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Position_Nested_IR" x="98" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Product_ABI" x="112" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Ack_ABI" x="112" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Extraction_V1" x="126" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Seeds_V1" x="126" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Strict_Proof_Link_V1" x="140" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Mode_Product_ABI" x="140" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Current_Read_G0_V9" x="154" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Current_Read_Vector_Export" x="154" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Typed_Artifact" x="168" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Current_Read_G0_Source" x="168" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Configured_Profile_ABI" x="182" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Supplier_ABI" x="182" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Image_Link" x="196" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_ID_Guard_ABI_V2" x="196" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Sync_V061_Image_Binding_ABI" x="210" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Query_Cache_Source_G0" x="210" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Query_Cache_Source_Export" x="224" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Query6_Capture_G0" x="224" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Query6_Capture_Export" x="238" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Secondary_Read_G0" x="238" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Secondary_Read_Export" x="252" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Historical_Read_G0" x="252" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Historical_Read_Export" x="266" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Raw_Terminal_Read_Model_Link" x="266" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Cache_Capture_Model_Link" x="280" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Historical_Source_Pool_Link" x="280" y="1334.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Unpublished_Typed_Read_Link" x="294" y="1320.05" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 315 1338.67)"><g fill="#a6f0dc"><use href="#fvmaps-g99" x="0"/><use href="#fvmaps-g93" x="1322"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1288.95)"><g fill="#d3def5"><use href="#fvmaps-g62" x="0"/><use href="#fvmaps-g63" x="1332"/><use href="#fvmaps-g59" x="2065"/><use href="#fvmaps-g63" x="3241"/><use href="#fvmaps-g64" x="3944"/><use href="#fvmaps-g55" x="5671"/><use href="#fvmaps-g71" x="6796"/><use href="#fvmaps-g61" x="8001"/><use href="#fvmaps-g73" x="9254"/><use href="#fvmaps-g59" x="10963"/><use href="#fvmaps-g61" x="12139"/><use href="#fvmaps-g81" x="13392"/><use href="#fvmaps-g53" x="15186"/><use href="#fvmaps-g64" x="15954"/><use href="#fvmaps-g59" x="17185"/><use href="#fvmaps-g81" x="18361"/><use href="#fvmaps-g55" x="19639"/></g></g>
+  <rect data-session="OIP_Sync_V061_Wire_V4" x="28" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Definitions" x="28" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Proofs" x="42" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Originals" x="42" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Boundary" x="56" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Selection" x="56" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Provider" x="70" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Concrete_Supplier_V2" x="70" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Direct_IR" x="84" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Transport" x="84" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Ack" x="98" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Position_Nested_IR" x="98" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Product_ABI" x="112" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Ack_ABI" x="112" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Extraction_V1" x="126" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Seeds_V1" x="126" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Strict_Proof_Link_V1" x="140" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Mode_Product_ABI" x="140" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Current_Read_G0_V9" x="154" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Current_Read_Vector_Export" x="154" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Typed_Artifact" x="168" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Current_Read_G0_Source" x="168" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Configured_Profile_ABI" x="182" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Supplier_ABI" x="182" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Image_Link" x="196" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_ID_Guard_ABI_V2" x="196" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Sync_V061_Image_Binding_ABI" x="210" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query_Cache_Source_G0" x="210" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query_Cache_Source_Export" x="224" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query6_Capture_G0" x="224" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query6_Capture_Export" x="238" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Secondary_Read_G0" x="238" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Secondary_Read_Export" x="252" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Historical_Read_G0" x="252" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Historical_Read_Export" x="266" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Raw_Terminal_Read_Model_Link" x="266" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Cache_Capture_Model_Link" x="280" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Historical_Source_Pool_Link" x="280" y="1312.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Unpublished_Typed_Read_Link" x="294" y="1298.3" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 315 1316.92)"><g fill="#a6f0dc"><use href="#fvmaps-g94" x="0"/><use href="#fvmaps-g93" x="1322"/></g></g>
   </g>
   <g data-group="Persistence and recovery">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1372.65)"><g fill="#d3def5"><use href="#fvmaps-g65" x="0"/><use href="#fvmaps-g64" x="1306"/><use href="#fvmaps-g53" x="2517"/><use href="#fvmaps-g55" x="3330"/><use href="#fvmaps-g60" x="4455"/><use href="#fvmaps-g55" x="4991"/><use href="#fvmaps-g63" x="6116"/><use href="#fvmaps-g64" x="6819"/><use href="#fvmaps-g61" x="8030"/><use href="#fvmaps-g73" x="9283"/><use href="#fvmaps-g64" x="10476"/><use href="#fvmaps-g59" x="12203"/><use href="#fvmaps-g61" x="13379"/><use href="#fvmaps-g81" x="14632"/><use href="#fvmaps-g53" x="16426"/><use href="#fvmaps-g64" x="17194"/><use href="#fvmaps-g73" x="18405"/><use href="#fvmaps-g54" x="19598"/><use href="#fvmaps-g66" x="20807"/><use href="#fvmaps-g64" x="21971"/><use href="#fvmaps-g53" x="23182"/><use href="#fvmaps-g71" x="24027"/></g></g>
-  <rect data-session="OIP_Record_Reopening_Prefix_G0" x="28" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Direct_Publication_Check" x="28" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Direct_Publication_Export" x="42" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Independent_Publication_Check" x="42" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Independent_Publication_Export" x="56" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Etcd_Control_Confirmation" x="56" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Witness_Mirror_Check" x="70" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Witness_Prepare_Codec_Check" x="70" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Etcd_Replace_Preflight" x="84" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Refund_Source_Certificate_Link" x="84" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Selected_Record_Reopening_Model_Link" x="98" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Retained_Transition_Integrity_Model_Link" x="98" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Retained_Transition_Source_Link" x="112" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Source_Writer_JSON_G0" x="112" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Source_Writer_Phases" x="126" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Source_Writer_Integer_Transport" x="126" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Source_Resume_Link" x="140" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Source_Commitment_Resume_Link" x="140" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Publication_Endorser_Link" x="154" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Witness_Prepare_Compare_Link" x="154" y="1396" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Settlement_Sync_Integrity_Link" x="168" y="1382" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 189 1400.62)"><g fill="#a6f0dc"><use href="#fvmaps-g94" x="0"/><use href="#fvmaps-g92" x="1290"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1350.9)"><g fill="#d3def5"><use href="#fvmaps-g65" x="0"/><use href="#fvmaps-g64" x="1306"/><use href="#fvmaps-g53" x="2517"/><use href="#fvmaps-g55" x="3330"/><use href="#fvmaps-g60" x="4455"/><use href="#fvmaps-g55" x="4991"/><use href="#fvmaps-g63" x="6116"/><use href="#fvmaps-g64" x="6819"/><use href="#fvmaps-g61" x="8030"/><use href="#fvmaps-g73" x="9283"/><use href="#fvmaps-g64" x="10476"/><use href="#fvmaps-g59" x="12203"/><use href="#fvmaps-g61" x="13379"/><use href="#fvmaps-g81" x="14632"/><use href="#fvmaps-g53" x="16426"/><use href="#fvmaps-g64" x="17194"/><use href="#fvmaps-g73" x="18405"/><use href="#fvmaps-g54" x="19598"/><use href="#fvmaps-g66" x="20807"/><use href="#fvmaps-g64" x="21971"/><use href="#fvmaps-g53" x="23182"/><use href="#fvmaps-g71" x="24027"/></g></g>
+  <rect data-session="OIP_Record_Reopening_Prefix_G0" x="28" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Direct_Publication_Check" x="28" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Direct_Publication_Export" x="42" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Independent_Publication_Check" x="42" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Independent_Publication_Export" x="56" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Etcd_Control_Confirmation" x="56" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Witness_Mirror_Check" x="70" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Witness_Prepare_Codec_Check" x="70" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Etcd_Replace_Preflight" x="84" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Refund_Source_Certificate_Link" x="84" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Selected_Record_Reopening_Model_Link" x="98" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Retained_Transition_Integrity_Model_Link" x="98" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Retained_Transition_Source_Link" x="112" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Writer_JSON_G0" x="112" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Writer_Phases" x="126" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Writer_Integer_Transport" x="126" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Resume_Link" x="140" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Source_Commitment_Resume_Link" x="140" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Publication_Endorser_Link" x="154" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Witness_Prepare_Compare_Link" x="154" y="1374.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Settlement_Sync_Integrity_Link" x="168" y="1360.25" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 189 1378.87)"><g fill="#a6f0dc"><use href="#fvmaps-g99" x="0"/><use href="#fvmaps-g92" x="1290"/></g></g>
   </g>
   <g data-group="Ordering and settlement">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1434.6)"><g fill="#d3def5"><use href="#fvmaps-g83" x="0"/><use href="#fvmaps-g53" x="1574"/><use href="#fvmaps-g81" x="2342"/><use href="#fvmaps-g64" x="3620"/><use href="#fvmaps-g53" x="4831"/><use href="#fvmaps-g60" x="5657"/><use href="#fvmaps-g61" x="6193"/><use href="#fvmaps-g68" x="7446"/><use href="#fvmaps-g59" x="9243"/><use href="#fvmaps-g61" x="10419"/><use href="#fvmaps-g81" x="11672"/><use href="#fvmaps-g55" x="13466"/><use href="#fvmaps-g64" x="14591"/><use href="#fvmaps-g63" x="15802"/><use href="#fvmaps-g63" x="16511"/><use href="#fvmaps-g70" x="17238"/><use href="#fvmaps-g64" x="17774"/><use href="#fvmaps-g58" x="18985"/><use href="#fvmaps-g64" x="20829"/><use href="#fvmaps-g61" x="22040"/><use href="#fvmaps-g63" x="23293"/></g></g>
-  <rect data-session="OIP_Settlement_Queue_G0" x="28" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Terminal_Record_G0" x="28" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Terminal_Record_Export" x="42" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Primary_Origin_Check" x="42" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Primary_Origin_Export" x="56" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Schedule_Core" x="56" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Typed_Scheduler" x="70" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Schedule_Product" x="70" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Schedule_Cases" x="84" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Schedule_Export" x="84" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Schedule_Boundaries" x="98" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Schedule_Pair" x="98" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Schedule_Refusals" x="112" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_ACK1_Entry" x="112" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Signed_Publish_Primary_Model_Link" x="126" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Receiver_State_Branches" x="126" y="1457.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Receiver_State_ABI" x="140" y="1443.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 161 1462.57)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g100" x="883"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1412.85)"><g fill="#d3def5"><use href="#fvmaps-g83" x="0"/><use href="#fvmaps-g53" x="1574"/><use href="#fvmaps-g81" x="2342"/><use href="#fvmaps-g64" x="3620"/><use href="#fvmaps-g53" x="4831"/><use href="#fvmaps-g60" x="5657"/><use href="#fvmaps-g61" x="6193"/><use href="#fvmaps-g68" x="7446"/><use href="#fvmaps-g59" x="9243"/><use href="#fvmaps-g61" x="10419"/><use href="#fvmaps-g81" x="11672"/><use href="#fvmaps-g55" x="13466"/><use href="#fvmaps-g64" x="14591"/><use href="#fvmaps-g63" x="15802"/><use href="#fvmaps-g63" x="16511"/><use href="#fvmaps-g70" x="17238"/><use href="#fvmaps-g64" x="17774"/><use href="#fvmaps-g58" x="18985"/><use href="#fvmaps-g64" x="20829"/><use href="#fvmaps-g61" x="22040"/><use href="#fvmaps-g63" x="23293"/></g></g>
+  <rect data-session="OIP_Settlement_Queue_G0" x="28" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Terminal_Record_G0" x="28" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Terminal_Record_Export" x="42" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Primary_Origin_Check" x="42" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Primary_Origin_Export" x="56" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Core" x="56" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Typed_Scheduler" x="70" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Product" x="70" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Cases" x="84" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Export" x="84" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Schedule_Boundaries" x="98" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Schedule_Pair" x="98" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Schedule_Refusals" x="112" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_ACK1_Entry" x="112" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Signed_Publish_Primary_Model_Link" x="126" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Receiver_State_Branches" x="126" y="1436.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Receiver_State_ABI" x="140" y="1422.2" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 161 1440.82)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g100" x="883"/></g></g>
   </g>
   <g data-group="Wire and authentication">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1496.55)"><g fill="#d3def5"><use href="#fvmaps-g101" x="0"/><use href="#fvmaps-g60" x="2089"/><use href="#fvmaps-g53" x="2625"/><use href="#fvmaps-g64" x="3393"/><use href="#fvmaps-g59" x="5120"/><use href="#fvmaps-g61" x="6296"/><use href="#fvmaps-g81" x="7549"/><use href="#fvmaps-g59" x="9343"/><use href="#fvmaps-g69" x="10519"/><use href="#fvmaps-g63" x="11773"/><use href="#fvmaps-g75" x="12500"/><use href="#fvmaps-g64" x="13754"/><use href="#fvmaps-g61" x="14965"/><use href="#fvmaps-g63" x="16218"/><use href="#fvmaps-g60" x="16941"/><use href="#fvmaps-g73" x="17477"/><use href="#fvmaps-g59" x="18690"/><use href="#fvmaps-g63" x="19866"/><use href="#fvmaps-g60" x="20589"/><use href="#fvmaps-g54" x="21125"/><use href="#fvmaps-g61" x="22372"/></g></g>
-  <rect data-session="OIP_V062_Negotiation_Public_Bridge" x="28" y="1505.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Transport_Boundary_Arithmetic" x="28" y="1519.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Transport_Boundary_Typed" x="42" y="1505.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Transport_Boundary_G0" x="42" y="1519.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_P19_Threshold_G0" x="56" y="1505.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_P19_Threshold_Export" x="56" y="1519.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_P19_Configured_Registry_G0" x="70" y="1505.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_P19_Configured_Registry_Export" x="70" y="1519.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Threshold_Raw_Identity" x="84" y="1505.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Go_Admitted_Operand_Model_Link" x="84" y="1519.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Active_Session_Grant_Link" x="98" y="1505.9" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Negotiation_Core" x="122.725" y="1506.72" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="OIP_V062_Negotiation_G0" x="122.725" y="1520.72" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="OIP_V062_Negotiation_Authentication" x="136.725" y="1506.72" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="OIP_V062_Negotiation_Export" x="136.725" y="1520.72" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 156.9 1524.52)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g102" x="883"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1474.8)"><g fill="#d3def5"><use href="#fvmaps-g101" x="0"/><use href="#fvmaps-g60" x="2089"/><use href="#fvmaps-g53" x="2625"/><use href="#fvmaps-g64" x="3393"/><use href="#fvmaps-g59" x="5120"/><use href="#fvmaps-g61" x="6296"/><use href="#fvmaps-g81" x="7549"/><use href="#fvmaps-g59" x="9343"/><use href="#fvmaps-g69" x="10519"/><use href="#fvmaps-g63" x="11773"/><use href="#fvmaps-g75" x="12500"/><use href="#fvmaps-g64" x="13754"/><use href="#fvmaps-g61" x="14965"/><use href="#fvmaps-g63" x="16218"/><use href="#fvmaps-g60" x="16941"/><use href="#fvmaps-g73" x="17477"/><use href="#fvmaps-g59" x="18690"/><use href="#fvmaps-g63" x="19866"/><use href="#fvmaps-g60" x="20589"/><use href="#fvmaps-g54" x="21125"/><use href="#fvmaps-g61" x="22372"/></g></g>
+  <rect data-session="OIP_V062_Negotiation_Public_Bridge" x="28" y="1484.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Transport_Boundary_Arithmetic" x="28" y="1498.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Transport_Boundary_Typed" x="42" y="1484.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Transport_Boundary_G0" x="42" y="1498.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Threshold_G0" x="56" y="1484.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Threshold_Export" x="56" y="1498.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Configured_Registry_G0" x="70" y="1484.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_P19_Configured_Registry_Export" x="70" y="1498.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Threshold_Raw_Identity" x="84" y="1484.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Go_Admitted_Operand_Model_Link" x="84" y="1498.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Active_Session_Grant_Link" x="98" y="1484.15" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Negotiation_Core" x="122.725" y="1484.97" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="OIP_V062_Negotiation_G0" x="122.725" y="1498.97" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="OIP_V062_Negotiation_Authentication" x="136.725" y="1484.97" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="OIP_V062_Negotiation_Export" x="136.725" y="1498.97" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 156.9 1502.77)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g102" x="883"/></g></g>
   </g>
   <g data-group="Responses and receipts">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1558.5)"><g fill="#d3def5"><use href="#fvmaps-g67" x="0"/><use href="#fvmaps-g64" x="1310"/><use href="#fvmaps-g55" x="2521"/><use href="#fvmaps-g74" x="3646"/><use href="#fvmaps-g54" x="4924"/><use href="#fvmaps-g61" x="6171"/><use href="#fvmaps-g55" x="7424"/><use href="#fvmaps-g64" x="8549"/><use href="#fvmaps-g55" x="9760"/><use href="#fvmaps-g59" x="11401"/><use href="#fvmaps-g61" x="12577"/><use href="#fvmaps-g81" x="13830"/><use href="#fvmaps-g53" x="15624"/><use href="#fvmaps-g64" x="16392"/><use href="#fvmaps-g73" x="17603"/><use href="#fvmaps-g64" x="18796"/><use href="#fvmaps-g60" x="20007"/><use href="#fvmaps-g74" x="20543"/><use href="#fvmaps-g63" x="21821"/><use href="#fvmaps-g55" x="22527"/></g></g>
-  <rect data-session="OIP_Response_Code_IntInf_Runtime" x="28" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Code_Allocation" x="28" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Code_Extension" x="42" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Egress_V061_Runtime_V7" x="42" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Egress_V061_Preservation_V7" x="56" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Egress_V061_Operands" x="56" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Egress_V061_V5" x="70" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Egress_V061_Export" x="70" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Completion_Gates" x="84" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Completion_Gates_Export" x="84" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Exact_Receipt_Core_Comparison" x="98" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Query8_Scope_Binding" x="98" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_Response_Signer_Parse_Probe" x="112" y="1567.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="OIP_V062_Response_Profile_Guard" x="112" y="1581.85" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 133 1586.47)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g103" x="883"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1536.75)"><g fill="#d3def5"><use href="#fvmaps-g67" x="0"/><use href="#fvmaps-g64" x="1310"/><use href="#fvmaps-g55" x="2521"/><use href="#fvmaps-g74" x="3646"/><use href="#fvmaps-g54" x="4924"/><use href="#fvmaps-g61" x="6171"/><use href="#fvmaps-g55" x="7424"/><use href="#fvmaps-g64" x="8549"/><use href="#fvmaps-g55" x="9760"/><use href="#fvmaps-g59" x="11401"/><use href="#fvmaps-g61" x="12577"/><use href="#fvmaps-g81" x="13830"/><use href="#fvmaps-g53" x="15624"/><use href="#fvmaps-g64" x="16392"/><use href="#fvmaps-g73" x="17603"/><use href="#fvmaps-g64" x="18796"/><use href="#fvmaps-g60" x="20007"/><use href="#fvmaps-g74" x="20543"/><use href="#fvmaps-g63" x="21821"/><use href="#fvmaps-g55" x="22527"/></g></g>
+  <rect data-session="OIP_Response_Code_IntInf_Runtime" x="28" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Code_Allocation" x="28" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Code_Extension" x="42" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Runtime_V7" x="42" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Preservation_V7" x="56" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Operands" x="56" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_V5" x="70" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Egress_V061_Export" x="70" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Completion_Gates" x="84" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Completion_Gates_Export" x="84" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Exact_Receipt_Core_Comparison" x="98" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Query8_Scope_Binding" x="98" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_Response_Signer_Parse_Probe" x="112" y="1546.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="OIP_V062_Response_Profile_Guard" x="112" y="1560.1" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 133 1564.72)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g103" x="883"/></g></g>
   </g>
-  <g data-group="Trace contracts">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1620.45)"><g fill="#d3def5"><use href="#fvmaps-g104" x="0"/><use href="#fvmaps-g53" x="1236"/><use href="#fvmaps-g59" x="2030"/><use href="#fvmaps-g73" x="3206"/><use href="#fvmaps-g64" x="4399"/><use href="#fvmaps-g73" x="6126"/><use href="#fvmaps-g54" x="7319"/><use href="#fvmaps-g61" x="8566"/><use href="#fvmaps-g63" x="9819"/><use href="#fvmaps-g53" x="10542"/><use href="#fvmaps-g59" x="11336"/><use href="#fvmaps-g73" x="12512"/><use href="#fvmaps-g63" x="13705"/><use href="#fvmaps-g55" x="14411"/></g></g>
-  <rect data-session="Operational_Trace_Contracts" x="38.725" y="1630.62" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 58.9 1648.42)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/></g></g>
+  <g data-group="Transition contracts">
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1598.7)"><g fill="#d3def5"><use href="#fvmaps-g104" x="0"/><use href="#fvmaps-g53" x="1236"/><use href="#fvmaps-g59" x="2030"/><use href="#fvmaps-g61" x="3206"/><use href="#fvmaps-g55" x="4459"/><use href="#fvmaps-g60" x="5584"/><use href="#fvmaps-g63" x="6120"/><use href="#fvmaps-g60" x="6843"/><use href="#fvmaps-g54" x="7379"/><use href="#fvmaps-g61" x="8626"/><use href="#fvmaps-g73" x="10395"/><use href="#fvmaps-g54" x="11588"/><use href="#fvmaps-g61" x="12835"/><use href="#fvmaps-g63" x="14088"/><use href="#fvmaps-g53" x="14811"/><use href="#fvmaps-g59" x="15605"/><use href="#fvmaps-g73" x="16781"/><use href="#fvmaps-g63" x="17974"/><use href="#fvmaps-g55" x="18680"/></g></g>
+  <rect data-session="Operational_Trace_Contracts" x="38.725" y="1608.87" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 58.9 1626.67)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/></g></g>
   </g>
   <g data-group="Regulatory execution">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1682.4)"><g fill="#d3def5"><use href="#fvmaps-g67" x="0"/><use href="#fvmaps-g64" x="1310"/><use href="#fvmaps-g68" x="2521"/><use href="#fvmaps-g69" x="3802"/><use href="#fvmaps-g70" x="5056"/><use href="#fvmaps-g59" x="5592"/><use href="#fvmaps-g63" x="6768"/><use href="#fvmaps-g54" x="7471"/><use href="#fvmaps-g53" x="8718"/><use href="#fvmaps-g71" x="9563"/><use href="#fvmaps-g64" x="11284"/><use href="#fvmaps-g91" x="12452"/><use href="#fvmaps-g64" x="13574"/><use href="#fvmaps-g73" x="14785"/><use href="#fvmaps-g69" x="15978"/><use href="#fvmaps-g63" x="17232"/><use href="#fvmaps-g60" x="17955"/><use href="#fvmaps-g54" x="18491"/><use href="#fvmaps-g61" x="19738"/></g></g>
-  <rect data-session="REOS_Rollback_Legacy" x="28" y="1691.75" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="REOS_Rollback" x="52.725" y="1692.57" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="REOS_Rollback_Examples" x="52.725" y="1706.57" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="REOS_Open_Scheduler" x="66.725" y="1692.57" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="REOS_Request_Progress" x="66.725" y="1706.57" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="REOS_Scheduler_Controls" x="80.725" y="1692.57" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 100.9 1710.37)"><g fill="#a6f0dc"><use href="#fvmaps-g98" x="0"/></g></g>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1660.65)"><g fill="#d3def5"><use href="#fvmaps-g67" x="0"/><use href="#fvmaps-g64" x="1310"/><use href="#fvmaps-g68" x="2521"/><use href="#fvmaps-g69" x="3802"/><use href="#fvmaps-g70" x="5056"/><use href="#fvmaps-g59" x="5592"/><use href="#fvmaps-g63" x="6768"/><use href="#fvmaps-g54" x="7471"/><use href="#fvmaps-g53" x="8718"/><use href="#fvmaps-g71" x="9563"/><use href="#fvmaps-g64" x="11284"/><use href="#fvmaps-g91" x="12452"/><use href="#fvmaps-g64" x="13574"/><use href="#fvmaps-g73" x="14785"/><use href="#fvmaps-g69" x="15978"/><use href="#fvmaps-g63" x="17232"/><use href="#fvmaps-g60" x="17955"/><use href="#fvmaps-g54" x="18491"/><use href="#fvmaps-g61" x="19738"/></g></g>
+  <rect data-session="REOS_Rollback_Legacy" x="28" y="1670" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="REOS_Rollback" x="52.725" y="1670.82" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="REOS_Rollback_Examples" x="52.725" y="1684.82" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="REOS_Open_Scheduler" x="66.725" y="1670.82" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="REOS_Request_Progress" x="66.725" y="1684.82" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="REOS_Scheduler_Controls" x="80.725" y="1670.82" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="REOS_Scoped_Service" x="80.725" y="1684.82" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 100.9 1688.62)"><g fill="#a6f0dc"><use href="#fvmaps-g100" x="0"/></g></g>
   </g>
-  <g data-group="State preservation">
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1744.35)"><g fill="#d3def5"><use href="#fvmaps-g62" x="0"/><use href="#fvmaps-g63" x="1332"/><use href="#fvmaps-g59" x="2065"/><use href="#fvmaps-g63" x="3241"/><use href="#fvmaps-g64" x="3944"/><use href="#fvmaps-g74" x="5671"/><use href="#fvmaps-g53" x="6949"/><use href="#fvmaps-g64" x="7717"/><use href="#fvmaps-g55" x="8928"/><use href="#fvmaps-g64" x="10053"/><use href="#fvmaps-g53" x="11264"/><use href="#fvmaps-g66" x="12109"/><use href="#fvmaps-g59" x="13294"/><use href="#fvmaps-g63" x="14470"/><use href="#fvmaps-g60" x="15193"/><use href="#fvmaps-g54" x="15729"/><use href="#fvmaps-g61" x="16976"/></g></g>
-  <rect data-session="DOSP_Legacy" x="28" y="1753.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_EAB_Coupling" x="28" y="1767.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_EAB_Coupling_Cases" x="42" y="1753.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_EAB_Lifecycle_Cases" x="42" y="1767.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_Integrated_Authority" x="56" y="1753.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_Integrated_Cases" x="56" y="1767.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_Integrated_Recovery" x="70" y="1753.7" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
-  <rect data-session="DOSP_Progress" x="94.725" y="1754.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Degree" x="94.725" y="1768.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Recovery" x="108.725" y="1754.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Views" x="108.725" y="1768.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_OIP_Profile" x="122.725" y="1754.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Atomic_Comparison" x="122.725" y="1768.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Quiet_Run_Comparison" x="136.725" y="1754.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Rollback_Trade_Recovery" x="136.725" y="1768.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Router_Metadata_Projection" x="150.725" y="1754.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Billing_Epoch_Projection" x="150.725" y="1768.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <rect data-session="DOSP_Terminal_Repair" x="164.725" y="1754.52" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
-  <g class="t" transform="matrix(.0083008 0 0 .0083008 184.9 1772.32)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g105" x="883"/></g></g>
+  <g data-group="Operational preservation">
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 28 1722.6)"><g fill="#d3def5"><use href="#fvmaps-g83" x="0"/><use href="#fvmaps-g74" x="1574"/><use href="#fvmaps-g64" x="2852"/><use href="#fvmaps-g53" x="4063"/><use href="#fvmaps-g59" x="4857"/><use href="#fvmaps-g63" x="6033"/><use href="#fvmaps-g60" x="6756"/><use href="#fvmaps-g54" x="7292"/><use href="#fvmaps-g61" x="8539"/><use href="#fvmaps-g59" x="9792"/><use href="#fvmaps-g70" x="10968"/><use href="#fvmaps-g74" x="12020"/><use href="#fvmaps-g53" x="13298"/><use href="#fvmaps-g64" x="14066"/><use href="#fvmaps-g55" x="15277"/><use href="#fvmaps-g64" x="16402"/><use href="#fvmaps-g53" x="17613"/><use href="#fvmaps-g66" x="18458"/><use href="#fvmaps-g59" x="19643"/><use href="#fvmaps-g63" x="20819"/><use href="#fvmaps-g60" x="21542"/><use href="#fvmaps-g54" x="22078"/><use href="#fvmaps-g61" x="23325"/></g></g>
+  <rect data-session="DOSP_Legacy" x="28" y="1731.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_EAB_Coupling" x="28" y="1745.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_EAB_Coupling_Cases" x="42" y="1731.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_EAB_Lifecycle_Cases" x="42" y="1745.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_Integrated_Authority" x="56" y="1731.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_Integrated_Cases" x="56" y="1745.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_Integrated_Recovery" x="70" y="1731.95" width="11" height="11" rx="2.42" fill="#5ccfb0"/>
+  <rect data-session="DOSP_Progress" x="94.725" y="1732.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Degree" x="94.725" y="1746.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Recovery" x="108.725" y="1732.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Views" x="108.725" y="1746.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_OIP_Profile" x="122.725" y="1732.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Atomic_Comparison" x="122.725" y="1746.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Quiet_Run_Comparison" x="136.725" y="1732.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Rollback_Trade_Recovery" x="136.725" y="1746.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Router_Metadata_Projection" x="150.725" y="1732.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Billing_Epoch_Projection" x="150.725" y="1746.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <rect data-session="DOSP_Terminal_Repair" x="164.725" y="1732.77" width="9.35" height="9.35" rx="2.2" fill="none" stroke="#5ccfb0" stroke-width="1.65"/>
+  <g class="t" transform="matrix(.0083008 0 0 .0083008 184.9 1750.57)"><g fill="#a6f0dc"><use href="#fvmaps-g92" x="0"/><use href="#fvmaps-g105" x="883"/></g></g>
   </g>
-  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1820.7)"><g fill="#7f93bd"><use href="#fvmaps-g41" x="0"/><use href="#fvmaps-g23" x="1158"/><use href="#fvmaps-g24" x="1654"/><use href="#fvmaps-g25" x="2864"/><use href="#fvmaps-g28" x="4058"/><use href="#fvmaps-g28" x="5715"/><use href="#fvmaps-g21" x="6796"/><use href="#fvmaps-g30" x="8007"/><use href="#fvmaps-g106" x="9198"/><use href="#fvmaps-g28" x="11450"/><use href="#fvmaps-g25" x="12531"/><use href="#fvmaps-g28" x="13725"/><use href="#fvmaps-g28" x="14806"/><use href="#fvmaps-g23" x="15887"/><use href="#fvmaps-g30" x="16383"/><use href="#fvmaps-g24" x="17611"/><use href="#fvmaps-g23" x="19397"/><use href="#fvmaps-g31" x="19893"/><use href="#fvmaps-g33" x="21687"/><use href="#fvmaps-g30" x="22941"/><use href="#fvmaps-g26" x="24169"/><use href="#fvmaps-g32" x="24972"/><use href="#fvmaps-g28" x="25622"/><use href="#fvmaps-g34" x="26703"/><use href="#fvmaps-g107" x="27869"/><use href="#fvmaps-g21" x="29191"/><use href="#fvmaps-g25" x="30402"/><use href="#fvmaps-g20" x="32172"/><use href="#fvmaps-g30" x="33342"/><use href="#fvmaps-g31" x="34570"/><use href="#fvmaps-g33" x="36364"/><use href="#fvmaps-g19" x="37638"/><use href="#fvmaps-g24" x="38788"/><use href="#fvmaps-g23" x="39998"/><use href="#fvmaps-g30" x="40494"/><use href="#fvmaps-g24" x="41722"/><use href="#fvmaps-g108" x="43508"/><use href="#fvmaps-g25" x="45358"/><use href="#fvmaps-g26" x="46552"/><use href="#fvmaps-g31" x="47355"/><use href="#fvmaps-g19" x="49149"/><use href="#fvmaps-g23" x="50299"/><use href="#fvmaps-g86" x="50795"/><use href="#fvmaps-g97" x="52625"/><use href="#fvmaps-g26" x="53881"/><use href="#fvmaps-g19" x="54652"/><use href="#fvmaps-g33" x="55802"/><use href="#fvmaps-g21" x="57056"/><use href="#fvmaps-g22" x="58843"/><use href="#fvmaps-g23" x="59339"/><use href="#fvmaps-g28" x="59835"/><use href="#fvmaps-g32" x="60916"/><use href="#fvmaps-g28" x="61566"/><use href="#fvmaps-g25" x="63223"/><use href="#fvmaps-g109" x="64377"/><use href="#fvmaps-g25" x="65488"/><use href="#fvmaps-g26" x="66682"/><use href="#fvmaps-g44" x="67485"/></g></g>
-  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1842.45)"><g fill="#7f93bd"><use href="#fvmaps-g26" x="0"/><use href="#fvmaps-g25" x="737"/><use href="#fvmaps-g97" x="1931"/><use href="#fvmaps-g23" x="3187"/><use href="#fvmaps-g28" x="3683"/><use href="#fvmaps-g32" x="4764"/><use href="#fvmaps-g25" x="5414"/><use href="#fvmaps-g26" x="6608"/><use href="#fvmaps-g25" x="7345"/><use href="#fvmaps-g86" x="8539"/><use href="#fvmaps-g25" x="10369"/><use href="#fvmaps-g86" x="11563"/><use href="#fvmaps-g97" x="12817"/><use href="#fvmaps-g25" x="14073"/><use href="#fvmaps-g34" x="15267"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1798.95)"><g fill="#7f93bd"><use href="#fvmaps-g41" x="0"/><use href="#fvmaps-g23" x="1158"/><use href="#fvmaps-g24" x="1654"/><use href="#fvmaps-g25" x="2864"/><use href="#fvmaps-g28" x="4058"/><use href="#fvmaps-g28" x="5715"/><use href="#fvmaps-g21" x="6796"/><use href="#fvmaps-g30" x="8007"/><use href="#fvmaps-g106" x="9198"/><use href="#fvmaps-g107" x="11450"/><use href="#fvmaps-g40" x="12768"/><use href="#fvmaps-g40" x="14334"/><use href="#fvmaps-g108" x="15839"/><use href="#fvmaps-g23" x="17737"/><use href="#fvmaps-g31" x="18233"/><use href="#fvmaps-g33" x="20027"/><use href="#fvmaps-g30" x="21281"/><use href="#fvmaps-g26" x="22509"/><use href="#fvmaps-g32" x="23312"/><use href="#fvmaps-g28" x="23962"/><use href="#fvmaps-g87" x="25043"/><use href="#fvmaps-g24" x="26209"/><use href="#fvmaps-g30" x="27419"/><use href="#fvmaps-g32" x="28647"/><use href="#fvmaps-g86" x="29893"/><use href="#fvmaps-g25" x="31147"/><use href="#fvmaps-g33" x="32341"/><use href="#fvmaps-g22" x="33595"/><use href="#fvmaps-g30" x="34091"/><use href="#fvmaps-g44" x="35279"/><use href="#fvmaps-g31" x="36430"/><use href="#fvmaps-g25" x="38224"/><use href="#fvmaps-g24" x="39418"/><use href="#fvmaps-g32" x="40628"/><use href="#fvmaps-g28" x="41874"/><use href="#fvmaps-g32" x="42955"/><use href="#fvmaps-g25" x="43605"/><use href="#fvmaps-g33" x="44799"/><use href="#fvmaps-g28" x="46053"/><use href="#fvmaps-g30" x="47710"/><use href="#fvmaps-g26" x="48938"/></g></g>
+  <g class="t" transform="matrix(.0073242 0 0 .0073242 28 1820.7)"><g fill="#7f93bd"><use href="#fvmaps-g106" x="0"/><use href="#fvmaps-g21" x="1676"/><use href="#fvmaps-g30" x="2887"/><use href="#fvmaps-g22" x="4115"/><use href="#fvmaps-g25" x="4611"/><use href="#fvmaps-g109" x="5805"/><use href="#fvmaps-g23" x="6747"/><use href="#fvmaps-g31" x="7243"/><use href="#fvmaps-g33" x="9037"/><use href="#fvmaps-g22" x="10291"/><use href="#fvmaps-g25" x="10787"/><use href="#fvmaps-g31" x="11981"/><use href="#fvmaps-g25" x="13775"/><use href="#fvmaps-g24" x="14969"/><use href="#fvmaps-g32" x="16179"/><use href="#fvmaps-g19" x="16859"/><use href="#fvmaps-g32" x="18009"/><use href="#fvmaps-g23" x="18679"/><use href="#fvmaps-g30" x="19175"/><use href="#fvmaps-g24" x="20403"/><use href="#fvmaps-g110" x="22189"/><use href="#fvmaps-g25" x="23300"/><use href="#fvmaps-g26" x="24494"/><use href="#fvmaps-g23" x="25285"/><use href="#fvmaps-g29" x="25781"/><use href="#fvmaps-g23" x="26539"/><use href="#fvmaps-g20" x="27035"/><use href="#fvmaps-g19" x="28225"/><use href="#fvmaps-g32" x="29375"/><use href="#fvmaps-g23" x="30045"/><use href="#fvmaps-g30" x="30541"/><use href="#fvmaps-g24" x="31769"/><use href="#fvmaps-g34" x="32979"/></g></g>
 </svg>

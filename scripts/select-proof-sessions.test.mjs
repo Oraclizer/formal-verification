@@ -128,6 +128,7 @@ const regulatoryExecutionSessions = [
   "REOS_Open_Scheduler",
   "REOS_Request_Progress",
   "REOS_Scheduler_Controls",
+  "REOS_Scoped_Service",
 ];
 const dospIntegratedSessions = [
   "DOSP_Integrated_Authority",
@@ -258,10 +259,16 @@ test("the shared trace theory selects its regulatory execution and DOSP consumer
 test("the supplied completion proof rebuilds request-progress and recovery consumers", () => {
   const selected = selectProofSessions(root, ["DOSP_Progress/Recovery_Progress.thy"]);
   assert.deepEqual(selected.productSessions, [
-    "DOSP_Progress", "REOS_Request_Progress", "REOS_Scheduler_Controls",
+    "DOSP_Progress", "REOS_Request_Progress", "REOS_Scheduler_Controls", "REOS_Scoped_Service",
     "DOSP_Recovery", "DOSP_Views", "DOSP_Legacy", "DOSP_OIP_Profile", "DOSP_Atomic_Comparison",
     "DOSP_Quiet_Run_Comparison", "DOSP_Rollback_Trade_Recovery", "DOSP_Terminal_Repair", ...dospEabConsumers,
   ]);
+  assert.equal(selected.audit, false);
+});
+
+test("a scoped service theory selects its registered session", () => {
+  const selected = selectProofSessions(root, ["REOS_Scheduler/scoped/Scoped_Dispatch.thy"]);
+  assert.deepEqual(selected.productSessions, ["REOS_Scoped_Service"]);
   assert.equal(selected.audit, false);
 });
 
