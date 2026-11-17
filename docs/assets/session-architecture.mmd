@@ -211,6 +211,7 @@ flowchart TB
     REOS_Rollback_Examples["REOS_Rollback_Examples"]
     REOS_Rollback_Legacy["REOS_Rollback_Legacy"]
     REOS_Scheduler_Controls["REOS_Scheduler_Controls"]
+    REOS_Scoped_Service["REOS_Scoped_Service"]
     Regulatory_Action_Composition["Regulatory_Action_Composition"]
     HOL_Library --> Cross_Domain_State_Preservation
     HOL_Eisbach --> Cross_Domain_State_Preservation
@@ -454,6 +455,7 @@ flowchart TB
     DOSP_Progress --> REOS_Request_Progress
     REOS_Request_Progress --> REOS_Scheduler_Controls
     REOS_Rollback_Examples --> REOS_Scheduler_Controls
+    REOS_Scheduler_Controls --> REOS_Scoped_Service
     Operational_Trace_Contracts --> DOSP_Degree
     DOSP_Progress --> DOSP_Recovery
     DOSP_Recovery --> DOSP_Views

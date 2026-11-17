@@ -21,3 +21,7 @@ With the repository's Isabelle2025-2 and AFP ADS_Functor prerequisites:
 ~~~
 isabelle build -d . DOSP_Progress REOS_Scheduler_Controls
 ~~~
+
+The [scoped service extension](scoped/README.md) binds a certified current
+order to a committed effect, retains the exact receipt across later
+operations, and derives a request bound in actual service slots.

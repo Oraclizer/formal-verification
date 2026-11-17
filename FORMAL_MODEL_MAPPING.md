@@ -36,6 +36,16 @@ All theory files mapped below are mechanically checked by Isabelle/HOL 2025-2 wi
 
 The [rollback contracts](REOS_Rollback/README.md) verify authority, footprint restoration, terminal effects and budget accounting for the abstract rollback transition. Runtime authentication, durable records and external abort and finality evidence remain interface obligations.
 
+### Scoped regulatory and ordinary service
+
+The [scoped service](REOS_Scheduler/scoped/README.md) relates certified
+orders and complete comparison states to actual model effects and exact
+receipts. It supplies the finite-case interference bound to the request
+progress theorem and records the boundary for absent service, unlimited
+new cases, and legal lowering. Native observations must reconstruct the
+compared state and carry the applicable signature, grant, and ledger
+evidence to establish product correspondence.
+
 ### Dynamic operational state preservation
 
 The [operational preservation model](Dynamic_Operational_State_Preservation/README.md)
